@@ -1,0 +1,92 @@
+//General import
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Set;
+import java.util.HashSet;
+
+/**
+ * This is a key listener which is used to register ctrl z, ctrl y, and ctrl s.
+ *
+ * @author Will Jeong
+ * @version 2.0
+ * @since 2019-02-19
+ */
+
+
+public class CustomKeyListener implements KeyListener {
+
+   //W is -1, S is 1, A is -1, D is 1
+   //Instance variables
+   private Set<Integer> pressed = new HashSet<Integer>();
+   private int[] direction = new int[2];//WASD
+
+   //Start of methods that are implemented from KeyListener
+
+   /**
+    * This is not used, just implemented.
+    *
+    * @param e, a KeyEvent
+    */
+   @Override
+   public void keyTyped(KeyEvent e) {
+   }
+
+   /**
+    * This activates the direction
+    *
+    * @param e, a KeyEvent
+    */
+   @Override
+   public void keyPressed(KeyEvent e) {
+      pressed.add(e.getKeyCode());
+   }
+
+   /**
+    * This removes the keys in the set to ensure that sensing multiple buttons works.
+    *
+    * @param e, a KeyEvent
+    */
+   @Override
+   public void keyReleased(KeyEvent e) {
+      pressed.remove(e.getKeyCode());
+   }
+
+   //End of methods that are implemented from KeyListener
+
+   //Getters and setters
+
+   public double getAngle() {
+      direction[0] = 0;
+      direction[1] = 0;
+      if (pressed.contains(87)) {
+         direction[1] = -1;
+      }
+      if (pressed.contains(65)) {
+         direction[0] = -1;
+      }
+      if (pressed.contains(83)) {
+         direction[1] = 1;
+      }
+      if (pressed.contains(68)) {
+         direction[0] = 1;
+      }
+      double tempAngle;
+      if ((pressed.contains(87)) && (pressed.contains(83))) {
+         direction[1] = 0;
+      }
+      if ((pressed.contains(68)) && (pressed.contains(65))) {
+         direction[0] = 0;
+      }
+      //direction[0] is for the x values, direction[1] is for the y values
+      tempAngle = Math.atan2(direction[1], direction[0]);
+      if ((direction[0] == 0) && (direction[1] == 0)) {
+      //   System.out.println("-1");
+         return (-1);//Check to see if the return works
+      } else {
+        // System.out.println("tempAngle"+tempAngle);
+         return (tempAngle);
+      }
+   }
+}
+
