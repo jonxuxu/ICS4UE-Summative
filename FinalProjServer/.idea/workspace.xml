@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bf469bc2-6156-45bd-b4b2-a6a47f18761d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../FinalProjClient/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjClient/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjClient/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
@@ -18,8 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="293" column="22" selection-start-line="293" selection-start-column="22" selection-end-line="293" selection-end-column="22" />
+            <state relative-caret-position="66">
+              <caret line="296" column="62" selection-start-line="296" selection-start-column="62" selection-end-line="296" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#9536#9537#0" expanded="true" />
@@ -205,7 +204,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3286119" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32719547" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32719395" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -230,8 +229,8 @@
     <entry file="file://$PROJECT_DIR$/src/MenuHandler.java" />
     <entry file="file://$PROJECT_DIR$/src/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="293" column="22" selection-start-line="293" selection-start-column="22" selection-end-line="293" selection-end-column="22" />
+        <state relative-caret-position="66">
+          <caret line="296" column="62" selection-start-line="296" selection-start-column="62" selection-end-line="296" selection-end-column="62" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#9536#9537#0" expanded="true" />
