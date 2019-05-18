@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
@@ -49,7 +50,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean start = true;
    private boolean connected = false;
    private JPanel[] allPanels = new JPanel[6];
-   private String[] panelNames = {"LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "WAITING_PANEL", "GAME_PANEL"};
+   private String[] panelNames = {"LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CustomMouseAdapter myMouseAdapter = new CustomMouseAdapter();
    private CustomKeyListener myKeyListener = new CustomKeyListener();
    private boolean sendName = false;
@@ -72,6 +73,9 @@ public class Client extends JFrame implements WindowListener {
    private Player myPlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
+   private boolean loading = false;
+   private int DESIRED_Y = 500;
+   private int DESIRED_X = 800;
 
    public Client() {
       super("Dark");
@@ -97,7 +101,7 @@ public class Client extends JFrame implements WindowListener {
       allPanels[2] = new CreatePanel();
       allPanels[3] = new JoinPanel();
       allPanels[4] = new WaitingPanel();
-      allPanels[5] = new GamePanel();
+      allPanels[5] = new IntermediatePanel();
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(37, 37, 37));
       for (int i = 0; i < allPanels.length; i++) {
@@ -166,6 +170,7 @@ public class Client extends JFrame implements WindowListener {
                   if (notifyReady) {
                      notifyReady = false;
                      output.println("R");
+                     loading = true;
                      output.flush();
                      waitForInput();
                   }
@@ -261,24 +266,8 @@ public class Client extends JFrame implements WindowListener {
             gameBegin = true;
          }
       } else {
-         /*
-         When a game message is sent back, it should have the following information
-         The () brackets should be included, the {} are not
-         G represents general, shows all the player info
-         A represents animals
-         P represents plants
-         I represents items dropped
-         All ? represent a boolean value, which will be either t or f
-         GID,x,y,health,artifact?,status,gold,level,spell1ready?,spell2ready?,spell3ready? {space}  ID,x,y,health,artifact,status,gold,level,spell1ready?,spell2ready?,
-         spell3ready? ... {space} AID,x,y,health {space} ID,x,y,health ... {space}
-         PID,x,y,harvestTimeRemaining {space} ID,x,y,harvestTimeRemaining ... {space}
-         IID,x,y {space} ID,x,y ... {space}. Actually, just keep the last whitespace
-         (I for items? you may want to display what was dropped by a monster)
-         The map is only visual, so you can just send what changes in terms of the animals and the plants. So you do not need the speed or attack, only what the player can see
-         Every animal has an ID, every plant has an ID, and every item has an ID. This makes it so that less info can be sent. You could also then place all the animals and plants inside two seperate arrays, calling them animal[ID].draw(x,y) to make it more convinient
-         Implement a game ID which represents a number based on the array. This would be easier to use
-         */
-         //For now, just get the ID,x,y (the P was removed at the beginning)
+         //Below is all temp. In reality, a serializable class should be decoded and output here
+
          input = input.trim();
          String[] initialSplit = input.split(" ", -1);
          for (int i = 0; i < initialSplit.length; i++) {
@@ -295,7 +284,11 @@ public class Client extends JFrame implements WindowListener {
          state = newState;
          cardLayout.show(mainContainer, panelNames[state]);
       }
-      allPanels[state].repaint();
+      if (state < 5) {
+         allPanels[state].repaint();
+      } else {
+         ((IntermediatePanel) (allPanels[state])).repaintReal();
+      }
    }
 
    public void connect() {
@@ -374,8 +367,8 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if (generateGraphics) {
-            g2 = (Graphics2D) g.create();
             generateGraphics = false;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
@@ -429,8 +422,8 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if (generateGraphics) {
-            g2 = (Graphics2D) g.create();
             generateGraphics = false;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
@@ -484,8 +477,8 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if (generateGraphics) {
-            g2 = (Graphics2D) g.create();
             generateGraphics = false;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
@@ -535,8 +528,8 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if (generateGraphics) {
-            g2 = (Graphics2D) g.create();
             generateGraphics = false;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
@@ -552,6 +545,7 @@ public class Client extends JFrame implements WindowListener {
       private int MAX_X;
       private int MAX_Y;
       private boolean buttonAdd = true;
+      private boolean buttonRemove = true;
       private CustomButton readyGameButton = new CustomButton("Begin game");
 
       public WaitingPanel() {
@@ -578,8 +572,8 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if (generateGraphics) {
-            g2 = (Graphics2D) g.create();
             generateGraphics = false;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
@@ -595,37 +589,78 @@ public class Client extends JFrame implements WindowListener {
          for (int i = 0; i < onlineList.size(); i++) {
             g2.drawString(onlineList.get(i).getUsername(), 0, 40 * (i + 1));
          }
+         if (loading) {
+            if (buttonRemove) {
+               this.remove(readyGameButton);
+               buttonRemove = false;
+            }
+            g2.drawString("LOADING", MAX_X / 2, MAX_Y / 2);
+         }
       }
    }
 
-   private class GamePanel extends JPanel { //State=5
+   private class IntermediatePanel extends JPanel { //State=5 (intermediate)
+      private int MAX_X;
+      private int MAX_Y;
+      private double scaling;
+      private GamePanel gamePanel = new GamePanel();
+
+      public IntermediatePanel() {
+         MAX_X = Toolkit.getDefaultToolkit().getScreenSize().width;
+         MAX_Y = Toolkit.getDefaultToolkit().getScreenSize().height;
+         if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //Make sure that these are doubles
+            //Y is excess
+            scaling = 1.0 * MAX_X / DESIRED_X;
+         } else {
+            //X is excess
+            scaling = 1.0 * MAX_Y / DESIRED_Y;
+         }
+         //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
+         //Setting up the size
+         this.add(gamePanel);
+         gamePanel.setBounds((int) ((MAX_X - (DESIRED_X * scaling)) / 2), (int) ((MAX_Y - (DESIRED_Y * scaling)) / 2), (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
+         //System.out.println(scaling);
+         //Basic visuals
+         this.setDoubleBuffered(true);
+         this.setBackground(new Color(20, 20, 20));
+         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
+         this.setVisible(true);
+         this.setFocusable(true);
+      }
+
+      public void repaintReal() {
+         gamePanel.repaint();
+      }
+   }
+
+   private class GamePanel extends JPanel {//State=5
       private Graphics2D g2;
       private boolean generateGraphics = true;
       private int MAX_X;
       private int MAX_Y;
 
       public GamePanel() {
-         //Setting up the size
-         this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-         MAX_X = this.getWidth();
-         MAX_Y = this.getHeight();
+         MAX_X = Toolkit.getDefaultToolkit().getScreenSize().width;
+         MAX_Y = Toolkit.getDefaultToolkit().getScreenSize().height;
          //Basic visuals
          this.setDoubleBuffered(true);
-         this.setBackground(new Color(30, 30, 30));
+         this.setBackground(new Color(40, 40, 40));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
       public void paintComponent(Graphics g) {
+         super.paintComponent(g);
+         g2 = (Graphics2D) g;
          if (generateGraphics) {
-            g2 = (Graphics2D) g.create();
             generateGraphics = false;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
          }
-         super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
+         //This is temp, the decoded serialized class should be called here for .draw
          for (int i = 0; i < gamePlayers.length; i++) {
             gamePlayers[i].draw(g2);
          }

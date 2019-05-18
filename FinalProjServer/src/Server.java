@@ -266,6 +266,9 @@ public class Server {
             gameSockets = new Socket[onlineGameSockets.size()];
             gameOutputs = new PrintWriter[onlineGameSockets.size()];
             gameInputs = new BufferedReader[onlineGameSockets.size()];
+            /*
+            This is where a seed is generated
+            */
             for (int i = 0; i < gamePlayers.length; i++) {
                gamePlayers[i] = onlineGamePlayers.get(i);
                gameSockets[i] = onlineGameSockets.get(i);
@@ -293,6 +296,8 @@ public class Server {
                   //Calculations here - This is essentially where ALL calculations take place.
                   //The game is essentially made in this space
 
+
+                  //This is all temp, just for testing purposes
                   for (int i = 0; i < playerNum; i++) {
                      if (allInput[i].length() != 0) {
                         gamePlayers[i].addXy(Double.parseDouble(allInput[i]));
