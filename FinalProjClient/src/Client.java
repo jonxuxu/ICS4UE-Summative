@@ -72,6 +72,7 @@ public class Client extends JFrame implements WindowListener {
    private ArrayList<Player> onlineList = new ArrayList<Player>();
    private GamePlayer[] gamePlayers;
    private Player myPlayer;
+   private GamePlayer myGamePlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
@@ -252,9 +253,9 @@ public class Client extends JFrame implements WindowListener {
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
                   System.out.println("Valid Game");
+                  myPlayer = new Player(username);//Sets the player
                   if (state == 2) {
                      host = true;
-                     myPlayer = new Player(username);
                      onlineList.add(myPlayer);
                   }
                } else {
@@ -278,6 +279,9 @@ public class Client extends JFrame implements WindowListener {
             gamePlayers = new GamePlayer[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                gamePlayers[i] = new GamePlayer(onlineList.get(i).getUsername());
+               if (onlineList.get(i).getUsername().equals(myPlayer.getUsername())) {
+                  myGamePlayer = gamePlayers[i];
+               }
             }
             newState = 5;//Sends to the game screen
             gameBegin = true;
@@ -643,6 +647,11 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          if ((state == 5) && (generateGraphics)) {
+            int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+            for (GamePlayer currentGamePlayer : gamePlayers) {
+               currentGamePlayer.setScaling(scaling);
+               currentGamePlayer.setCenterXy(tempXy);
+            }
             g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
@@ -654,7 +663,7 @@ public class Client extends JFrame implements WindowListener {
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //This is temp, the decoded serialized class should be called here for .draw
          for (GamePlayer currentGamePlayer : gamePlayers) {
-            currentGamePlayer.draw(g2);
+            currentGamePlayer.draw(g2, myGamePlayer.getXy());
          }
          /*
          g2.setColor(Color.white);
