@@ -11,6 +11,7 @@ import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -115,7 +116,7 @@ public class Client extends JFrame implements WindowListener {
       allPanels[4] = new WaitingPanel();
       allPanels[5] = new IntermediatePanel();
       //Adding to mainContainer cards
-      mainContainer.setBackground(new Color(37, 37, 37));
+      mainContainer.setBackground(new Color(0, 0, 0));
       for (int i = 0; i < allPanels.length; i++) {
          mainContainer.add(allPanels[i], panelNames[i]);
       }
@@ -352,13 +353,18 @@ public class Client extends JFrame implements WindowListener {
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic username field
          nameButton.addActionListener((ActionEvent e) -> {
-            if (!(nameField.getText().contains(" "))) {
-               username = nameField.getText();
-               sendName = true;
-            } else {
-               System.out.println("Error: Spaces exist");
+            if (!sendName) {
+               if (!(nameField.getText().contains(" "))) {
+                  username = nameField.getText();
+                  sendName = true;
+               } else {
+                  System.out.println("Error: Spaces exist");
+               }
             }
          });
+         //FOR NOW, ONLY TEMP
+         username = Math.random() * 10 + "";
+         sendName = true;
          nameField.setFont(MAIN_FONT);
          nameField.setBounds(MAX_X / 2 - 75, MAX_Y / 5, 150, 30);
          nameButton.setBounds(MAX_X / 2 - 130, MAX_Y * 3 / 10, 260, 30);
@@ -437,9 +443,11 @@ public class Client extends JFrame implements WindowListener {
          //Basic create and join server buttons
          testGameButton.addActionListener((ActionEvent e) -> {
             if (!(gameNameField.getText().contains(" ")) && (!(gamePasswordField.getText().contains(" ")))) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
+               if (!testGame) {
+                  attemptedGameName = gameNameField.getText();
+                  attemptedGamePassword = gamePasswordField.getText();
+                  testGame = true;
+               }
             } else {
                System.out.println("Error: Spaces exist");
             }
@@ -467,6 +475,17 @@ public class Client extends JFrame implements WindowListener {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
          }
+
+         //FOR NOW, ONLY TEMP
+         if (attemptedGameName != null) {
+            if (!attemptedGameName.equals("w")) {
+               attemptedGameName = "w";
+               attemptedGamePassword = "";
+               testGame = true;
+            }
+         } else {
+            attemptedGameName = "";
+         }
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
       }
@@ -483,9 +502,11 @@ public class Client extends JFrame implements WindowListener {
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
          testGameButton.addActionListener((ActionEvent e) -> {
-            attemptedGameName = gameNameTestField.getText();
-            attemptedGamePassword = gamePasswordTestField.getText();
-            testGame = true;
+            if (!testGame) {
+               attemptedGameName = gameNameTestField.getText();
+               attemptedGamePassword = gamePasswordTestField.getText();
+               testGame = true;
+            }
          });
          testGameButton.setBounds(MAX_X / 2 - 130, MAX_Y * 4 / 10, 260, 30);
          this.add(testGameButton);
@@ -509,6 +530,17 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
+
+         //FOR NOW, ONLY TEMP
+         if (attemptedGameName != null) {
+            if (!attemptedGameName.equals("w")) {
+               attemptedGameName = "w";
+               attemptedGamePassword = "";
+               testGame = true;
+            }
+         } else {
+            attemptedGameName = "";
+         }
       }
    }
 
@@ -624,10 +656,25 @@ public class Client extends JFrame implements WindowListener {
          for (GamePlayer currentGamePlayer : gamePlayers) {
             currentGamePlayer.draw(g2);
          }
+         /*
          g2.setColor(Color.white);
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);
          g2.setColor(Color.white);
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
+           */
+         g2.setColor(Color.WHITE);
+         g2.drawRect((int) (670 * scaling), (int) (5 * scaling), (int) (125 * scaling), (int) (125 * scaling));
+         Polygon bottomBar = new Polygon();
+         bottomBar.addPoint((int) (5 * scaling), (int) (495 * scaling));
+         bottomBar.addPoint((int) (5 * scaling), (int) (390 * scaling));
+         bottomBar.addPoint((int) (25 * scaling), (int) (370 * scaling));
+         bottomBar.addPoint((int) (775 * scaling), (int) (370 * scaling));
+         bottomBar.addPoint((int) (795 * scaling), (int) (390 * scaling));
+         bottomBar.addPoint((int) (795 * scaling), (int) (495 * scaling));
+         g2.drawPolygon(bottomBar);
+         g2.drawRect((int) (5 * scaling), (int) (5 * scaling), (int) (200 * scaling), (int) (30 * scaling));
+         g2.drawRect((int) (5 * scaling), (int) (40 * scaling), (int) (160 * scaling), (int) (10 * scaling));
+         g2.drawRect((int) (5 * scaling), (int) (55 * scaling), (int) (160 * scaling), (int) (10 * scaling));
       }
    }
 
