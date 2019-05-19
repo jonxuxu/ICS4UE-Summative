@@ -10,7 +10,8 @@
 public class GamePlayer extends Player {
    //Constants
    private int ID;
-   private int[] xy= {300,300};
+   private double[] xy= {300,300};//set as a double intentionally so that adding diagonally will be better
+   private int[] finalXy= new int [2];
    GamePlayer (String username){
       super (username);
    }
@@ -21,12 +22,14 @@ public class GamePlayer extends Player {
 
    public void addXy(double angle){
       if (angle!=-1) {
-         xy[0] += 5 * Math.cos(angle);
-         xy[1] += 5 * Math.sin(angle);
+         xy[0] += 7.5 * Math.cos(angle);
+         xy[1] += 7.5 * Math.sin(angle);
       }
    }
 
    public int[] getXy(){
-      return(xy);
+      finalXy[0]=(int)(xy[0]);
+      finalXy[1]=(int)(xy[1]);
+      return(finalXy);
    }
 }

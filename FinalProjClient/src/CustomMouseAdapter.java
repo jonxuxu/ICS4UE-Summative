@@ -24,6 +24,8 @@ public class CustomMouseAdapter extends MouseAdapter {
    private boolean pressed;
    private int rotation;
    private boolean rotated = false;
+   private double scaling;
+   private int[] centerXy = new int[2];
 
 //Methods that are implemented from MouseListener
 
@@ -175,5 +177,22 @@ public class CustomMouseAdapter extends MouseAdapter {
     */
    public boolean getPressed() {
       return pressed;
+   }
+
+   public void setCenterXy(int[] centerXy) {
+      this.centerXy[0] = centerXy[0];
+      this.centerXy[1] = centerXy[1];
+   }
+
+   public void setScaling(double scaling) {
+      this.scaling = scaling;
+   }
+
+   public double getAngleOfClick() {
+      return (Math.atan2(centerXy[1]-clickXy[1],clickXy[0] - centerXy[0])); //REMEMBER, MATH A TAN2 IS Y AND THEN X
+   }
+
+   public double getLengthOfClick() {
+      return (Math.sqrt(Math.pow((centerXy[0] - clickXy[0])/scaling, 2) + Math.pow((centerXy[1] - clickXy[1])/scaling, 2)));
    }
 }

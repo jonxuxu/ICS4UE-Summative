@@ -76,14 +76,14 @@ public class Client extends JFrame implements WindowListener {
    private boolean loading = false;
    private int DESIRED_Y = 500;
    private int DESIRED_X = 800;
+   private int MAX_Y;
+   private int MAX_X;
+   private double scaling;
 
    public Client() {
       super("Dark");
 
-      //Control set up
-      this.addMouseListener(myMouseAdapter);
-      this.addMouseWheelListener(myMouseAdapter);
-      this.addMouseMotionListener(myMouseAdapter);
+      //Control set up (the mouse listeners are attached to the game panel)
       this.addKeyListener(myKeyListener);
 
       //Font set up
@@ -94,6 +94,18 @@ public class Client extends JFrame implements WindowListener {
          System.out.print("Font not available");
       }
       MAIN_FONT = new Font("Kiona Bold", Font.PLAIN, 16);
+
+      //Basic set up
+      MAX_X = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getWidth());
+      MAX_Y = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getHeight());
+      this.setSize(MAX_X, MAX_Y);
+      this.setVisible(true);
+      Dimension actualSize = this.getContentPane().getSize();
+      MAX_Y = (int) (actualSize.getHeight()); //Re-adjust after removing the top
+      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      this.setLocationRelativeTo(null);
+      this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
+      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
       //Creating components
       allPanels[0] = new LoginPanel();
@@ -109,14 +121,7 @@ public class Client extends JFrame implements WindowListener {
       }
       this.add(mainContainer);
       cardLayout.show(mainContainer, panelNames[0]);
-
-      //Basic set up
-      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      this.setLocationRelativeTo(null);
-      this.pack();
-      this.setVisible(true);
-      this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
+      this.setVisible(true);//Must be called again so that it appears visible
    }
 
    public static void main(String[] args) {
@@ -182,8 +187,19 @@ public class Client extends JFrame implements WindowListener {
                   //If the raw data was to be sent, the following should be sent: MAX_X/MAX_Y (only once),
                   //the x and y of the mouse, the relevant keyboard presses maybe? (not all)
                   outputString = "";
-                  double angle = myKeyListener.getAngle();
-                  outputString = "" + angle;//If it is -1, then the server will recognize to stop
+                  double angleOfMovement = myKeyListener.getAngle();
+                  double angleOfClick = -1;
+                  double lengthOfClick = -1;
+                  if (myMouseAdapter.getPressed()) {
+                     angleOfClick = myMouseAdapter.getAngleOfClick(); //Sends the correct angle
+                     lengthOfClick = myMouseAdapter.getLengthOfClick(); //Sends the fully calculated length
+                  }
+                  if (angleOfClick != -1) {
+                     System.out.println(angleOfClick + " " + lengthOfClick);
+                  }
+                  //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
+                  //must add the mouse adapter to the JPanel.
+                  outputString = "" + angleOfMovement;//If it is -1, then the server will recognize to stop
                   output.println(outputString);
                   output.flush();
                }
@@ -328,27 +344,19 @@ public class Client extends JFrame implements WindowListener {
 
    private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
-      private boolean generateGraphics = true;
       private JTextField nameField = new JTextField(3);
       private CustomButton nameButton = new CustomButton("Click to test name");
-      private int MAX_X;
-      private int MAX_Y;
 
       public LoginPanel() {
          //Setting up the size
-         this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-         MAX_X = this.getWidth();
-         MAX_Y = this.getHeight();
+         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic username field
-         nameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               if (!(nameField.getText().contains(" "))) {
-                  username = nameField.getText();
-                  sendName = true;
-               } else {
-                  System.out.println("Error: Spaces exist");
-               }
+         nameButton.addActionListener((ActionEvent e) -> {
+            if (!(nameField.getText().contains(" "))) {
+               username = nameField.getText();
+               sendName = true;
+            } else {
+               System.out.println("Error: Spaces exist");
             }
          });
          nameField.setFont(MAIN_FONT);
@@ -368,11 +376,8 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         if (generateGraphics) {
-            generateGraphics = false;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setFont(MAIN_FONT);
-         }
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow();// Removed, this interferes with the textboxes. See if this is truly necessary
 
@@ -383,32 +388,21 @@ public class Client extends JFrame implements WindowListener {
 
    private class MenuPanel extends JPanel {//State=1
       private Graphics2D g2;
-      private boolean generateGraphics = true;
       private CustomButton createButton = new CustomButton("Create game");
       private CustomButton joinButton = new CustomButton("Join game");
-      private int MAX_X;
-      private int MAX_Y;
 
       public MenuPanel() {
          //Setting up the size
-         this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-         MAX_X = this.getWidth();
-         MAX_Y = this.getHeight();
+         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
-         createButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               newState = 2;
-            }
+         createButton.addActionListener((ActionEvent e) -> {
+            newState = 2;
          });
          createButton.setBounds(MAX_X / 2 - 130, MAX_Y * 3 / 10, 260, 30);
          this.add(createButton);
 
-         joinButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               newState = 3;
-            }
+         joinButton.addActionListener((ActionEvent e) -> {
+            newState = 3;
          });
          joinButton.setBounds(MAX_X / 2 - 130, MAX_Y / 2, 260, 30);
          this.add(joinButton);
@@ -423,11 +417,8 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         if (generateGraphics) {
-            generateGraphics = false;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setFont(MAIN_FONT);
-         }
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
       }
@@ -439,25 +430,18 @@ public class Client extends JFrame implements WindowListener {
       private JTextField gameNameField = new JTextField(3);
       private JTextField gamePasswordField = new JTextField(3);
       private CustomButton testGameButton = new CustomButton("Confirm game");
-      private int MAX_X;
-      private int MAX_Y;
 
       public CreatePanel() {
          //Setting up the size
-         this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-         MAX_X = this.getWidth();
-         MAX_Y = this.getHeight();
+         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
-         testGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               if (!(gameNameField.getText().contains(" ")) && (!(gamePasswordField.getText().contains(" ")))) {
-                  attemptedGameName = gameNameField.getText();
-                  attemptedGamePassword = gamePasswordField.getText();
-                  testGame = true;
-               } else {
-                  System.out.println("Error: Spaces exist");
-               }
+         testGameButton.addActionListener((ActionEvent e) -> {
+            if (!(gameNameField.getText().contains(" ")) && (!(gamePasswordField.getText().contains(" ")))) {
+               attemptedGameName = gameNameField.getText();
+               attemptedGamePassword = gamePasswordField.getText();
+               testGame = true;
+            } else {
+               System.out.println("Error: Spaces exist");
             }
          });
          testGameButton.setBounds(MAX_X / 2 - 130, MAX_Y * 4 / 10, 260, 30);
@@ -490,26 +474,18 @@ public class Client extends JFrame implements WindowListener {
 
    private class JoinPanel extends JPanel { //State =3
       private Graphics2D g2;
-      private boolean generateGraphics = true;
       private JTextField gameNameTestField = new JTextField(3);
       private JTextField gamePasswordTestField = new JTextField(3);
       private CustomButton testGameButton = new CustomButton("Join game");
-      private int MAX_X;
-      private int MAX_Y;
 
       public JoinPanel() {
          //Setting up the size
-         this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-         MAX_X = this.getWidth();
-         MAX_Y = this.getHeight();
+         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
-         testGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               attemptedGameName = gameNameTestField.getText();
-               attemptedGamePassword = gamePasswordTestField.getText();
-               testGame = true;
-            }
+         testGameButton.addActionListener((ActionEvent e) -> {
+            attemptedGameName = gameNameTestField.getText();
+            attemptedGamePassword = gamePasswordTestField.getText();
+            testGame = true;
          });
          testGameButton.setBounds(MAX_X / 2 - 130, MAX_Y * 4 / 10, 260, 30);
          this.add(testGameButton);
@@ -529,11 +505,8 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         if (generateGraphics) {
-            generateGraphics = false;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setFont(MAIN_FONT);
-         }
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
       }
@@ -541,28 +514,18 @@ public class Client extends JFrame implements WindowListener {
 
    private class WaitingPanel extends JPanel { //State=4
       private Graphics2D g2;
-      private boolean generateGraphics = true;
-      private int MAX_X;
-      private int MAX_Y;
       private boolean buttonAdd = true;
       private boolean buttonRemove = true;
       private CustomButton readyGameButton = new CustomButton("Begin game");
 
       public WaitingPanel() {
          //Setting up the size
-         this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-         MAX_X = this.getWidth();
-         MAX_Y = this.getHeight();
-
+         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Setting up buttons
          readyGameButton.setBounds(MAX_X / 2 - 130, MAX_Y * 4 / 10, 260, 30);
-         readyGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               notifyReady = true;
-            }
+         readyGameButton.addActionListener((ActionEvent e) -> {
+            notifyReady = true;
          });
-
          //Basic visuals
          this.setDoubleBuffered(true);
          this.setBackground(new Color(70, 70, 70));
@@ -573,11 +536,8 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         if (generateGraphics) {
-            generateGraphics = false;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setFont(MAIN_FONT);
-         }
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //if host==true, then display the ready button
@@ -599,15 +559,10 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   private class IntermediatePanel extends JPanel { //State=5 (intermediate)
-      private int MAX_X;
-      private int MAX_Y;
-      private double scaling;
+   private class IntermediatePanel extends JPanel { //State=5 (intermediate)=
       private GamePanel gamePanel = new GamePanel();
 
       public IntermediatePanel() {
-         MAX_X = Toolkit.getDefaultToolkit().getScreenSize().width;
-         MAX_Y = Toolkit.getDefaultToolkit().getScreenSize().height;
          if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //Make sure that these are doubles
             //Y is excess
             scaling = 1.0 * MAX_X / DESIRED_X;
@@ -615,8 +570,12 @@ public class Client extends JFrame implements WindowListener {
             //X is excess
             scaling = 1.0 * MAX_Y / DESIRED_Y;
          }
+         int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+         myMouseAdapter.setCenterXy(tempXy);
+         myMouseAdapter.setScaling(scaling);
          //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
          //Setting up the size
+         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          this.add(gamePanel);
          gamePanel.setBounds((int) ((MAX_X - (DESIRED_X * scaling)) / 2), (int) ((MAX_Y - (DESIRED_Y * scaling)) / 2), (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
          //System.out.println(scaling);
@@ -636,34 +595,39 @@ public class Client extends JFrame implements WindowListener {
    private class GamePanel extends JPanel {//State=5
       private Graphics2D g2;
       private boolean generateGraphics = true;
-      private int MAX_X;
-      private int MAX_Y;
 
       public GamePanel() {
-         MAX_X = Toolkit.getDefaultToolkit().getScreenSize().width;
-         MAX_Y = Toolkit.getDefaultToolkit().getScreenSize().height;
          //Basic visuals
          this.setDoubleBuffered(true);
          this.setBackground(new Color(40, 40, 40));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
          this.setFocusable(true);
+         this.addMouseListener(myMouseAdapter);
+         this.addMouseWheelListener(myMouseAdapter);
+         this.addMouseMotionListener(myMouseAdapter);
       }
 
       @Override
       public void paintComponent(Graphics g) {
-         super.paintComponent(g);
-         g2 = (Graphics2D) g;
-         if (generateGraphics) {
-            generateGraphics = false;
+         if ((state == 5) && (generateGraphics)) {
+            g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
+            generateGraphics = false;
+         } else {
+            g2 = (Graphics2D) g;
          }
+         super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //This is temp, the decoded serialized class should be called here for .draw
-         for (int i = 0; i < gamePlayers.length; i++) {
-            gamePlayers[i].draw(g2);
+         for (GamePlayer currentGamePlayer : gamePlayers) {
+            currentGamePlayer.draw(g2);
          }
+         g2.setColor(Color.white);
+         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);
+         g2.setColor(Color.white);
+         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
       }
    }
 

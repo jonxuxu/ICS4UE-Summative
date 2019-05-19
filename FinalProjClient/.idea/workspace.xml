@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="Updated scaling (now it accounts for the taskbar and the frame itself)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Clock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Clock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CustomMouseAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CustomMouseAdapter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/Clock.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/Clock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/GamePlayer.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,13 +19,28 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="616">
-              <caret line="179" column="29" selection-start-line="179" selection-start-column="29" selection-end-line="179" selection-end-column="29" />
+            <state relative-caret-position="204">
+              <caret line="625" column="10" lean-forward="true" selection-start-line="625" selection-start-column="10" selection-end-line="625" selection-end-column="10" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2569#2577#0" expanded="true" />
+                <element signature="e#4896#4897#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/CustomMouseAdapter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="412">
+              <caret line="197" column="1" lean-forward="true" selection-start-line="197" selection-start-column="1" selection-end-line="197" selection-end-column="1" />
+              <folding>
+                <element signature="e#4191#4192#0" expanded="true" />
+                <element signature="e#4226#4227#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -30,8 +49,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Clock.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="11" column="38" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
+            <state relative-caret-position="386">
+              <caret line="21" column="3" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
             </state>
           </provider>
         </entry>
@@ -39,8 +58,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/GamePlayer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="25" column="14" selection-start-line="25" selection-start-column="14" selection-end-line="25" selection-end-column="14" />
+            <state relative-caret-position="616">
+              <caret line="36" column="34" selection-start-line="36" selection-start-column="34" selection-end-line="36" selection-end-column="34" />
               <folding>
                 <element signature="e#268#269#0" expanded="true" />
                 <element signature="e#297#298#0" expanded="true" />
@@ -90,14 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>pack</find>
-      <find>setBac</find>
-      <find>Button</find>
-      <find>decipherInput</find>
-      <find>waitForIn</find>
-      <find>attemptedGam</find>
-      <find>WaitingPanel</find>
-      <find>online</find>
       <find>JButton</find>
       <find>actionP</find>
       <find>testGame</find>
@@ -120,6 +131,14 @@
       <find>System</find>
       <find>angle</find>
       <find>repaint</find>
+      <find>Click</find>
+      <find>getA</find>
+      <find>www</find>
+      <find>System.o</find>
+      <find>.pack</find>
+      <find>this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);</find>
+      <find>//Setting up the size</find>
+      <find>MAX_X</find>
     </findStrings>
     <replaceStrings>
       <replace>outputLine</replace>
@@ -128,6 +147,7 @@
       <replace>JButton</replace>
       <replace>CustomButton</replace>
       <replace>e</replace>
+      <replace>this.pack();</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -138,9 +158,10 @@
       <list>
         <option value="$PROJECT_DIR$/src/ClientFrame.java" />
         <option value="$PROJECT_DIR$/src/Player.java" />
+        <option value="$PROJECT_DIR$/src/CustomKeyListener.java" />
         <option value="$PROJECT_DIR$/src/GamePlayer.java" />
         <option value="$PROJECT_DIR$/src/Clock.java" />
-        <option value="$PROJECT_DIR$/src/CustomKeyListener.java" />
+        <option value="$PROJECT_DIR$/src/CustomMouseAdapter.java" />
         <option value="$PROJECT_DIR$/src/Client.java" />
       </list>
     </option>
@@ -182,7 +203,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558103525188" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558288214778" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
@@ -231,14 +252,22 @@
       <option name="presentableId" value="Default" />
       <updated>1556110878287</updated>
     </task>
+    <task id="LOCAL-00001" summary="IntelliJ testing">
+      <created>1558191449188</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1558191449188</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49484536" visible="true" weight="0.015991472" />
-      <window_info id="Structure" order="1" sideWeight="0.5051546" side_tool="true" weight="0.09127517" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49348533" visible="true" weight="0.09434968" />
+      <window_info id="Structure" order="1" sideWeight="0.50651467" side_tool="true" visible="true" weight="0.09434968" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
@@ -246,7 +275,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.18271954" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.1787649" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -254,7 +283,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.33569404" />
+      <window_info active="true" anchor="bottom" id="Messages" order="10" visible="true" weight="0.3347779" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -264,6 +293,11 @@
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
     </layout>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="IntelliJ testing" />
+    <MESSAGE value="Updated scaling (now it accounts for the taskbar and the frame itself)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated scaling (now it accounts for the taskbar and the frame itself)" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/ClientFrame.java" />
@@ -281,27 +315,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Client.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="616">
-          <caret line="179" column="29" selection-start-line="179" selection-start-column="29" selection-end-line="179" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Clock.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="11" column="38" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/GamePlayer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="25" column="14" selection-start-line="25" selection-start-column="14" selection-end-line="25" selection-end-column="14" />
+        <state relative-caret-position="616">
+          <caret line="36" column="34" selection-start-line="36" selection-start-column="34" selection-end-line="36" selection-end-column="34" />
           <folding>
             <element signature="e#268#269#0" expanded="true" />
             <element signature="e#297#298#0" expanded="true" />
@@ -331,6 +348,36 @@
             <element signature="e#213#214#0" expanded="true" />
             <element signature="e#245#246#0" expanded="true" />
             <element signature="e#275#276#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Clock.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="386">
+          <caret line="21" column="3" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Client.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="625" column="10" lean-forward="true" selection-start-line="625" selection-start-column="10" selection-end-line="625" selection-end-column="10" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2569#2577#0" expanded="true" />
+            <element signature="e#4896#4897#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CustomMouseAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="197" column="1" lean-forward="true" selection-start-line="197" selection-start-column="1" selection-end-line="197" selection-end-column="1" />
+          <folding>
+            <element signature="e#4191#4192#0" expanded="true" />
+            <element signature="e#4226#4227#0" expanded="true" />
           </folding>
         </state>
       </provider>
