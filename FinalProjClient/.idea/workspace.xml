@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="Added cooldown for animations">
-      <change afterPath="$PROJECT_DIR$/../FinalProjServer/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../FinalProjServer/src/GeneralClassServer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../FinalProjServer/src/TestClassServer.java" afterDir="false" />
+    <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GamePlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TestClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TestClass.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/GamePlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/GeneralClassServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/GeneralClass.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/TestClassServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/TestClass.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -50,8 +45,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/TestClass.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="412">
-              <caret line="47" column="19" selection-start-line="47" selection-start-column="19" selection-end-line="47" selection-end-column="19" />
+            <state relative-caret-position="610">
+              <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -250,7 +245,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558390409154" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558394332420" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
@@ -341,7 +336,14 @@
       <option name="project" value="LOCAL" />
       <updated>1558320159915</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Added cooldown for animations">
+      <created>1558390423570</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1558390423570</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -541,7 +543,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../FinalProjServer/src/TestClassServer.java">
+    <entry file="file://$PROJECT_DIR$/../FinalProjServer/src/TestClass.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="188">
           <caret line="15" selection-start-line="15" selection-end-line="15" />
@@ -588,8 +590,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/TestClass.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="47" column="19" selection-start-line="47" selection-start-column="19" selection-end-line="47" selection-end-column="19" />
+        <state relative-caret-position="610">
+          <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

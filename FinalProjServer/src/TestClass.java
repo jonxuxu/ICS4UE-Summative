@@ -1,5 +1,5 @@
 /**
- * TestClassServer.java
+ * TestClass.java
  * This is
  *
  * @author Will Jeong
@@ -7,7 +7,7 @@
  * @since 2019-05-19
  */
 
-public class TestClassServer extends GeneralClassServer {
+public class TestClass extends GeneralClass {
    private int maxHealth = 100;
    private int attack = 10;
    private int mobility = 10;

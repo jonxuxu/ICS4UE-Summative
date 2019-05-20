@@ -13,7 +13,7 @@ public class GamePlayer extends Player {
    private int[] xy = {300, 300};
    private int[] centerXy = new int[2];
    private double scaling;
-   private GeneralClassServer thisClass = new TestClassServer();//Temporary, normally it should be determined in the constructor
+   private GeneralClass thisClass = new TestClass();//Temporary, normally it should be determined in the constructor
    private boolean spell1;
 
    GamePlayer(String username) {
@@ -48,7 +48,7 @@ public class GamePlayer extends Player {
    }
 
 
-   public GeneralClassServer getThisClass(){
+   public GeneralClass getThisClass(){
       return(thisClass);
    }
 }
