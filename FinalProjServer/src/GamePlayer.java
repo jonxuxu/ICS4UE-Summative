@@ -10,10 +10,14 @@
 public class GamePlayer extends Player {
    //Constants
    private int ID;
-   private double[] xy= {300,300};//set as a double intentionally so that adding diagonally will be better
-   private int[] finalXy= new int [2];
-   GamePlayer (String username){
-      super (username);
+   private int[] xy = {300, 300};
+   private int[] centerXy = new int[2];
+   private double scaling;
+   private GeneralClassServer thisClass = new TestClassServer();//Temporary, normally it should be determined in the constructor
+   private boolean spell1;
+
+   GamePlayer(String username) {
+      super(username);
    }
 
    public void setID(int ID) {
@@ -27,9 +31,24 @@ public class GamePlayer extends Player {
       }
    }
 
-   public int[] getXy(){
-      finalXy[0]=(int)(xy[0]);
-      finalXy[1]=(int)(xy[1]);
-      return(finalXy);
+   public int[] getXy() {
+      return (xy);
+   }
+
+   public void setXy(int[] xy) {
+      this.xy = xy;
+   }
+
+   public void setSpell1(boolean spell1) {
+      this.spell1=spell1;
+   }
+
+   public boolean getSpell1() {
+      return spell1;
+   }
+
+
+   public GeneralClassServer getThisClass(){
+      return(thisClass);
    }
 }

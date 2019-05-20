@@ -1,4 +1,5 @@
 import java.awt.Menu;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -253,6 +254,12 @@ public class Server {
       private BufferedReader[] gameInputs;
       private int playerNum;
       private Clock time = new Clock();
+      private int gameTick = 0;
+
+      //Constants for general display
+      private Rectangle SPELL_1 = new Rectangle(425, 383, 100, 100);
+      private Rectangle SPELL_2 = new Rectangle(550, 383, 100, 100);
+      private Rectangle SPELL_3 = new Rectangle(675, 383, 100, 100);
 
       @Override
       public void run() {
@@ -305,18 +312,21 @@ public class Server {
                         double lengthOfClick = Double.parseDouble(allInput[i]);
                         allInput[i] = "";
                         gamePlayers[i].addXy(angleOfMovement);
+                        if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
+                           gamePlayers[i].setSpell1(gamePlayers[i].getThisClass().testSpell1(gameTick)); //Check, for some reason despite being true this does not work
+                        }
                      }
                   }
-
                   //Output will be here
                   String outputString = "G";
                   for (int i = 0; i < gamePlayers.length; i++) {
-                     outputString += i + "," + gamePlayers[i].getXy()[0] + "," + gamePlayers[i].getXy()[1] + " ";
+                     outputString += i + "," + gamePlayers[i].getXy()[0] + "," + gamePlayers[i].getXy()[1] + "," + gamePlayers[i].getSpell1() + "," + gamePlayers[i].getThisClass().getSpell1Percent(gameTick) + " ";
                   }
                   for (int i = 0; i < gamePlayers.length; i++) {
                      gameOutputs[i].println(outputString);
                      gameOutputs[i].flush();
                   }
+                  gameTick++;
                }
             }
          } catch (IOException e) {
