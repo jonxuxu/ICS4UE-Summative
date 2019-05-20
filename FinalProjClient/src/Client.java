@@ -84,6 +84,7 @@ public class Client extends JFrame implements WindowListener {
    private int MAX_X;
    private double scaling;
    private Sector[][] sectors;
+   private boolean animation1=true;
 
    public Client() {
       super("Dark");
@@ -693,7 +694,10 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          for (GamePlayer currentGamePlayer : gamePlayers) {
-            currentGamePlayer.draw(g2, myGamePlayer.getXy());
+            currentGamePlayer.draw(g2, myGamePlayer.getXy(),animation1);
+            if (animation1){
+               animation1=false;
+            }
          }
          /*
          g2.setColor(Color.white);

@@ -15,6 +15,7 @@ public class GamePlayer extends Player {
    private int[] xy = {300, 300};
    private int[] centerXy = new int[2];
    private double scaling;
+   private GeneralClass thisClass = new TestClass();//Temporary, normally it should be determined in the constructor
 
    GamePlayer(String username) {
       super(username);
@@ -42,11 +43,15 @@ public class GamePlayer extends Player {
       this.xy = xy;
    }
 
-   public void draw(Graphics2D g2, int[] midXy) {
-      g2.fillRect(centerXy[0] + (int) (scaling * (xy[0] - midXy[0]))-(int) (100 * scaling)/2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1]))-(int) (100 * scaling)/2, (int) (100 * scaling), (int) (100 * scaling));
+   public void draw(Graphics2D g2, int[] midXy, boolean animation1) {
+      thisClass.drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), animation1);
    }
 
    public void setScaling(double scaling) {
       this.scaling = scaling;
+   }
+
+   public double getScaling() {
+      return (scaling);
    }
 }
