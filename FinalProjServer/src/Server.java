@@ -296,11 +296,15 @@ public class Server {
                   //Calculations here - This is essentially where ALL calculations take place.
                   //The game is essentially made in this space
 
-
-                  //This is all temp, just for testing purposes
                   for (int i = 0; i < playerNum; i++) {
-                     if (allInput[i].length() != 0) {
-                        gamePlayers[i].addXy(Double.parseDouble(allInput[i]));
+                     if (!allInput[i].isEmpty()) {
+                        double angleOfMovement = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
+                        allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
+                        double angleOfClick = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
+                        allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
+                        double lengthOfClick = Double.parseDouble(allInput[i]);
+                        allInput[i] = "";
+                        gamePlayers[i].addXy(angleOfMovement);
                      }
                   }
 

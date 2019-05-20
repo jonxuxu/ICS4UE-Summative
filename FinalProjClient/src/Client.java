@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -81,6 +83,7 @@ public class Client extends JFrame implements WindowListener {
    private int MAX_Y;
    private int MAX_X;
    private double scaling;
+   private Sector[][] sectors;
 
    public Client() {
       super("Dark");
@@ -201,7 +204,7 @@ public class Client extends JFrame implements WindowListener {
                   }
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
-                  outputString = "" + angleOfMovement;//If it is -1, then the server will recognize to stop
+                  outputString = angleOfMovement + " " + angleOfClick + " " + lengthOfClick;//If it is -1, then the server will recognize to stop
                   output.println(outputString);
                   output.flush();
                }
@@ -609,6 +612,22 @@ public class Client extends JFrame implements WindowListener {
          int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
          myMouseAdapter.setCenterXy(tempXy);
          myMouseAdapter.setScaling(scaling);
+         //Game set up
+         try {
+            BufferedImage sheet = ImageIO.read(new File(".\\res\\Map.png"));
+            sectors = new Sector[16][16];
+            for (int i = 0; i < 16; i++) {
+               for (int j = 0; j < 16; j++) {
+                  sectors[j][i] = new Sector();
+                  sectors[j][i].setImage(sheet.getSubimage(j * 100, i * 100, 100, 100));
+                  sectors[j][i].setSectorCoords(j, i);
+                  sectors[j][i].setScaling(scaling);
+                  sectors[j][i].setCenterXy(tempXy);
+               }
+            }
+         } catch (IOException e) {
+            System.out.println("Image not found");
+         }
          //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
@@ -662,6 +681,17 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //This is temp, the decoded serialized class should be called here for .draw
+         int startX = (int) ((myGamePlayer.getXy()[0] - 400.0) / 100.0);
+         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 400.0) / 100.0)) + 1;//Try adding +1 here if necessary
+         int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 100.0);
+         int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 100.0)) + 1;
+         for (int i = startY; i < finalY; i++) {
+            for (int j = startX; j < finalX; j++) {
+               if ((i >= 0) && (j >= 0) && (i <= 15) && (j <= 15)) {
+                  sectors[j][i].drawSector(g2, myGamePlayer.getXy());
+               }
+            }
+         }
          for (GamePlayer currentGamePlayer : gamePlayers) {
             currentGamePlayer.draw(g2, myGamePlayer.getXy());
          }
@@ -671,6 +701,8 @@ public class Client extends JFrame implements WindowListener {
          g2.setColor(Color.white);
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
            */
+
+
          g2.setColor(Color.WHITE);
          g2.drawRect((int) (670 * scaling), (int) (5 * scaling), (int) (125 * scaling), (int) (125 * scaling));
          Polygon bottomBar = new Polygon();
