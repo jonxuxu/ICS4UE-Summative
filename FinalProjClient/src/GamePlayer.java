@@ -16,6 +16,8 @@ public class GamePlayer extends Player {
    private int[] centerXy = new int[2];
    private double scaling;
    private GeneralClass thisClass = new TestClass();//Temporary, normally it should be determined in the constructor
+   private boolean spell1;
+   private int spell1Percent;
 
    GamePlayer(String username) {
       super(username);
@@ -23,11 +25,6 @@ public class GamePlayer extends Player {
 
    public void setID(int ID) {
       this.ID = ID;
-   }
-
-   public void addXy(double angle) {
-      xy[0] += 3 * Math.cos(angle);
-      xy[1] += 3 * Math.sin(angle);
    }
 
    public void setCenterXy(int[] centerXy) {
@@ -53,5 +50,20 @@ public class GamePlayer extends Player {
 
    public double getScaling() {
       return (scaling);
+   }
+
+   public void setSpell1(boolean spell1) {
+      this.spell1 = spell1;
+   }
+
+   public boolean getSpell1() {
+      return spell1;
+   }
+
+   public void setSpell1Percent(int spell1Percent) {
+      this.spell1Percent = spell1Percent;
+   }
+   public double getSpell1Percent() {
+      return spell1Percent/100.0;
    }
 }

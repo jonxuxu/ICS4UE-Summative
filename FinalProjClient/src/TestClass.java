@@ -19,6 +19,7 @@ public class TestClass extends GeneralClass {
    private int mobility = 10;
    private int range = 10;
    private int animation1Index = 0;
+   private int spell1Cooldown = 500;//Measured in ticks
 
    private BufferedImage[][] allAnimations = new BufferedImage[4][];
 
@@ -36,14 +37,14 @@ public class TestClass extends GeneralClass {
          for (int i = 0; i < 4; i++) {
             allAnimations[1][i] = animationSheet.getSubimage(0, i * 15, 15, 15);
          }
-      }catch(IOException e){
+      } catch (IOException e) {
          System.out.println("Unable to find image");
       }
    }
 
    public void spell1(Graphics2D g2, int x, int y, int width, int height) {
-      if (animation1Index < 40) {
-         g2.drawImage(allAnimations[1][animation1Index%4], x, y, width, height, null);
+      if (animation1Index < 80) {
+         g2.drawImage(allAnimations[1][animation1Index % 4], x, y, width, height, null);
          animation1Index++;
       }
    }
@@ -61,7 +62,7 @@ public class TestClass extends GeneralClass {
          resetSpell1();
          spell1(g2, x, y, width, height);
       } else {
-         if (animation1Index != 40) {
+         if (animation1Index != 80) {
             spell1(g2, x, y, width, height);
          } else {
             move(g2, x, y, width, height);

@@ -84,7 +84,7 @@ public class Client extends JFrame implements WindowListener {
    private int MAX_X;
    private double scaling;
    private Sector[][] sectors;
-   private boolean animation1=true;
+
 
    public Client() {
       super("Dark");
@@ -292,7 +292,6 @@ public class Client extends JFrame implements WindowListener {
          }
       } else {
          //Below is all temp. In reality, a serializable class should be decoded and output here
-
          input = input.trim();
          String[] initialSplit = input.split(" ", -1);
          for (int i = 0; i < initialSplit.length; i++) {
@@ -300,6 +299,8 @@ public class Client extends JFrame implements WindowListener {
             int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
             //System.out.println(tempXy[0]+" "+tempXy[1]);
             gamePlayers[Integer.parseInt(secondSplit[0])].setXy(tempXy);
+            gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1(Boolean.parseBoolean(secondSplit[3]));
+            gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1Percent(Integer.parseInt(secondSplit[4]));
          }
       }
    }
@@ -694,10 +695,7 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          for (GamePlayer currentGamePlayer : gamePlayers) {
-            currentGamePlayer.draw(g2, myGamePlayer.getXy(),animation1);
-            if (animation1){
-               animation1=false;
-            }
+            currentGamePlayer.draw(g2, myGamePlayer.getXy(), currentGamePlayer.getSpell1());
          }
          /*
          g2.setColor(Color.white);
@@ -720,6 +718,11 @@ public class Client extends JFrame implements WindowListener {
          g2.drawRect((int) (5 * scaling), (int) (5 * scaling), (int) (200 * scaling), (int) (30 * scaling));
          g2.drawRect((int) (5 * scaling), (int) (40 * scaling), (int) (160 * scaling), (int) (10 * scaling));
          g2.drawRect((int) (5 * scaling), (int) (55 * scaling), (int) (160 * scaling), (int) (10 * scaling));
+         g2.drawRect((int) (425 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
+         g2.drawRect((int) (550 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
+         g2.drawRect((int) (675 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
+         g.setColor(new Color(20, 30, 50));
+         g2.fillRect((int) (425 * scaling), (int) ((483 - 100 * myGamePlayer.getSpell1Percent()) * scaling), (int) (100 * scaling), (int) ((100 * myGamePlayer.getSpell1Percent()) * scaling));
       }
    }
 
