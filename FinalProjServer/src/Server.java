@@ -305,12 +305,6 @@ public class Server {
                   /////////////////////////////////////////////////////////////
 
 
-
-
-
-
-
-
                   /////////////////////////////////////////////////////////////
                   for (int i = 0; i < playerNum; i++) {
                      if (!allInput[i].isEmpty()) {
@@ -322,14 +316,14 @@ public class Server {
                         allInput[i] = "";
                         gamePlayers[i].addXy(angleOfMovement);
                         if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
-                           gamePlayers[i].setSpell1(gamePlayers[i].getThisClass().testSpell1(gameTick));
+                           gamePlayers[i].setSpell(gamePlayers[i].getThisClass().testSpell(gameTick, 0), 0);
                         }
                      }
                   }
                   //Output will be here
                   String outputString = "G";
                   for (int i = 0; i < gamePlayers.length; i++) {
-                     outputString += i + "," + gamePlayers[i].getXy()[0] + "," + gamePlayers[i].getXy()[1] + "," + gamePlayers[i].getSpell1() + "," + gamePlayers[i].getThisClass().getSpell1Percent(gameTick) + " ";
+                     outputString += i + "," + gamePlayers[i].getFullOutput(gameTick);
                   }
                   for (int i = 0; i < gamePlayers.length; i++) {
                      gameOutputs[i].println(outputString);

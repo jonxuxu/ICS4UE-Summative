@@ -8,27 +8,31 @@
  */
 
 public class TestClass extends GeneralClass {
-   private int maxHealth = 100;
-   private int attack = 10;
-   private int mobility = 10;
-   private int range = 10;
-   private int lastSpellTick=-10000;//So that it can be used immediately
-   private int spell1Cooldown=500;
+   private int[] spellCooldowns = {500,500,500};
+   private int[] lastSpellTicks = {-10000,-10000,-10000};//So that they can be used immediately
 
-   public boolean testSpell1(int spellTick) {
-      if (spellTick-lastSpellTick>spell1Cooldown){
-         lastSpellTick=spellTick;
+   TestClass() {
+      setMaxHealth(100);
+      setHealth(100);
+      setAttack(100);
+      setMobility(10);
+      setRange(10);
+   }
+
+   public boolean testSpell(int spellTick, int spellIndex) {
+      if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
+         lastSpellTicks[spellIndex] = spellTick;
          return true;
-      }else{
+      } else {
          return false;
       }
    }
 
-   public int getSpell1Percent(int spellTick){
-      if (spellTick-lastSpellTick>spell1Cooldown){
-         return(100);
-      }else{
-         return ((int)((100.0*(spellTick-lastSpellTick)/spell1Cooldown)));
+   public int getSpellPercent(int spellTick, int spellIndex) {
+      if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
+         return (100);
+      } else {
+         return ((int) ((100.0 * (spellTick - lastSpellTicks[spellIndex]) / spellCooldowns[spellIndex])));
       }
    }
 }
