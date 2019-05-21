@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bf469bc2-6156-45bd-b4b2-a6a47f18761d" name="Default Changelist" comment="Delegated a space for the game itself">
-      <change afterPath="$PROJECT_DIR$/src/Status.java" afterDir="false" />
+    <list default="true" id="bf469bc2-6156-45bd-b4b2-a6a47f18761d" name="Default Changelist" comment="Organized code, added all the other general player output (health, atk, etc)">
       <change beforePath="$PROJECT_DIR$/../FinalProjClient/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjClient/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjClient/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjClient/src/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GamePlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GeneralClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GeneralClass.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TestClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TestClass.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -217,7 +212,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558480073891" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558480157040" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunDashboard">
@@ -292,11 +287,19 @@
       <option name="project" value="LOCAL" />
       <updated>1558476233996</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Organized code, added all the other general player output (health, atk, etc)">
+      <created>1558480153849</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1558480153849</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17270789" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -331,7 +334,8 @@
     <MESSAGE value="Fixed a bug" />
     <MESSAGE value="T" />
     <MESSAGE value="Delegated a space for the game itself" />
-    <option name="LAST_COMMIT_MESSAGE" value="Delegated a space for the game itself" />
+    <MESSAGE value="Organized code, added all the other general player output (health, atk, etc)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Organized code, added all the other general player output (health, atk, etc)" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/GameServer.java" />

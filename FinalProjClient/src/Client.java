@@ -299,13 +299,14 @@ public class Client extends JFrame implements WindowListener {
          String[] initialSplit = input.split(" ", -1);
          for (int i = 0; i < initialSplit.length; i++) {
             String[] secondSplit = initialSplit[i].split(",", -1);
+            int playerID=Integer.parseInt(secondSplit[0]);
             int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
             //System.out.println(tempXy[0]+" "+tempXy[1]);
-            gamePlayers[Integer.parseInt(secondSplit[0])].setXy(tempXy);
-            if (Boolean.parseBoolean(secondSplit[3])) {
-               gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1(Boolean.parseBoolean(secondSplit[3]));
+            gamePlayers[playerID].setXy(tempXy);
+            if (Boolean.parseBoolean(secondSplit[12])) {
+               gamePlayers[playerID].setSpell1(Boolean.parseBoolean(secondSplit[12]));
             }
-            gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1Percent(Integer.parseInt(secondSplit[4]));
+            gamePlayers[playerID].setSpell1Percent(Integer.parseInt(secondSplit[13]));
          }
       }
    }
