@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -294,7 +295,7 @@ public class Client extends JFrame implements WindowListener {
       } else {
          //Below is all temp. In reality, a serializable class should be decoded and output here
          input = input.trim();
-        // System.out.println(input);
+         // System.out.println(input);
          String[] initialSplit = input.split(" ", -1);
          for (int i = 0; i < initialSplit.length; i++) {
             String[] secondSplit = initialSplit[i].split(",", -1);
@@ -659,10 +660,15 @@ public class Client extends JFrame implements WindowListener {
       int[] midXy = new int[2];
       double adjustment = 0;
       int changeFactor = 1;
-      private Shape circle;
       private Shape rect;
-      private Area largeRect;
-      private Area smallCircle;
+      private Shape largeCircle;
+      private Shape midCircle;
+      private Shape smallCircle;
+      private Area areaRect;
+      private Area largeRing;
+      private Area midRing;
+      private Area areaSmallCircle;
+
 
       public GamePanel() {
          //Basic visuals
@@ -686,17 +692,25 @@ public class Client extends JFrame implements WindowListener {
                currentGamePlayer.setCenterXy(midXy);
             }
             g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
-            circle = new Ellipse2D.Double(180*scaling, 30*scaling, 440*scaling, 440*scaling);
-            rect = new Rectangle2D.Double(0, 0, 800*scaling, 500*scaling);
-            largeRect = new Area(rect);
-            smallCircle = new Area(circle);
-            largeRect.subtract(smallCircle);
+            largeCircle = new Ellipse2D.Double(180 * scaling, 30 * scaling, 440 * scaling, 440 * scaling);
+            midCircle = new Ellipse2D.Double(230 * scaling, 80 * scaling, 340 * scaling, 340 * scaling);
+            smallCircle = new Ellipse2D.Double(300 * scaling, 150 * scaling, 200 * scaling, 200 * scaling);
+            rect = new Rectangle2D.Double(0, 0, 800 * scaling, 500 * scaling);
+            areaRect = new Area(rect);
+            largeRing = new Area(largeCircle);
+            areaRect.subtract(largeRing);
+            midRing = new Area(midCircle);
+            areaSmallCircle = new Area(smallCircle);
+            largeRing.subtract(midRing);
+            midRing.subtract (areaSmallCircle);
+            //Now display large ring, mid ring, and small ring
+
          } else {
             g2 = (Graphics2D) g;
          }
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //This is temp, the decoded serialized class should be called here for .draw
@@ -741,7 +755,13 @@ public class Client extends JFrame implements WindowListener {
          g2.setColor(new Color(20, 30, 50));
          g2.fillRect((int) (425 * scaling), (int) ((483 - 100 * myGamePlayer.getSpell1Percent()) * scaling), (int) (100 * scaling), (int) ((100 * myGamePlayer.getSpell1Percent()) * scaling));
          g2.setColor(new Color(0f, 0f, 0f, 0.8f));
-         g2.fill(largeRect);
+         g2.fill(areaRect);
+         g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.5f));
+         g2.fill(largeRing);
+         g2.setColor(new Color(0.1f, 0.1f,0.02f, 0.3f));
+         g2.fill(midRing);
+         g2.setColor(new Color(0.1f, 0.1f,0.02f, 0.1f));
+         g2.fill(smallCircle);
          /*
          if (adjustment > 15) {
             changeFactor=-1;

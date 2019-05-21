@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="">
+    <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="Fixed animations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GamePlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TestClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TestClass.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" afterDir="false" />
     </list>
@@ -21,8 +19,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="205" column="19" selection-start-line="205" selection-start-column="19" selection-end-line="205" selection-end-column="19" />
+            <state relative-caret-position="2550">
+              <caret line="225" column="21" lean-forward="true" selection-start-line="225" selection-start-column="21" selection-end-line="225" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -106,8 +104,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/GamePlayer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-12">
-              <caret line="45" column="22" selection-start-line="45" selection-start-column="22" selection-end-line="45" selection-end-column="22" />
+            <state relative-caret-position="318">
+              <caret line="19" column="29" lean-forward="true" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
               <folding>
                 <element signature="e#1264#1265#0" expanded="true" />
                 <element signature="e#1326#1327#0" expanded="true" />
@@ -147,8 +145,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>myPlay</find>
-      <find>&quot;S</find>
       <find>MAX_X</find>
       <find>sector</find>
       <find>Sector</find>
@@ -177,6 +173,8 @@
       <find>System.out</find>
       <find>setSp</find>
       <find>System.out.p</find>
+      <find>circle</find>
+      <find>smallRing</find>
     </findStrings>
     <replaceStrings>
       <replace>outputLine</replace>
@@ -186,6 +184,8 @@
       <replace>CustomButton</replace>
       <replace>e</replace>
       <replace>this.pack();</replace>
+      <replace>largeCircle</replace>
+      <replace>areaSmallCircle</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -202,9 +202,9 @@
         <option value="$PROJECT_DIR$/src/GeneralClass.java" />
         <option value="$PROJECT_DIR$/src/Clock.java" />
         <option value="$PROJECT_DIR$/../FinalProjServer/src/TestClass.java" />
-        <option value="$PROJECT_DIR$/src/GamePlayer.java" />
-        <option value="$PROJECT_DIR$/src/Client.java" />
         <option value="$PROJECT_DIR$/src/TestClass.java" />
+        <option value="$PROJECT_DIR$/src/Client.java" />
+        <option value="$PROJECT_DIR$/src/GamePlayer.java" />
       </list>
     </option>
   </component>
@@ -344,15 +344,22 @@
       <option name="project" value="LOCAL" />
       <updated>1558390423570</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Fixed animations">
+      <created>1558450738031</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1558450738031</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48949578" visible="true" weight="0.09731544" />
-      <window_info id="Structure" order="1" sideWeight="0.5105042" side_tool="true" visible="true" weight="0.09731544" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49008498" visible="true" weight="0.09731544" />
+      <window_info id="Structure" order="1" sideWeight="0.509915" side_tool="true" visible="true" weight="0.09731544" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
@@ -360,7 +367,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32577905" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32577905" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39869988" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -387,7 +394,8 @@
     <MESSAGE value="Added test background image and sectors" />
     <MESSAGE value="Extremely rudimentary test class and animation was implemented" />
     <MESSAGE value="Added cooldown for animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added cooldown for animations" />
+    <MESSAGE value="Fixed animations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed animations" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/ClientFrame.java" />
@@ -513,13 +521,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/GeneralClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="12" selection-start-line="12" selection-end-line="17" selection-end-column="106" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/CustomKeyListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
@@ -574,10 +575,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/GeneralClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="12" selection-start-line="12" selection-end-line="17" selection-end-column="106" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/GamePlayer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12">
-          <caret line="45" column="22" selection-start-line="45" selection-start-column="22" selection-end-line="45" selection-end-column="22" />
+        <state relative-caret-position="318">
+          <caret line="19" column="29" lean-forward="true" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
           <folding>
             <element signature="e#1264#1265#0" expanded="true" />
             <element signature="e#1326#1327#0" expanded="true" />
@@ -591,8 +599,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="205" column="19" selection-start-line="205" selection-start-column="19" selection-end-line="205" selection-end-column="19" />
+        <state relative-caret-position="2550">
+          <caret line="225" column="21" lean-forward="true" selection-start-line="225" selection-start-column="21" selection-end-line="225" selection-end-column="21" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
