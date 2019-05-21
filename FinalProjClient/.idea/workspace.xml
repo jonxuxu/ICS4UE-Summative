@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="Fixed animations">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" afterDir="false" />
     </list>
@@ -351,7 +349,14 @@
       <option name="project" value="LOCAL" />
       <updated>1558450738031</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Fixed animations">
+      <created>1558456294445</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1558456294445</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">

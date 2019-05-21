@@ -302,7 +302,16 @@ public class Server {
                   }//This is the input
                   //Calculations here - This is essentially where ALL calculations take place.
                   //The game is essentially made in this space
+                  /////////////////////////////////////////////////////////////
 
+
+
+
+
+
+
+
+                  /////////////////////////////////////////////////////////////
                   for (int i = 0; i < playerNum; i++) {
                      if (!allInput[i].isEmpty()) {
                         double angleOfMovement = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
