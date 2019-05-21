@@ -57,8 +57,8 @@ public class TestClass extends GeneralClass {
       g2.drawImage(allAnimations[0][2], x, y, width, height, null);
    }
 
-   public void drawReal(Graphics2D g2, int x, int y, int width, int height, boolean animation1) {
-      if (animation1) {
+   public void drawReal(Graphics2D g2, int x, int y, int width, int height, boolean spell1) {
+      if (spell1) {
          resetSpell1();
          spell1(g2, x, y, width, height);
       } else {

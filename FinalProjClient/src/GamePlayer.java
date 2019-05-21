@@ -40,8 +40,11 @@ public class GamePlayer extends Player {
       this.xy = xy;
    }
 
-   public void draw(Graphics2D g2, int[] midXy, boolean animation1) {
-      thisClass.drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), animation1);
+   public void draw(Graphics2D g2, int[] midXy) {
+      thisClass.drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), spell1);
+      if (spell1){
+         spell1=false;
+      }
    }
 
    public void setScaling(double scaling) {

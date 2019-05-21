@@ -14,11 +14,15 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -200,9 +204,6 @@ public class Client extends JFrame implements WindowListener {
                      angleOfClick = myMouseAdapter.getAngleOfClick(); //Sends the correct angle
                      lengthOfClick = myMouseAdapter.getLengthOfClick(); //Sends the fully calculated length
                   }
-                  if (angleOfClick != -1) {
-                     System.out.println(angleOfClick + " " + lengthOfClick);
-                  }
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
                   outputString = angleOfMovement + " " + angleOfClick + " " + lengthOfClick;//If it is -1, then the server will recognize to stop
@@ -293,13 +294,16 @@ public class Client extends JFrame implements WindowListener {
       } else {
          //Below is all temp. In reality, a serializable class should be decoded and output here
          input = input.trim();
+        // System.out.println(input);
          String[] initialSplit = input.split(" ", -1);
          for (int i = 0; i < initialSplit.length; i++) {
             String[] secondSplit = initialSplit[i].split(",", -1);
             int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
             //System.out.println(tempXy[0]+" "+tempXy[1]);
             gamePlayers[Integer.parseInt(secondSplit[0])].setXy(tempXy);
-            gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1(Boolean.parseBoolean(secondSplit[3]));
+            if (Boolean.parseBoolean(secondSplit[3])) {
+               gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1(Boolean.parseBoolean(secondSplit[3]));
+            }
             gamePlayers[Integer.parseInt(secondSplit[0])].setSpell1Percent(Integer.parseInt(secondSplit[4]));
          }
       }
@@ -652,6 +656,13 @@ public class Client extends JFrame implements WindowListener {
    private class GamePanel extends JPanel {//State=5
       private Graphics2D g2;
       private boolean generateGraphics = true;
+      int[] midXy = new int[2];
+      double adjustment = 0;
+      int changeFactor = 1;
+      private Shape circle;
+      private Shape rect;
+      private Area largeRect;
+      private Area smallCircle;
 
       public GamePanel() {
          //Basic visuals
@@ -668,15 +679,21 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          if ((state == 5) && (generateGraphics)) {
-            int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+            midXy[0] = (int) (DESIRED_X * scaling / 2);
+            midXy[1] = (int) (DESIRED_Y * scaling / 2);
             for (GamePlayer currentGamePlayer : gamePlayers) {
                currentGamePlayer.setScaling(scaling);
-               currentGamePlayer.setCenterXy(tempXy);
+               currentGamePlayer.setCenterXy(midXy);
             }
             g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
+            circle = new Ellipse2D.Double(180*scaling, 30*scaling, 440*scaling, 440*scaling);
+            rect = new Rectangle2D.Double(0, 0, 800*scaling, 500*scaling);
+            largeRect = new Area(rect);
+            smallCircle = new Area(circle);
+            largeRect.subtract(smallCircle);
          } else {
             g2 = (Graphics2D) g;
          }
@@ -695,7 +712,7 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          for (GamePlayer currentGamePlayer : gamePlayers) {
-            currentGamePlayer.draw(g2, myGamePlayer.getXy(), currentGamePlayer.getSpell1());
+            currentGamePlayer.draw(g2, myGamePlayer.getXy());
          }
          /*
          g2.setColor(Color.white);
@@ -721,8 +738,20 @@ public class Client extends JFrame implements WindowListener {
          g2.drawRect((int) (425 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
          g2.drawRect((int) (550 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
          g2.drawRect((int) (675 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
-         g.setColor(new Color(20, 30, 50));
+         g2.setColor(new Color(20, 30, 50));
          g2.fillRect((int) (425 * scaling), (int) ((483 - 100 * myGamePlayer.getSpell1Percent()) * scaling), (int) (100 * scaling), (int) ((100 * myGamePlayer.getSpell1Percent()) * scaling));
+         g2.setColor(new Color(0f, 0f, 0f, 0.8f));
+         g2.fill(largeRect);
+         /*
+         if (adjustment > 15) {
+            changeFactor=-1;
+         }else if (adjustment<-15){
+            changeFactor=1;
+         }
+         adjustment+=0.4*changeFactor;
+         */
+
+         //g2.fillOval(midXy[0] - (int) ((220 + adjustment / 2.0) * scaling), midXy[1] - (int) ((220 + adjustment / 2.0) * scaling), (int) ((440 + adjustment) * scaling), (int) ((440 + adjustment) * scaling));
       }
    }
 
