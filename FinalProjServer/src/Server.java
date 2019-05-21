@@ -313,7 +313,7 @@ public class Server {
                         allInput[i] = "";
                         gamePlayers[i].addXy(angleOfMovement);
                         if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
-                           gamePlayers[i].setSpell1(gamePlayers[i].getThisClass().testSpell1(gameTick)); //Check, for some reason despite being true this does not work
+                           gamePlayers[i].setSpell1(gamePlayers[i].getThisClass().testSpell1(gameTick));
                         }
                      }
                   }
