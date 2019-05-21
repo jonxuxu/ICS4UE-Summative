@@ -51,16 +51,8 @@ public class GamePlayer extends Player {
       this.scaling = scaling;
    }
 
-   public double getScaling() {
-      return (scaling);
-   }
-
    public void setSpell1(boolean spell1) {
       this.spell1 = spell1;
-   }
-
-   public boolean getSpell1() {
-      return spell1;
    }
 
    public void setSpell1Percent(int spell1Percent) {

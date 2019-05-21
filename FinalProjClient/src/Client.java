@@ -65,7 +65,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean testGame = false;
    private Font MAIN_FONT;
    //State legend:
-   //0: Login panel, 1: Create/Join game, 2:Create game, 3:Join game , 4:Waiting , 5:Game
+   //0: Login panel, 1: Create/Join game, 2:Create gam   e, 3:Join game , 4:Waiting , 5:Game
    private int state = 0;
    private int newState = 0;
    private CardLayout cardLayout = new CardLayout(5, 5);

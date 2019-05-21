@@ -42,7 +42,7 @@ public class Sector {
       this.scaling = scaling;
    }
 
-   public void drawSector(Graphics2D g2, int[] midXy) {
+   public void drawSector(Graphics2D g2, int[] midXy)  {
       g2.drawImage(image, centerXy[0] + (int) (scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0]))-(int) (SECTOR_SIZE * scaling)/2, centerXy[1] +(int) (scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1]))-(int) (SECTOR_SIZE * scaling)/2, (int) (SECTOR_SIZE * scaling), (int) (SECTOR_SIZE * scaling), null);
    }
 }
