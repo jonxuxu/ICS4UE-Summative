@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * GamePlayer.java
  * This is
@@ -16,9 +18,10 @@ public class GamePlayer extends Player {
    private GeneralClass thisClass = new TestClass();//Temporary, normally it should be determined in the constructor
    private boolean spells[] = new boolean[3];
    private boolean artifact = false;
-   private Status status = null;
+   private ArrayList<Status> allStatus = new ArrayList<Status>();
    private int gold = 0;
    private int level = 0;
+   private int desiredSpell;
 
 
    GamePlayer(String username) {
@@ -54,10 +57,20 @@ public class GamePlayer extends Player {
 
    public String getFullOutput(int spellTick) {
       String outputString = "";
+      desiredSpell = -1;//In case nothing affects it
+      for (int i = 0; i < 3; i++) {
+         if (spells[i]) {
+            desiredSpell = i;
+         }
+      }
       outputString += xy[0] + "," + xy[1] + ",";//Coords
       outputString += thisClass.getHealth() + "," + thisClass.getMaxHealth() + "," + thisClass.getAttack() + "," + thisClass.getMobility() + "," + thisClass.getRange() + ",";//Stats
-      outputString += artifact + "," + status + "," + gold + "," + level + ",";//General
-      outputString += spells[0] + "," + thisClass.getSpellPercent(spellTick, 0) + "," + spells[1] + "," + thisClass.getSpellPercent(spellTick, 1) + "," + spells[2] + "," + thisClass.getSpellPercent(spellTick, 2);//Spells
+      outputString += artifact + "," + gold + "," + level + ",";//General
+      outputString += desiredSpell + "," + thisClass.getSpellPercent(spellTick, 0) + "," + thisClass.getSpellPercent(spellTick, 1) + "," + thisClass.getSpellPercent(spellTick, 2);//Spells
+      for (int i = 0; i < allStatus.size(); i++) {
+         outputString += "," + allStatus.get(i); //Status exclusive
+      }
+      outputString += " ";
       return outputString;
    }
 
