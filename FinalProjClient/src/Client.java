@@ -299,14 +299,25 @@ public class Client extends JFrame implements WindowListener {
          String[] initialSplit = input.split(" ", -1);
          for (int i = 0; i < initialSplit.length; i++) {
             String[] secondSplit = initialSplit[i].split(",", -1);
-            int playerID=Integer.parseInt(secondSplit[0]);
+            int playerID = Integer.parseInt(secondSplit[0]);
             int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
             //System.out.println(tempXy[0]+" "+tempXy[1]);
             gamePlayers[playerID].setXy(tempXy);
-            if (Boolean.parseBoolean(secondSplit[12])) {
-               gamePlayers[playerID].setSpell1(Boolean.parseBoolean(secondSplit[12]));
+            gamePlayers[playerID].getThisClass().setHealth(Integer.parseInt(secondSplit[3]));
+            gamePlayers[playerID].getThisClass().setMaxHealth(Integer.parseInt(secondSplit[4]));
+            gamePlayers[playerID].getThisClass().setAttack(Integer.parseInt(secondSplit[5]));
+            gamePlayers[playerID].getThisClass().setMobility(Integer.parseInt(secondSplit[6]));
+            gamePlayers[playerID].getThisClass().setRange(Integer.parseInt(secondSplit[7]));
+            gamePlayers[playerID].setArtifact(Boolean.parseBoolean(secondSplit[8]));
+            gamePlayers[playerID].setGold(Integer.parseInt(secondSplit[9]));
+            gamePlayers[playerID].setLevel(Integer.parseInt(secondSplit[10]));
+            gamePlayers[playerID].setSpell(Integer.parseInt(secondSplit[11]));//No more than one spell can be activated at once
+            for (int j = 12; j < 15; j++) {
+               gamePlayers[playerID].setSpellPercent(Integer.parseInt(secondSplit[j]), j - 12);
             }
-            gamePlayers[playerID].setSpell1Percent(Integer.parseInt(secondSplit[13]));
+            for (int j = 15; j < secondSplit.length; j++) {
+               gamePlayers[playerID].addStatus(Integer.parseInt(secondSplit[j]));
+            }
          }
       }
    }
@@ -705,7 +716,7 @@ public class Client extends JFrame implements WindowListener {
             midRing = new Area(midCircle);
             areaSmallCircle = new Area(smallCircle);
             largeRing.subtract(midRing);
-            midRing.subtract (areaSmallCircle);
+            midRing.subtract(areaSmallCircle);
             //Now display large ring, mid ring, and small ring
 
          } else {
@@ -754,14 +765,14 @@ public class Client extends JFrame implements WindowListener {
          g2.drawRect((int) (550 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
          g2.drawRect((int) (675 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
          g2.setColor(new Color(20, 30, 50));
-         g2.fillRect((int) (425 * scaling), (int) ((483 - 100 * myGamePlayer.getSpell1Percent()) * scaling), (int) (100 * scaling), (int) ((100 * myGamePlayer.getSpell1Percent()) * scaling));
+         g2.fillRect((int) (425 * scaling), (int) ((483 - 100 * myGamePlayer.getSpellPercent(0)) * scaling), (int) (100 * scaling), (int) ((100 * myGamePlayer.getSpellPercent(0)) * scaling));
          g2.setColor(new Color(0f, 0f, 0f, 0.8f));
          g2.fill(areaRect);
          g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.5f));
          g2.fill(largeRing);
-         g2.setColor(new Color(0.1f, 0.1f,0.02f, 0.3f));
+         g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.3f));
          g2.fill(midRing);
-         g2.setColor(new Color(0.1f, 0.1f,0.02f, 0.1f));
+         g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
          g2.fill(smallCircle);
          /*
          if (adjustment > 15) {

@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 /**
  * GamePlayer.java
@@ -16,8 +17,12 @@ public class GamePlayer extends Player {
    private int[] centerXy = new int[2];
    private double scaling;
    private GeneralClass thisClass = new TestClass();//Temporary, normally it should be determined in the constructor
-   private boolean spell1;
-   private int spell1Percent;
+   private int desiredSpell;
+   private int [] spellPercent = {100, 100, 100};
+   private ArrayList<Status> allStatus = new ArrayList<Status>();
+   private int gold = 0;
+   private boolean artifact;
+   private int level = 0;
 
    GamePlayer(String username) {
       super(username);
@@ -41,9 +46,9 @@ public class GamePlayer extends Player {
    }
 
    public void draw(Graphics2D g2, int[] midXy) {
-      thisClass.drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), spell1);
-      if (spell1){
-         spell1=false;
+      thisClass.drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), desiredSpell);
+      if (desiredSpell!=-1) {
+         desiredSpell=-1;
       }
    }
 
@@ -51,14 +56,38 @@ public class GamePlayer extends Player {
       this.scaling = scaling;
    }
 
-   public void setSpell1(boolean spell1) {
-      this.spell1 = spell1;
+   public void setSpell(int spellIndex) {
+      if (spellIndex!=-1) {
+         this.desiredSpell = spellIndex;
+      }
    }
 
-   public void setSpell1Percent(int spell1Percent) {
-      this.spell1Percent = spell1Percent;
+   public void setSpellPercent(int spellPercent, int spellIndex) {
+      this.spellPercent[spellIndex] = spellPercent;
    }
-   public double getSpell1Percent() {
-      return spell1Percent/100.0;
+
+   public double getSpellPercent(int spellIndex) {
+      return spellPercent[spellIndex] / 100.0;
+   }
+
+
+   public GeneralClass getThisClass() {
+      return (thisClass);
+   }
+
+   public void setGold(int gold) {
+      this.gold = gold;
+   }
+
+   public void addStatus(int statusInt) {
+      allStatus.clear(); //very inefficient, possibly change?
+      allStatus.add(new Status(statusInt));
+   }
+
+   public void setArtifact(boolean artifact) {
+      this.artifact = artifact;
+   }
+   public void setLevel(int level){
+      this.level=level;
    }
 }
