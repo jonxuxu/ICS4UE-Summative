@@ -100,11 +100,15 @@ public class Client extends JFrame implements WindowListener {
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Kiona-Bold.ttf")));
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Regular.ttf")));
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Bold.ttf")));
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
       } catch (IOException | FontFormatException e) {
          System.out.print("Font not available");
       }
-      MAIN_FONT = new Font("Kiona Bold", Font.PLAIN, 16);
+
+      MAIN_FONT = new Font("Quicksand", Font.PLAIN, 16);
 
       //Basic set up
       MAX_X = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getWidth());
@@ -117,7 +121,6 @@ public class Client extends JFrame implements WindowListener {
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
       this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
       //Creating components
       allPanels[0] = new LoginPanel();
       allPanels[1] = new MenuPanel();
@@ -133,6 +136,8 @@ public class Client extends JFrame implements WindowListener {
       this.add(mainContainer);
       cardLayout.show(mainContainer, panelNames[0]);
       this.setVisible(true);//Must be called again so that it appears visible
+      this.addKeyListener(myKeyListener);
+      this.addWindowListener(this);
    }
 
    public static void main(String[] args) {
@@ -281,6 +286,13 @@ public class Client extends JFrame implements WindowListener {
             }
          } else if (initializer == 'N') {
             onlineList.add(new Player(input));
+         } else if (initializer == 'X') {
+            for (int i = 0; i < onlineList.size(); i++) {
+               if (onlineList.get(i).getUsername().equals(input)) {
+                  onlineList.remove(i);
+                 System.out.println(onlineList.get(i).getUsername());
+               }
+            }
          } else if (initializer == 'B') {
             gamePlayers = new GamePlayer[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
@@ -367,6 +379,11 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void windowClosed(WindowEvent e) {
+      System.out.println("w");
+      output.println("X");
+      output.flush();
+      dispose();
+      System.exit(0);
    }
 
    private class LoginPanel extends JPanel { //State=0
@@ -681,7 +698,6 @@ public class Client extends JFrame implements WindowListener {
       private Area midRing;
       private Area areaSmallCircle;
 
-
       public GamePanel() {
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -706,26 +722,25 @@ public class Client extends JFrame implements WindowListener {
             g2 = (Graphics2D) g.create();
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
-            largeCircle = new Ellipse2D.Double(180 * scaling, 30 * scaling, 440 * scaling, 440 * scaling);
-            midCircle = new Ellipse2D.Double(230 * scaling, 80 * scaling, 340 * scaling, 340 * scaling);
-            smallCircle = new Ellipse2D.Double(300 * scaling, 150 * scaling, 200 * scaling, 200 * scaling);
+            largeCircle = new Ellipse2D.Double(325 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
+            midCircle = new Ellipse2D.Double(370 * scaling, 220 * scaling, 60 * scaling, 60 * scaling);
+            // smallCircle = new Ellipse2D.Double(300 * scaling, 150 * scaling, 200 * scaling, 200 * scaling);
             rect = new Rectangle2D.Double(0, 0, 800 * scaling, 500 * scaling);
             areaRect = new Area(rect);
             largeRing = new Area(largeCircle);
             areaRect.subtract(largeRing);
             midRing = new Area(midCircle);
-            areaSmallCircle = new Area(smallCircle);
+            //  areaSmallCircle = new Area(smallCircle);
             largeRing.subtract(midRing);
-            midRing.subtract(areaSmallCircle);
-            //Now display large ring, mid ring, and small ring
-
+            // midRing.subtract(areaSmallCircle);
          } else {
             g2 = (Graphics2D) g;
          }
+         g2.setFont(MAIN_FONT);
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         //This is temp, the decoded serialized class should be called here for .draw
+         //Sectors
          int startX = (int) ((myGamePlayer.getXy()[0] - 400.0) / 100.0);
          int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 400.0) / 100.0)) + 1;//Try adding +1 here if necessary
          int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 100.0);
@@ -737,6 +752,8 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          }
+
+         //Game player
          for (GamePlayer currentGamePlayer : gamePlayers) {
             currentGamePlayer.draw(g2, myGamePlayer.getXy());
          }
@@ -747,33 +764,46 @@ public class Client extends JFrame implements WindowListener {
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
            */
 
-
-         g2.setColor(Color.WHITE);
-         g2.drawRect((int) (670 * scaling), (int) (5 * scaling), (int) (125 * scaling), (int) (125 * scaling));
-         Polygon bottomBar = new Polygon();
-         bottomBar.addPoint((int) (5 * scaling), (int) (495 * scaling));
-         bottomBar.addPoint((int) (5 * scaling), (int) (390 * scaling));
-         bottomBar.addPoint((int) (25 * scaling), (int) (370 * scaling));
-         bottomBar.addPoint((int) (775 * scaling), (int) (370 * scaling));
-         bottomBar.addPoint((int) (795 * scaling), (int) (390 * scaling));
-         bottomBar.addPoint((int) (795 * scaling), (int) (495 * scaling));
-         g2.drawPolygon(bottomBar);
-         g2.drawRect((int) (5 * scaling), (int) (5 * scaling), (int) (200 * scaling), (int) (30 * scaling));
-         g2.drawRect((int) (5 * scaling), (int) (40 * scaling), (int) (160 * scaling), (int) (10 * scaling));
-         g2.drawRect((int) (5 * scaling), (int) (55 * scaling), (int) (160 * scaling), (int) (10 * scaling));
-         g2.drawRect((int) (425 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
-         g2.drawRect((int) (550 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
-         g2.drawRect((int) (675 * scaling), (int) (383 * scaling), (int) (100 * scaling), (int) (100 * scaling));
-         g2.setColor(new Color(20, 30, 50));
-         g2.fillRect((int) (425 * scaling), (int) ((483 - 100 * myGamePlayer.getSpellPercent(0)) * scaling), (int) (100 * scaling), (int) ((100 * myGamePlayer.getSpellPercent(0)) * scaling));
+         //Darkness
          g2.setColor(new Color(0f, 0f, 0f, 0.8f));
          g2.fill(areaRect);
-         g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.5f));
-         g2.fill(largeRing);
          g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.3f));
-         g2.fill(midRing);
+         g2.fill(largeRing);
          g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
-         g2.fill(smallCircle);
+         g2.fill(midRing);
+         //   g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
+         //  g2.fill(smallCircle);
+
+         //UI
+         g2.setColor(Color.WHITE);
+         g2.fillRect((int) (DESIRED_X * 67.0 / 80.0 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X * 5.0 / 32.0 * scaling), (int) (DESIRED_Y / 4 * scaling));
+         Polygon bottomBar = new Polygon();
+         bottomBar.addPoint((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 99.0 / 100.0 * scaling));
+         bottomBar.addPoint((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 39.0 / 50.0 * scaling));
+         bottomBar.addPoint((int) (DESIRED_X / 32 * scaling), (int) (DESIRED_Y * 37.0 / 50.0 * scaling));
+         bottomBar.addPoint((int) (DESIRED_X * 31.0 / 32.0 * scaling), (int) (DESIRED_Y * 37.0 / 50.0 * scaling));
+         bottomBar.addPoint((int) (DESIRED_X * 159.0 / 160.0 * scaling), (int) (DESIRED_Y * 39.0 / 50.0 * scaling));
+         bottomBar.addPoint((int) (DESIRED_X * 159.0 / 160.0 * scaling), (int) (DESIRED_Y * 99.0 / 100.0 * scaling));
+         g2.fillPolygon(bottomBar);
+         g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X / 4 * scaling), (int) (DESIRED_Y * 3.0 / 50.0 * scaling));
+         g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 2.0 / 25.0 * scaling), (int) (DESIRED_X / 5 * scaling), (int) (DESIRED_Y / 50 * scaling));
+         g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 11.0 / 100.0 * scaling), (int) (DESIRED_X / 5 * scaling), (int) (DESIRED_Y / 50 * scaling));
+         g2.fillRect((int) (DESIRED_X * 17.0 / 32.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
+         g2.fillRect((int) (DESIRED_X * 11.0 / 16.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
+         g2.fillRect((int) (DESIRED_X * 27.0 / 32.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
+         g2.setColor(new Color(20, 30, 50));
+         g2.fillRect((int) (DESIRED_X * 17.0 / 32.0 * scaling), (int) ((DESIRED_Y * 483.0 / 500.0 - DESIRED_Y / 5 * myGamePlayer.getSpellPercent(0)) * scaling), (int) (DESIRED_X / 8 * scaling), (int) ((DESIRED_Y / 5 * myGamePlayer.getSpellPercent(0)) * scaling));
+
+         //Stat bars
+         g2.setColor(new Color(190, 40, 40));
+         g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 2.0 / 25.0 * scaling), (int) (DESIRED_X / 5 * scaling * myGamePlayer.getThisClass().getHealth() / myGamePlayer.getThisClass().getMaxHealth()), (int) (DESIRED_Y / 50 * scaling));
+         g2.drawString("Gold: " + myGamePlayer.getGold(), (int) (5 * scaling), (int) (31 * scaling));
+         g2.drawString("Level: " + myGamePlayer.getLevel(), (int) (5 * scaling), (int) (22 * scaling));
+         g2.drawString("Username: " + myGamePlayer.getUsername(), (int) (5 * scaling), (int) (13 * scaling));
+         g2.drawString("Attack:" + myGamePlayer.getThisClass().getAttack(), (int) (10 * scaling), (int) (470 * scaling));
+         g2.drawString("Mobility:" + myGamePlayer.getThisClass().getMobility(), (int) (10 * scaling), (int) (485 * scaling));
+         g2.drawString("Range:" + myGamePlayer.getThisClass().getRange(), (int) (10 * scaling), (int) (455 * scaling));
+
          /*
          if (adjustment > 15) {
             changeFactor=-1;

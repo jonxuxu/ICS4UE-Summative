@@ -90,4 +90,12 @@ public class GamePlayer extends Player {
    public void setLevel(int level){
       this.level=level;
    }
+
+   public int getGold() {
+      return gold;
+   }
+
+   public int getLevel() {
+      return level;
+   }
 }
