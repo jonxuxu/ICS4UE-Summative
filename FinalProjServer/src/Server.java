@@ -144,7 +144,7 @@ public class Server {
                         if (error == 0) {
                            //To the person trying to join, they should have the names of everyone sent to them
                            //To everyone else, they should have the name of the new individual
-                           printOnlineList();
+                           printOnlineList(true);
                         }
                         output.println(error);
                         output.flush();
@@ -188,11 +188,15 @@ public class Server {
                         }
                         myGame = null;
                      } else if (initializer == 'X') { //Activated by window listener only
-                        myGame.removeGamePlayer(myPlayer, myConnection, this);
-                        if (myGame.getGameSize() == 0) {
-                           games.remove(myGame);
+                        System.out.println("Exit");
+                        if (myGame != null) {
+                           myGame.removeGamePlayer(myPlayer, myConnection, this);
+                           if (myGame.getGameSize() == 0) {
+                              games.remove(myGame);
+                           }
+                           printOnlineList(false);
+                           myGame = null;
                         }
-                        myGame = null;
                         stop = true;
                      }
                   }
@@ -217,24 +221,35 @@ public class Server {
          return (true);
       }
 
-      public void printOnlineList() {
+      public void printOnlineList(boolean toAll) {
          //N means new player, A means all players
          try {
-            ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
-            String currentPlayerString = myGame.getOnlineGameString();
-            for (int i = 0; i < currentSocketList.size(); i++) {
-               //If the error is 0, which it is in this case, no error needs to be printed out
-               output = new PrintWriter(currentSocketList.get(i).getOutputStream());
-               if (currentSocketList.get(i).equals(myConnection)) {
-                  System.out.println("A" + currentPlayerString);
-                  output.println("A" + currentPlayerString); //Print the entire list
-                  output.flush();
-               } else {
-                  output.println("N" + myPlayer.getUsername()); //Print only the name for the player
+            if (toAll) {
+               ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
+               String currentPlayerString = myGame.getOnlineGameString();
+               for (int i = 0; i < currentSocketList.size(); i++) {
+                  //If the error is 0, which it is in this case, no error needs to be printed out
+                  output = new PrintWriter(currentSocketList.get(i).getOutputStream());
+                  if (currentSocketList.get(i).equals(myConnection)) {
+                     System.out.println("A" + currentPlayerString);
+                     output.println("A" + currentPlayerString); //Print the entire list
+                     output.flush();
+                  } else {
+                     output.println("N" + myPlayer.getUsername()); //Print only the name for the player
+                     output.flush();
+                  }
+               }
+               output = new PrintWriter(myConnection.getOutputStream());
+            } else {
+               ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
+               String currentPlayerString = myGame.getOnlineGameString();
+               for (int i = 0; i < currentSocketList.size(); i++) {
+                  //If the error is 0, which it is in this case, no error needs to be printed out
+                  output = new PrintWriter(currentSocketList.get(i).getOutputStream());
+                  output.println("X" + myPlayer.getUsername()); //Print only the name for the player
                   output.flush();
                }
             }
-            output = new PrintWriter(myConnection.getOutputStream());
          } catch (IOException e) {
             System.out.println("Failed to transfer information");
          }
