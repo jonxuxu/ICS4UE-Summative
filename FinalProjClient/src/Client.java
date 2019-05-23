@@ -162,14 +162,15 @@ public class Client extends JFrame implements WindowListener {
                   if (verifyUsername(username)) {
                      output.println(username);
                      output.flush();
-                     System.out.println(username);
                      waitForInput();
                   }
                   if (usernameError == 0) {
                      System.out.println("Valid username");
-                     start = false;
+                     start=false;
                   } else {
+                     System.out.println("N"+username);
                      username = null;
+                     start=true;
                      if (usernameError == 1) {
                         System.out.println("Username already taken");
                      } else if (usernameError == 2) {
@@ -277,7 +278,6 @@ public class Client extends JFrame implements WindowListener {
          while (!inputReady) {
             if (input.ready()) {
                inputReady = true;
-               System.out.println(input.readLine());
                decipherInput(input.readLine());
             }
          }
@@ -303,18 +303,20 @@ public class Client extends JFrame implements WindowListener {
       if (!gameBegin) {
          if (isParsable(initializer)) {
             if (start) {
-               usernameError = initializer;
+               usernameError = Integer.parseInt(initializer+"");
             } else if ((state == 2) || (state == 3)) {
                if (initializer == '0') {
                   newState = 4;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
                   System.out.println("Valid Game");
+                  System.out.println(username);
                   myPlayer = new Player(username);//Sets the player
                   if (state == 2) {
                      host = true;
                      onlineList.add(myPlayer);
                   }
+                  System.out.println(myPlayer.getUsername());
                } else {
                   System.out.println("Invalid Game");
                }
@@ -569,7 +571,7 @@ public class Client extends JFrame implements WindowListener {
          if (attemptedGameName != null) {
             if (!attemptedGameName.equals("w")) {
                attemptedGameName = "w";
-               attemptedGamePassword = "";
+               attemptedGamePassword = "w";
                testGame = true;
             }
          } else {
@@ -624,7 +626,7 @@ public class Client extends JFrame implements WindowListener {
          if (attemptedGameName != null) {
             if (!attemptedGameName.equals("w")) {
                attemptedGameName = "w";
-               attemptedGamePassword = "";
+               attemptedGamePassword = "w";
                testGame = true;
             }
          } else {
