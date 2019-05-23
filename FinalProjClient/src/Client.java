@@ -89,6 +89,8 @@ public class Client extends JFrame implements WindowListener {
    private int MAX_X;
    private double scaling;
    private Sector[][] sectors;
+   private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
+   private int usernameError;
 
 
    public Client() {
@@ -155,14 +157,24 @@ public class Client extends JFrame implements WindowListener {
             repaintPanels();
             if (sendName) {
                sendName = false;
-               output.println(username);
-               System.out.println(username);
-               output.flush();
-               waitForInput();
-               if (start) {
-                  System.out.println("Invalid username");
-               } else {
+               usernameError = 0;
+               if (verifyUsername(username)) {
+                  output.println(username);
+                  System.out.println(username);
+                  output.flush();
+                  waitForInput();
+               }
+               if (usernameError == 0) {
                   System.out.println("Valid username");
+                  start = false;
+               } else if (usernameError == 1) {
+                  System.out.println("Username already taken");
+               } else if (usernameError == 2) {
+                  System.out.println("Only letters and numbers are allowed");
+               } else if (usernameError == 3) {
+                  System.out.println("Username exceeds 15 characters");
+               } else if (usernameError == 4) {
+                  System.out.println("Username is blank");
                }
             }
          }
@@ -224,6 +236,35 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+   public boolean verifyUsername(String username) {
+      if (username.length() < 15) {
+         if (username.isEmpty()) {
+            usernameError = 4;
+         } else {
+            for (int i = 0; i < username.length(); i++) {
+               if (!letterOrNumber(username.charAt(i))) {
+                  usernameError = 2;
+               }
+            }
+         }
+      } else {
+         usernameError = 3;
+      }
+      if (usernameError == 0) {
+         return true;
+      } else {
+         return false;
+      }
+   }
+
+   public boolean letterOrNumber(char letter) {
+      if (((letter >= 97) && (letter <= 122)) || ((letter >= 65) && (letter <= 90)) || ((letter >= 48) && (letter <= 57))) {
+         return true;
+      } else {
+         return false;
+      }
+   }
+
    public void waitForInput() {
       boolean inputReady = false;
       try {
@@ -255,9 +296,7 @@ public class Client extends JFrame implements WindowListener {
       if (!gameBegin) {
          if (isParsable(initializer)) {
             if (start) {
-               if (initializer == '0') {
-                  start = false; //Otherwise, nothing occurs
-               }
+               usernameError = initializer;
             } else if ((state == 2) || (state == 3)) {
                if (initializer == '0') {
                   newState = 4;//Sends to a waiting room
@@ -290,7 +329,7 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
                   onlineList.remove(i);
-                 System.out.println(onlineList.get(i).getUsername());
+                  System.out.println(onlineList.get(i).getUsername());
                }
             }
          } else if (initializer == 'B') {
@@ -305,31 +344,33 @@ public class Client extends JFrame implements WindowListener {
             gameBegin = true;
          }
       } else {
-         //Below is all temp. In reality, a serializable class should be decoded and output here
          input = input.trim();
-         // System.out.println(input);
-         String[] initialSplit = input.split(" ", -1);
-         for (int i = 0; i < initialSplit.length; i++) {
-            String[] secondSplit = initialSplit[i].split(",", -1);
-            int playerID = Integer.parseInt(secondSplit[0]);
-            int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
-            //System.out.println(tempXy[0]+" "+tempXy[1]);
-            gamePlayers[playerID].setXy(tempXy);
-            gamePlayers[playerID].getThisClass().setHealth(Integer.parseInt(secondSplit[3]));
-            gamePlayers[playerID].getThisClass().setMaxHealth(Integer.parseInt(secondSplit[4]));
-            gamePlayers[playerID].getThisClass().setAttack(Integer.parseInt(secondSplit[5]));
-            gamePlayers[playerID].getThisClass().setMobility(Integer.parseInt(secondSplit[6]));
-            gamePlayers[playerID].getThisClass().setRange(Integer.parseInt(secondSplit[7]));
-            gamePlayers[playerID].setArtifact(Boolean.parseBoolean(secondSplit[8]));
-            gamePlayers[playerID].setGold(Integer.parseInt(secondSplit[9]));
-            gamePlayers[playerID].setLevel(Integer.parseInt(secondSplit[10]));
-            gamePlayers[playerID].setSpell(Integer.parseInt(secondSplit[11]));//No more than one spell can be activated at once
-            for (int j = 12; j < 15; j++) {
-               gamePlayers[playerID].setSpellPercent(Integer.parseInt(secondSplit[j]), j - 12);
+         if (initializer == 'G') {
+            String[] initialSplit = input.split(" ", -1);
+            for (int i = 0; i < initialSplit.length; i++) {
+               String[] secondSplit = initialSplit[i].split(",", -1);
+               int playerID = Integer.parseInt(secondSplit[0]);
+               int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
+               //System.out.println(tempXy[0]+" "+tempXy[1]);
+               gamePlayers[playerID].setXy(tempXy);
+               gamePlayers[playerID].getThisClass().setHealth(Integer.parseInt(secondSplit[3]));
+               gamePlayers[playerID].getThisClass().setMaxHealth(Integer.parseInt(secondSplit[4]));
+               gamePlayers[playerID].getThisClass().setAttack(Integer.parseInt(secondSplit[5]));
+               gamePlayers[playerID].getThisClass().setMobility(Integer.parseInt(secondSplit[6]));
+               gamePlayers[playerID].getThisClass().setRange(Integer.parseInt(secondSplit[7]));
+               gamePlayers[playerID].setArtifact(Boolean.parseBoolean(secondSplit[8]));
+               gamePlayers[playerID].setGold(Integer.parseInt(secondSplit[9]));
+               gamePlayers[playerID].setLevel(Integer.parseInt(secondSplit[10]));
+               gamePlayers[playerID].setSpell(Integer.parseInt(secondSplit[11]));//No more than one spell can be activated at once
+               for (int j = 12; j < 15; j++) {
+                  gamePlayers[playerID].setSpellPercent(Integer.parseInt(secondSplit[j]), j - 12);
+               }
+               for (int j = 15; j < secondSplit.length; j++) {
+                  gamePlayers[playerID].addStatus(Integer.parseInt(secondSplit[j]));
+               }
             }
-            for (int j = 15; j < secondSplit.length; j++) {
-               gamePlayers[playerID].addStatus(Integer.parseInt(secondSplit[j]));
-            }
+         } else {
+            gamePlayers[Integer.parseInt(initializer + "")] = null;
          }
       }
    }
@@ -742,7 +783,7 @@ public class Client extends JFrame implements WindowListener {
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
          int startX = (int) ((myGamePlayer.getXy()[0] - 400.0) / 100.0);
-         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 400.0) / 100.0)) + 1;//Try adding +1 here if necessary
+         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 400.0) / 100.0)) + 1;
          int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 100.0);
          int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 100.0)) + 1;
          for (int i = startY; i < finalY; i++) {
@@ -755,7 +796,9 @@ public class Client extends JFrame implements WindowListener {
 
          //Game player
          for (GamePlayer currentGamePlayer : gamePlayers) {
-            currentGamePlayer.draw(g2, myGamePlayer.getXy());
+            if (currentGamePlayer != null) {
+               currentGamePlayer.draw(g2, myGamePlayer.getXy());
+            }
          }
          /*
          g2.setColor(Color.white);
@@ -775,7 +818,7 @@ public class Client extends JFrame implements WindowListener {
          //  g2.fill(smallCircle);
 
          //UI
-         g2.setColor(new Color (50,50,50));
+         g2.setColor(new Color(50, 50, 50));
          g2.fillRect((int) (DESIRED_X * 67.0 / 80.0 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X * 5.0 / 32.0 * scaling), (int) (DESIRED_Y / 4 * scaling));
          Polygon bottomBar = new Polygon();
          bottomBar.addPoint((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 99.0 / 100.0 * scaling));
@@ -797,12 +840,13 @@ public class Client extends JFrame implements WindowListener {
          //Stat bars
          g2.setColor(new Color(190, 40, 40));
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 2.0 / 25.0 * scaling), (int) (DESIRED_X / 5 * scaling * myGamePlayer.getThisClass().getHealth() / myGamePlayer.getThisClass().getMaxHealth()), (int) (DESIRED_Y / 50 * scaling));
+         g2.setColor(Color.white);
          g2.drawString("Gold: " + myGamePlayer.getGold(), (int) (5 * scaling), (int) (31 * scaling));
          g2.drawString("Level: " + myGamePlayer.getLevel(), (int) (5 * scaling), (int) (22 * scaling));
          g2.drawString("Username: " + myGamePlayer.getUsername(), (int) (5 * scaling), (int) (13 * scaling));
-         g2.drawString("Attack:" + myGamePlayer.getThisClass().getAttack(), (int) (10 * scaling), (int) (470 * scaling));
-         g2.drawString("Mobility:" + myGamePlayer.getThisClass().getMobility(), (int) (10 * scaling), (int) (485 * scaling));
-         g2.drawString("Range:" + myGamePlayer.getThisClass().getRange(), (int) (10 * scaling), (int) (455 * scaling));
+         g2.drawString("Attack: " + myGamePlayer.getThisClass().getAttack(), (int) (10 * scaling), (int) (470 * scaling));
+         g2.drawString("Mobility: " + myGamePlayer.getThisClass().getMobility(), (int) (10 * scaling), (int) (485 * scaling));
+         g2.drawString("Range: " + myGamePlayer.getThisClass().getRange(), (int) (10 * scaling), (int) (455 * scaling));
 
          /*
          if (adjustment > 15) {

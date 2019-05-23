@@ -37,8 +37,6 @@ Pressing leave game will instead send Q, which will do most of the same things
 
 public class Server {
    //All for the main server
-   private ServerSocket serverSock;
-   private ArrayList<Socket> allSockets = new ArrayList<Socket>();
    private ArrayList<MenuHandler> menuConnections = new ArrayList<MenuHandler>();
 
    //Used by all
@@ -50,12 +48,11 @@ public class Server {
       new Server().go();
    }
 
-   public void go() {
+   private void go() {
       try {
-         serverSock = new ServerSocket(5001);  //assigns an port to the server
+         ServerSocket serverSock = new ServerSocket(5001);  //assigns an port to the server
          while (true) {  //this loops to accept multiple clients
             Socket newConnection = serverSock.accept();
-            allSockets.add(newConnection);
             menuConnections.add(new MenuHandler(newConnection));
             Thread t = new Thread(menuConnections.get(menuConnections.size() - 1));
             t.start();
@@ -130,10 +127,10 @@ public class Server {
                         inputString = inputString.substring(inputString.indexOf(" ") + 1);
                         String attemptServerPassword = inputString;
                         error = 1;
-                        for (int i = 0; i < games.size(); i++) {
-                           if ((games.get(i).sameName(attemptServerName)) && (games.get(i).samePassword(attemptServerPassword))) {
-                              if (games.get(i).addGamePlayer(myPlayer, myConnection, this)) {
-                                 myGame = games.get(i);
+                        for (GameServer thisGame : games) {
+                           if ((thisGame.sameName(attemptServerName)) && (thisGame.samePassword(attemptServerPassword))) {
+                              if (thisGame.addGamePlayer(myPlayer, myConnection, this)) {
+                                 myGame = thisGame;
                                  error = 0;
                               } else {
                                  error = 2; //2 indicates that the game is full
@@ -208,11 +205,11 @@ public class Server {
          }
       }
 
-      public void kill() {
+      private void kill() {
          stop = true;
       }
 
-      public boolean usernameValid(String attemptedName) {
+      private boolean usernameValid(String attemptedName) {
          //Later on, check for special characters and set a limit
          for (int i = 0; i < onlinePlayers.size(); i++) {
             if (onlinePlayers.get(i).getUsername().equals(attemptedName)) {
@@ -222,7 +219,7 @@ public class Server {
          return (true);
       }
 
-      public void printOnlineList(boolean toAll) {
+      private void printOnlineList(boolean toAll) {
          //N means new player, A means all players
          try {
             if (toAll) {
@@ -271,7 +268,7 @@ public class Server {
       private int playerNum;//For the ID's even disconnected players will work
       private Clock time = new Clock();
       private int gameTick = 0;
-      private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
+      private int disconnectedPlayerNum = 0;
 
       //Constants for general display
       private Rectangle SPELL_1 = new Rectangle(425, 383, 100, 100);
@@ -282,8 +279,8 @@ public class Server {
       public void run() {
          //Not called until the game begins
          //Once it is called, this is all that really occurs
-         for (int i = 0; i < handlers.size(); i++) {
-            handlers.get(i).kill();
+         for (MenuHandler thisHandler : handlers) {
+            thisHandler.kill();
          }
          try {
             gamePlayers = new GamePlayer[onlineGamePlayers.size()];
@@ -313,7 +310,7 @@ public class Server {
                time.setTime();
                if (time.getFramePassed()) {
                   for (int i = 0; i < playerNum; i++) {
-                     if (!disconnectedPlayerID.contains(i)) {
+                     if (gamePlayers[i] != null) {
                         if (gameInputs[i].ready()) {
                            allInput[i] = gameInputs[i].readLine();//Timed
                         }
@@ -325,16 +322,19 @@ public class Server {
 
 
                   /////////////////////////////////////////////////////////////
+                  StringBuilder outputString = new StringBuilder("G");
                   for (int i = 0; i < playerNum; i++) {
-                     if (!disconnectedPlayerID.contains(i)) {
+                     if (gamePlayers[i] != null) {
                         if (!allInput[i].isEmpty()) {
                            if (allInput[i].equals("X")) {
-                              removeGamePlayer(gamePlayers[i], gameSockets[i], handlers.get(i));
-                              disconnectedPlayerID.add(i);
-                              if (disconnectedPlayerID.size() == (playerNum)) {
+                              gamePlayers[i] = null;
+                              disconnectedPlayerNum++;
+                              if (disconnectedPlayerNum == playerNum) {
                                  stopGame = true;
                               }
-                              allInput[i]="";
+                              allInput[i] = "";
+                              outputString.deleteCharAt(0);
+                              outputString.append(i);
                            } else {
                               double angleOfMovement = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
                               allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
@@ -350,15 +350,14 @@ public class Server {
                         }
                      }
                   }
-                  //Output will be here
-                  String outputString = "G";
+                  //Output will be here. The first loop generates the full message, the second distributes it
                   for (int i = 0; i < playerNum; i++) {
-                     if (!disconnectedPlayerID.contains(i)) {
-                        outputString += i + "," + gamePlayers[i].getFullOutput(gameTick);
+                     if (gamePlayers[i] != null) {
+                        outputString.append(i + "," + gamePlayers[i].getFullOutput(gameTick));
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
-                     if (!disconnectedPlayerID.contains(i)) {
+                     if (gamePlayers[i] != null) {
                         gameOutputs[i].println(outputString);
                         gameOutputs[i].flush();
                      }
@@ -376,7 +375,7 @@ public class Server {
          this.serverPassword = serverPassword;
       }
 
-      public boolean sameName(String comparedName) {
+      private boolean sameName(String comparedName) {
          if (comparedName.equals(serverName)) {
             return (true);
          } else {
@@ -384,7 +383,7 @@ public class Server {
          }
       }
 
-      public boolean samePassword(String comparedPassword) {
+      private boolean samePassword(String comparedPassword) {
          if (comparedPassword.equals(serverPassword)) {
             return (true);
          } else {
@@ -392,7 +391,7 @@ public class Server {
          }
       }
 
-      public boolean addGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
+      private boolean addGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
          if (onlineGamePlayers.size() < 6) {
             onlineGamePlayers.add(new GamePlayer(player.getUsername()));
             onlineGameSockets.add(playerSocket);
@@ -403,7 +402,7 @@ public class Server {
          }
       }
 
-      public void removeGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
+      private void removeGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
          System.out.println(player.getUsername());
          System.out.println(onlineGamePlayers.size());
          for (int i = 0; i < onlineGamePlayers.size(); i++) {
@@ -416,20 +415,20 @@ public class Server {
          System.out.println(onlineGamePlayers.size());
       }
 
-      public int getGameSize() {
+      private int getGameSize() {
          return (onlineGamePlayers.size());
       }
 
-      public ArrayList<Socket> getOnlineGameSockets() {
+      private ArrayList<Socket> getOnlineGameSockets() {
          return (onlineGameSockets);
       }
 
-      public String getOnlineGameString() {
-         String onlineString = "";
+      private String getOnlineGameString() {
+         StringBuilder onlineString = new StringBuilder("");
          for (int i = 0; i < onlineGamePlayers.size(); i++) {
-            onlineString = onlineString + onlineGamePlayers.get(i).getUsername() + " ";
+            onlineString.append(onlineGamePlayers.get(i).getUsername() + " ");
          }
-         return (onlineString);//There will be a space at the end, this is useful
+         return (onlineString + "");//There will be a space at the end, this is useful
       }
    }
 }

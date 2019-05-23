@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4cc47424-5629-4100-bec4-efe5b4721688" name="Default Changelist" comment="Added new">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/../FinalProjServer/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Planning/Server.class.violet.html" beforeDir="false" afterPath="$PROJECT_DIR$/../Planning/Server.class.violet.html" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,10 +18,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="786" column="35" lean-forward="true" selection-start-line="786" selection-start-column="35" selection-end-line="786" selection-end-column="35" />
+            <state relative-caret-position="631">
+              <caret line="179" column="10" lean-forward="true" selection-start-line="179" selection-start-column="10" selection-end-line="179" selection-end-column="10" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#27136#27137#0" expanded="true" />
+                <element signature="e#27174#27175#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -164,14 +164,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>System</find>
-      <find>draw</find>
-      <find>Spell</find>
-      <find>animat</find>
-      <find>spell1</find>
-      <find>drawRea</find>
-      <find>getSpel</find>
-      <find>here</find>
       <find>System.out</find>
       <find>setSp</find>
       <find>System.out.p</find>
@@ -186,7 +178,6 @@
       <find>Syste</find>
       <find>spellAnim</find>
       <find>System.out.pr</find>
-      <find>decipherIn</find>
       <find>(5 * scaling</find>
       <find>(100 * scaling</find>
       <find>(383 * scaling)</find>
@@ -194,6 +185,15 @@
       <find>addWind</find>
       <find>w</find>
       <find>Window</find>
+      <find>decipherIn</find>
+      <find>repaintReal</find>
+      <find>&quot;X&quot;</find>
+      <find>decipherInput</find>
+      <find>username</find>
+      <find>usernameEr</find>
+      <find>verifyU</find>
+      <find>usernameError</find>
+      <find>start</find>
     </findStrings>
     <replaceStrings>
       <replace>outputLine</replace>
@@ -235,9 +235,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-7" />
-    <option name="width" value="1934" />
-    <option name="height" value="1047" />
+    <option name="x" value="-8" />
+    <option name="width" value="1935" />
+    <option name="height" value="1048" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -245,8 +245,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -408,11 +408,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4864572" visible="true" weight="0.07942431" />
-      <window_info id="Structure" order="1" sideWeight="0.5135428" side_tool="true" visible="true" weight="0.07942431" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48441926" visible="true" weight="0.08053691" />
+      <window_info id="Structure" order="1" sideWeight="0.5155807" side_tool="true" visible="true" weight="0.08053691" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
@@ -420,7 +420,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32827735" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.26203966" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39869988" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -452,18 +452,6 @@
     <MESSAGE value="Added the rest of the stats for the player" />
     <MESSAGE value="Added response when leaving" />
     <option name="LAST_COMMIT_MESSAGE" value="Added response when leaving" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Client.java</url>
-          <line>744</line>
-          <properties />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/ClientFrame.java" />
@@ -577,10 +565,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="786" column="35" lean-forward="true" selection-start-line="786" selection-start-column="35" selection-end-line="786" selection-end-column="35" />
+        <state relative-caret-position="631">
+          <caret line="179" column="10" lean-forward="true" selection-start-line="179" selection-start-column="10" selection-end-line="179" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#27136#27137#0" expanded="true" />
+            <element signature="e#27174#27175#0" expanded="true" />
           </folding>
         </state>
       </provider>
