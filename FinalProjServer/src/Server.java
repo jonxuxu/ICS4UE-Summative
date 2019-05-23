@@ -316,12 +316,6 @@ public class Server {
                         }
                      }
                   }//This is the input
-                  //Calculations here - This is essentially where ALL calculations take place.
-                  //The game is essentially made in this space
-                  /////////////////////////////////////////////////////////////
-
-
-                  /////////////////////////////////////////////////////////////
                   StringBuilder outputString = new StringBuilder("G");
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
@@ -350,6 +344,13 @@ public class Server {
                         }
                      }
                   }
+                  //Calculations here - This is essentially where ALL calculations take place.
+                  //The game is essentially made in this space
+                  /////////////////////////////////////////////////////////////
+
+
+                  /////////////////////////////////////////////////////////////
+
                   //Output will be here. The first loop generates the full message, the second distributes it
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {

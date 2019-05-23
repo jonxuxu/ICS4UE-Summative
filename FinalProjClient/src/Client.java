@@ -158,23 +158,28 @@ public class Client extends JFrame implements WindowListener {
             if (sendName) {
                sendName = false;
                usernameError = 0;
-               if (verifyUsername(username)) {
-                  output.println(username);
-                  System.out.println(username);
-                  output.flush();
-                  waitForInput();
-               }
-               if (usernameError == 0) {
-                  System.out.println("Valid username");
-                  start = false;
-               } else if (usernameError == 1) {
-                  System.out.println("Username already taken");
-               } else if (usernameError == 2) {
-                  System.out.println("Only letters and numbers are allowed");
-               } else if (usernameError == 3) {
-                  System.out.println("Username exceeds 15 characters");
-               } else if (usernameError == 4) {
-                  System.out.println("Username is blank");
+               if (username != null) {
+                  if (verifyUsername(username)) {
+                     output.println(username);
+                     output.flush();
+                     System.out.println(username);
+                     waitForInput();
+                  }
+                  if (usernameError == 0) {
+                     System.out.println("Valid username");
+                     start = false;
+                  } else {
+                     username = null;
+                     if (usernameError == 1) {
+                        System.out.println("Username already taken");
+                     } else if (usernameError == 2) {
+                        System.out.println("Only letters and numbers are allowed");
+                     } else if (usernameError == 3) {
+                        System.out.println("Username exceeds 15 characters");
+                     } else if (usernameError == 4) {
+                        System.out.println("Username is blank");
+                     }
+                  }
                }
             }
          }
@@ -225,6 +230,7 @@ public class Client extends JFrame implements WindowListener {
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
                   outputString = angleOfMovement + " " + angleOfClick + " " + lengthOfClick;//If it is -1, then the server will recognize to stop
+                  //MAKE SURE TO CHANGE TO RECTANGULAR
                   output.println(outputString);
                   output.flush();
                }
@@ -271,6 +277,7 @@ public class Client extends JFrame implements WindowListener {
          while (!inputReady) {
             if (input.ready()) {
                inputReady = true;
+               System.out.println(input.readLine());
                decipherInput(input.readLine());
             }
          }
@@ -446,8 +453,6 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          });
-         //FOR NOW, ONLY TEMP
-         username = Math.random() * 10 + "";
          sendName = true;
          nameField.setFont(MAIN_FONT);
          nameField.setBounds(MAX_X / 2 - 75, MAX_Y / 5, 150, 30);
