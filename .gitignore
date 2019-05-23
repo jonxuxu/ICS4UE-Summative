@@ -1,6 +1,6 @@
 *.*
 !.gitignore
 !*.java
-!/FinalProjClient/res/
-!/FinalProjServer/res/
-!/FinalProjClient/graphicFonts/
+!/FinalProjClient/res/*
+!/FinalProjServer/res/*
+!/FinalProjClient/graphicFonts/*
