@@ -193,8 +193,9 @@ public class Server {
                            myGame.removeGamePlayer(myPlayer, myConnection, this);
                            if (myGame.getGameSize() == 0) {
                               games.remove(myGame);
+                           } else {
+                              printOnlineList(false);
                            }
-                           printOnlineList(false);
                            myGame = null;
                         }
                         stop = true;
@@ -263,13 +264,14 @@ public class Server {
       private ArrayList<Socket> onlineGameSockets = new ArrayList<Socket>();
       private ArrayList<MenuHandler> handlers = new ArrayList<MenuHandler>();
       private boolean stopGame = false;
-      private GamePlayer[] gamePlayers;
+      private GamePlayer[] gamePlayers;//For the ID's, even disconnected players will work
       private Socket[] gameSockets;
       private PrintWriter[] gameOutputs;
       private BufferedReader[] gameInputs;
-      private int playerNum;
+      private int playerNum;//For the ID's even disconnected players will work
       private Clock time = new Clock();
       private int gameTick = 0;
+      private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
 
       //Constants for general display
       private Rectangle SPELL_1 = new Rectangle(425, 383, 100, 100);
@@ -300,7 +302,7 @@ public class Server {
                gameOutputs[i].flush();
             }
             playerNum = gamePlayers.length;
-            for (int i = 0; i < gamePlayers.length; i++) {
+            for (int i = 0; i < playerNum; i++) {
                gamePlayers[i].setID(i);
             }//Set the gameplayer ID's
             String allInput[] = new String[playerNum];
@@ -311,8 +313,10 @@ public class Server {
                time.setTime();
                if (time.getFramePassed()) {
                   for (int i = 0; i < playerNum; i++) {
-                     if (gameInputs[i].ready()) {
-                        allInput[i] = gameInputs[i].readLine();//Timed
+                     if (!disconnectedPlayerID.contains(i)) {
+                        if (gameInputs[i].ready()) {
+                           allInput[i] = gameInputs[i].readLine();//Timed
+                        }
                      }
                   }//This is the input
                   //Calculations here - This is essentially where ALL calculations take place.
@@ -322,27 +326,42 @@ public class Server {
 
                   /////////////////////////////////////////////////////////////
                   for (int i = 0; i < playerNum; i++) {
-                     if (!allInput[i].isEmpty()) {
-                        double angleOfMovement = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
-                        allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
-                        double angleOfClick = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
-                        allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
-                        double lengthOfClick = Double.parseDouble(allInput[i]);
-                        allInput[i] = "";
-                        gamePlayers[i].addXy(angleOfMovement);
-                        if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
-                           gamePlayers[i].setSpell(gamePlayers[i].getThisClass().testSpell(gameTick, 0), 0);
+                     if (!disconnectedPlayerID.contains(i)) {
+                        if (!allInput[i].isEmpty()) {
+                           if (allInput[i].equals("X")) {
+                              removeGamePlayer(gamePlayers[i], gameSockets[i], handlers.get(i));
+                              disconnectedPlayerID.add(i);
+                              if (disconnectedPlayerID.size() == (playerNum)) {
+                                 stopGame = true;
+                              }
+                              allInput[i]="";
+                           } else {
+                              double angleOfMovement = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
+                              allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
+                              double angleOfClick = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
+                              allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
+                              double lengthOfClick = Double.parseDouble(allInput[i]);
+                              allInput[i] = "";
+                              gamePlayers[i].addXy(angleOfMovement);
+                              if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
+                                 gamePlayers[i].setSpell(gamePlayers[i].getThisClass().testSpell(gameTick, 0), 0);
+                              }
+                           }
                         }
                      }
                   }
                   //Output will be here
                   String outputString = "G";
-                  for (int i = 0; i < gamePlayers.length; i++) {
-                     outputString += i + "," + gamePlayers[i].getFullOutput(gameTick);
+                  for (int i = 0; i < playerNum; i++) {
+                     if (!disconnectedPlayerID.contains(i)) {
+                        outputString += i + "," + gamePlayers[i].getFullOutput(gameTick);
+                     }
                   }
-                  for (int i = 0; i < gamePlayers.length; i++) {
-                     gameOutputs[i].println(outputString);
-                     gameOutputs[i].flush();
+                  for (int i = 0; i < playerNum; i++) {
+                     if (!disconnectedPlayerID.contains(i)) {
+                        gameOutputs[i].println(outputString);
+                        gameOutputs[i].flush();
+                     }
                   }
                   gameTick++;
                }
@@ -385,9 +404,16 @@ public class Server {
       }
 
       public void removeGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
-         onlineGamePlayers.remove(new GamePlayer(player.getUsername()));
+         System.out.println(player.getUsername());
+         System.out.println(onlineGamePlayers.size());
+         for (int i = 0; i < onlineGamePlayers.size(); i++) {
+            if (player.getUsername().equals(onlineGamePlayers.get(i).getUsername())) {
+               onlineGamePlayers.remove(i);
+            }
+         }
          onlineGameSockets.remove(playerSocket);
          handlers.remove(handler);
+         System.out.println(onlineGamePlayers.size());
       }
 
       public int getGameSize() {

@@ -767,15 +767,15 @@ public class Client extends JFrame implements WindowListener {
          //Darkness
          g2.setColor(new Color(0f, 0f, 0f, 0.8f));
          g2.fill(areaRect);
-         g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.3f));
+         g2.setColor(new Color(0.1f, 0.1f, 0.1f, 0.7f));
          g2.fill(largeRing);
-         g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
+         g2.setColor(new Color(0.1f, 0.1f, 0.1f, 0.6f));
          g2.fill(midRing);
          //   g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
          //  g2.fill(smallCircle);
 
          //UI
-         g2.setColor(Color.WHITE);
+         g2.setColor(new Color (50,50,50));
          g2.fillRect((int) (DESIRED_X * 67.0 / 80.0 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X * 5.0 / 32.0 * scaling), (int) (DESIRED_Y / 4 * scaling));
          Polygon bottomBar = new Polygon();
          bottomBar.addPoint((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 99.0 / 100.0 * scaling));
