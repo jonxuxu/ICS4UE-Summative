@@ -84,7 +84,7 @@ public class Client extends JFrame implements WindowListener {
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
    private int DESIRED_Y = 500;
-   private int DESIRED_X = 800;
+   private int DESIRED_X = 950;
    private int MAX_Y;
    private int MAX_X;
    private double scaling;
@@ -732,7 +732,7 @@ public class Client extends JFrame implements WindowListener {
          //System.out.println(scaling);
          //Basic visuals
          this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
+         this.setBackground(new Color(0, 0, 0));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
       }
@@ -756,6 +756,7 @@ public class Client extends JFrame implements WindowListener {
       private Area largeRing;
       private Area midRing;
       private Area areaSmallCircle;
+      private Polygon BOTTOM_BAR = new Polygon();
 
       public GamePanel() {
          //Basic visuals
@@ -780,17 +781,23 @@ public class Client extends JFrame implements WindowListener {
             g2 = (Graphics2D) g.create();
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
-            largeCircle = new Ellipse2D.Double(325 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
-            midCircle = new Ellipse2D.Double(370 * scaling, 220 * scaling, 60 * scaling, 60 * scaling);
+            largeCircle = new Ellipse2D.Double(400 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
+            // midCircle = new Ellipse2D.Double(439 * scaling, 220 * scaling, 60 * scaling, 60 * scaling);
             // smallCircle = new Ellipse2D.Double(300 * scaling, 150 * scaling, 200 * scaling, 200 * scaling);
-            rect = new Rectangle2D.Double(0, 0, 800 * scaling, 500 * scaling);
+            rect = new Rectangle2D.Double(0, 0, 950 * scaling, 500 * scaling);
             areaRect = new Area(rect);
             largeRing = new Area(largeCircle);
             areaRect.subtract(largeRing);
-            midRing = new Area(midCircle);
+            //  midRing = new Area(midCircle);
             //  areaSmallCircle = new Area(smallCircle);
             // largeRing.subtract(midRing);
             // midRing.subtract(areaSmallCircle);
+            BOTTOM_BAR.addPoint((int) (272 * scaling), (int) (500 * scaling));
+            BOTTOM_BAR.addPoint((int) (265 * scaling), (int) (440 * scaling));
+            BOTTOM_BAR.addPoint((int) (270 * scaling), (int) (435 * scaling));
+            BOTTOM_BAR.addPoint((int) (680 * scaling), (int) (435 * scaling));
+            BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
+            BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
          } else {
             g2 = (Graphics2D) g;
          }
@@ -799,8 +806,8 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
-         int startX = (int) ((myGamePlayer.getXy()[0] - 400.0) / 100.0);
-         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 400.0) / 100.0)) + 1;
+         int startX = (int) ((myGamePlayer.getXy()[0] - 475.0) / 100.0);
+         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 475.0) / 100.0)) + 1;
          int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 100.0);
          int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 100.0)) + 1;
          for (int i = startY; i < finalY; i++) {
@@ -833,9 +840,6 @@ public class Client extends JFrame implements WindowListener {
          //  g2.fill(midRing);
          //   g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
          //  g2.fill(smallCircle);
-
-         //UI
-         g2.setColor(new Color(50, 50, 50));
          /*
          g2.fillRect((int) (DESIRED_X * 67.0 / 80.0 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X * 5.0 / 32.0 * scaling), (int) (DESIRED_Y / 4 * scaling));
          Polygon bottomBar = new Polygon();
@@ -845,35 +849,49 @@ public class Client extends JFrame implements WindowListener {
          bottomBar.addPoint((int) (DESIRED_X * 31.0 / 32.0 * scaling), (int) (DESIRED_Y * 37.0 / 50.0 * scaling));
          bottomBar.addPoint((int) (DESIRED_X * 159.0 / 160.0 * scaling), (int) (DESIRED_Y * 39.0 / 50.0 * scaling));
          bottomBar.addPoint((int) (DESIRED_X * 159.0 / 160.0 * scaling), (int) (DESIRED_Y * 99.0 / 100.0 * scaling));
-         g2.fillPolygon(bottomBar);
+        ;
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X / 4 * scaling), (int) (DESIRED_Y * 3.0 / 50.0 * scaling));
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 2.0 / 25.0 * scaling), (int) (DESIRED_X / 5 * scaling), (int) (DESIRED_Y / 50 * scaling));
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 11.0 / 100.0 * scaling), (int) (DESIRED_X / 5 * scaling), (int) (DESIRED_Y / 50 * scaling));
          */
-         g2.setColor(Color.WHITE);
+
+         g2.setColor(new Color(165, 156, 148));
          //Minimap
-         g2.drawRect((int) (680 * scaling),0, (int) (120 * scaling), (int) (120 * scaling));
-         Polygon bottomBar = new Polygon();
-         bottomBar.addPoint((int) (197 * scaling), (int) (500 * scaling));
-         bottomBar.addPoint((int) (190 * scaling), (int) (440 * scaling));
-         bottomBar.addPoint((int) (195 * scaling), (int) (435 * scaling));
-         bottomBar.addPoint((int) (605 * scaling), (int) (435 * scaling));
-         bottomBar.addPoint((int) (610 * scaling), (int) (440 * scaling));
-         bottomBar.addPoint((int) (603 * scaling), (int) (500 * scaling));
-         g2.drawPolygon(bottomBar);
+         g2.drawRect((int) (830 * scaling), (int) (scaling), (int) (120 * scaling), (int) (120 * scaling));
+         //Bottom bar
+         g2.drawPolygon(BOTTOM_BAR);
+         /*
+          g2.drawPolygon(bottomBar);
+         */
+
          //Stat bars
          g2.setColor(new Color(190, 40, 40));
-         g2.fillRect(0, (int) (6 * scaling), (int) (120 * scaling * myGamePlayer.getHealth() / myGamePlayer.getMaxHealth()), (int) (3 * scaling));
+         g2.fillRect(0, (int) (2 * scaling), (int) (121 * scaling * myGamePlayer.getHealth() / myGamePlayer.getMaxHealth()), (int) (5 * scaling));
          //Stat borders
          //  g2.drawRect((int) (5 * scaling), (int) (5 * scaling), (int) (200 * scaling), (int) ( * scaling)); This is the information panel, possibly move.
-         g2.setColor(Color.WHITE);
+         /*
+         g2.setColor(new Color(91, 85, 80));
          g2.drawRect(0, 0, (int) (120 * scaling), (int) (3 * scaling));
          g2.drawRect(0, (int) (6 * scaling), (int) (120 * scaling), (int) (3 * scaling));
-         g2.drawRect(0, (int) (12 * scaling), (int) (120 * scaling), (int) (25  * scaling));//Menu bar
-         g2.fillRect((int) (428 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
-         g2.fillRect((int) (485 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
-         g2.fillRect((int) (542 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
+         g2.drawRect(0, (int) (12 * scaling), (int) (120 * scaling), (int) (25 * scaling));//Menu bar
+         */
+         g2.setColor(new Color(165, 156, 148));
+         g2.drawRect(0, (int) (2 * scaling), (int) (121 * scaling), (int) (5 * scaling));
+         g2.drawRect(0, (int) (11 * scaling), (int) (121 * scaling), (int) (5 * scaling));
+         //Bottom bar contents
+
+         //Spells
+         g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+         g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+         g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+
+
+         //g2.fillRect((int) (485 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
+         //g2.fillRect((int) (542 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
 /*
+  //Partition
+         g2.fillRect((int) (474 * scaling), (int) (439 * scaling), (int) (2 * scaling), (int) (57 * scaling));
+
          g2.fillRect((int) (DESIRED_X * 17.0 / 32.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
          g2.fillRect((int) (DESIRED_X * 11.0 / 16.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
          g2.fillRect((int) (DESIRED_X * 27.0 / 32.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
