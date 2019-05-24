@@ -92,6 +92,7 @@ public class Client extends JFrame implements WindowListener {
    private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
    private int[] errors = new int[3];
    private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full"};
+   private BufferedImage sheet;
 
    public Client() {
       super("Dark");
@@ -710,7 +711,7 @@ public class Client extends JFrame implements WindowListener {
          myMouseAdapter.setScaling(scaling);
          //Game set up
          try {
-            BufferedImage sheet = ImageIO.read(new File(".\\res\\Map.png"));
+            sheet = ImageIO.read(new File(".\\res\\Map.png"));
             sectors = new Sector[16][16];
             for (int i = 0; i < 16; i++) {
                for (int j = 0; j < 16; j++) {
@@ -810,6 +811,7 @@ public class Client extends JFrame implements WindowListener {
          int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 475.0) / 100.0)) + 1;
          int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 100.0);
          int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 100.0)) + 1;
+
          for (int i = startY; i < finalY; i++) {
             for (int j = startX; j < finalX; j++) {
                if ((i >= 0) && (j >= 0) && (i <= 15) && (j <= 15)) {
@@ -818,12 +820,26 @@ public class Client extends JFrame implements WindowListener {
             }
          }
 
+/*
+         long time = System.currentTimeMillis();
+         //  g2.drawImage(sheet, -(int) (scaling * myGamePlayer.getXy()[0]), -(int) (scaling * myGamePlayer.getXy()[1]), (int) (8752 * scaling), (int) (5920 * scaling), null);
+         int width = (int) (scaling * 950);
+         int height = (int) (scaling * 500);
+         int x = (int) (scaling * (myGamePlayer.getXy()[0] - 475));
+         int y = (int) (scaling * (myGamePlayer.getXy()[1] - 250));
+         if () {
+
+         }
+         BufferedImage temp = sheet.getSubimage(x,y ,width ,height);
+         g2.drawImage(temp, 0, 0, 950, 500, null);
+         System.out.println(System.currentTimeMillis() - time);
          //Game player
          for (GamePlayer currentGamePlayer : gamePlayers) {
             if (currentGamePlayer != null) {
                currentGamePlayer.draw(g2, myGamePlayer.getXy());
             }
          }
+         */
          /*
          g2.setColor(Color.white);
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);
@@ -919,6 +935,7 @@ public class Client extends JFrame implements WindowListener {
 
          //g2.fillOval(midXy[0] - (int) ((220 + adjustment / 2.0) * scaling), midXy[1] - (int) ((220 + adjustment / 2.0) * scaling), (int) ((440 + adjustment) * scaling), (int) ((440 + adjustment) * scaling));
       }
+
    }
 
    private class CustomButton extends JButton {
