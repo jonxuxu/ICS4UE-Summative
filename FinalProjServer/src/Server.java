@@ -351,16 +351,25 @@ public class Server {
                               outputString.deleteCharAt(0);
                               outputString.append(i);
                            } else {
-                              double angleOfMovement = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
-                              allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
-                              double angleOfClick = Double.parseDouble(allInput[i].substring(0, allInput[i].indexOf(" ")));
-                              allInput[i] = allInput[i].substring(allInput[i].indexOf(" ") + 1);
-                              double lengthOfClick = Double.parseDouble(allInput[i]);
+                              String[] inputSet = allInput[i].split(" ", -1);
+                              double angleOfMovement = Double.parseDouble(inputSet[0]);
+                              int[] xyDisp = {Integer.parseInt(inputSet[1]), Integer.parseInt(inputSet[2])};
+                              //xyDisp represents the xy displacement from the top left (0,0) corner
+                              int[] xyPos = {xyDisp[0] + gamePlayers[i].getXy()[0], xyDisp[1] + gamePlayers[i].getXy()[1]};
+                              //xyPos represents the xy position in terms of the server map
+                              //This is probably useful for calculations where you need to check for whether or not the
+                              //player had actually hit their target
                               allInput[i] = "";
                               gamePlayers[i].addXy(angleOfMovement);
-                              if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
+                              if (SPELL_1.contains(xyDisp[0], xyDisp[1])) { //Add in the condition of clicking the spell icon
                                  gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, 0), 0);
                               }
+                              //Calculations here - This is essentially where ALL calculations take place.
+                              //The game is essentially made in this space
+                              /////////////////////////////////////////////////////////////
+
+
+                              /////////////////////////////////////////////////////////////
                            }
                         }
                      }

@@ -225,15 +225,14 @@ public class Client extends JFrame implements WindowListener {
                   //the x and y of the mouse, the relevant keyboard presses maybe? (not all)
                   outputString = "";
                   double angleOfMovement = myKeyListener.getAngle();
-                  double angleOfClick = -1;
-                  double lengthOfClick = -1;
+                  int[] xyDisp = new int[2]; //Scaled to the map
                   if (myMouseAdapter.getPressed()) {
-                     angleOfClick = myMouseAdapter.getAngleOfClick(); //Sends the correct angle
-                     lengthOfClick = myMouseAdapter.getLengthOfClick(); //Sends the fully calculated length
+                     xyDisp = myMouseAdapter.getDispXy();
+                     System.out.println(xyDisp[0]+" "+xyDisp[1]);
                   }
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
-                  outputString = angleOfMovement + " " + angleOfClick + " " + lengthOfClick;//If it is -1, then the server will recognize to stop
+                  outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1];//If it is -1, then the server will recognize to stop
                   //MAKE SURE TO CHANGE TO RECTANGULAR
                   output.println(outputString);
                   output.flush();
@@ -421,7 +420,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void windowClosing(WindowEvent e) {
-      if ((username != null)&&(!gameBegin)) {
+      if ((username != null) && (!gameBegin)) {
          output.println("X" + username);
       } else {
          output.println("X");

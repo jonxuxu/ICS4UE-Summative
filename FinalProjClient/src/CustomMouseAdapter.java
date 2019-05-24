@@ -188,11 +188,17 @@ public class CustomMouseAdapter extends MouseAdapter {
       this.scaling = scaling;
    }
 
-   public double getAngleOfClick() {
-      return (Math.atan2(centerXy[1]-clickXy[1],clickXy[0] - centerXy[0])); //REMEMBER, MATH A TAN2 IS Y AND THEN X
-   }
+   /*
+      public double getAngleOfClick() {
+         return (Math.atan2(centerXy[1] - clickXy[1], clickXy[0] - centerXy[0])); //REMEMBER, MATH A TAN2 IS Y AND THEN X
+      }
 
-   public double getLengthOfClick() {
-      return (Math.sqrt(Math.pow((centerXy[0] - clickXy[0])/scaling, 2) + Math.pow((centerXy[1] - clickXy[1])/scaling, 2)));
+      public double getLengthOfClick() {
+         return (Math.sqrt(Math.pow((centerXy[0] - clickXy[0]) / scaling, 2) + Math.pow((centerXy[1] - clickXy[1]) / scaling, 2)));
+      }
+   */
+   public int[] getDispXy() { //Returns the displacement from the top left corner
+      int[] dispXy = {400 + (int) ((clickXy[0]-centerXy[0]) / scaling), 250 + (int) ((clickXy[1]-centerXy[1]ssss) / scaling)};
+      return (dispXy);
    }
 }
