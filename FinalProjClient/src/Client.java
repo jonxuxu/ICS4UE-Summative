@@ -91,7 +91,7 @@ public class Client extends JFrame implements WindowListener {
    private Sector[][] sectors;
    private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
    private int[] errors = new int[3];
-   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full"};
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun"};
    private BufferedImage sheet;
 
    public Client() {
@@ -577,7 +577,7 @@ public class Client extends JFrame implements WindowListener {
          }
 
          //FOR NOW, ONLY TEMP
-
+/*
          if (attemptedGameName != null) {
             if (!attemptedGameName.equals("w")) {
                attemptedGameName = "w";
@@ -587,7 +587,7 @@ public class Client extends JFrame implements WindowListener {
          } else {
             attemptedGameName = "";
          }
-
+*/
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
       }
@@ -634,7 +634,7 @@ public class Client extends JFrame implements WindowListener {
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
 
          //FOR NOW, ONLY TEMP
-
+/*
          if (attemptedGameName != null) {
             if (!attemptedGameName.equals("w")) {
                attemptedGameName = "w";
@@ -644,7 +644,7 @@ public class Client extends JFrame implements WindowListener {
          } else {
             attemptedGameName = "";
          }
-
+*/
       }
    }
 
@@ -712,11 +712,11 @@ public class Client extends JFrame implements WindowListener {
          //Game set up
          try {
             sheet = ImageIO.read(new File(".\\res\\Map.png"));
-            sectors = new Sector[16][16];
-            for (int i = 0; i < 16; i++) {
-               for (int j = 0; j < 16; j++) {
+            sectors = new Sector[20][20];
+            for (int i = 0; i < 20; i++) {
+               for (int j = 0; j < 20; j++) {
                   sectors[j][i] = new Sector();
-                  sectors[j][i].setImage(sheet.getSubimage(j * 100, i * 100, 100, 100));
+                  sectors[j][i].setImage(sheet.getSubimage(j * 500, i * 500, 500, 500));
                   sectors[j][i].setSectorCoords(j, i);
                   sectors[j][i].setScaling(scaling);
                   sectors[j][i].setCenterXy(tempXy);
@@ -807,39 +807,64 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
-         int startX = (int) ((myGamePlayer.getXy()[0] - 475.0) / 100.0);
-         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 475.0) / 100.0)) + 1;
-         int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 100.0);
-         int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 100.0)) + 1;
+         int startX = (int) ((myGamePlayer.getXy()[0] - 475.0) / 500.0);
+         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 475.0) / 500.0)) + 1;
+         int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 500.0);
+         int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 500.0)) + 1;
 
+
+         //FOR NOW, DRAW TWICE. IN THE FUTURE, FIND A BETTER WAY TO DO THIS
          for (int i = startY; i < finalY; i++) {
             for (int j = startX; j < finalX; j++) {
-               if ((i >= 0) && (j >= 0) && (i <= 15) && (j <= 15)) {
+               if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
                   sectors[j][i].drawSector(g2, myGamePlayer.getXy());
                }
             }
          }
-
-/*
-         long time = System.currentTimeMillis();
-         //  g2.drawImage(sheet, -(int) (scaling * myGamePlayer.getXy()[0]), -(int) (scaling * myGamePlayer.getXy()[1]), (int) (8752 * scaling), (int) (5920 * scaling), null);
-         int width = (int) (scaling * 950);
-         int height = (int) (scaling * 500);
-         int x = (int) (scaling * (myGamePlayer.getXy()[0] - 475));
-         int y = (int) (scaling * (myGamePlayer.getXy()[1] - 250));
-         if () {
-
+         for (int i = startY; i < finalY; i++) {
+            for (int j = startX; j < finalX; j++) {
+               if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
+                  sectors[j][i].drawSector(g2, myGamePlayer.getXy());
+               }
+            }
          }
-         BufferedImage temp = sheet.getSubimage(x,y ,width ,height);
-         g2.drawImage(temp, 0, 0, 950, 500, null);
-         System.out.println(System.currentTimeMillis() - time);
+         // g2.drawImage(sheet, -(int) (scaling * myGamePlayer.getXy()[0]), -(int) (scaling * myGamePlayer.getXy()[1]), (int) (8752 * scaling), (int) (5920 * scaling), null);
+         /*
+         int width = 950;
+         int height = 500;
+         int x = myGamePlayer.getXy()[0] - 475;
+         int y = myGamePlayer.getXy()[1] - 250;
+         int xAdjust = 0;
+         int yAdjust = 0;
+         if ((x + width) > 8752) {
+            width =  8752 - x;
+            if (width < 0) {
+               width = 0;
+            }
+         }
+         if ((y + height) > 5920) {
+            height =  5920 - y;
+            if (height < 0) {
+               height = 0;
+            }
+         }
+         if (x < 0) {
+            xAdjust = -x;
+            x = 0;
+         }
+         if (y < 0) {
+            yAdjust = -y;
+            y = 0;
+         }
+         BufferedImage temp = sheet.getSubimage(x, y, width, height);
+         g2.drawImage(temp, (int) (xAdjust * scaling), (int) (yAdjust * scaling), (int) (width * scaling), (int) (height * scaling), null);
+         */
          //Game player
          for (GamePlayer currentGamePlayer : gamePlayers) {
             if (currentGamePlayer != null) {
                currentGamePlayer.draw(g2, myGamePlayer.getXy());
             }
          }
-         */
          /*
          g2.setColor(Color.white);
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);

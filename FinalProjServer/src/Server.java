@@ -290,6 +290,7 @@ public class Server {
       private Clock time = new Clock();
       private int gameTick = 0;
       private int disconnectedPlayerNum = 0;
+      private boolean begin;
 
       //Constants for general display
       private Rectangle SPELL_1 = new Rectangle(425, 383, 100, 100);
@@ -298,6 +299,7 @@ public class Server {
 
       @Override
       public void run() {
+         begin =true;
          //Not called until the game begins
          //Once it is called, this is all that really occurs
          for (MenuHandler thisHandler : handlers) {
@@ -431,13 +433,17 @@ public class Server {
       }
 
       private boolean addGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
-         if (onlineGamePlayers.size() < 6) {
-            onlineGamePlayers.add(new TestClass(player.getUsername()));
-            onlineGameSockets.add(playerSocket);
-            handlers.add(handler);
-            return (true);
-         } else {
-            return (false);
+         if (!begin) {
+            if (onlineGamePlayers.size() < 6) {
+               onlineGamePlayers.add(new TestClass(player.getUsername()));
+               onlineGameSockets.add(playerSocket);
+               handlers.add(handler);
+               return (true);
+            } else {
+               return (false);
+            }
+         }else{
+            return(false);
          }
       }
 
