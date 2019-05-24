@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 2019-05-19
  */
 
-public class TestClass extends GeneralClass {
+public class TestClass extends GamePlayer {
    private int maxHealth = 100;
    private int attack = 10;
    private int mobility = 10;
@@ -22,7 +22,8 @@ public class TestClass extends GeneralClass {
    private int[] ANIMATION_LENGTH = {80, 80, 80};
    private BufferedImage[][] ALL_ANIMATIONS = new BufferedImage[4][];
 
-   TestClass() {
+   TestClass(String username) {
+      super(username);
       try {
          BufferedImage movementSheet = ImageIO.read(new File(".\\res\\LightningRoomba.png"));
          ALL_ANIMATIONS[0] = new BufferedImage[12];

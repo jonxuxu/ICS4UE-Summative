@@ -228,7 +228,7 @@ public class Client extends JFrame implements WindowListener {
                   int[] xyDisp = new int[2]; //Scaled to the map
                   if (myMouseAdapter.getPressed()) {
                      xyDisp = myMouseAdapter.getDispXy();
-                     System.out.println(xyDisp[0]+" "+xyDisp[1]);
+                     System.out.println(xyDisp[0] + " " + xyDisp[1]);
                   }
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
@@ -354,7 +354,7 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'B') {
             gamePlayers = new GamePlayer[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               gamePlayers[i] = new GamePlayer(onlineList.get(i).getUsername());
+               gamePlayers[i] = new TestClass(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myPlayer.getUsername())) {
                   myGamePlayer = gamePlayers[i];
                }
@@ -375,11 +375,11 @@ public class Client extends JFrame implements WindowListener {
                int[] tempXy = {Integer.parseInt(secondSplit[1]), Integer.parseInt(secondSplit[2])};
                //System.out.println(tempXy[0]+" "+tempXy[1]);
                gamePlayers[playerID].setXy(tempXy);
-               gamePlayers[playerID].getThisClass().setHealth(Integer.parseInt(secondSplit[3]));
-               gamePlayers[playerID].getThisClass().setMaxHealth(Integer.parseInt(secondSplit[4]));
-               gamePlayers[playerID].getThisClass().setAttack(Integer.parseInt(secondSplit[5]));
-               gamePlayers[playerID].getThisClass().setMobility(Integer.parseInt(secondSplit[6]));
-               gamePlayers[playerID].getThisClass().setRange(Integer.parseInt(secondSplit[7]));
+               gamePlayers[playerID].setHealth(Integer.parseInt(secondSplit[3]));
+               gamePlayers[playerID].setMaxHealth(Integer.parseInt(secondSplit[4]));
+               gamePlayers[playerID].setAttack(Integer.parseInt(secondSplit[5]));
+               gamePlayers[playerID].setMobility(Integer.parseInt(secondSplit[6]));
+               gamePlayers[playerID].setRange(Integer.parseInt(secondSplit[7]));
                gamePlayers[playerID].setArtifact(Boolean.parseBoolean(secondSplit[8]));
                gamePlayers[playerID].setGold(Integer.parseInt(secondSplit[9]));
                gamePlayers[playerID].setLevel(Integer.parseInt(secondSplit[10]));
@@ -836,6 +836,7 @@ public class Client extends JFrame implements WindowListener {
 
          //UI
          g2.setColor(new Color(50, 50, 50));
+         /*
          g2.fillRect((int) (DESIRED_X * 67.0 / 80.0 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X * 5.0 / 32.0 * scaling), (int) (DESIRED_Y / 4 * scaling));
          Polygon bottomBar = new Polygon();
          bottomBar.addPoint((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 99.0 / 100.0 * scaling));
@@ -848,22 +849,46 @@ public class Client extends JFrame implements WindowListener {
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y / 100 * scaling), (int) (DESIRED_X / 4 * scaling), (int) (DESIRED_Y * 3.0 / 50.0 * scaling));
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 2.0 / 25.0 * scaling), (int) (DESIRED_X / 5 * scaling), (int) (DESIRED_Y / 50 * scaling));
          g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 11.0 / 100.0 * scaling), (int) (DESIRED_X / 5 * scaling), (int) (DESIRED_Y / 50 * scaling));
+         */
+         g2.setColor(Color.WHITE);
+         //Minimap
+         g2.drawRect((int) (680 * scaling),0, (int) (120 * scaling), (int) (120 * scaling));
+         Polygon bottomBar = new Polygon();
+         bottomBar.addPoint((int) (197 * scaling), (int) (500 * scaling));
+         bottomBar.addPoint((int) (190 * scaling), (int) (440 * scaling));
+         bottomBar.addPoint((int) (195 * scaling), (int) (435 * scaling));
+         bottomBar.addPoint((int) (605 * scaling), (int) (435 * scaling));
+         bottomBar.addPoint((int) (610 * scaling), (int) (440 * scaling));
+         bottomBar.addPoint((int) (603 * scaling), (int) (500 * scaling));
+         g2.drawPolygon(bottomBar);
+         //Stat bars
+         g2.setColor(new Color(190, 40, 40));
+         g2.fillRect(0, (int) (6 * scaling), (int) (120 * scaling * myGamePlayer.getHealth() / myGamePlayer.getMaxHealth()), (int) (3 * scaling));
+         //Stat borders
+         //  g2.drawRect((int) (5 * scaling), (int) (5 * scaling), (int) (200 * scaling), (int) ( * scaling)); This is the information panel, possibly move.
+         g2.setColor(Color.WHITE);
+         g2.drawRect(0, 0, (int) (120 * scaling), (int) (3 * scaling));
+         g2.drawRect(0, (int) (6 * scaling), (int) (120 * scaling), (int) (3 * scaling));
+         g2.drawRect(0, (int) (12 * scaling), (int) (120 * scaling), (int) (25  * scaling));//Menu bar
+         g2.fillRect((int) (428 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
+         g2.fillRect((int) (485 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
+         g2.fillRect((int) (542 * scaling),(int) (450 * scaling), (int) (29 * scaling), (int) (25 * scaling));
+/*
          g2.fillRect((int) (DESIRED_X * 17.0 / 32.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
          g2.fillRect((int) (DESIRED_X * 11.0 / 16.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
          g2.fillRect((int) (DESIRED_X * 27.0 / 32.0 * scaling), (int) (DESIRED_Y * 383.0 / 500.0 * scaling), (int) (DESIRED_X / 8 * scaling), (int) (DESIRED_Y / 5 * scaling));
          g2.setColor(new Color(20, 30, 50));
          g2.fillRect((int) (DESIRED_X * 17.0 / 32.0 * scaling), (int) ((DESIRED_Y * 483.0 / 500.0 - DESIRED_Y / 5 * myGamePlayer.getSpellPercent(0)) * scaling), (int) (DESIRED_X / 8 * scaling), (int) ((DESIRED_Y / 5 * myGamePlayer.getSpellPercent(0)) * scaling));
-
+*/
          //Stat bars
-         g2.setColor(new Color(190, 40, 40));
-         g2.fillRect((int) (DESIRED_X / 160 * scaling), (int) (DESIRED_Y * 2.0 / 25.0 * scaling), (int) (DESIRED_X / 5 * scaling * myGamePlayer.getThisClass().getHealth() / myGamePlayer.getThisClass().getMaxHealth()), (int) (DESIRED_Y / 50 * scaling));
+         /*
          g2.setColor(Color.white);
          g2.drawString("Gold: " + myGamePlayer.getGold(), (int) (5 * scaling), (int) (31 * scaling));
          g2.drawString("Level: " + myGamePlayer.getLevel(), (int) (5 * scaling), (int) (22 * scaling));
          g2.drawString("Username: " + myGamePlayer.getUsername(), (int) (5 * scaling), (int) (13 * scaling));
-         g2.drawString("Attack: " + myGamePlayer.getThisClass().getAttack(), (int) (10 * scaling), (int) (470 * scaling));
-         g2.drawString("Mobility: " + myGamePlayer.getThisClass().getMobility(), (int) (10 * scaling), (int) (485 * scaling));
-         g2.drawString("Range: " + myGamePlayer.getThisClass().getRange(), (int) (10 * scaling), (int) (455 * scaling));
+         g2.drawString("Attack: " + myGamePlayer.getAttack(), (int) (10 * scaling), (int) (470 * scaling));
+         g2.drawString("Mobility: " + myGamePlayer.getMobility(), (int) (10 * scaling), (int) (485 * scaling));
+         g2.drawString("Range: " + myGamePlayer.getRange(), (int) (10 * scaling), (int) (455 * scaling));
 
          /*
          if (adjustment > 15) {
