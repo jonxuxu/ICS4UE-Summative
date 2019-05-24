@@ -126,14 +126,14 @@ public class Server {
                         String attemptServerName = inputString.substring(0, inputString.indexOf(" "));
                         inputString = inputString.substring(inputString.indexOf(" ") + 1);
                         String attemptServerPassword = inputString;
-                        error = 1;
+                        error = 5;//Slightly different, this should give an error message which tells the client that the password/username is wrong
                         for (GameServer thisGame : games) {
                            if ((thisGame.sameName(attemptServerName)) && (thisGame.samePassword(attemptServerPassword))) {
                               if (thisGame.addGamePlayer(myPlayer, myConnection, this)) {
                                  myGame = thisGame;
                                  error = 0;
                               } else {
-                                 error = 2; //2 indicates that the game is full
+                                 error = 6; //2 indicates that the game is full
                               }
                            }
                         }
@@ -186,14 +186,35 @@ public class Server {
                         myGame = null;
                      } else if (initializer == 'X') { //Activated by window listener only
                         System.out.println("Exit");
-                        if (myGame != null) {
-                           myGame.removeGamePlayer(myPlayer, myConnection, this);
-                           if (myGame.getGameSize() == 0) {
-                              games.remove(myGame);
-                           } else {
-                              printOnlineList(false);
+                        if (!inputString.isEmpty()) {
+                           for (int i = 0; i < onlinePlayers.size(); i++) {
+                              if ((onlinePlayers.get(i).getUsername().equals(inputString))) {
+                                 onlinePlayers.remove(i);
+                              }
                            }
-                           myGame = null;
+                        }
+                        if (myGame != null) {
+                           if (!myGame.isHost(myPlayer)) {
+                              myGame.removeGamePlayer(myPlayer, myConnection, this);
+                              if (myGame.getGameSize() == 0) {
+                                 games.remove(myGame);
+                              } else {
+                                 printOnlineList(false);
+                              }
+                              myGame = null;
+                           } else {
+                              System.out.println();
+                              myGame.removeGamePlayer(myPlayer, myConnection, this);
+                              games.remove(myGame);
+                              //here is where you will send a message to everyone to remove all the players
+                              ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
+                              for (int i = 0; i < currentSocketList.size(); i++) {
+                                 output = new PrintWriter(currentSocketList.get(i).getOutputStream());
+                                 output.println("P");//Stands for previous, as in go to the previous card
+                                 output.flush();
+                              }
+                              myGame = null;
+                           }
                         }
                         stop = true;
                      }
@@ -338,7 +359,7 @@ public class Server {
                               allInput[i] = "";
                               gamePlayers[i].addXy(angleOfMovement);
                               if (SPELL_1.contains(400 + lengthOfClick * Math.cos(angleOfClick), 250 - lengthOfClick * Math.sin(angleOfClick))) { //Add in the condition of clicking the spell icon
-                                 gamePlayers[i].setSpell(gamePlayers[i].getThisClass().testSpell(gameTick, 0), 0);
+                                 gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, 0), 0);
                               }
                            }
                         }
@@ -376,6 +397,14 @@ public class Server {
          this.serverPassword = serverPassword;
       }
 
+      private boolean isHost(Player myPlayer) {
+         if (myPlayer.getUsername().equals(onlineGamePlayers.get(0).getUsername())) {
+            return true;
+         } else {
+            return false;
+         }
+      }
+
       private boolean sameName(String comparedName) {
          if (comparedName.equals(serverName)) {
             return (true);
@@ -394,7 +423,7 @@ public class Server {
 
       private boolean addGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
          if (onlineGamePlayers.size() < 6) {
-            onlineGamePlayers.add(new GamePlayer(player.getUsername()));
+            onlineGamePlayers.add(new TestClass(player.getUsername()));
             onlineGameSockets.add(playerSocket);
             handlers.add(handler);
             return (true);

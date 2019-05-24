@@ -7,11 +7,12 @@
  * @since 2019-05-19
  */
 
-public class TestClass extends GeneralClass {
+public class TestClass extends GamePlayer {
    private int[] spellCooldowns = {500,500,500};
    private int[] lastSpellTicks = {-10000,-10000,-10000};//So that they can be used immediately
 
-   TestClass() {
+   TestClass(String username) {
+      super(username);
       setMaxHealth(100);
       setHealth(100);
       setAttack(100);

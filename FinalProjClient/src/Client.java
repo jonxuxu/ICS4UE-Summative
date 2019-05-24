@@ -90,8 +90,8 @@ public class Client extends JFrame implements WindowListener {
    private double scaling;
    private Sector[][] sectors;
    private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
-   private int usernameError;
-
+   private int[] errors = new int[3];
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full"};
 
    public Client() {
       super("Dark");
@@ -157,29 +157,21 @@ public class Client extends JFrame implements WindowListener {
             repaintPanels();
             if (sendName) {
                sendName = false;
-               usernameError = 0;
+               errors[0] = 0;
                if (username != null) {
-                  if (verifyUsername(username)) {
+                  if (verifyString(username, 0)) {
                      output.println(username);
                      output.flush();
                      waitForInput();
                   }
-                  if (usernameError == 0) {
+                  if (errors[0] == 0) {
                      System.out.println("Valid username");
-                     start=false;
+                     start = false;
                   } else {
-                     System.out.println("N"+username);
+                     System.out.println("N" + username);
                      username = null;
-                     start=true;
-                     if (usernameError == 1) {
-                        System.out.println("Username already taken");
-                     } else if (usernameError == 2) {
-                        System.out.println("Only letters and numbers are allowed");
-                     } else if (usernameError == 3) {
-                        System.out.println("Username exceeds 15 characters");
-                     } else if (usernameError == 4) {
-                        System.out.println("Username is blank");
-                     }
+                     start = true;
+                     System.out.println("Error: " + errorMessages[errors[0]]);
                   }
                }
             }
@@ -198,13 +190,24 @@ public class Client extends JFrame implements WindowListener {
                if (!gameBegin) {
                   if (testGame) {
                      testGame = false;
-                     if (state == 2) {
-                        output.println("C" + attemptedGameName + " " + attemptedGamePassword);
-                     } else {
-                        output.println("J" + attemptedGameName + " " + attemptedGamePassword);
+                     boolean test1 = (verifyString(attemptedGameName, 1));
+                     boolean test2 = (verifyString(attemptedGamePassword, 2));
+                     if ((test1) && (test2)) {
+                        if (state == 2) {
+                           output.println("C" + attemptedGameName + " " + attemptedGamePassword);
+                        } else {
+                           output.println("J" + attemptedGameName + " " + attemptedGamePassword);
+                        }
+                        output.flush();
+                        waitForInput();
                      }
-                     output.flush();
-                     waitForInput();
+                     System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
+                     if ((errors[1] == 0) && (errors[2] == 0)) {
+                        System.out.println("Valid game");
+                     } else {
+                        System.out.println("Error: " + errorMessages[errors[1]]);
+                        System.out.println("Error: " + errorMessages[errors[2]]);
+                     }
                   }
                   if (notifyReady) {
                      notifyReady = false;
@@ -243,21 +246,22 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   public boolean verifyUsername(String username) {
-      if (username.length() < 15) {
-         if (username.isEmpty()) {
-            usernameError = 4;
+   public boolean verifyString(String testString, int errorIndex) {
+      errors[errorIndex] = 0;
+      if (testString.length() < 15) {
+         if (testString.isEmpty()) {
+            errors[errorIndex] = 4;
          } else {
-            for (int i = 0; i < username.length(); i++) {
-               if (!letterOrNumber(username.charAt(i))) {
-                  usernameError = 2;
+            for (int i = 0; i < testString.length(); i++) {
+               if (!letterOrNumber(testString.charAt(i))) {
+                  errors[errorIndex] = 2;
                }
             }
          }
       } else {
-         usernameError = 3;
+         errors[errorIndex] = 3;
       }
-      if (usernameError == 0) {
+      if (errors[errorIndex] == 0) {
          return true;
       } else {
          return false;
@@ -303,23 +307,30 @@ public class Client extends JFrame implements WindowListener {
       if (!gameBegin) {
          if (isParsable(initializer)) {
             if (start) {
-               usernameError = Integer.parseInt(initializer+"");
+               errors[0] = Integer.parseInt(initializer + "");
             } else if ((state == 2) || (state == 3)) {
                if (initializer == '0') {
                   newState = 4;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
-                  System.out.println("Valid Game");
-                  System.out.println(username);
                   myPlayer = new Player(username);//Sets the player
                   if (state == 2) {
                      host = true;
                      onlineList.add(myPlayer);
                   }
-                  System.out.println(myPlayer.getUsername());
-               } else {
-                  System.out.println("Invalid Game");
                }
+               errors[1] = Integer.parseInt(initializer + "");
+               /*
+               else if (initializer == '1') {
+                  if (state == 2) {
+                     System.out.println("Game name in use");
+                  } else {
+                     System.out.println("Wrong username/password"); //Make this one print out state==5
+                  }
+               } else if (initializer == '2') {
+                  System.out.println("Game is full");//Make this one print out state==6
+               }
+               */
             } else if (state == 4) {
                if (initializer == '0') {
                   System.out.println("Starting Game");
@@ -351,6 +362,9 @@ public class Client extends JFrame implements WindowListener {
             }
             newState = 5;//Sends to the game screen
             gameBegin = true;
+         } else if (initializer == 'P') { //Then leave the game
+            onlineList.clear();
+            newState = 1;
          }
       } else {
          input = input.trim();
@@ -407,7 +421,11 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void windowClosing(WindowEvent e) {
-      output.println("X");
+      if ((username != null)&&(!gameBegin)) {
+         output.println("X" + username);
+      } else {
+         output.println("X");
+      }
       output.flush();
       dispose();
       System.exit(0);
@@ -429,11 +447,6 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void windowClosed(WindowEvent e) {
-      System.out.println("w");
-      output.println("X");
-      output.flush();
-      dispose();
-      System.exit(0);
    }
 
    private class LoginPanel extends JPanel { //State=0
@@ -533,14 +546,10 @@ public class Client extends JFrame implements WindowListener {
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
          testGameButton.addActionListener((ActionEvent e) -> {
-            if (!(gameNameField.getText().contains(" ")) && (!(gamePasswordField.getText().contains(" ")))) {
-               if (!testGame) {
-                  attemptedGameName = gameNameField.getText();
-                  attemptedGamePassword = gamePasswordField.getText();
-                  testGame = true;
-               }
-            } else {
-               System.out.println("Error: Spaces exist");
+            if (!testGame) {
+               attemptedGameName = gameNameField.getText();
+               attemptedGamePassword = gamePasswordField.getText();
+               testGame = true;
             }
          });
          testGameButton.setBounds(MAX_X / 2 - 130, MAX_Y * 4 / 10, 260, 30);
@@ -568,6 +577,7 @@ public class Client extends JFrame implements WindowListener {
          }
 
          //FOR NOW, ONLY TEMP
+
          if (attemptedGameName != null) {
             if (!attemptedGameName.equals("w")) {
                attemptedGameName = "w";
@@ -577,6 +587,7 @@ public class Client extends JFrame implements WindowListener {
          } else {
             attemptedGameName = "";
          }
+
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
       }
@@ -623,6 +634,7 @@ public class Client extends JFrame implements WindowListener {
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
 
          //FOR NOW, ONLY TEMP
+
          if (attemptedGameName != null) {
             if (!attemptedGameName.equals("w")) {
                attemptedGameName = "w";
@@ -632,6 +644,7 @@ public class Client extends JFrame implements WindowListener {
          } else {
             attemptedGameName = "";
          }
+
       }
    }
 
@@ -723,7 +736,6 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(20, 20, 20));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
-         this.setFocusable(true);
       }
 
       public void repaintReal() {
@@ -752,7 +764,6 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(40, 40, 40));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
-         this.setFocusable(true);
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
@@ -779,7 +790,7 @@ public class Client extends JFrame implements WindowListener {
             areaRect.subtract(largeRing);
             midRing = new Area(midCircle);
             //  areaSmallCircle = new Area(smallCircle);
-            largeRing.subtract(midRing);
+            // largeRing.subtract(midRing);
             // midRing.subtract(areaSmallCircle);
          } else {
             g2 = (Graphics2D) g;
@@ -817,10 +828,10 @@ public class Client extends JFrame implements WindowListener {
          //Darkness
          g2.setColor(new Color(0f, 0f, 0f, 0.8f));
          g2.fill(areaRect);
-         g2.setColor(new Color(0.1f, 0.1f, 0.1f, 0.7f));
+         g2.setColor(new Color(0f, 0f, 0f, 0.7f));
          g2.fill(largeRing);
-         g2.setColor(new Color(0.1f, 0.1f, 0.1f, 0.6f));
-         g2.fill(midRing);
+         //   g2.setColor(new Color(0.1f, 0.1f, 0.1f, 0.6f));
+         //  g2.fill(midRing);
          //   g2.setColor(new Color(0.1f, 0.1f, 0.02f, 0.1f));
          //  g2.fill(smallCircle);
 
