@@ -213,7 +213,6 @@ public class Client extends JFrame implements WindowListener {
                   if (notifyReady) {
                      notifyReady = false;
                      output.println("R");
-                     loading = true;
                      output.flush();
                      waitForInput();
                   }
@@ -334,6 +333,7 @@ public class Client extends JFrame implements WindowListener {
             } else if (state == 4) {
                if (initializer == '0') {
                   System.out.println("Starting Game");
+                  loading = true;
                } else {
                   System.out.println("Unable to Start Game");
                }
