@@ -37,6 +37,8 @@ Pressing leave game will instead send Q, which will do most of the same things
  * @since 2019-04-24
  */
 
+//kustard
+
 public class Server {
    //All for the main server
    private ArrayList<MenuHandler> menuConnections = new ArrayList<MenuHandler>();
