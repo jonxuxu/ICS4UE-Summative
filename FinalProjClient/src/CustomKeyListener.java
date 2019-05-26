@@ -20,6 +20,7 @@ public class CustomKeyListener implements KeyListener {
    //Instance variables
    private Set<Integer> pressed = new HashSet<Integer>();
    private int[] direction = new int[2];//WASD
+   private boolean [] spellsUsed = new boolean [3];
 
    //Start of methods that are implemented from KeyListener
 
@@ -87,6 +88,24 @@ public class CustomKeyListener implements KeyListener {
         // System.out.println("tempAngle"+tempAngle);
          return (tempAngle);
       }
+   }
+
+
+   public boolean[] getSpell() {
+      //0 refers to q, 1 refers to e, 2 refers to space
+      spellsUsed[0]=false;
+      spellsUsed[1]=false;
+      spellsUsed[2]=false;
+      if (pressed.contains(81)) {
+         spellsUsed[0]=true;
+      }
+      if (pressed.contains(69)){
+         spellsUsed[1]=true;
+      }
+      if (pressed.contains(32)){
+         spellsUsed[2]=true;
+      }
+      return (spellsUsed);
    }
 }
 
