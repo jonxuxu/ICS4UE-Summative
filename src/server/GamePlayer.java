@@ -14,20 +14,21 @@ import java.util.ArrayList;
 public abstract class GamePlayer extends Player {
    //Constants
    private int ID;
-   private int[] xy = {300, 300};
+   private double[] xy = {300, 300};
    private int[] centerXy = new int[2];
    private double scaling;//Temporary, normally it should be determined in the constructor
    private boolean spells[] = new boolean[3];
    private boolean artifact = false;
+   private boolean damaged = false;
    private ArrayList<Status> allStatus = new ArrayList<Status>();
    private int gold = 0;
-   private int level = 0;
    private int desiredSpell;
    private int maxHealth;
    private int health;
    private int attack;
    private int mobility;
    private int range;
+   private int spriteID;
 
 
    GamePlayer(String username) {
@@ -38,19 +39,13 @@ public abstract class GamePlayer extends Player {
       this.ID = ID;
    }
 
-   public void addXy(double angle) {
-      if (angle != -1) {
-         xy[0] += 7.5 * Math.cos(angle);
-         xy[1] += 7.5 * Math.sin(angle);
-      }
-   }
-
-   public int[] getXy() {
+   public double[] getXy() {
       return (xy);
    }
 
-   public void setXy(int[] xy) {
-      this.xy = xy;
+   public void addXy(double xDisp, double yDisp) {
+      this.xy[0] += xDisp;
+      this.xy[1] += yDisp;
    }
 
    public void setSpell(boolean spell, int spellIndex) {
@@ -61,26 +56,37 @@ public abstract class GamePlayer extends Player {
       return spells[spellIndex];
    }
 
-   public String getFullOutput(int spellTick) {
-      String outputString = "";
-      desiredSpell = -1;//In case nothing affects it
-      for (int i = 0; i < 3; i++) {
-         if (spells[i]) {
-            desiredSpell = i;
-         }
-      }
-      outputString += xy[0] + "," + xy[1] + ",";//Coords
-      outputString += health + "," + maxHealth + "," + attack + "," + mobility + "," + range + ",";//Stats
-      outputString += artifact + "," + gold + "," + level + ",";//General
-      outputString += desiredSpell + "," + getSpellPercent(spellTick, 0) + "," + getSpellPercent(spellTick, 1) + "," + getSpellPercent(spellTick, 2);//Spells
+   public String getMainOutput(int spellTick) {
+      StringBuilder outputString = new StringBuilder();
+      outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
+      outputString.append(health + "," + maxHealth + "," + attack + "," + mobility + "," + range + ",");//Stats
+      outputString.append(artifact + "," + gold + ",");//General
+      outputString.append(spriteID + ",");//Sprite
+      outputString.append(getSpellPercent(spellTick, 0) + "," + getSpellPercent(spellTick, 1) + "," + getSpellPercent(spellTick, 2) + ",");//Spells
+      outputString.append(damaged + "," + allStatus.size());
       for (int i = 0; i < allStatus.size(); i++) {
-         outputString += "," + allStatus.get(i); //Status exclusive
+         outputString.append("," + allStatus.get(i)); //Status exclusive
       }
-      outputString += " ";
-      return outputString;
+      return outputString.toString();
    }
+
+   public String getOtherOutput() {
+      StringBuilder outputString = new StringBuilder();
+      outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
+      outputString.append(health + "," + maxHealth + ",");//stats
+      outputString.append(artifact + ",");//General
+      outputString.append(spriteID + ",");//Sprite
+      outputString.append(damaged + "," + allStatus.size());
+      for (int i = 0; i < allStatus.size(); i++) {
+         outputString.append("," + allStatus.get(i)); //Status exclusive
+      }
+      return outputString.toString();
+   }
+
    public abstract boolean testSpell(int spellTick, int spellIndex);
+
    public abstract int getSpellPercent(int spellTick, int spellIndex);
+
    public int getAttack() {
       return attack;
    }

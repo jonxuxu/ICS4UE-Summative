@@ -259,6 +259,7 @@ public class Server {
                      output.flush();
                   } else {
                      output.println("N" + myPlayer.getUsername()); //Print only the name for the player
+                     System.out.println("N" + myPlayer.getUsername());
                      output.flush();
                   }
                }
@@ -303,7 +304,7 @@ public class Server {
 
       @Override
       public void run() {
-         begin =true;
+         begin = true;
          //Not called until the game begins
          //Once it is called, this is all that really occurs
          for (MenuHandler thisHandler : handlers) {
@@ -343,7 +344,11 @@ public class Server {
                         }
                      }
                   }//This is the input
-                  StringBuilder outputString = new StringBuilder("G");
+                  StringBuilder[] outputString = new StringBuilder[playerNum];
+                  for (int i = 0; i < playerNum; i++) {
+                     outputString[i] = new StringBuilder();
+                  }
+
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
                         if (!allInput[i].isEmpty()) {
@@ -354,21 +359,27 @@ public class Server {
                                  stopGame = true;
                               }
                               allInput[i] = "";
-                              outputString.deleteCharAt(0);
-                              outputString.append(i);
+                              for (int j = 0; j < playerNum; j++) {
+                                 outputString[j].append("D" + j);
+                              }
                            } else {
-                              String[] inputSet = allInput[i].split(" ", -1);
-                              double angleOfMovement = Double.parseDouble(inputSet[0]);
-                              int[] xyDisp = {Integer.parseInt(inputSet[1]), Integer.parseInt(inputSet[2])};
-                              //xyDisp represents the xy displacement from the top left (0,0) corner
-                              int[] xyPos = {xyDisp[0] + gamePlayers[i].getXy()[0], xyDisp[1] + gamePlayers[i].getXy()[1]};
-                              //xyPos represents the xy position in terms of the server map
-                              //This is probably useful for calculations where you need to check for whether or not the
-                              //player had actually hit their target
-                              allInput[i] = "";
-                              gamePlayers[i].addXy(angleOfMovement);
-                              if (SPELL_1.contains(xyDisp[0], xyDisp[1])) { //Add in the condition of clicking the spell icon
-                                 gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, 0), 0);
+                               String[] firstSplit = allInput[i].split(" ", -1);
+                              for (String firstInput : firstSplit) {
+                                if (!firstInput.equals("")) {
+                                    char initializer = firstInput.charAt(0);
+                                    String[] secondSplit = allInput[i].split(initializer + "", -1);
+                                    for (String secondInput : secondSplit) {
+                                       if (!secondInput.equals("")) {
+                                          String[] thirdSplit = secondInput.split(",", -1);
+                                          if (initializer == 'M') {
+                                             gamePlayers[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
+                                          } else if (initializer == 'S') {
+                                             gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
+                                             //The x y information about the spell is stored as thirdSplit[1] and [2]
+                                          }
+                                       }
+                                    }
+                                 }
                               }
                               //Calculations here - This is essentially where ALL calculations take place.
                               //The game is essentially made in this space
@@ -380,22 +391,35 @@ public class Server {
                         }
                      }
                   }
-                  //Calculations here - This is essentially where ALL calculations take place.
-                  //The game is essentially made in this space
-                  /////////////////////////////////////////////////////////////
-
-
-                  /////////////////////////////////////////////////////////////
-
-                  //Output will be here. The first loop generates the full message, the second distributes it
+                  //Check to see if anything was added from disconnecting players. If this is true, then add a space
+                  String[] mainPlayer = new String[playerNum];
+                  String[] otherPlayers = new String[playerNum];
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
-                        outputString.append(i + "," + gamePlayers[i].getFullOutput(gameTick));
+                        mainPlayer[i] = "P" + i + "," + gamePlayers[i].getMainOutput(gameTick);
+                        otherPlayers[i] = "O" + i + "," + gamePlayers[i].getOtherOutput();
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
-                        gameOutputs[i].println(outputString);
+                        outputString[i].append(" ");//Adds the spaces. If something is already there from before (leaving), then this won't be removed by trim. Otherwise, it is gone
+                     }
+                  }
+                  //Output will be here. The first loop generates the full message, the second distributes it
+
+                  for (int i = 0; i < playerNum; i++) {
+                     if (gamePlayers[i] != null) {
+                        outputString[i].append(mainPlayer[i] + " ");
+                        for (int j = 0; j < playerNum; j++) {
+                           if (i != j) {
+                              outputString[i].append(otherPlayers[i]);
+                           }
+                        }
+                     }
+                  }
+                  for (int i = 0; i < playerNum; i++) {
+                     if (gamePlayers[i] != null) {
+                        gameOutputs[i].println(outputString[i].toString().trim());
                         gameOutputs[i].flush();
                      }
                   }
@@ -446,8 +470,8 @@ public class Server {
             } else {
                return (false);
             }
-         }else{
-            return(false);
+         } else {
+            return (false);
          }
       }
 

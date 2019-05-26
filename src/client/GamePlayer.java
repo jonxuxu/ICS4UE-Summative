@@ -19,7 +19,7 @@ public abstract class GamePlayer extends Player {
    private int[] centerXy = new int[2];
    private double scaling;
    private int desiredSpell;
-   private int [] spellPercent = {100, 100, 100};
+   private int[] spellPercent = {100, 100, 100};
    private ArrayList<Status> allStatus = new ArrayList<Status>();
    private int gold = 0;
    private boolean artifact;
@@ -29,6 +29,8 @@ public abstract class GamePlayer extends Player {
    private int attack;
    private int mobility;
    private int range;
+   private boolean damaged;
+   private int spriteID;
 
    GamePlayer(String username) {
       super(username);
@@ -47,15 +49,21 @@ public abstract class GamePlayer extends Player {
       return (xy);
    }
 
-   public void setXy(int[] xy) {
-      this.xy = xy;
+   public void setXy(int x, int y) {
+      this.xy[0] = x;
+      this.xy[1] = y;
    }
 
    public void draw(Graphics2D g2, int[] midXy) {
       drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), desiredSpell);
-      if (desiredSpell!=-1) {
-         desiredSpell=-1;
+      if (desiredSpell != -1) {
+         desiredSpell = -1;
       }
+   }
+
+   public double[] getDisp(double angleOfMovement) {
+      double[] displacements = {7.5 * Math.cos(angleOfMovement), 7.5 * Math.sin(angleOfMovement)};
+      return (displacements);
    }
 
    public void setScaling(double scaling) {
@@ -63,7 +71,7 @@ public abstract class GamePlayer extends Player {
    }
 
    public void setSpell(int spellIndex) {
-      if (spellIndex!=-1) {
+      if (spellIndex != -1) {
          this.desiredSpell = spellIndex;
       }
    }
@@ -88,8 +96,9 @@ public abstract class GamePlayer extends Player {
    public void setArtifact(boolean artifact) {
       this.artifact = artifact;
    }
-   public void setLevel(int level){
-      this.level=level;
+
+   public void setLevel(int level) {
+      this.level = level;
    }
 
    public int getGold() {
@@ -99,11 +108,15 @@ public abstract class GamePlayer extends Player {
    public int getLevel() {
       return level;
    }
+
    public abstract void spellAnimation(Graphics2D g2, int x, int y, int width, int height, int spellIndex);
+
    //public abstract void spell2(Graphics2D g2, int x, int y, int width, int height);
    //  public abstract void spell3(Graphics2D g2, int x, int y, int width, int height);
    public abstract void move(Graphics2D g2, int x, int y, int width, int height);
-   public abstract void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) ;
+
+   public abstract void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex);
+
    public int getAttack() {
       return attack;
    }
@@ -142,5 +155,12 @@ public abstract class GamePlayer extends Player {
 
    public void setRange(int range) {
       this.range = range;
+   }
+
+   public void setSpriteID(int spriteID) {
+      this.spriteID = spriteID;
+   }
+   public void setDamaged(boolean damaged) {
+      this.damaged=damaged;
    }
 }
