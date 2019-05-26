@@ -1,4 +1,4 @@
-//General import
+package client;//General import
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -26,6 +26,7 @@ public class CustomMouseAdapter extends MouseAdapter {
    private boolean rotated = false;
    private double scaling;
    private int[] centerXy = new int[2];
+   private boolean[] leftRight= new boolean[2];
 
 //Methods that are implemented from MouseListener
 
@@ -52,6 +53,15 @@ public class CustomMouseAdapter extends MouseAdapter {
       xy[0] = e.getX();
       xy[1] = e.getY();
       pressed = true;
+      leftRight[0]=false;
+      leftRight[1]=false;
+      if (e.getButton()==1){
+         leftRight[0]=true;
+
+      }
+      if (e.getButton()==3){
+         leftRight[1]=true;
+      }
    }
 
    /**
@@ -200,5 +210,9 @@ public class CustomMouseAdapter extends MouseAdapter {
    public int[] getDispXy() { //Returns the displacement from the top left corner
       int[] dispXy = {475 + (int) ((clickXy[0]-centerXy[0]) / scaling), 250 + (int) ((clickXy[1]-centerXy[1]) / scaling)};
       return (dispXy);
+   }
+
+   public boolean[] getLeftRight() { //Returns the displacement from the top left corner
+      return (leftRight);
    }
 }

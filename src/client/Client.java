@@ -1,3 +1,5 @@
+package client;
+
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -232,8 +234,10 @@ public class Client extends JFrame implements WindowListener {
                   }
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
-                  outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1];//If it is -1, then the server will recognize to stop
-                  //MAKE SURE TO CHANGE TO RECTANGULAR
+
+                  boolean[] spellsPressed = myKeyListener.getSpell();
+                  boolean[] leftRight= myMouseAdapter.getLeftRight();
+                  outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0]+" "+leftRight[1];//If it is -1, then the server will recognize to stop
                   output.println(outputString);
                   output.flush();
                }

@@ -1,3 +1,5 @@
+package server;
+
 import java.awt.Menu;
 import java.awt.Rectangle;
 import java.io.BufferedReader;

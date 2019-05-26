@@ -1,3 +1,5 @@
+package server;
+
 /**
  * This is a class which helps regulate the paint component speed
  *
