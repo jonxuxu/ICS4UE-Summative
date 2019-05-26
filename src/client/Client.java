@@ -182,12 +182,11 @@ public class Client extends JFrame implements WindowListener {
          //Username successfully entered in
          newState = 1; //Only update newState, state will follow shortly
          while (connected) {
-            repaintPanels();
-            if (input.ready()) {
-               decipherInput(input.readLine());
-            }
             //Otherwise, continue to send messages. The lines below are for when something is going to be sent
             if (!gameBegin) {
+               if (input.ready()) {
+                  decipherInput(input.readLine());
+               }
                if (testGame) {
                   testGame = false;
                   boolean test1 = (verifyString(attemptedGameName, 1));
@@ -215,6 +214,7 @@ public class Client extends JFrame implements WindowListener {
                   output.flush();
                   waitForInput();
                }
+               repaintPanels();
             } else {
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
@@ -249,8 +249,11 @@ public class Client extends JFrame implements WindowListener {
                      outputString.append("M" + myGamePlayer.getDisp(angleOfMovement)[0] + "," + myGamePlayer.getDisp(angleOfMovement)[1]);
                   }
                   // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
-                  output.println(outputString);
-                  output.flush();
+                  if (!outputString.toString().isEmpty()) {
+                     output.println(outputString);
+                     output.flush();
+                  }
+                  repaintPanels();
                }
             }
          }

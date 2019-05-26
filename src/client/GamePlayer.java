@@ -62,7 +62,7 @@ public abstract class GamePlayer extends Player {
    }
 
    public double[] getDisp(double angleOfMovement) {
-      double[] displacements = {7.5 * Math.cos(angleOfMovement), 7.5 * Math.sin(angleOfMovement)};
+      double[] displacements = {(20 * Math.cos(angleOfMovement))/scaling, (20 * Math.sin(angleOfMovement))/scaling};
       return (displacements);
    }
 

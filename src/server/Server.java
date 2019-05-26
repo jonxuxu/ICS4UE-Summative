@@ -341,6 +341,8 @@ public class Server {
                      if (gamePlayers[i] != null) {
                         if (gameInputs[i].ready()) {
                            allInput[i] = gameInputs[i].readLine();//Timed
+                        } else {
+                           allInput[i] = "";
                         }
                      }
                   }//This is the input
@@ -351,7 +353,7 @@ public class Server {
 
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
-                        if (!allInput[i].isEmpty()) {
+                        if (!allInput[i].isBlank()) {
                            if (allInput[i].equals("X")) {
                               gamePlayers[i] = null;
                               disconnectedPlayerNum++;
@@ -363,9 +365,9 @@ public class Server {
                                  outputString[j].append("D" + j);
                               }
                            } else {
-                               String[] firstSplit = allInput[i].split(" ", -1);
+                              String[] firstSplit = allInput[i].split(" ", -1);
                               for (String firstInput : firstSplit) {
-                                if (!firstInput.equals("")) {
+                                 if (!firstInput.equals("")) {
                                     char initializer = firstInput.charAt(0);
                                     String[] secondSplit = allInput[i].split(initializer + "", -1);
                                     for (String secondInput : secondSplit) {
@@ -412,7 +414,7 @@ public class Server {
                         outputString[i].append(mainPlayer[i] + " ");
                         for (int j = 0; j < playerNum; j++) {
                            if (i != j) {
-                              outputString[i].append(otherPlayers[i]);
+                              outputString[i].append(otherPlayers[j]);
                            }
                         }
                      }
@@ -420,6 +422,7 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
                         gameOutputs[i].println(outputString[i].toString().trim());
+                        //System.out.println(outputString[i].toString().trim());
                         gameOutputs[i].flush();
                      }
                   }
