@@ -1,3 +1,5 @@
+package client;
+
 /**
  * Status.java
  * This is
@@ -8,5 +10,8 @@
  */
 
 public class Status {
-
+   private int statusID;
+   Status (int statusID){
+      this.statusID=statusID;
+   }
 }

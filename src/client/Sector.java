@@ -1,3 +1,5 @@
+package client;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -14,7 +16,7 @@ public class Sector {
    private BufferedImage image;
    private int[] sectorCoords = new int[2];
    private int[][] corners = new int[4][2];
-   private int SECTOR_SIZE = 100;
+   private int SECTOR_SIZE = 500;
    private int[] centerXy = new int[2];
    private double scaling;
 
@@ -34,15 +36,17 @@ public class Sector {
       }
       */
    }
+
    public void setCenterXy(int[] centerXy) {
       this.centerXy[0] = centerXy[0];
       this.centerXy[1] = centerXy[1];
    }
+
    public void setScaling(double scaling) {
       this.scaling = scaling;
    }
 
-   public void drawSector(Graphics2D g2, int[] midXy)  {
-      g2.drawImage(image, centerXy[0] + (int) (scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0]))-(int) (SECTOR_SIZE * scaling)/2, centerXy[1] +(int) (scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1]))-(int) (SECTOR_SIZE * scaling)/2, (int) (SECTOR_SIZE * scaling), (int) (SECTOR_SIZE * scaling), null);
+   public void drawSector(Graphics2D g2, int[] midXy) {
+      g2.drawImage(image, centerXy[0] + (int) (Math.ceil((scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0])) - (SECTOR_SIZE * scaling) / 2)), (int) (centerXy[1] + Math.ceil((scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1])) - (SECTOR_SIZE * scaling) / 2)), (int) (Math.ceil(SECTOR_SIZE * scaling)), (int) (Math.ceil(SECTOR_SIZE * scaling)), null);
    }
 }

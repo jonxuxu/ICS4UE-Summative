@@ -1,3 +1,5 @@
+package client;
+
 /**
  * Player.java
  * This is

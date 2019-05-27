@@ -1,3 +1,5 @@
+package server;
+
 /**
  * This is a class which helps regulate the paint component speed
  *
@@ -14,7 +16,7 @@ public class Clock {
    private long secondTime;
    private long currentTime;
    //Indicate frames per second
-   private final long DELTA_LIMIT = 15000000;//Every time this much time elapses, a frame is passed
+   private final long DELTA_LIMIT = 10000000;//Every time this much time elapses, a frame is passed
 
    /**
     * Sets the instance variables upon creation
