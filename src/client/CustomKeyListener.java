@@ -57,7 +57,7 @@ public class CustomKeyListener implements KeyListener {
 
    //Getters and setters
 
-   public double getAngle() {
+   public int getAngle() {
       direction[0] = 0;
       direction[1] = 0;
       if (pressed.contains(87)) {
@@ -81,12 +81,13 @@ public class CustomKeyListener implements KeyListener {
       }
       //direction[0] is for the x values, direction[1] is for the y values
       tempAngle = Math.atan2(direction[1], direction[0]);
+      int roundedAngle =(int)(4*(tempAngle/Math.PI));
       if ((direction[0] == 0) && (direction[1] == 0)) {
       //   System.out.println("-1");
-         return (-1);//Check to see if the return works
+         return (-10);//Check to see if the return works
       } else {
         // System.out.println("tempAngle"+tempAngle);
-         return (tempAngle);
+         return (roundedAngle);
       }
    }
 

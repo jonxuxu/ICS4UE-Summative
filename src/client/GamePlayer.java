@@ -27,10 +27,11 @@ public abstract class GamePlayer extends Player {
    private int maxHealth;
    private int health;
    private int attack;
-   private int mobility;
+   private int mobility = 20;
    private int range;
    private boolean damaged;
    private int spriteID;
+   private double ROOT2O2 = 0.70710678118;
 
    GamePlayer(String username) {
       super(username);
@@ -61,8 +62,27 @@ public abstract class GamePlayer extends Player {
       }
    }
 
-   public double[] getDisp(double angleOfMovement) {
-      double[] displacements = {7.5 * Math.cos(angleOfMovement), 7.5 * Math.sin(angleOfMovement)};
+   public double[] getDisp(int angleOfMovement) {
+      double[] displacements = new double[2];
+      if (angleOfMovement == 0) {
+         displacements[0] = mobility / scaling;
+         displacements[1] = 0;
+      } else if (Math.abs(angleOfMovement) == 1) {
+         displacements[0] = ROOT2O2 * mobility / scaling;
+         displacements[1] = ROOT2O2 * mobility / scaling;
+      } else if (Math.abs(angleOfMovement) == 2) {
+         displacements[0] = 0;
+         displacements[1] = mobility / scaling;
+      } else if (Math.abs(angleOfMovement) == 3) {
+         displacements[0] = -ROOT2O2 * mobility / scaling;
+         displacements[1] = ROOT2O2 * mobility / scaling;
+      } else {
+         displacements[0] = -mobility / scaling;
+         displacements[1] = 0;
+      }
+      if (angleOfMovement < 0) {
+         displacements[1] = -displacements[1];
+      }
       return (displacements);
    }
 
@@ -160,7 +180,8 @@ public abstract class GamePlayer extends Player {
    public void setSpriteID(int spriteID) {
       this.spriteID = spriteID;
    }
+
    public void setDamaged(boolean damaged) {
-      this.damaged=damaged;
+      this.damaged = damaged;
    }
 }
