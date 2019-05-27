@@ -20,8 +20,8 @@ class MapGenTester extends JFrame{
     
     MapGen gen = new MapGen();
     
-    gen.generateMap2(50,800,200,100,0.2);
-    gen.tetherAllNodes();
+    gen.generateMap2(50,800,200,150,0.5);
+    gen.tetherAllNodes2();
     
     activeNodes = gen.getNodes();
     
@@ -50,15 +50,9 @@ class MapGenTester extends JFrame{
       g.setColor(Color.BLUE);
       this.drawOvalCustom(200, g);
       g.setColor(Color.GREEN);
-      this.drawOvalCustom(200 - 50,g);
-      this.drawOvalCustom(200 + 50,g);
-      //g.drawOval(-200,-200,400,400);
-     // g.drawOval(-225,-225,400 + 50,400 + 50);
-     // g.drawOval(-175,-175,400 - 50,400 - 50);
-//      g.drawOval(-150,-150,300,300);
-//      g.drawOval(-50,-50,100,100);
-      
-      
+      this.drawOvalCustom(200 - 75,g);
+      this.drawOvalCustom(200 + 75,g);
+           
       g.setColor(Color.RED);
       
       for (int i = 0; i < activeNodes.size(); i++) {
@@ -168,6 +162,77 @@ class MapGenTester extends JFrame{
     	
     	
     }    
+    
+    public void tetherAllNodes2() {
+    	int quad1Best,quad2Best,quad3Best,quad4Best;
+    	int q1Idx,q2Idx,q3Idx,q4Idx;
+    	
+    	int tempDeltaX, tempDeltaY;
+    	
+    	int numOfNodes = nodes.size();
+    	
+    	for (int sourceIdx = 0; sourceIdx < numOfNodes; sourceIdx++) {
+    		quad1Best = 9999;
+    		quad2Best = 9999;
+    		quad3Best = 9999;
+    		quad4Best = 9999;
+    		q1Idx = 0;
+    		q2Idx = 0;
+    		q3Idx = 0;
+    		q4Idx = 0;
+    		
+    		for (int targetIdx = 0; targetIdx < numOfNodes; targetIdx++) {
+    			tempDeltaX = nodes.get(sourceIdx).location.x - nodes.get(targetIdx).location.x;
+    			tempDeltaY = nodes.get(sourceIdx).location.y - nodes.get(targetIdx).location.y;
+    			
+    			int tempDeltaSum = Math.abs(tempDeltaX) + Math.abs(tempDeltaY);
+    			
+    			if (tempDeltaX >= 0 && tempDeltaY >= 0) {
+    				if (tempDeltaSum < quad2Best) {
+    					quad2Best = tempDeltaSum;
+    					q2Idx = targetIdx;
+    				}
+    			} else if (tempDeltaX >= 0 && tempDeltaY <= 0) {
+    				if (tempDeltaSum < quad3Best) {
+    					quad3Best = tempDeltaSum;
+    					q3Idx = targetIdx;
+    				}
+    			} else if (tempDeltaX <= 0 && tempDeltaY <= 0) {
+    				if (tempDeltaSum < quad4Best) {
+    					quad4Best = tempDeltaSum;
+    					q4Idx = targetIdx;
+    				}
+    			} else if (tempDeltaX <= 0 && tempDeltaY >= 0) {
+    				if (tempDeltaSum < quad1Best) {
+    					quad1Best = tempDeltaSum;
+    					q1Idx = targetIdx;
+    				}
+    			}
+    		}
+    		
+    		ArrayList newConnections = new ArrayList<Point>(0);    		
+    		
+    		if (quad1Best < 150) {
+    			newConnections.add(nodes.get(q1Idx).location);
+    		}
+    		if (quad2Best < 150) {
+    			newConnections.add(nodes.get(q2Idx).location);
+    		}
+    		if (quad3Best < 150) {
+    			newConnections.add(nodes.get(q3Idx).location);
+    		}
+    		if (quad4Best < 150) {
+    			newConnections.add(nodes.get(q4Idx).location);
+    		}
+    		
+    		
+    		nodes.get(sourceIdx).connections = newConnections;
+    		
+    		
+    		
+    	}
+    	
+    }
 
     
     private boolean randRoll(int chance) {
