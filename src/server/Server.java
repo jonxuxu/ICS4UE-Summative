@@ -367,7 +367,7 @@ public class Server {
 
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
-                        if (!allInput[i].isBlank()) {
+                        if (!allInput[i].isEmpty()) {
                            if (allInput[i].equals("X")) {
                               gamePlayers[i] = null;
                               disconnectedPlayerNum++;

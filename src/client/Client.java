@@ -58,8 +58,8 @@ public class Client extends JFrame implements WindowListener {
    private PrintWriter output;
    private String username;
    private boolean connected = false;
-   private JPanel[] allPanels = new JPanel[7];
-   private String[] panelNames = {"LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL", "INSTRUCTION_PANEL"};
+   private JPanel[] allPanels = new JPanel[8];
+   private String[] panelNames = {"LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL", "INSTRUCTION_PANEL","INTRO_PANEL"};
    private CustomMouseAdapter myMouseAdapter = new CustomMouseAdapter();
    private CustomKeyListener myKeyListener = new CustomKeyListener();
    private boolean sendName = false;
@@ -134,6 +134,7 @@ public class Client extends JFrame implements WindowListener {
       allPanels[3] = new JoinPanel();
       allPanels[4] = new WaitingPanel();
       allPanels[6] = new InstructionPanel();
+      allPanels[7] = new IntroPanel();
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
       for (int i = 0; i < allPanels.length; i++) {
@@ -145,6 +146,7 @@ public class Client extends JFrame implements WindowListener {
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
       ((IntermediatePanel) (allPanels[5])).initializeSize();
+     // ((IntroPanel)(allPanels[7])).go();
    }
 
    public static void main(String[] args) {
@@ -152,6 +154,8 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void go() {
+      //Start the opening here
+
       connect();
       boolean inputReady = false;
       try {
