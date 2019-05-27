@@ -199,7 +199,7 @@ public class Server {
                            }
                            myGame = null;
                         }
-                     }else{
+                     } else {
                         System.out.println("Back");
                         onlinePlayers.remove(myPlayer);
                      }
@@ -258,10 +258,10 @@ public class Server {
          return (true);
       }
 
-      private void printOnlineList(boolean toAll) {
+      private void printOnlineList(boolean someoneLeft) {
          //N means new player, A means all players
          try {
-            if (toAll) {
+            if (someoneLeft) {
                ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
                String currentPlayerString = myGame.getOnlineGameString();
                for (int i = 0; i < currentSocketList.size(); i++) {
@@ -349,64 +349,63 @@ public class Server {
                allInput[i] = "";
             }
             while (!stopGame) {
-               time.setTime();
-               if (time.getFramePassed()) {
-                  for (int i = 0; i < playerNum; i++) {
-                     if (gamePlayers[i] != null) {
-                        if (gameInputs[i].ready()) {
-                           allInput[i] = gameInputs[i].readLine();//Timed
-                        } else {
-                           allInput[i] = "";
-                        }
+               for (int i = 0; i < playerNum; i++) {
+                  if (gamePlayers[i] != null) {
+                     if (gameInputs[i].ready()) {
+                        allInput[i] = gameInputs[i].readLine();//Timed
+                     } else {
+                        allInput[i] = "";
                      }
-                  }//This is the input
-                  StringBuilder[] outputString = new StringBuilder[playerNum];
-                  for (int i = 0; i < playerNum; i++) {
-                     outputString[i] = new StringBuilder();
                   }
+               }//This is the input
+               StringBuilder[] outputString = new StringBuilder[playerNum];
+               for (int i = 0; i < playerNum; i++) {
+                  outputString[i] = new StringBuilder();
+               }
 
-                  for (int i = 0; i < playerNum; i++) {
-                     if (gamePlayers[i] != null) {
-                        if (!allInput[i].isEmpty()) {
-                           if (allInput[i].equals("X")) {
-                              gamePlayers[i] = null;
-                              disconnectedPlayerNum++;
-                              if (disconnectedPlayerNum == playerNum) {
-                                 stopGame = true;
-                              }
-                              allInput[i] = "";
-                              for (int j = 0; j < playerNum; j++) {
-                                 outputString[j].append("D" + j);
-                              }
-                           } else {
-                              String[] firstSplit = allInput[i].split(" ", -1);
-                              for (String firstInput : firstSplit) {
-                                 if (!firstInput.equals("")) {
-                                    char initializer = firstInput.charAt(0);
-                                    String[] secondSplit = allInput[i].split(initializer + "", -1);
-                                    for (String secondInput : secondSplit) {
-                                       if (!secondInput.equals("")) {
-                                          String[] thirdSplit = secondInput.split(",", -1);
-                                          if (initializer == 'M') {
-                                             gamePlayers[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
-                                          } else if (initializer == 'S') {
-                                             gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
-                                             //The x y information about the spell is stored as thirdSplit[1] and [2]
-                                          }
+               for (int i = 0; i < playerNum; i++) {
+                  if (gamePlayers[i] != null) {
+                     if (!allInput[i].isEmpty()) {
+                        if (allInput[i].equals("X")) {
+                           gamePlayers[i] = null;
+                           disconnectedPlayerNum++;
+                           if (disconnectedPlayerNum == playerNum) {
+                              stopGame = true;
+                           }
+                           allInput[i] = "";
+                           for (int j = 0; j < playerNum; j++) {
+                              outputString[j].append("D" + j);
+                           }
+                        } else {
+                           String[] firstSplit = allInput[i].split(" ", -1);
+                           for (String firstInput : firstSplit) {
+                              if (!firstInput.equals("")) {
+                                 char initializer = firstInput.charAt(0);
+                                 String[] secondSplit = allInput[i].split(initializer + "", -1);
+                                 for (String secondInput : secondSplit) {
+                                    if (!secondInput.equals("")) {
+                                       String[] thirdSplit = secondInput.split(",", -1);
+                                       if (initializer == 'M') {
+                                          gamePlayers[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
+                                       } else if (initializer == 'S') {
+                                          gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
+                                          //The x y information about the spell is stored as thirdSplit[1] and [2]
                                        }
                                     }
                                  }
                               }
-                              //Calculations here - This is essentially where ALL calculations take place.
-                              //The game is essentially made in this space
-                              /////////////////////////////////////////////////////////////
-
-
-                              /////////////////////////////////////////////////////////////
                            }
+                           //Calculations here - This is essentially where ALL calculations take place.
+                           //The game is essentially made in this space
+                           /////////////////////////////////////////////////////////////
+
+
+                           /////////////////////////////////////////////////////////////
                         }
                      }
                   }
+               }
+               if (time.getFramePassed()) {
                   //Check to see if anything was added from disconnecting players. If this is true, then add a space
                   String[] mainPlayer = new String[playerNum];
                   String[] otherPlayers = new String[playerNum];
