@@ -9,7 +9,7 @@ package server;
  * @since 2019-05-19
  */
 
-public class TestClass extends GamePlayer {
+public class TestClass extends Player {
    private int[] spellCooldowns = {500,500,500};
    private int[] lastSpellTicks = {-10000,-10000,-10000};//So that they can be used immediately
 

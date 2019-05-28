@@ -1,7 +1,6 @@
 package client;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,12 +17,9 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -77,10 +73,10 @@ public class Client extends JFrame implements WindowListener {
    private String attemptedGamePassword;
    private boolean host = false;
    private boolean notifyReady = false;
-   private ArrayList<Player> onlineList = new ArrayList<Player>();
-   private GamePlayer[] gamePlayers;
+   private ArrayList<User> onlineList = new ArrayList<User>();
+   private Player[] players;
+   private User myUser;
    private Player myPlayer;
-   private GamePlayer myGamePlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
@@ -247,8 +243,8 @@ public class Client extends JFrame implements WindowListener {
                   int angleOfMovement = myKeyListener.getAngle();
                   int[] xyPos = new int[2]; //Scaled to the map
                   if (myMouseAdapter.getPressed()) {
-                     xyPos[0] = myMouseAdapter.getDispXy()[0] + myGamePlayer.getXy()[0];
-                     xyPos[1] = myMouseAdapter.getDispXy()[1] + myGamePlayer.getXy()[1];
+                     xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
+                     xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
                   }
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
@@ -265,7 +261,7 @@ public class Client extends JFrame implements WindowListener {
                      outputString.append(" "); //Add the seperator
                   }
                   if (angleOfMovement != -10) {
-                     outputString.append("M" + myGamePlayer.getDisp(angleOfMovement)[0] + "," + myGamePlayer.getDisp(angleOfMovement)[1]);
+                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1]);
                   }
                   // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
                   if (!outputString.toString().isEmpty()) {
@@ -357,10 +353,10 @@ public class Client extends JFrame implements WindowListener {
                   newState = 6;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
-                  myPlayer = new Player(username);//Sets the player
+                  myUser = new User(username);//Sets the player
                   if (state == 3) {
                      host = true;
-                     onlineList.add(myPlayer);
+                     onlineList.add(myUser);
                   }
                }
                errors[1] = Integer.parseInt(initializer + "");
@@ -386,10 +382,10 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'A') {
             String[] allPlayers = input.split(" ", -1);
             for (String aPlayer : allPlayers) {
-               onlineList.add(new Player(aPlayer));
+               onlineList.add(new User(aPlayer));
             }
          } else if (initializer == 'N') {
-            onlineList.add(new Player(input));
+            onlineList.add(new User(input));
          } else if (initializer == 'X') {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
@@ -398,11 +394,11 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          } else if (initializer == 'B') {
-            gamePlayers = new GamePlayer[onlineList.size()];
+            players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               gamePlayers[i] = new TestClass(onlineList.get(i).getUsername());
-               if (onlineList.get(i).getUsername().equals(myPlayer.getUsername())) {
-                  myGamePlayer = gamePlayers[i];
+               players[i] = new TestClass(onlineList.get(i).getUsername());
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
                }
             }
             newState = 7;//Sends to the game screen
@@ -422,36 +418,36 @@ public class Client extends JFrame implements WindowListener {
                   if (initializer == 'P') {
                      //REPLACE THIS WITH A SET PLAYER METHOD.
                      int playerID = Integer.parseInt(thirdSplit[0]);
-                     gamePlayers[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
-                     gamePlayers[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
-                     gamePlayers[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
-                     gamePlayers[playerID].setAttack(Integer.parseInt(thirdSplit[5]));
-                     gamePlayers[playerID].setMobility(Integer.parseInt(thirdSplit[6]));
-                     gamePlayers[playerID].setRange(Integer.parseInt(thirdSplit[7]));
-                     gamePlayers[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[8]));
-                     gamePlayers[playerID].setGold(Integer.parseInt(thirdSplit[9]));
-                     gamePlayers[playerID].setSpriteID(Integer.parseInt(thirdSplit[10]));
+                     players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
+                     players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
+                     players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
+                     players[playerID].setAttack(Integer.parseInt(thirdSplit[5]));
+                     players[playerID].setMobility(Integer.parseInt(thirdSplit[6]));
+                     players[playerID].setRange(Integer.parseInt(thirdSplit[7]));
+                     players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[8]));
+                     players[playerID].setGold(Integer.parseInt(thirdSplit[9]));
+                     players[playerID].setSpriteID(Integer.parseInt(thirdSplit[10]));
                      for (int j = 11; j < 14; j++) {
-                        gamePlayers[playerID].setSpellPercent(Integer.parseInt(thirdSplit[j]), j - 11);
+                        players[playerID].setSpellPercent(Integer.parseInt(thirdSplit[j]), j - 11);
                      }
-                     gamePlayers[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[14]));
+                     players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[14]));
                      for (int j = 15; j < 15 + Integer.parseInt(thirdSplit[15]); j++) {
-                        gamePlayers[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
+                        players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
                      }
                   } else if (initializer == 'O') {
                      //REPLACE THIS WITH A SET OTHERS METHOD.
                      int playerID = Integer.parseInt(thirdSplit[0]);
-                     gamePlayers[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
-                     gamePlayers[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
-                     gamePlayers[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
-                     gamePlayers[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[5]));
-                     gamePlayers[playerID].setSpriteID(Integer.parseInt(thirdSplit[6]));
-                     gamePlayers[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[7]));
+                     players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
+                     players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
+                     players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
+                     players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[5]));
+                     players[playerID].setSpriteID(Integer.parseInt(thirdSplit[6]));
+                     players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[7]));
                      for (int j = 8; j < 8 + Integer.parseInt(thirdSplit[8]); j++) {
-                        gamePlayers[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
+                        players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
                      }
                   } else if (initializer == 'D') {
-                     gamePlayers[Integer.parseInt(thirdSplit[0])] = null;
+                     players[Integer.parseInt(thirdSplit[0])] = null;
                   }
                }
             }
@@ -915,9 +911,9 @@ public class Client extends JFrame implements WindowListener {
          if ((state == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * scaling / 2);
             midXy[1] = (int) (DESIRED_Y * scaling / 2);
-            for (GamePlayer currentGamePlayer : gamePlayers) {
-               currentGamePlayer.setScaling(scaling);
-               currentGamePlayer.setCenterXy(midXy);
+            for (Player currentPlayer : players) {
+               currentPlayer.setScaling(scaling);
+               currentPlayer.setCenterXy(midXy);
             }
             g2 = (Graphics2D) g.create();
             g2.setFont(MAIN_FONT);
@@ -960,31 +956,31 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
-         int startX = (int) ((myGamePlayer.getXy()[0] - 475.0) / 500.0);
-         int finalX = (int) (Math.ceil((myGamePlayer.getXy()[0] + 475.0) / 500.0)) + 1;
-         int startY = (int) ((myGamePlayer.getXy()[1] - 250.0) / 500.0);
-         int finalY = (int) (Math.ceil((myGamePlayer.getXy()[1] + 250.0) / 500.0)) + 1;
+         int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 500.0);
+         int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 500.0)) + 1;
+         int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 500.0);
+         int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 500.0)) + 1;
 
 
          //FOR NOW, DRAW TWICE. IN THE FUTURE, FIND A BETTER WAY TO DO THIS
          for (int i = startY; i < finalY; i++) {
             for (int j = startX; j < finalX; j++) {
                if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
-                  sectors[j][i].drawSector(g2, myGamePlayer.getXy());
+                  sectors[j][i].drawSector(g2, myPlayer.getXy());
                }
             }
          }
          for (int i = startY; i < finalY; i++) {
             for (int j = startX; j < finalX; j++) {
                if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
-                  sectors[j][i].drawSector(g2, myGamePlayer.getXy());
+                  sectors[j][i].drawSector(g2, myPlayer.getXy());
                }
             }
          }
          //Game player
-         for (GamePlayer currentGamePlayer : gamePlayers) {
-            if (currentGamePlayer != null) {
-               currentGamePlayer.draw(g2, myGamePlayer.getXy());
+         for (Player currentPlayer : players) {
+            if (currentPlayer != null) {
+               currentPlayer.draw(g2, myPlayer.getXy());
             }
          }
          //Darkness
@@ -1002,7 +998,7 @@ public class Client extends JFrame implements WindowListener {
 
          //Stat bars
          g2.setColor(new Color(190, 40, 40));
-         g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myGamePlayer.getHealth() / myGamePlayer.getMaxHealth()), (int) (5 * scaling));
+         g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
 
          g2.setColor(new Color(165, 156, 148));
          g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
