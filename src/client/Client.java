@@ -73,10 +73,10 @@ public class Client extends JFrame implements WindowListener {
    private String attemptedGamePassword;
    private boolean host = false;
    private boolean notifyReady = false;
-   private ArrayList<User> onlineList = new ArrayList<User>();
-   private Player[] players;
-   private User myUser;
-   private Player myPlayer;
+   private ArrayList<User1> onlineList = new ArrayList<User1>();
+   private Player1[] players;
+   private User1 myUser;
+   private Player1 myPlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
@@ -92,6 +92,8 @@ public class Client extends JFrame implements WindowListener {
    private BufferedImage sheet;
    private boolean logout = false;
    private boolean leaveGame = false;
+
+   private FogMap fog;
 
    public Client() {
       super("Dark");
@@ -144,6 +146,10 @@ public class Client extends JFrame implements WindowListener {
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
       ((IntermediatePanel) (allPanels[7])).initializeSize();
+
+      // Setting up fog (should be moved soon TM)
+      fog = new FogMap(1000, 1000);
+
    }
 
    public static void main(String[] args) {
@@ -231,6 +237,7 @@ public class Client extends JFrame implements WindowListener {
                }
                repaintPanels();
             } else {
+               // TODO: Initialize map ONCE after game begin
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
                   //This is where everything is output. Output the key controls
@@ -246,6 +253,17 @@ public class Client extends JFrame implements WindowListener {
                      xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
                      xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
                   }
+
+                  // Updating fog
+                  fog.age();
+                  for(int i = 0; i < players.length; i++){
+                     // TODO: Separate by teams
+                     // TODO: Account for players that quit?
+                     fog.scout(players[i].getXy()[1]/10, players[i].getXy()[0]/10);
+
+                  }
+
+
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
 
@@ -353,7 +371,7 @@ public class Client extends JFrame implements WindowListener {
                   newState = 6;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
-                  myUser = new User(username);//Sets the player
+                  myUser = new User1(username);//Sets the player
                   if (state == 3) {
                      host = true;
                      onlineList.add(myUser);
@@ -382,10 +400,10 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'A') {
             String[] allPlayers = input.split(" ", -1);
             for (String aPlayer : allPlayers) {
-               onlineList.add(new User(aPlayer));
+               onlineList.add(new User1(aPlayer));
             }
          } else if (initializer == 'N') {
-            onlineList.add(new User(input));
+            onlineList.add(new User1(input));
          } else if (initializer == 'X') {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
@@ -394,7 +412,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          } else if (initializer == 'B') {
-            players = new Player[onlineList.size()];
+            players = new Player1[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                players[i] = new TestClass(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
@@ -446,6 +464,7 @@ public class Client extends JFrame implements WindowListener {
                      for (int j = 8; j < 8 + Integer.parseInt(thirdSplit[8]); j++) {
                         players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
                      }
+
                   } else if (initializer == 'D') {
                      players[Integer.parseInt(thirdSplit[0])] = null;
                   }
@@ -548,7 +567,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow();// Removed, this interferes with the textboxes. See if this is truly necessary
-         if (myKeyListener.getEnter()) {
+         if (myKeyListener.getEnter()){
             if (!(nameField.getText().contains(" "))) {
                username = nameField.getText();
                sendName = true;
@@ -662,7 +681,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
          }
-         if (myKeyListener.getEnter()) {
+         if (myKeyListener.getEnter()){
             if (!testGame) {
                attemptedGameName = gameNameField.getText();
                attemptedGamePassword = gamePasswordField.getText();
@@ -732,7 +751,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         if (myKeyListener.getEnter()) {
+         if (myKeyListener.getEnter()){
             if (!testGame) {
                attemptedGameName = gameNameTestField.getText();
                attemptedGamePassword = gamePasswordTestField.getText();
@@ -836,16 +855,16 @@ public class Client extends JFrame implements WindowListener {
          }
          StringBuilder players = new StringBuilder("Players: ");
          for (int i = 0; i < onlineList.size(); i++) {
-            players.append(onlineList.get(i).getUsername() + ", ");
+            players.append(onlineList.get(i).getUsername()+", ");
          }
-         g2.drawString(players.toString(), (int) (2 * scaling), (int) (10 * scaling));
+         g2.drawString(players.toString(), (int)(2*scaling), (int)(10*scaling));
          if (loading) {
             if (buttonRemove) {
                this.remove(readyGameButton);
                buttonRemove = false;
             }
 
-            g2.drawString("LOADING", (int) (MAX_X - metrics.stringWidth("LOADING") / 2.0), MAX_Y / 2);
+            g2.drawString("LOADING", (int)(MAX_X -metrics.stringWidth("LOADING")/2.0), MAX_Y / 2);
          }
       }
    }
@@ -917,7 +936,7 @@ public class Client extends JFrame implements WindowListener {
          if ((state == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * scaling / 2);
             midXy[1] = (int) (DESIRED_Y * scaling / 2);
-            for (Player currentPlayer : players) {
+            for (Player1 currentPlayer : players) {
                currentPlayer.setScaling(scaling);
                currentPlayer.setCenterXy(midXy);
             }
@@ -983,21 +1002,47 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          }
+
          //Game player
-         for (Player currentPlayer : players) {
+         for (Player1 currentPlayer : players) {
             if (currentPlayer != null) {
                currentPlayer.draw(g2, myPlayer.getXy());
             }
          }
-         //Darkness
-         g2.setColor(new Color(0f, 0f, 0f, 0.8f));
-         g2.fill(areaRect);
-         g2.setColor(new Color(0f, 0f, 0f, 0.7f));
-         g2.fill(largeRing);
+         /*
+         g2.setColor(Color.white);
+         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);
+         g2.setColor(Color.white);
+         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
+           */
+
+         // Draws fog
+         for(int i = -MAX_X/2; i < MAX_X/2; i+=10){
+            for(int j = -MAX_Y/2; j < MAX_Y/2; j+=10){
+
+               int mapX = myPlayer.getXy()[0]/10 + i;
+               int mapY = myPlayer.getXy()[1]/10 + j;
+
+               if(mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY< 1000){
+                  int fogBlock = fog.getFog()[mapY][mapX];
+                  if(fogBlock == 0){ // Unexplored
+                     g2.setColor(Color.black);
+                  } else if(fogBlock == 1){ // Explored but not actively viewed
+                     g2.setColor(new Color(0, 0, 0, 128));
+                  } else {
+                     g2.setColor(new Color(0, 0, 0, 0));
+                  }
+               } else{
+                  g2.setColor(Color.black);
+               }
+               g2.drawRect(i+MAX_X/2, j+MAX_Y/2, 10, 10);
+            }
+         }
+
 
          g2.setColor(new Color(165, 156, 148));
          //Minimap
-         g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
+         g2.drawRect((int) (830 * scaling), (int) (379*scaling), (int) (120 * scaling), (int) (120 * scaling));
          //Bottom bar
          g2.drawPolygon(BOTTOM_BAR);
 
