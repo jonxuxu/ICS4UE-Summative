@@ -15,7 +15,7 @@ import java.io.IOException;
  * @since 2019-05-19
  */
 
-public class TestClass extends GamePlayer {
+public class TestClass extends Player {
    private int maxHealth = 100;
    private int attack = 10;
    private int mobility = 10;

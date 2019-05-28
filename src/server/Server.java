@@ -1,10 +1,11 @@
 package server;
 
-import java.awt.Menu;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -44,7 +45,7 @@ public class Server {
    private ArrayList<MenuHandler> menuConnections = new ArrayList<MenuHandler>();
 
    //Used by all
-   private ArrayList<Player> onlinePlayers = new ArrayList<Player>();
+   private ArrayList<User> onlineUsers = new ArrayList<User>();
    private ArrayList<GameServer> games = new ArrayList<GameServer>();
    private ArrayList<GameServer> startedGames = new ArrayList<GameServer>();
 
@@ -69,7 +70,7 @@ public class Server {
 
    class MenuHandler implements Runnable {
       private Socket myConnection;
-      private Player myPlayer;
+      private User myUser;
       private GameServer myGame;
       private PrintWriter output;
       private BufferedReader input;
@@ -113,8 +114,8 @@ public class Server {
                   inputString = inputString.substring(1);//Remove the initializer
                   if (initializer == 'U') { //username
                      if (usernameValid(inputString)) {
-                        myPlayer = new Player(inputString);
-                        onlinePlayers.add(myPlayer);
+                        myUser = new User(inputString);
+                        onlineUsers.add(myUser);
                         error = 0;
                      } else {
                         error = 1;
@@ -128,7 +129,7 @@ public class Server {
                      error = 5;//Slightly different, this should give an error message which tells the client that the password/username is wrong
                      for (GameServer thisGame : games) {
                         if ((thisGame.sameName(attemptServerName)) && (thisGame.samePassword(attemptServerPassword))) {
-                           if (thisGame.addGamePlayer(myPlayer, myConnection, this)) {
+                           if (thisGame.addGamePlayer(myUser, myConnection, this)) {
                               myGame = thisGame;
                               error = 0;
                            } else {
@@ -157,7 +158,7 @@ public class Server {
                      }
                      if (error == 0) { //When the error is 0, there is no need to print it out
                         myGame = new GameServer(serverName, serverPassword);//Set this game to the specific game for this gameserver
-                        myGame.addGamePlayer(myPlayer, myConnection, this);
+                        myGame.addGamePlayer(myUser, myConnection, this);
                         games.add(myGame);
                      }
                      System.out.println(error);
@@ -179,8 +180,8 @@ public class Server {
 
                   } else if (initializer == 'B') {
                      if (myGame != null) {
-                        if (!myGame.isHost(myPlayer)) {
-                           myGame.removeGamePlayer(myPlayer, myConnection, this);
+                        if (!myGame.isHost(myUser)) {
+                           myGame.removeGamePlayer(myUser, myConnection, this);
                            if (myGame.getGameSize() == 0) {
                               games.remove(myGame);
                            } else {
@@ -188,7 +189,7 @@ public class Server {
                            }
                            myGame = null;
                         } else {
-                           myGame.removeGamePlayer(myPlayer, myConnection, this);
+                           myGame.removeGamePlayer(myUser, myConnection, this);
                            games.remove(myGame);
                            //here is where you will send a message to everyone to remove all the players
                            ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
@@ -201,21 +202,21 @@ public class Server {
                         }
                      }else{
                         System.out.println("Back");
-                        onlinePlayers.remove(myPlayer);
+                        onlineUsers.remove(myUser);
                      }
                   } else if (initializer == 'Q') {
                      System.out.println("Quit");
-                     myGame.removeGamePlayer(myPlayer, myConnection, this);
+                     myGame.removeGamePlayer(myUser, myConnection, this);
                      if (myGame.getGameSize() == 0) {
                         games.remove(myGame);
                      }
                      myGame = null;
                   } else if (initializer == 'X') { //Activated by window listener only
                      System.out.println("Exit");
-                     onlinePlayers.remove(myPlayer);//If it doesn't exist, nothing happens
+                     onlineUsers.remove(myUser);//If it doesn't exist, nothing happens
                      if (myGame != null) {
-                        if (!myGame.isHost(myPlayer)) {
-                           myGame.removeGamePlayer(myPlayer, myConnection, this);
+                        if (!myGame.isHost(myUser)) {
+                           myGame.removeGamePlayer(myUser, myConnection, this);
                            if (myGame.getGameSize() == 0) {
                               games.remove(myGame);
                            } else {
@@ -223,7 +224,7 @@ public class Server {
                            }
                            myGame = null;
                         } else {
-                           myGame.removeGamePlayer(myPlayer, myConnection, this);
+                           myGame.removeGamePlayer(myUser, myConnection, this);
                            games.remove(myGame);
                            //here is where you will send a message to everyone to remove all the players
                            ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
@@ -250,8 +251,8 @@ public class Server {
 
       private boolean usernameValid(String attemptedName) {
          //Later on, check for special characters and set a limit
-         for (int i = 0; i < onlinePlayers.size(); i++) {
-            if (onlinePlayers.get(i).getUsername().equals(attemptedName)) {
+         for (int i = 0; i < onlineUsers.size(); i++) {
+            if (onlineUsers.get(i).getUsername().equals(attemptedName)) {
                return (false);
             }
          }
@@ -272,8 +273,8 @@ public class Server {
                      output.println("A" + currentPlayerString); //Print the entire list
                      output.flush();
                   } else {
-                     output.println("N" + myPlayer.getUsername()); //Print only the name for the player
-                     System.out.println("N" + myPlayer.getUsername());
+                     output.println("N" + myUser.getUsername()); //Print only the name for the player
+                     System.out.println("N" + myUser.getUsername());
                      output.flush();
                   }
                }
@@ -284,7 +285,7 @@ public class Server {
                for (int i = 0; i < currentSocketList.size(); i++) {
                   //If the error is 0, which it is in this case, no error needs to be printed out
                   output = new PrintWriter(currentSocketList.get(i).getOutputStream());
-                  output.println("X" + myPlayer.getUsername()); //Print only the name for the player
+                  output.println("X" + myUser.getUsername()); //Print only the name for the player
                   output.flush();
                }
             }
@@ -297,14 +298,16 @@ public class Server {
    class GameServer implements Runnable {
       private String serverName;
       private String serverPassword;
-      private ArrayList<GamePlayer> onlineGamePlayers = new ArrayList<GamePlayer>();
+      private ArrayList<Player> onlinePlayers = new ArrayList<Player>();
       private ArrayList<Socket> onlineGameSockets = new ArrayList<Socket>();
       private ArrayList<MenuHandler> handlers = new ArrayList<MenuHandler>();
       private boolean stopGame = false;
-      private GamePlayer[] gamePlayers;//For the ID's, even disconnected players will work
+      private Player[] players;//For the ID's, even disconnected players will work
       private Socket[] gameSockets;
       private PrintWriter[] gameOutputs;
       private BufferedReader[] gameInputs;
+      private ObjectInputStream[] gameObjectInputs;
+      private ObjectOutputStream[] gameObjectOutputs;
       private int playerNum;//For the ID's even disconnected players will work
       private Clock time = new Clock();
       private int gameTick = 0;
@@ -325,24 +328,29 @@ public class Server {
             thisHandler.kill();
          }
          try {
-            gamePlayers = new GamePlayer[onlineGamePlayers.size()];
-            gameSockets = new Socket[onlineGameSockets.size()];
-            gameOutputs = new PrintWriter[onlineGameSockets.size()];
-            gameInputs = new BufferedReader[onlineGameSockets.size()];
+            players = new Player[onlinePlayers.size()];
+
+            gameSockets = new Socket[players.length];
+            gameOutputs = new PrintWriter[players.length];
+            gameInputs = new BufferedReader[players.length];
+            gameObjectOutputs = new ObjectOutputStream[players.length];
+            gameObjectInputs = new ObjectInputStream[players.length];
             /*
             This is where a seed is generated
             */
-            for (int i = 0; i < gamePlayers.length; i++) {
-               gamePlayers[i] = onlineGamePlayers.get(i);
+            for (int i = 0; i < players.length; i++) {
+               players[i] = onlinePlayers.get(i);
                gameSockets[i] = onlineGameSockets.get(i);
                gameOutputs[i] = new PrintWriter(onlineGameSockets.get(i).getOutputStream());
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
+               gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
+
                gameOutputs[i].println("B"); //B for begin
                gameOutputs[i].flush();
             }
-            playerNum = gamePlayers.length;
+            playerNum = players.length;
             for (int i = 0; i < playerNum; i++) {
-               gamePlayers[i].setID(i);
+               players[i].setID(i);
             }//Set the gameplayer ID's
             String allInput[] = new String[playerNum];
             for (int i = 0; i < allInput.length; i++) {
@@ -350,7 +358,7 @@ public class Server {
             }
             while (!stopGame) {
                for (int i = 0; i < playerNum; i++) {
-                  if (gamePlayers[i] != null) {
+                  if (players[i] != null) {
                      if (gameInputs[i].ready()) {
                         allInput[i] = gameInputs[i].readLine();//Timed
                      } else {
@@ -363,18 +371,19 @@ public class Server {
                   outputString[i] = new StringBuilder();
                }
 
-               for (int i = 0; i < playerNum; i++) {
-                  if (gamePlayers[i] != null) {
+               // Input from clients
+               for (int i =  0; i < playerNum; i++) {
+                  if (players[i] != null) {
                      if (!allInput[i].isEmpty()) {
                         if (allInput[i].equals("X")) {
-                           gamePlayers[i] = null;
+                           players[i] = null;
                            disconnectedPlayerNum++;
                            if (disconnectedPlayerNum == playerNum) {
                               stopGame = true;
                            }
                            allInput[i] = "";
                            for (int j = 0; j < playerNum; j++) {
-                              outputString[j].append("D" + j);
+                              outputString[j].append("D" + j+ " ");
                            }
                         } else {
                            String[] firstSplit = allInput[i].split(" ", -1);
@@ -386,44 +395,35 @@ public class Server {
                                     if (!secondInput.equals("")) {
                                        String[] thirdSplit = secondInput.split(",", -1);
                                        if (initializer == 'M') {
-                                          gamePlayers[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
+                                          players[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
                                        } else if (initializer == 'S') {
-                                          gamePlayers[i].setSpell(gamePlayers[i].testSpell(gameTick, Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
+                                          players[i].setSpell(players[i].testSpell(gameTick, Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
                                           //The x y information about the spell is stored as thirdSplit[1] and [2]
                                        }
                                     }
                                  }
                               }
                            }
-                           //Calculations here - This is essentially where ALL calculations take place.
-                           //The game is essentially made in this space
-                           /////////////////////////////////////////////////////////////
-
-
-                           /////////////////////////////////////////////////////////////
                         }
                      }
                   }
                }
+
+               // Output to clients
                if (time.getFramePassed()) {
                   //Check to see if anything was added from disconnecting players. If this is true, then add a space
                   String[] mainPlayer = new String[playerNum];
                   String[] otherPlayers = new String[playerNum];
                   for (int i = 0; i < playerNum; i++) {
-                     if (gamePlayers[i] != null) {
-                        mainPlayer[i] = "P" + i + "," + gamePlayers[i].getMainOutput(gameTick);
-                        otherPlayers[i] = "O" + i + "," + gamePlayers[i].getOtherOutput();
-                     }
-                  }
-                  for (int i = 0; i < playerNum; i++) {
-                     if (gamePlayers[i] != null) {
-                        outputString[i].append(" ");//Adds the spaces. If something is already there from before (leaving), then this won't be removed by trim. Otherwise, it is gone
+                     if (players[i] != null) {
+                        mainPlayer[i] = "P" + i + "," + players[i].getMainOutput(gameTick); //player
+                        otherPlayers[i] = "O" + i + "," + players[i].getOtherOutput(); //others
                      }
                   }
                   //Output will be here. The first loop generates the full message, the second distributes it
 
                   for (int i = 0; i < playerNum; i++) {
-                     if (gamePlayers[i] != null) {
+                     if (players[i] != null) {
                         outputString[i].append(mainPlayer[i] + " ");
                         for (int j = 0; j < playerNum; j++) {
                            if (i != j) {
@@ -433,7 +433,7 @@ public class Server {
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
-                     if (gamePlayers[i] != null) {
+                     if (players[i] != null) {
                         gameOutputs[i].println(outputString[i].toString().trim());
                         //System.out.println(outputString[i].toString().trim());
                         gameOutputs[i].flush();
@@ -452,8 +452,8 @@ public class Server {
          this.serverPassword = serverPassword;
       }
 
-      private boolean isHost(Player myPlayer) {
-         if (myPlayer.getUsername().equals(onlineGamePlayers.get(0).getUsername())) {
+      private boolean isHost(User myUser) {
+         if (myUser.getUsername().equals(onlinePlayers.get(0).getUsername())) {
             return true;
          } else {
             return false;
@@ -476,10 +476,10 @@ public class Server {
          }
       }
 
-      private boolean addGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
+      private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
          if (!begin) {
-            if (onlineGamePlayers.size() < 6) {
-               onlineGamePlayers.add(new TestClass(player.getUsername()));
+            if (onlinePlayers.size() < 6) {
+               onlinePlayers.add(new TestClass(user.getUsername()));
                onlineGameSockets.add(playerSocket);
                handlers.add(handler);
                return (true);
@@ -491,21 +491,21 @@ public class Server {
          }
       }
 
-      private void removeGamePlayer(Player player, Socket playerSocket, MenuHandler handler) {
-         System.out.println(player.getUsername());
-         System.out.println(onlineGamePlayers.size());
-         for (int i = 0; i < onlineGamePlayers.size(); i++) {
-            if (player.getUsername().equals(onlineGamePlayers.get(i).getUsername())) {
-               onlineGamePlayers.remove(i);
+      private void removeGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
+         System.out.println(user.getUsername());
+         System.out.println(onlinePlayers.size());
+         for (int i = 0; i < onlinePlayers.size(); i++) {
+            if (user.getUsername().equals(onlinePlayers.get(i).getUsername())) {
+               onlinePlayers.remove(i);
             }
          }
          onlineGameSockets.remove(playerSocket);
          handlers.remove(handler);
-         System.out.println(onlineGamePlayers.size());
+         System.out.println(onlinePlayers.size());
       }
 
       private int getGameSize() {
-         return (onlineGamePlayers.size());
+         return (onlinePlayers.size());
       }
 
       private ArrayList<Socket> getOnlineGameSockets() {
@@ -514,10 +514,13 @@ public class Server {
 
       private String getOnlineGameString() {
          StringBuilder onlineString = new StringBuilder("");
-         for (int i = 0; i < onlineGamePlayers.size(); i++) {
-            onlineString.append(onlineGamePlayers.get(i).getUsername() + " ");
+         for (int i = 0; i < onlinePlayers.size(); i++) {
+            onlineString.append(onlinePlayers.get(i).getUsername() + " ");
          }
          return (onlineString + "");//There will be a space at the end, this is useful
       }
+
    }
+
+
 }
