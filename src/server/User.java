@@ -1,7 +1,7 @@
 package server;
 
 /**
- * User.java
+ * User1.java
  * This is
  *
  * @author Will Jeong
