@@ -1,7 +1,7 @@
 package client;
 
 /**
- * User.java
+ * User1.java
  * This is
  *
  * @author Will Jeong
@@ -9,9 +9,9 @@ package client;
  * @since 2019-04-24
  */
 
-public class User {
+public class User1 {
    private String username ="";
-   User(String username){
+   User1(String username){
       this.username=username;
    }
    public String getUsername(){
