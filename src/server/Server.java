@@ -310,11 +310,7 @@ public class Server {
       private int gameTick = 0;
       private int disconnectedPlayerNum = 0;
       private boolean begin;
-
-      //Constants for general display
-      private Rectangle SPELL_1 = new Rectangle(425, 383, 100, 100);
-      private Rectangle SPELL_2 = new Rectangle(550, 383, 100, 100);
-      private Rectangle SPELL_3 = new Rectangle(675, 383, 100, 100);
+      private int playerDisconnected=-1;
 
       @Override
       public void run() {
@@ -367,15 +363,14 @@ public class Server {
                   if (gamePlayers[i] != null) {
                      if (!allInput[i].isEmpty()) {
                         if (allInput[i].equals("X")) {
+                           System.out.println("X");
                            gamePlayers[i] = null;
                            disconnectedPlayerNum++;
+                           playerDisconnected = i;
                            if (disconnectedPlayerNum == playerNum) {
                               stopGame = true;
                            }
                            allInput[i] = "";
-                           for (int j = 0; j < playerNum; j++) {
-                              outputString[j].append("D" + j);
-                           }
                         } else {
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
@@ -417,7 +412,10 @@ public class Server {
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
-                        outputString[i].append(" ");//Adds the spaces. If something is already there from before (leaving), then this won't be removed by trim. Otherwise, it is gone
+                        if (playerDisconnected != -1) {
+                           outputString[i].append("D" + playerDisconnected + " ");
+                           playerDisconnected = -1;
+                        }
                      }
                   }
                   //Output will be here. The first loop generates the full message, the second distributes it
@@ -427,7 +425,9 @@ public class Server {
                         outputString[i].append(mainPlayer[i] + " ");
                         for (int j = 0; j < playerNum; j++) {
                            if (i != j) {
-                              outputString[i].append(otherPlayers[j]);
+                              if (gamePlayers[j] != null) {
+                                 outputString[i].append(otherPlayers[j]);
+                              }
                            }
                         }
                      }
@@ -435,7 +435,7 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (gamePlayers[i] != null) {
                         gameOutputs[i].println(outputString[i].toString().trim());
-                        //System.out.println(outputString[i].toString().trim());
+                        System.out.println(outputString[i].toString().trim());
                         gameOutputs[i].flush();
                      }
                   }

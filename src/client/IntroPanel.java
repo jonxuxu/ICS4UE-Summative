@@ -33,7 +33,7 @@ public class IntroPanel extends JPanel {
    static int y;
    static ArrayList<Particle> particles = new ArrayList<Particle>();
    static final int SIZE = 100;
-   static double fade1, fade2 = 0;
+   static double fade1 = 0;
    static Font font;
    static FontMetrics metrics;
    static int fontX, fontY;
@@ -41,11 +41,12 @@ public class IntroPanel extends JPanel {
    static String text = "7";
    static int lineY = 0;
    static BufferedImage img;
-   static boolean animationOver=false;
+   static boolean animationOver = false;
+   static int animationWait = 120;
    static Color fireColours[] = {new Color(255, 249, 202), new Color(209, 106, 4), new Color(227, 238, 35), new Color(254, 69, 0), new Color(234, 185, 79)};
 
 
-   IntroPanel(){
+   IntroPanel() {
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Kiona-Bold.ttf")));
@@ -56,7 +57,7 @@ public class IntroPanel extends JPanel {
       this.setBackground(new Color(17, 17, 17));
    }
 
-   public void go(){
+   public void go() {
       for (double i = 0; i < Math.PI * 7 / 2; i += 0.01) {
          //particles.add(new Particle(x,y,(Math.random()*10-5),(Math.random()*10),(int)(Math.random()*12),(int)(Math.random()*(50)+200),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
          for (double j = -SIZE / 2; j < SIZE / 2; j += 10) {
@@ -115,7 +116,6 @@ public class IntroPanel extends JPanel {
       fontY = (int) (((h - metrics.getHeight()) / 2) + metrics.getAscent());
       for (double i = 0; i < 1; i += 0.01) {
          fade1 = i;
-         fade2 = i;
          try {
             Thread.sleep(10);
          } catch (Exception E) {
@@ -148,13 +148,14 @@ public class IntroPanel extends JPanel {
 
       for (double i = 1; i >= 0; i -= 0.01) {
          fade1 = i;
-         fade2 = i;
          try {
             Thread.sleep(5);
          } catch (Exception E) {
          }
       }
+      fade1=0;
    }
+
    /**
     * Paints all of the required elements in the JPanel.
     *
@@ -193,7 +194,7 @@ public class IntroPanel extends JPanel {
       metrics = g2.getFontMetrics();
       g2.setColor(new Color((float) 1, (float) 1, (float) 1, (float) fade1));
       g2.drawString("7", fontX, fontY);
-      g2.setColor(new Color((float) 1, (float) 1, (float) 0, (float) fade2));
+      g2.setColor(new Color((float) 1, (float) 1, (float) 0, (float) fade1));
       g2.drawString("SPEED", fontX + metrics.stringWidth("7"), fontY);
       //img = (BufferedImage)(this.createImage((int)w,(int)h));
       //for (int i = 0; i <
@@ -202,16 +203,13 @@ public class IntroPanel extends JPanel {
          g2.fillRect(0, 0, (int) w, lineY);
          //System.out.println(w + " " + lineY);
       }
-      if (fade2==1){
-         animationOver=true;
-      }
-      if (animationOver) {
+     // if (!particles.isEmpty()) {
          repaint();
-      }
+     // }
    }
 
-   public boolean checkAnimationOver(){
-      return (animationOver);
-   }
+   public boolean checkAnimationOver() {
 
+      return (particles.isEmpty());
+   }
 }

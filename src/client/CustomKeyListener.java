@@ -20,7 +20,7 @@ public class CustomKeyListener implements KeyListener {
    //Instance variables
    private Set<Integer> pressed = new HashSet<Integer>();
    private int[] direction = new int[2];//WASD
-   private boolean [] spellsUsed = new boolean [3];
+   private boolean[] spellsUsed = new boolean[3];
 
    //Start of methods that are implemented from KeyListener
 
@@ -40,6 +40,7 @@ public class CustomKeyListener implements KeyListener {
     */
    @Override
    public void keyPressed(KeyEvent e) {
+      System.out.println(e.getKeyCode());
       pressed.add(e.getKeyCode());
    }
 
@@ -81,30 +82,37 @@ public class CustomKeyListener implements KeyListener {
       }
       //direction[0] is for the x values, direction[1] is for the y values
       tempAngle = Math.atan2(direction[1], direction[0]);
-      int roundedAngle =(int)(4*(tempAngle/Math.PI));
+      int roundedAngle = (int) (4 * (tempAngle / Math.PI));
       if ((direction[0] == 0) && (direction[1] == 0)) {
-      //   System.out.println("-1");
+         //   System.out.println("-1");
          return (-10);//Check to see if the return works
       } else {
-        // System.out.println("tempAngle"+tempAngle);
+         // System.out.println("tempAngle"+tempAngle);
          return (roundedAngle);
       }
    }
 
+   public boolean getEnter() {
+      if (pressed.contains(10)) {
+         return true;
+      }else{
+         return false;
+      }
+   }
 
    public boolean[] getSpell() {
       //0 refers to q, 1 refers to e, 2 refers to space
-      spellsUsed[0]=false;
-      spellsUsed[1]=false;
-      spellsUsed[2]=false;
+      spellsUsed[0] = false;
+      spellsUsed[1] = false;
+      spellsUsed[2] = false;
       if (pressed.contains(81)) {
-         spellsUsed[0]=true;
+         spellsUsed[0] = true;
       }
-      if (pressed.contains(69)){
-         spellsUsed[1]=true;
+      if (pressed.contains(69)) {
+         spellsUsed[1] = true;
       }
-      if (pressed.contains(32)){
-         spellsUsed[2]=true;
+      if (pressed.contains(32)) {
+         spellsUsed[2] = true;
       }
       return (spellsUsed);
    }
