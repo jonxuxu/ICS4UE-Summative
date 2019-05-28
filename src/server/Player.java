@@ -3,7 +3,7 @@ package server;
 import java.util.ArrayList;
 
 /**
- * User1.java
+ * User.java
  * This is
  *
  * @author Will Jeong

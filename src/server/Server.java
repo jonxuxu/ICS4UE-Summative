@@ -3,8 +3,6 @@ package server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -305,8 +303,6 @@ public class Server {
       private Socket[] gameSockets;
       private PrintWriter[] gameOutputs;
       private BufferedReader[] gameInputs;
-      //private ObjectInputStream[] gameObjectInputs;
-      //private ObjectOutputStream[] gameObjectOutputs;
       private int playerNum;//For the ID's even disconnected players will work
       private Clock time = new Clock();
       private int gameTick = 0;
@@ -324,13 +320,9 @@ public class Server {
          }
          try {
             players = new Player[onlinePlayers.size()];
-
-            gameSockets = new Socket[players.length];
-            gameOutputs = new PrintWriter[players.length];
-            gameInputs = new BufferedReader[players.length];
-            //gameObjectOutputs = new ObjectOutputStream[players.length];
-            //gameObjectInputs = new ObjectInputStream[players.length];
-
+            gameSockets = new Socket[onlineGameSockets.size()];
+            gameOutputs = new PrintWriter[onlineGameSockets.size()];
+            gameInputs = new BufferedReader[onlineGameSockets.size()];
             /*
             This is where a seed is generated
             */
@@ -339,8 +331,6 @@ public class Server {
                gameSockets[i] = onlineGameSockets.get(i);
                gameOutputs[i] = new PrintWriter(onlineGameSockets.get(i).getOutputStream());
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
-               //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
-
                gameOutputs[i].println("B"); //B for begin
                gameOutputs[i].flush();
             }
@@ -367,12 +357,11 @@ public class Server {
                   outputString[i] = new StringBuilder();
                }
 
-               // Input from clients
-               for (int i =  0; i < playerNum; i++) {
+               for (int i = 0; i < playerNum; i++) {
                   if (players[i] != null) {
                      if (!allInput[i].isEmpty()) {
                         if (allInput[i].equals("X")) {
-
+                           System.out.println("X");
                            players[i] = null;
                            disconnectedPlayerNum++;
                            playerDisconnected = i;
@@ -399,12 +388,16 @@ public class Server {
                                  }
                               }
                            }
+                           //Calculations here - This is essentially where ALL calculations take place.
+                           //The game is essentially made in this space
+                           /////////////////////////////////////////////////////////////
+
+
+                           /////////////////////////////////////////////////////////////
                         }
                      }
                   }
                }
-
-               // Output to clients
                if (time.getFramePassed()) {
                   //Check to see if anything was added from disconnecting players. If this is true, then add a space
                   String[] mainPlayer = new String[playerNum];
@@ -524,8 +517,5 @@ public class Server {
          }
          return (onlineString + "");//There will be a space at the end, this is useful
       }
-
    }
-
-
 }
