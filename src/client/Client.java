@@ -548,7 +548,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow();// Removed, this interferes with the textboxes. See if this is truly necessary
-         if (myKeyListener.getEnter()){
+         if (myKeyListener.getEnter()) {
             if (!(nameField.getText().contains(" "))) {
                username = nameField.getText();
                sendName = true;
@@ -662,7 +662,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setFont(MAIN_FONT);
          }
-         if (myKeyListener.getEnter()){
+         if (myKeyListener.getEnter()) {
             if (!testGame) {
                attemptedGameName = gameNameField.getText();
                attemptedGamePassword = gamePasswordField.getText();
@@ -732,7 +732,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         if (myKeyListener.getEnter()){
+         if (myKeyListener.getEnter()) {
             if (!testGame) {
                attemptedGameName = gameNameTestField.getText();
                attemptedGamePassword = gamePasswordTestField.getText();
@@ -836,16 +836,16 @@ public class Client extends JFrame implements WindowListener {
          }
          StringBuilder players = new StringBuilder("Players: ");
          for (int i = 0; i < onlineList.size(); i++) {
-            players.append(onlineList.get(i).getUsername()+", ");
+            players.append(onlineList.get(i).getUsername() + ", ");
          }
-         g2.drawString(players.toString(), (int)(2*scaling), (int)(10*scaling));
+         g2.drawString(players.toString(), (int) (2 * scaling), (int) (10 * scaling));
          if (loading) {
             if (buttonRemove) {
                this.remove(readyGameButton);
                buttonRemove = false;
             }
 
-            g2.drawString("LOADING", (int)(MAX_X -metrics.stringWidth("LOADING")/2.0), MAX_Y / 2);
+            g2.drawString("LOADING", (int) (MAX_X - metrics.stringWidth("LOADING") / 2.0), MAX_Y / 2);
          }
       }
    }
@@ -997,7 +997,7 @@ public class Client extends JFrame implements WindowListener {
 
          g2.setColor(new Color(165, 156, 148));
          //Minimap
-         g2.drawRect((int) (830 * scaling), (int) (379*scaling), (int) (120 * scaling), (int) (120 * scaling));
+         g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
          //Bottom bar
          g2.drawPolygon(BOTTOM_BAR);
 
