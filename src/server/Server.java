@@ -305,8 +305,8 @@ public class Server {
       private Socket[] gameSockets;
       private PrintWriter[] gameOutputs;
       private BufferedReader[] gameInputs;
-      private ObjectInputStream[] gameObjectInputs;
-      private ObjectOutputStream[] gameObjectOutputs;
+      //private ObjectInputStream[] gameObjectInputs;
+      //private ObjectOutputStream[] gameObjectOutputs;
       private int playerNum;//For the ID's even disconnected players will work
       private Clock time = new Clock();
       private int gameTick = 0;
@@ -328,8 +328,8 @@ public class Server {
             gameSockets = new Socket[players.length];
             gameOutputs = new PrintWriter[players.length];
             gameInputs = new BufferedReader[players.length];
-            gameObjectOutputs = new ObjectOutputStream[players.length];
-            gameObjectInputs = new ObjectInputStream[players.length];
+            //gameObjectOutputs = new ObjectOutputStream[players.length];
+            //gameObjectInputs = new ObjectInputStream[players.length];
 
             /*
             This is where a seed is generated
@@ -339,7 +339,7 @@ public class Server {
                gameSockets[i] = onlineGameSockets.get(i);
                gameOutputs[i] = new PrintWriter(onlineGameSockets.get(i).getOutputStream());
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
-               gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
+               //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
 
                gameOutputs[i].println("B"); //B for begin
                gameOutputs[i].flush();
