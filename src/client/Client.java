@@ -538,6 +538,7 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(20, 20, 20));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
@@ -600,6 +601,7 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(20, 20, 20));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
@@ -649,6 +651,7 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(20, 20, 20));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
@@ -719,6 +722,7 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(20, 20, 20));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
@@ -771,6 +775,7 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(150, 150, 150));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
@@ -812,6 +817,7 @@ public class Client extends JFrame implements WindowListener {
          this.setBackground(new Color(70, 70, 70));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
