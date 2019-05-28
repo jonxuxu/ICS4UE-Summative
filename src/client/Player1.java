@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 /**
- * User.java
+ * User1.java
  * This is
  *
  * @author Will Jeong
@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @since 2019-04-24
  */
 
-public abstract class Player extends User {
+public abstract class Player1 extends User1 {
    //Constants
    private int ID;
    private int[] xy = {300, 300};
@@ -33,7 +33,7 @@ public abstract class Player extends User {
    private int spriteID;
    private double ROOT2O2 = 0.70710678118;
 
-   Player(String username) {
+   Player1(String username) {
       super(username);
    }
 
