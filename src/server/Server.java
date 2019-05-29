@@ -440,7 +440,7 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         gameOutputs[i].println(outputString[i].toString().trim());
-                        //System.out.println(outputString[i].toString().trim());
+
                         gameOutputs[i].flush();
                      }
                   }

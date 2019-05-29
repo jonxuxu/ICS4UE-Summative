@@ -49,8 +49,8 @@ public class IntroPanel extends JPanel {
    IntroPanel() {
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Kiona-Bold.ttf")));
-         font = new Font("Kiona Bold", Font.PLAIN, 70);
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Richardson Brand Accelerator.ttf")));
+         font = new Font("Richards", Font.PLAIN, 70);
       } catch (IOException | FontFormatException e) {
          System.out.print("Font not available");
       }
