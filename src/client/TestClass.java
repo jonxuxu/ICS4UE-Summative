@@ -23,7 +23,6 @@ public class TestClass extends Player1 {
    private int[] animationIndex = {80, 80, 80};
    private int[] ANIMATION_LENGTH = {80, 80, 80};
    private BufferedImage[][] ALL_ANIMATIONS = new BufferedImage[4][];
-
    TestClass(String username) {
       super(username);
       try {
