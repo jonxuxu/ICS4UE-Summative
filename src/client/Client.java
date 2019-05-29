@@ -5,18 +5,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -1017,6 +1006,7 @@ public class Client extends JFrame implements WindowListener {
            */
 
       // Draws fog
+      //g2.setStroke(new BasicStroke(0)); Remove after debugging
       for(int i = -MAX_X/2; i < MAX_X/2; i+=10){
         for(int j = -MAX_Y/2; j < MAX_Y/2; j+=10){
 
