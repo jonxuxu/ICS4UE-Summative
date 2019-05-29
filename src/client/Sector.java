@@ -16,7 +16,7 @@ public class Sector {
    private BufferedImage image;
    private int[] sectorCoords = new int[2];
    private int[][] corners = new int[4][2];
-   private int SECTOR_SIZE = 500;
+   private int SECTOR_SIZE = 10;
    private int[] centerXy = new int[2];
    private double scaling;
 

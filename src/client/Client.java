@@ -953,11 +953,11 @@ public class Client extends JFrame implements WindowListener {
             int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
             try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
-               sectors = new Sector[20][20];
-               for (int i = 0; i < 20; i++) {
-                  for (int j = 0; j < 20; j++) {
+               sectors = new Sector[1000][1000];
+               for (int i = 0; i < 1000; i++) {
+                  for (int j = 0; j < 1000; j++) {
                      sectors[j][i] = new Sector();
-                     sectors[j][i].setImage(sheet.getSubimage(j * 500, i * 500, 500, 500));
+                     sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
                      sectors[j][i].setSectorCoords(j, i);
                      sectors[j][i].setScaling(scaling);
                      sectors[j][i].setCenterXy(tempXy);
@@ -975,14 +975,14 @@ public class Client extends JFrame implements WindowListener {
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
          int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
-         int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 500.0)) + 1;
-         int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 500.0);
-         int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 500.0)) + 1;
+         int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
+         int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
+         int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
 
 
          for (int i = startY; i < finalY; i++) {
             for (int j = startX; j < finalX; j++) {
-               if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
+               if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
                   sectors[j][i].drawSector(g2, myPlayer.getXy());
                }
             }
