@@ -907,6 +907,7 @@ public class Client extends JFrame implements WindowListener {
       private Area areaRect;
       private Area largeRing;
       private Polygon BOTTOM_BAR = new Polygon();
+      Image offscreen;
 
       public GamePanel() {
          //Basic visuals
@@ -964,9 +965,11 @@ public class Client extends JFrame implements WindowListener {
          } else {
             g2 = (Graphics2D) g;
          }
+         this.setDoubleBuffered(true);
+         super.paintComponent(g2);
          g2.setFont(MAIN_FONT);
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         super.paintComponent(g2);
+
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
          int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
@@ -1018,16 +1021,13 @@ public class Client extends JFrame implements WindowListener {
          g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
          g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
 
-         /*
+
          // Draws fog
          for(int i = -MAX_X/2; i < MAX_X/2; i+= 10*scaling){ // In units of screen pixels
             for(int j = -MAX_Y/2; j< MAX_Y/2; j+=10*scaling){
-
                int mapX = (myPlayer.getXy()[0] + (int)(i/scaling))/10; // In units of fog map
                int mapY = (myPlayer.getXy()[1] + (int)(j/scaling))/10;
-
                if(mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY< 1000){ // If within bounds of fog
-
                   int fogValue = fog.getFog()[mapY][mapX];
                   if(fogValue == 0){ // Unexplored
                      g2.setColor(Color.black);
@@ -1038,7 +1038,7 @@ public class Client extends JFrame implements WindowListener {
                   }
                }
             }
-         } */
+         }
       }
 
    }
