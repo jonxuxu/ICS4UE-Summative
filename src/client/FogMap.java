@@ -33,7 +33,7 @@ public class FogMap {
             if(y+ i >= 0 && y + i< fog.length && x + j >= 0 && x + j < fog.length){
               fog[y + i][x + j] = 2;
               currentlyExploring[y + i][x + j] = true;
-              
+
               updateFog(y + i, j + x, distanceLeft -1);
             }
           }

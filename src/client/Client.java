@@ -1,6 +1,7 @@
 package client;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -45,7 +46,7 @@ public class Client extends JFrame implements WindowListener {
    private String username;
    private boolean connected = false;
    private JPanel[] allPanels = new JPanel[8];
-   private String[] panelNames = {"INTRO_PANEL", "LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
+   private final String[] PANEL_NAMES = {"INTRO_PANEL", "LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CustomMouseAdapter myMouseAdapter = new CustomMouseAdapter();
    private CustomKeyListener myKeyListener = new CustomKeyListener();
    private boolean sendName = false;
@@ -81,6 +82,8 @@ public class Client extends JFrame implements WindowListener {
    private BufferedImage sheet;
    private boolean logout = false;
    private boolean leaveGame = false;
+   private BufferedImage TITLE_SCREEN;
+   private BufferedImage TITLE;
 
    private FogMap fog;
 
@@ -90,13 +93,16 @@ public class Client extends JFrame implements WindowListener {
       //Control set up (the mouse listeners are attached to the game panel)
       this.addKeyListener(myKeyListener);
 
-      //Font set up
+      //Font+image set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Regular.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Bold.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
+         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreen.png"));
+         TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
          System.out.print("Font not available");
       }
@@ -126,11 +132,11 @@ public class Client extends JFrame implements WindowListener {
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
       for (int i = 0; i < allPanels.length; i++) {
-         mainContainer.add(allPanels[i], panelNames[i]);
+         mainContainer.add(allPanels[i], PANEL_NAMES[i]);
       }
       this.add(mainContainer);
-      //cardLayout.show(mainContainer, panelNames[0]);
-      cardLayout.show(mainContainer, panelNames[1]);
+      //cardLayout.show(mainContainer, PANEL_NAMES[0]);
+      cardLayout.show(mainContainer, PANEL_NAMES[1]);
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
@@ -153,7 +159,7 @@ public class Client extends JFrame implements WindowListener {
          Thread.sleep(2200);
       } catch (Exception E) {
       }
-      cardLayout.show(mainContainer, panelNames[1]);
+      cardLayout.show(mainContainer, PANEL_NAMES[1]);
       */
       connect();
       boolean inputReady = false;
@@ -229,6 +235,23 @@ public class Client extends JFrame implements WindowListener {
                repaintPanels();
             } else {
                // TODO: Initialize map ONCE after game begin
+               int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+               try {
+                  sheet = ImageIO.read(new File(".\\res\\Map.png"));
+                  sectors = new Sector[20][20];
+                  for (int i = 0; i < 20; i++) {
+                     for (int j = 0; j < 20; j++) {
+                        sectors[j][i] = new Sector();
+                        sectors[j][i].setImage(sheet.getSubimage(j * 500, i * 500, 500, 500));
+                        sectors[j][i].setSectorCoords(j, i);
+                        sectors[j][i].setScaling(scaling);
+                        sectors[j][i].setCenterXy(tempXy);
+                     }
+                  }
+               } catch (IOException e) {
+                  System.out.println("Image not found");
+               }
+
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
                   //This is where everything is output. Output the key controls
@@ -245,7 +268,7 @@ public class Client extends JFrame implements WindowListener {
                      xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
                   }
 
-                  // Updating fogw
+                  // Updating fog
                   if(fogTicks > 50){ //50 frames or 0.5 seconds @ 100fps
                      fog.age();
                      for(int i = 0; i < players.length; i++){
@@ -472,7 +495,7 @@ public class Client extends JFrame implements WindowListener {
    public void repaintPanels() {
       if (state != newState) {
          state = newState;
-         cardLayout.show(mainContainer, panelNames[state]);
+         cardLayout.show(mainContainer, PANEL_NAMES[state]);
       }
       if (state != 7) {
          allPanels[state].repaint();
@@ -524,13 +547,13 @@ public class Client extends JFrame implements WindowListener {
    private class LoginPanel extends JPanel { //State=1
       private Graphics2D g2;
       private JTextField nameField = new JTextField(3);
-      private CustomButton nameButton = new CustomButton("Click to test name");
 
       public LoginPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic username field
-         nameButton.addActionListener((ActionEvent e) -> {
+         //sendName = true;
+         nameField.addActionListener((ActionEvent e) -> {
             if (!sendName) {
                if (!(nameField.getText().contains(" "))) {
                   username = nameField.getText();
@@ -540,12 +563,9 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          });
-         //sendName = true;
          nameField.setFont(MAIN_FONT);
          nameField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
-         nameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 3 / 10, (int) (130 * scaling), (int) (15 * scaling));
          this.add(nameField);
-         this.add(nameButton);
 
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -561,26 +581,20 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
-         //this.requestFocusInWindow();// Removed, this interferes with the textboxes. See if this is truly necessary
-         if (myKeyListener.getEnter()){
-            if (!(nameField.getText().contains(" "))) {
-               username = nameField.getText();
-               sendName = true;
-            } else {
-               System.out.println("Error: Spaces exist");
-            }
-         }
-         //Begin drawing
 
+         //Begin drawing
+         g2.setColor(Color.WHITE);
+         g2.drawString("LOGIN", (int) ((MAX_X - g2.getFontMetrics().stringWidth("LOGIN")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
       }
    }
 
    private class MenuPanel extends JPanel {//State=2
       private Graphics2D g2;
-      private CustomButton createButton = new CustomButton("Create game");
-      private CustomButton joinButton = new CustomButton("Join game");
-      private CustomButton instructionButton = new CustomButton("Instructions");
-      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton createButton = new CustomButton("CREATE GAME");
+      private CustomButton joinButton = new CustomButton("JOIN GAME");
+      private CustomButton instructionButton = new CustomButton("INSTRUCTIONS");
+      private CustomButton backButton = new CustomButton("BACK");
+      private double introScaling;
 
       public MenuPanel() {
          //Setting up the size
@@ -589,26 +603,35 @@ public class Client extends JFrame implements WindowListener {
          createButton.addActionListener((ActionEvent e) -> {
             newState = 3;
          });
-         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 3.0 / 10), (int) (130 * scaling), (int) (15 * scaling));
+         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
          this.add(createButton);
 
          joinButton.addActionListener((ActionEvent e) -> {
             newState = 4;
          });
-         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 4.5 / 10), (int) (130 * scaling), (int) (15 * scaling));
+         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
          this.add(joinButton);
          instructionButton.addActionListener((ActionEvent e) -> {
             newState = 5;//I added this later so I didn't want to move everything around
          });
-         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 6.0 / 10), (int) (130 * scaling), (int) (15 * scaling));
+         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
 
          this.add(instructionButton);
          backButton.addActionListener((ActionEvent e) -> {
             newState = 1;
             logout = true;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 7.5 / 10), (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
          this.add(backButton);
+
+         //Setting up intro scaling
+         if ((1.0 * MAX_Y / MAX_X) > (1.0 * 1198 / 1800)) { //Make sure that these are doubles
+            //Y is excess
+            introScaling = 1.0 * MAX_Y / 1198;
+         } else {
+            //X is excess
+            introScaling = 1.0 * MAX_X / 1800;
+         }
 
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -624,34 +647,40 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
+         //Title
+         g2.drawImage(TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
       }
    }
 
    private class CreatePanel extends JPanel { //State =3
       private Graphics2D g2;
-      private boolean generateGraphics = true;
       private JTextField gameNameField = new JTextField(3);
       private JTextField gamePasswordField = new JTextField(3);
-      private CustomButton testGameButton = new CustomButton("Confirm game");
-      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton backButton = new CustomButton("BACK");
 
       public CreatePanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
-         testGameButton.addActionListener((ActionEvent e) -> {
+         gameNameField.addActionListener((ActionEvent e) -> {
             if (!testGame) {
                attemptedGameName = gameNameField.getText();
                attemptedGamePassword = gamePasswordField.getText();
                testGame = true;
             }
          });
-         testGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (15 * scaling));
-         this.add(testGameButton);
          gameNameField.setFont(MAIN_FONT);
          gameNameField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
          this.add(gameNameField);
+         gamePasswordField.addActionListener((ActionEvent e) -> {
+            if (!testGame) {
+               attemptedGameName = gameNameField.getText();
+               attemptedGamePassword = gamePasswordField.getText();
+               testGame = true;
+            }
+         });
          gamePasswordField.setFont(MAIN_FONT);
          gamePasswordField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 3 / 10, (int) (75 * scaling), (int) (15 * scaling));
          this.add(gamePasswordField);
@@ -671,32 +700,11 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         if (generateGraphics) {
-            generateGraphics = false;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setFont(MAIN_FONT);
-         }
-         if (myKeyListener.getEnter()){
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         }
-         //FOR NOW, ONLY TEMP
-/*
-         if (attemptedGameName != null) {
-            if (!attemptedGameName.equals("w")) {
-               attemptedGameName = "w";
-               attemptedGamePassword = "w";
-               testGame = true;
-            }
-         } else {
-            attemptedGameName = "";
-         }
-*/
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
+         g2.setColor(Color.WHITE);
+         g2.drawString("Create Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Game")) / 2.0), MAX_Y / 5);
       }
    }
 
@@ -704,25 +712,29 @@ public class Client extends JFrame implements WindowListener {
       private Graphics2D g2;
       private JTextField gameNameTestField = new JTextField(3);
       private JTextField gamePasswordTestField = new JTextField(3);
-      private CustomButton testGameButton = new CustomButton("Join game");
-      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton backButton = new CustomButton("BACK");
 
       public JoinPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Basic create and join server buttons
-         testGameButton.addActionListener((ActionEvent e) -> {
+         gameNameTestField.addActionListener((ActionEvent e) -> {
             if (!testGame) {
                attemptedGameName = gameNameTestField.getText();
                attemptedGamePassword = gamePasswordTestField.getText();
                testGame = true;
             }
          });
-         testGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (15 * scaling));
-         this.add(testGameButton);
          gameNameTestField.setFont(MAIN_FONT);
          gameNameTestField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
          this.add(gameNameTestField);
+         gamePasswordTestField.addActionListener((ActionEvent e) -> {
+            if (!testGame) {
+               attemptedGameName = gameNameTestField.getText();
+               attemptedGamePassword = gamePasswordTestField.getText();
+               testGame = true;
+            }
+         });
          gamePasswordTestField.setFont(MAIN_FONT);
          gamePasswordTestField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 3 / 10, (int) (75 * scaling), (int) (15 * scaling));
          this.add(gamePasswordTestField);
@@ -745,32 +757,14 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         if (myKeyListener.getEnter()){
-            if (!testGame) {
-               attemptedGameName = gameNameTestField.getText();
-               attemptedGamePassword = gamePasswordTestField.getText();
-               testGame = true;
-            }
-         }
-         //FOR NOW, ONLY TEMP
-/*
-         if (attemptedGameName != null) {
-            if (!attemptedGameName.equals("w")) {
-               attemptedGameName = "w";
-               attemptedGamePassword = "w";
-               testGame = true;
-            }
-         } else {
-            attemptedGameName = "";
-         }
-*/
+         g2.setColor(Color.WHITE);
+         g2.drawString("Join Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Game")) / 2.0), MAX_Y / 5);
       }
    }
 
    private class InstructionPanel extends JPanel { //State=5
       private Graphics2D g2;
-      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton backButton = new CustomButton("BACK");
 
 
       public InstructionPanel() {
@@ -807,7 +801,7 @@ public class Client extends JFrame implements WindowListener {
       private boolean buttonAdd = true;
       private boolean buttonRemove = true;
       private CustomButton readyGameButton = new CustomButton("Begin game");
-      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton backButton = new CustomButton("BACK");
 
 
       public WaitingPanel() {
@@ -850,16 +844,16 @@ public class Client extends JFrame implements WindowListener {
          }
          StringBuilder players = new StringBuilder("Players: ");
          for (int i = 0; i < onlineList.size(); i++) {
-            players.append(onlineList.get(i).getUsername()+", ");
+            players.append(onlineList.get(i).getUsername() + ", ");
          }
-         g2.drawString(players.toString(), (int)(2*scaling), (int)(10*scaling));
+         g2.drawString(players.toString(), (int) (2 * scaling), (int) (10 * scaling));
          if (loading) {
             if (buttonRemove) {
                this.remove(readyGameButton);
                buttonRemove = false;
             }
 
-            g2.drawString("LOADING", (int)(MAX_X -metrics.stringWidth("LOADING")/2.0), MAX_Y / 2);
+            g2.drawString("LOADING", (int) (MAX_X - metrics.stringWidth("LOADING") / 2.0), MAX_Y / 2);
          }
       }
    }
@@ -952,22 +946,7 @@ public class Client extends JFrame implements WindowListener {
             BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
             BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
             //Game set up
-            int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
-            try {
-               sheet = ImageIO.read(new File(".\\res\\Map.png"));
-               sectors = new Sector[20][20];
-               for (int i = 0; i < 20; i++) {
-                  for (int j = 0; j < 20; j++) {
-                     sectors[j][i] = new Sector();
-                     sectors[j][i].setImage(sheet.getSubimage(j * 500, i * 500, 500, 500));
-                     sectors[j][i].setSectorCoords(j, i);
-                     sectors[j][i].setScaling(scaling);
-                     sectors[j][i].setCenterXy(tempXy);
-                  }
-               }
-            } catch (IOException e) {
-               System.out.println("Image not found");
-            }
+
          } else {
             g2 = (Graphics2D) g;
          }
@@ -1012,10 +991,9 @@ public class Client extends JFrame implements WindowListener {
            */
 
 
-
          g2.setColor(new Color(165, 156, 148));
          //Minimap
-         g2.drawRect((int) (830 * scaling), (int) (379*scaling), (int) (120 * scaling), (int) (120 * scaling));
+         g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
          //Bottom bar
          g2.drawPolygon(BOTTOM_BAR);
 
@@ -1046,15 +1024,12 @@ public class Client extends JFrame implements WindowListener {
                   int fogValue = fog.getFog()[mapY][mapX];
                   if(fogValue == 0){ // Unexplored
                      g2.setColor(Color.black);
+                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
                   } else if(fogValue == 1){ // Explored but not actively viewed
                      g2.setColor(new Color(0, 0, 0, 128));
-                  } else {
-                     g2.setColor(new Color(0, 0, 0, 0));
+                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
                   }
-               } else{
-                  g2.setColor(Color.black);
                }
-               g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
             }
          }
       }
@@ -1062,13 +1037,15 @@ public class Client extends JFrame implements WindowListener {
    }
 
    private class CustomButton extends JButton {
-      private Color foregroundColor = new Color(180, 180, 180);
-      private Color backgroundColor = new Color(50, 50, 50);
+      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
+      private Color backgroundColor = new Color(0f, 0f, 0f, 0f);
+      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
 
       CustomButton(String description) {
          super(description);
          super.setContentAreaFilled(false);
-         this.setFont(MAIN_FONT);
+         this.setFont(BUTTON_FONT);
+         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
          this.setForeground(foregroundColor);
          this.setBackground(backgroundColor);
          this.setFocusPainted(false);
