@@ -57,15 +57,15 @@ public class Client extends JFrame implements WindowListener {
    private String username;
    private boolean connected = false;
    private JPanel[] allPanels = new JPanel[8];
-   private final String[] PANEL_NAMES = {"INTRO_PANEL", "LOGIN_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
+   private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CustomMouseAdapter myMouseAdapter = new CustomMouseAdapter();
    private CustomKeyListener myKeyListener = new CustomKeyListener();
    private boolean sendName = false;
    private boolean testGame = false;
    private Font MAIN_FONT;
    //State legend:
-   private int state = 1;//should be 0
-   private int newState = 1;//should be 0
+   private int state = 0;//should be 0
+   private int newState = 0;//should be 0
    private CardLayout cardLayout = new CardLayout(5, 5);
    private JPanel mainContainer = new JPanel(cardLayout);
    private String gameName;
@@ -95,6 +95,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean leaveGame = false;
    private BufferedImage TITLE_SCREEN;
    private BufferedImage TITLE;
+   private boolean unableToConnect = false;
 
    private FogMap fog;
 
@@ -133,8 +134,8 @@ public class Client extends JFrame implements WindowListener {
       allPanels[7] = new IntermediatePanel();
       ((IntermediatePanel) (allPanels[7])).initializeScaling();//must be called before the rest of the fonts
 
-      allPanels[0] = new IntroPanel();
-      allPanels[1] = new LoginPanel();
+      allPanels[0] = new LoginPanel();
+      allPanels[1] = new IntroPanel();
       allPanels[2] = new MenuPanel();
       allPanels[3] = new CreatePanel();
       allPanels[4] = new JoinPanel();
@@ -147,7 +148,7 @@ public class Client extends JFrame implements WindowListener {
       }
       this.add(mainContainer);
       //cardLayout.show(mainContainer, PANEL_NAMES[0]);
-      cardLayout.show(mainContainer, PANEL_NAMES[1]);
+      cardLayout.show(mainContainer, PANEL_NAMES[0]);
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
@@ -163,17 +164,12 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void go() {
-      //Start the opening here
-/*
-      ((IntroPanel) (allPanels[0])).go();
-      try {
-         Thread.sleep(2200);
-      } catch (Exception E) {
-      }
-      cardLayout.show(mainContainer, PANEL_NAMES[1]);
-      */
-      connect();
       boolean inputReady = false;
+      while (!connected) {
+         //Idle
+         repaintPanels();
+         connect();
+      }
       try {
          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
          output = new PrintWriter(socket.getOutputStream());
@@ -200,7 +196,6 @@ public class Client extends JFrame implements WindowListener {
                   onlineList.clear();
                   leaveGame = false;
                }
-
                if (sendName) {
                   sendName = false;
                   if (username != null) {
@@ -244,22 +239,6 @@ public class Client extends JFrame implements WindowListener {
                repaintPanels();
             } else {
                // TODO: Initialize map ONCE after game begin
-               int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
-               try {
-                  sheet = ImageIO.read(new File(".\\res\\Map.png"));
-                  sectors = new Sector[20][20];
-                  for (int i = 0; i < 20; i++) {
-                     for (int j = 0; j < 20; j++) {
-                        sectors[j][i] = new Sector();
-                        sectors[j][i].setImage(sheet.getSubimage(j * 500, i * 500, 500, 500));
-                        sectors[j][i].setSectorCoords(j, i);
-                        sectors[j][i].setScaling(scaling);
-                        sectors[j][i].setCenterXy(tempXy);
-                     }
-                  }
-               } catch (IOException e) {
-                  System.out.println("Image not found");
-               }
 
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
@@ -382,9 +361,19 @@ public class Client extends JFrame implements WindowListener {
          char initializer = input.charAt(0);
          input = input.substring(1);
          if (isParsable(initializer)) {
-            if (state == 1) {
+            if (state == 0) {
                errors[0] = Integer.parseInt(initializer + "");
                if (initializer == '0') {
+                  /*
+                  //Start the opening here
+                  cardLayout.show(mainContainer, PANEL_NAMES[1]);
+                  ((IntroPanel) (allPanels[1])).go();
+                  try {
+                     Thread.sleep(2200);
+                  } catch (Exception E) {
+                  }
+                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
+                  */
                   newState = 2;
                } else {
                   username = null;
@@ -514,8 +503,11 @@ public class Client extends JFrame implements WindowListener {
          socket = new Socket("localhost", 5001);
          System.out.println("Successfully connected");
          connected = true;
+         unableToConnect = false;
       } catch (Exception e) {
          System.out.println("Unable to connect");
+         unableToConnect = true;
+         connected = false;
       }
    }
 
@@ -549,7 +541,7 @@ public class Client extends JFrame implements WindowListener {
    public void windowClosed(WindowEvent e) {
    }
 
-   private class LoginPanel extends JPanel { //State=1
+   private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
       private JTextField nameField = new JTextField(3);
 
@@ -589,7 +581,14 @@ public class Client extends JFrame implements WindowListener {
 
          //Begin drawing
          g2.setColor(Color.WHITE);
-         g2.drawString("LOGIN", (int) ((MAX_X - g2.getFontMetrics().stringWidth("LOGIN")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
+         g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
+         if ((!connected) && (!unableToConnect)) {
+            g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y / 4.0));
+         } else if ((connected) && (!unableToConnect)) {
+            g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y / 4.0));
+         } else if (unableToConnect){
+            g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y / 4.0));
+         }
       }
    }
 
@@ -623,7 +622,7 @@ public class Client extends JFrame implements WindowListener {
 
          this.add(instructionButton);
          backButton.addActionListener((ActionEvent e) -> {
-            newState = 1;
+            newState = 0;
             logout = true;
          });
          backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
@@ -951,7 +950,22 @@ public class Client extends JFrame implements WindowListener {
             BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
             BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
             //Game set up
-
+            int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+            try {
+               sheet = ImageIO.read(new File(".\\res\\Map.png"));
+               sectors = new Sector[20][20];
+               for (int i = 0; i < 20; i++) {
+                  for (int j = 0; j < 20; j++) {
+                     sectors[j][i] = new Sector();
+                     sectors[j][i].setImage(sheet.getSubimage(j * 500, i * 500, 500, 500));
+                     sectors[j][i].setSectorCoords(j, i);
+                     sectors[j][i].setScaling(scaling);
+                     sectors[j][i].setCenterXy(tempXy);
+                  }
+               }
+            } catch (IOException e) {
+               System.out.println("Image not found");
+            }
          } else {
             g2 = (Graphics2D) g;
          }
@@ -960,20 +974,12 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g2);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //Sectors
-         int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 500.0);
+         int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
          int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 500.0)) + 1;
          int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 500.0);
          int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 500.0)) + 1;
 
 
-         //FOR NOW, DRAW TWICE. IN THE FUTURE, FIND A BETTER WAY TO DO THIS
-         for (int i = startY; i < finalY; i++) {
-            for (int j = startX; j < finalX; j++) {
-               if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
-                  sectors[j][i].drawSector(g2, myPlayer.getXy());
-               }
-            }
-         }
          for (int i = startY; i < finalY; i++) {
             for (int j = startX; j < finalX; j++) {
                if ((i >= 0) && (j >= 0) && (i < 20) && (j < 20)) {
