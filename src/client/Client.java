@@ -6,18 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -175,6 +164,8 @@ public class Client extends JFrame implements WindowListener {
          output = new PrintWriter(socket.getOutputStream());
          //Start with entering the name. This must be separated from the rest
          //Username successfully entered in
+         int fogTicks = 0;
+
          while (connected) {
             //Otherwise, continue to send messages. The lines below are for when something is going to be sent
             if (!gameBegin) {
@@ -257,13 +248,17 @@ public class Client extends JFrame implements WindowListener {
                   }
 
                   // Updating fog
-                  fog.age();
-                  for (int i = 0; i < players.length; i++) {
-                     // TODO: Separate by teams
-                     // TODO: Account for players that quit?
-                     fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
+                  if(fogTicks > 50){ //50 frames or 0.5 seconds @ 100fps
+                     fog.age();
+                     for(int i = 0; i < players.length; i++){
+                        // TODO: Separate by teams
+                        // TODO: Account for players that quit?
+                        fog.scout(players[i].getXy()[1]/10, players[i].getXy()[0]/10);
 
+                     }
+                     fogTicks = 0;
                   }
+                  fogTicks ++;
 
 
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
@@ -1001,29 +996,6 @@ public class Client extends JFrame implements WindowListener {
          g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
            */
 
-         // Draws fog
-         for (int i = -MAX_X / 2; i < MAX_X / 2; i += 10) {
-            for (int j = -MAX_Y / 2; j < MAX_Y / 2; j += 10) {
-
-               int mapX = myPlayer.getXy()[0] / 10 + i;
-               int mapY = myPlayer.getXy()[1] / 10 + j;
-
-               if (mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY < 1000) {
-                  int fogBlock = fog.getFog()[mapY][mapX];
-                  if (fogBlock == 0) { // Unexplored
-                     g2.setColor(Color.black);
-                  } else if (fogBlock == 1) { // Explored but not actively viewed
-                     g2.setColor(new Color(0, 0, 0, 128));
-                  } else {
-                     g2.setColor(new Color(0, 0, 0, 0));
-                  }
-               } else {
-                  g2.setColor(Color.black);
-               }
-               g2.drawRect(i + MAX_X / 2, j + MAX_Y / 2, 10, 10);
-            }
-         }
-
 
          g2.setColor(new Color(165, 156, 148));
          //Minimap
@@ -1045,6 +1017,28 @@ public class Client extends JFrame implements WindowListener {
          g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
          g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
          g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+
+         /*
+         // Draws fog
+         for(int i = -MAX_X/2; i < MAX_X/2; i+= 10*scaling){ // In units of screen pixels
+            for(int j = -MAX_Y/2; j< MAX_Y/2; j+=10*scaling){
+
+               int mapX = (myPlayer.getXy()[0] + (int)(i/scaling))/10; // In units of fog map
+               int mapY = (myPlayer.getXy()[1] + (int)(j/scaling))/10;
+
+               if(mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY< 1000){ // If within bounds of fog
+
+                  int fogValue = fog.getFog()[mapY][mapX];
+                  if(fogValue == 0){ // Unexplored
+                     g2.setColor(Color.black);
+                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
+                  } else if(fogValue == 1){ // Explored but not actively viewed
+                     g2.setColor(new Color(0, 0, 0, 128));
+                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
+                  }
+               }
+            }
+         } */
       }
 
    }

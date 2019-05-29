@@ -107,7 +107,7 @@ public class Server {
                if (input.ready()) {
                   String inputString = input.readLine();//Reads as fast as it can. Or you could alternatively slow it down here by making a getFramePassed at this instance
                   //There would normally be a timer on the output, or possibly the input
-                  System.out.println("I:" + inputString);
+                  //System.out.println("I:" + inputString);
                   //Here, the initializer can be chars. U(Username), J (Join), C (Create), R (Ready), Q (Quit), and X (Close)
                   char initializer = inputString.charAt(0);
                   inputString = inputString.substring(1);//Remove the initializer
@@ -440,6 +440,7 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         gameOutputs[i].println(outputString[i].toString().trim());
+
                         gameOutputs[i].flush();
                      }
                   }
