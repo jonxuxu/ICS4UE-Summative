@@ -43,8 +43,6 @@ public class IntroPanel extends JPanel {
    static BufferedImage img;
    static boolean animationOver = false;
    static int animationWait = 120;
-   static Color fireColours[] = {new Color(255, 249, 202), new Color(209, 106, 4), new Color(227, 238, 35), new Color(254, 69, 0), new Color(234, 185, 79)};
-
 
    IntroPanel() {
       try {
@@ -61,10 +59,9 @@ public class IntroPanel extends JPanel {
       for (double i = 0; i < Math.PI * 7 / 2; i += 0.01) {
          //particles.add(new IntroParticle(x,y,(Math.random()*10-5),(Math.random()*10),(int)(Math.random()*12),(int)(Math.random()*(50)+200),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
          for (double j = -SIZE / 2; j < SIZE / 2; j += 10) {
-            int randomNum = (int) (Math.random() * 5);
-            particles.add(new IntroParticle(x + j, y + Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200), fireColours[randomNum]));
+            particles.add(new IntroParticle(x + j, y + Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200)));
             //System.out.println(x + " " + y + " " + (x + j) + " " + (y + Math.sqrt(Math.pow(SIZE/2,2) - Math.pow((j),2))));
-            particles.add(new IntroParticle(x + j, y - Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200), fireColours[randomNum]));
+            particles.add(new IntroParticle(x + j, y - Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200)));
          }
          double r1 = w / 2 - i * w / (7 * Math.PI);
          double r2 = h / 2 - i * h / (7 * Math.PI);
@@ -100,11 +97,10 @@ public class IntroPanel extends JPanel {
          }
       }
       for (int i = 0; i < 10000; i++) {
-         int randomNum = (int) (Math.random() * 5);
          double angle = (Math.random() * 1) * Math.PI;
          double dx = (Math.random() * 50) * Math.cos(angle);
          double dy = -(Math.random() * 50) * Math.sin(angle);
-         particles.add(new IntroParticle(x + SIZE / 2, y + SIZE / 2, dx, dy, (int) (Math.random() * 12), (int) (Math.random() * (50) + 250), fireColours[randomNum]));
+         particles.add(new IntroParticle(x + SIZE / 2, y + SIZE / 2, dx, dy, (int) (Math.random() * 12), (int) (Math.random() * (50) + 250)));
          //try{ Thread.sleep(1); } catch (Exception E){}
       }
       try {

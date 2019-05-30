@@ -3,10 +3,10 @@ package client;
 import java.awt.*;
 
 public class AshParticle extends Particle{
-  double dx;
-  double dy = Math.random() * 5 + 5;
-  Color[] ashColors = {new Color(224,224,224), new Color(192,192,192), new Color(96,96,96), new Color(64,64,64)};
-  int screenY;
+  private double dx;
+  private static double dy = Math.random() * 5 + 5;
+  private static Color[] ashColors = {new Color(224,224,224), new Color(192,192,192), new Color(96,96,96), new Color(64,64,64)};
+  private int screenY;
 
   AshParticle(double x, double y, int size, int screenY){
     super(x, y, size, Integer.MAX_VALUE);
