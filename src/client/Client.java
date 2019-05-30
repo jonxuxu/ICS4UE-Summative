@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 /*
 Here is how the messages work.
@@ -52,6 +53,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean sendName = false;
    private boolean testGame = false;
    private Font MAIN_FONT;
+   private Font HEADER_FONT;
    //State legend:
    private int state = 0;//should be 0
    private int newState = 0;//should be 0
@@ -63,10 +65,10 @@ public class Client extends JFrame implements WindowListener {
    private String attemptedGamePassword;
    private boolean host = false;
    private boolean notifyReady = false;
-   private ArrayList<User1> onlineList = new ArrayList<User1>();
-   private Player1[] players;
-   private User1 myUser;
-   private Player1 myPlayer;
+   private ArrayList<User> onlineList = new ArrayList<User>();
+   private Player[] players;
+   private User myUser;
+   private Player myPlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
@@ -85,8 +87,10 @@ public class Client extends JFrame implements WindowListener {
    private BufferedImage TITLE_SCREEN;
    private BufferedImage TITLE;
    private boolean unableToConnect = false;
-
    private FogMap fog;
+   private boolean testingBegin = false;
+   private double introScaling;
+   private ArrayList<AshParticle> particles = new ArrayList<>();
 
    public Client() {
       super("Dark");
@@ -102,10 +106,10 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
-         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreen.png"));
+         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreenDark.png"));
          TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
-         System.out.print("Font not available");
+         System.out.println("Font not available");
       }
 
 
@@ -145,7 +149,6 @@ public class Client extends JFrame implements WindowListener {
 
       // Setting up fog (should be moved soon TM)
       fog = new FogMap(1000, 1000);
-
    }
 
    public static void main(String[] args) {
@@ -165,71 +168,93 @@ public class Client extends JFrame implements WindowListener {
          //Start with entering the name. This must be separated from the rest
          //Username successfully entered in
          int fogTicks = 0;
-
+         Clock time = new Clock ();
          while (connected) {
             //Otherwise, continue to send messages. The lines below are for when something is going to be sent
             if (!gameBegin) {
-               //Recieves input if possible
-               if (input.ready()) {
-                  decipherInput(input.readLine());
-               }
+               if (time.getFramePassed()) {
+                  //Recieves input if possible
+                  if (input.ready()) {
+                     decipherInput(input.readLine());
+                  }
 
-               //Deal with output when going back through the menu
-               if (logout) {
-                  output.println("B");//for back
-                  output.flush();
-                  username = null;
-                  logout = false;
-               }
-               if (leaveGame) {
-                  output.println("B");//for back
-                  output.flush();
-                  onlineList.clear();
-                  leaveGame = false;
-               }
-               if (sendName) {
-                  sendName = false;
-                  if (username != null) {
-                     if (verifyString(username, 0)) {
-                        output.println("U" + username);
+                  //Deal with output when going back through the menu
+                  if (logout) {
+                     output.println("B");//for back
+                     output.flush();
+                     username = null;
+                     logout = false;
+                  }
+                  if (leaveGame) {
+                     output.println("B");//for back
+                     output.flush();
+                     onlineList.clear();
+                     leaveGame = false;
+                  }
+                  if (sendName) {
+                     sendName = false;
+                     if (username != null) {
+                        if (verifyString(username, 0)) {
+                           output.println("U" + username);
+                           output.flush();
+                           waitForInput();
+                        }
+                        if (errors[0] == 0) {
+                           System.out.println("Valid username");
+                        } else {
+                           System.out.println("Error: " + errorMessages[errors[0]]);
+                        }
+                     }
+                  }
+                  if (testGame) {
+                     testGame = false;
+                     if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
+                        if (state == 3) {
+                           output.println("C" + attemptedGameName + " " + attemptedGamePassword);
+                        } else {
+                           output.println("J" + attemptedGameName + " " + attemptedGamePassword);
+                        }
                         output.flush();
                         waitForInput();
                      }
-                     if (errors[0] == 0) {
-                        System.out.println("Valid username");
+                     System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
+                     if ((errors[1] == 0) && (errors[2] == 0)) {
+                        System.out.println("Valid game");
                      } else {
-                        System.out.println("Error: " + errorMessages[errors[0]]);
+                        System.out.println("Error: " + errorMessages[errors[1]]);
+                        System.out.println("Error: " + errorMessages[errors[2]]);
                      }
                   }
-               }
-               if (testGame) {
-                  testGame = false;
-                  if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
-                     if (state == 3) {
-                        output.println("C" + attemptedGameName + " " + attemptedGamePassword);
-                     } else {
-                        output.println("J" + attemptedGameName + " " + attemptedGamePassword);
-                     }
+                  if (notifyReady) {
+                     notifyReady = false;
+                     output.println("R");
                      output.flush();
                      waitForInput();
                   }
-                  System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
-                  if ((errors[1] == 0) && (errors[2] == 0)) {
-                     System.out.println("Valid game");
-                  } else {
-                     System.out.println("Error: " + errorMessages[errors[1]]);
-                     System.out.println("Error: " + errorMessages[errors[2]]);
+                  if (testingBegin) {
+                     username = Math.random() + "";
+                     myUser = new User(username);
+                     output.println("T" + username);//test
+                     output.flush();
+                     waitForInput();
+                     host = true;
+                     newState = 6;
+                     gameName = "";
+                     gamePassword = "";
+                     players = new Player[onlineList.size()];
+                     for (int i = 0; i < onlineList.size(); i++) {
+                        players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+                        if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                           myPlayer = players[i];
+                        }
+                     }
+                     testingBegin = false;
                   }
+                  repaintPanels();
                }
-               if (notifyReady) {
-                  notifyReady = false;
-                  output.println("R");
-                  output.flush();
-                  waitForInput();
-               }
-               repaintPanels();
             } else {
                // TODO: Initialize map ONCE after game begin
+
 
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
@@ -242,23 +267,21 @@ public class Client extends JFrame implements WindowListener {
                   outputString = "";
                   int angleOfMovement = myKeyListener.getAngle();
                   int[] xyPos = new int[2]; //Scaled to the map
-                  if (myMouseAdapter.getPressed()) {
-                     xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
-                     xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
-                  }
+
+                  xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0]; //Make it for hover
+                  xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
 
                   // Updating fog
-                  if(fogTicks > 50){ //50 frames or 0.5 seconds @ 100fps
+                  if (fogTicks > 30) { //50 frames or 0.5 seconds @ 100fps
                      fog.age();
-                     for(int i = 0; i < players.length; i++){
+                     for (int i = 0; i < players.length; i++) {
                         // TODO: Separate by teams
                         // TODO: Account for players that quit?
-                        fog.scout(players[i].getXy()[1]/10, players[i].getXy()[0]/10);
-
+                        fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
                      }
                      fogTicks = 0;
                   }
-                  fogTicks ++;
+                  fogTicks++;
 
 
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
@@ -276,11 +299,19 @@ public class Client extends JFrame implements WindowListener {
                      outputString.append(" "); //Add the seperator
                   }
                   if (angleOfMovement != -10) {
-                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1]);
+                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
+                  }
+                  if (myMouseAdapter.getPressed()) {
+                     if (myMouseAdapter.getLeftRight()[0]) {
+                        outputString.append("A" + xyPos[0] + "," + xyPos[1] + " ");
+                     }
+                     if (myMouseAdapter.getLeftRight()[1]) {
+                        outputString.append("F" + xyPos[0] + "," + xyPos[1] + " ");
+                     }
                   }
                   // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
-                  if (!outputString.toString().isEmpty()) {
-                     output.println(outputString);
+                  if (!outputString.toString().trim().isEmpty()) {
+                     output.println(outputString.toString().trim());
                      output.flush();
                   }
                   repaintPanels();
@@ -359,16 +390,18 @@ public class Client extends JFrame implements WindowListener {
             if (state == 0) {
                errors[0] = Integer.parseInt(initializer + "");
                if (initializer == '0') {
-                  /*
+
                   //Start the opening here
+/*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
                   ((IntroPanel) (allPanels[1])).go();
                   try {
-                     Thread.sleep(2200);
+                     Thread.sleep(3000);
                   } catch (Exception E) {
                   }
+*/
                   cardLayout.show(mainContainer, PANEL_NAMES[2]);
-                  */
+
                   newState = 2;
                } else {
                   username = null;
@@ -378,7 +411,7 @@ public class Client extends JFrame implements WindowListener {
                   newState = 6;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
-                  myUser = new User1(username);//Sets the player
+                  myUser = new User(username);//Sets the player
                   if (state == 3) {
                      host = true;
                      onlineList.add(myUser);
@@ -407,21 +440,24 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'A') {
             String[] allPlayers = input.split(" ", -1);
             for (String aPlayer : allPlayers) {
-               onlineList.add(new User1(aPlayer));
+               if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
+                  onlineList.add(myUser);
+               } else {
+                  onlineList.add(new User(aPlayer));
+               }
             }
          } else if (initializer == 'N') {
-            onlineList.add(new User1(input));
+            onlineList.add(new User(input));
          } else if (initializer == 'X') {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
-                  System.out.println(onlineList.get(i).getUsername());
                   onlineList.remove(i);
                }
             }
          } else if (initializer == 'B') {
-            players = new Player1[onlineList.size()];
+            players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               players[i] = new TestClass(onlineList.get(i).getUsername());
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
                }
@@ -538,7 +574,8 @@ public class Client extends JFrame implements WindowListener {
 
    private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
-      private JTextField nameField = new JTextField(3);
+      private CustomTextField nameField = new CustomTextField(3);
+      private CustomButton testButton = new CustomButton("Test");
 
       public LoginPanel() {
          //Setting up the size
@@ -559,6 +596,13 @@ public class Client extends JFrame implements WindowListener {
          nameField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
          this.add(nameField);
 
+
+         testButton.addActionListener((ActionEvent e) -> {
+            testingBegin = true;
+         });
+
+         testButton.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 2 / 5, (int) (75 * scaling), (int) (15 * scaling));
+         this.add(testButton);
          //Basic visuals
          this.setDoubleBuffered(true);
          this.setBackground(new Color(20, 20, 20));
@@ -581,7 +625,7 @@ public class Client extends JFrame implements WindowListener {
             g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y / 4.0));
          } else if ((connected) && (!unableToConnect)) {
             g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y / 4.0));
-         } else if (unableToConnect){
+         } else if (unableToConnect) {
             g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y / 4.0));
          }
       }
@@ -589,11 +633,11 @@ public class Client extends JFrame implements WindowListener {
 
    private class MenuPanel extends JPanel {//State=2
       private Graphics2D g2;
-      private CustomButton createButton = new CustomButton("CREATE GAME");
-      private CustomButton joinButton = new CustomButton("JOIN GAME");
-      private CustomButton instructionButton = new CustomButton("INSTRUCTIONS");
-      private CustomButton backButton = new CustomButton("BACK");
-      private double introScaling;
+      private CustomButton createButton = new CustomButton("Create Game");
+      private CustomButton joinButton = new CustomButton("Join Game");
+      private CustomButton instructionButton = new CustomButton("Instructions");
+      private CustomButton backButton = new CustomButton("Back");
+      private double introAlpha = 1;
 
       public MenuPanel() {
          //Setting up the size
@@ -602,25 +646,25 @@ public class Client extends JFrame implements WindowListener {
          createButton.addActionListener((ActionEvent e) -> {
             newState = 3;
          });
-         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
          this.add(createButton);
 
          joinButton.addActionListener((ActionEvent e) -> {
             newState = 4;
          });
-         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
          this.add(joinButton);
          instructionButton.addActionListener((ActionEvent e) -> {
             newState = 5;//I added this later so I didn't want to move everything around
          });
-         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
 
          this.add(instructionButton);
          backButton.addActionListener((ActionEvent e) -> {
             newState = 0;
             logout = true;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
 
          //Setting up intro scaling
@@ -650,14 +694,47 @@ public class Client extends JFrame implements WindowListener {
          g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          //Title
          g2.drawImage(TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
+         if (introAlpha != 0) {
+            introAlpha -= 0.03;
+            g2.setColor(new Color(0f, 0f, 0f, (float) (introAlpha)));
+            createButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            createButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            joinButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            joinButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            instructionButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            instructionButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            backButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            backButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            g2.fillRect(0, 0, MAX_X, MAX_Y);
+            if (introAlpha < 0.03) {
+               introAlpha = 0;
+            }
+         }
+         //Adds particles
+         if(Math.random() < 0.2){
+            particles.add(new AshParticle(Math.random()*MAX_X + MAX_X/20, 0, (int)((Math.random()*3+3)*scaling), MAX_Y));
+         }
+         //Draws particles
+         for (int i = 0; i < particles.size(); i++) {
+            try {
+               if (particles.get(i).update()) {
+                  particles.remove(i);
+               } else {
+                  particles.get(i).render(g2);
+               }
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
+         }
       }
    }
 
    private class CreatePanel extends JPanel { //State =3
       private Graphics2D g2;
-      private JTextField gameNameField = new JTextField(3);
-      private JTextField gamePasswordField = new JTextField(3);
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomTextField gameNameField = new CustomTextField(3);
+      private CustomTextField gamePasswordField = new CustomTextField(3);
+      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton confirmButton = new CustomButton("Confirm Game");
 
       public CreatePanel() {
          //Setting up the size
@@ -683,10 +760,19 @@ public class Client extends JFrame implements WindowListener {
          gamePasswordField.setFont(MAIN_FONT);
          gamePasswordField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 3 / 10, (int) (75 * scaling), (int) (15 * scaling));
          this.add(gamePasswordField);
+         confirmButton.addActionListener((ActionEvent e) -> {
+            if (!testGame) {
+               attemptedGameName = gameNameField.getText();
+               attemptedGamePassword = gamePasswordField.getText();
+               testGame = true;
+            }
+         });
+         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 2 / 5, (int) (130 * scaling), (int) (19 * scaling));
+         this.add(confirmButton);
          backButton.addActionListener((ActionEvent e) -> {
             newState = 2;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -700,18 +786,27 @@ public class Client extends JFrame implements WindowListener {
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
-         g2.drawString("Create Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Game")) / 2.0), MAX_Y / 5);
+         g2.setFont(HEADER_FONT);
+         g2.drawString("Create Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Server")) / 2.0), MAX_Y / 5);
+         //Server name
+         g2.setFont(MAIN_FONT);
+         g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y / 5 - g2.getFontMetrics().getHeight()));
+         //Server password
+         g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
+         //Confirm button
+         //Draws particles
       }
    }
 
    private class JoinPanel extends JPanel { //State =4
       private Graphics2D g2;
-      private JTextField gameNameTestField = new JTextField(3);
-      private JTextField gamePasswordTestField = new JTextField(3);
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomTextField gameNameTestField = new CustomTextField(3);
+      private CustomTextField gamePasswordTestField = new CustomTextField(3);
+      private CustomButton backButton = new CustomButton("Back");
 
       public JoinPanel() {
          //Setting up the size
@@ -740,7 +835,7 @@ public class Client extends JFrame implements WindowListener {
          backButton.addActionListener((ActionEvent e) -> {
             newState = 2;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -756,6 +851,8 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
          g2.drawString("Join Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Game")) / 2.0), MAX_Y / 5);
       }
@@ -763,7 +860,7 @@ public class Client extends JFrame implements WindowListener {
 
    private class InstructionPanel extends JPanel { //State=5
       private Graphics2D g2;
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomButton backButton = new CustomButton("Back");
 
 
       public InstructionPanel() {
@@ -791,7 +888,8 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
-
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
       }
    }
 
@@ -800,14 +898,14 @@ public class Client extends JFrame implements WindowListener {
       private boolean buttonAdd = true;
       private boolean buttonRemove = true;
       private CustomButton readyGameButton = new CustomButton("Begin game");
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomButton backButton = new CustomButton("Back");
 
 
       public WaitingPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Setting up buttons
-         readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
          readyGameButton.addActionListener((ActionEvent e) -> {
             notifyReady = true;
          });
@@ -816,7 +914,7 @@ public class Client extends JFrame implements WindowListener {
             newState = 2;
             leaveGame = true;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
 
          //Basic visuals
@@ -836,6 +934,8 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //if host==true, then display the ready button
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.white);
          if ((host) && (buttonAdd)) {
             this.add(readyGameButton);
@@ -852,7 +952,7 @@ public class Client extends JFrame implements WindowListener {
                buttonRemove = false;
             }
 
-            g2.drawString("LOADING", (int) (MAX_X - metrics.stringWidth("LOADING") / 2.0), MAX_Y / 2);
+            g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), MAX_Y / 2);
          }
       }
    }
@@ -885,7 +985,8 @@ public class Client extends JFrame implements WindowListener {
             //X is excess
             scaling = 1.0 * MAX_Y / DESIRED_Y;
          }
-         MAIN_FONT = new Font("Quicksand", Font.PLAIN, (int) (8 * scaling));
+         MAIN_FONT = new Font("Cambria Math", Font.PLAIN, (int) (10 * scaling));
+         HEADER_FONT = new Font("Akura Popo", Font.PLAIN, (int) (20 * scaling));
       }
 
       public void initializeSize() {
@@ -907,6 +1008,10 @@ public class Client extends JFrame implements WindowListener {
       private Area areaRect;
       private Area largeRing;
       private Polygon BOTTOM_BAR = new Polygon();
+      private Rectangle drawArea;
+      private int[] centerXy = new int[2];
+      private BufferedImage fogMap;
+
 
       public GamePanel() {
          //Basic visuals
@@ -921,14 +1026,14 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if ((state == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * scaling / 2);
             midXy[1] = (int) (DESIRED_Y * scaling / 2);
-            for (Player1 currentPlayer : players) {
+            for (Player currentPlayer : players) {
                currentPlayer.setScaling(scaling);
                currentPlayer.setCenterXy(midXy);
             }
-            g2 = (Graphics2D) g.create();
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
             largeCircle = new Ellipse2D.Double(400 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
@@ -937,7 +1042,6 @@ public class Client extends JFrame implements WindowListener {
             areaRect = new Area(rect);
             largeRing = new Area(largeCircle);
             areaRect.subtract(largeRing);
-
             BOTTOM_BAR.addPoint((int) (272 * scaling), (int) (500 * scaling));
             BOTTOM_BAR.addPoint((int) (265 * scaling), (int) (440 * scaling));
             BOTTOM_BAR.addPoint((int) (270 * scaling), (int) (435 * scaling));
@@ -945,100 +1049,104 @@ public class Client extends JFrame implements WindowListener {
             BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
             BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
             //Game set up
-            int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+            centerXy[0] = (int) (DESIRED_X * scaling / 2);
+            centerXy[1] = (int) (DESIRED_Y * scaling / 2);
             try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
+               /*
                sectors = new Sector[1000][1000];
                for (int i = 0; i < 1000; i++) {
                   for (int j = 0; j < 1000; j++) {
                      sectors[j][i] = new Sector();
-                     sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
+                    // sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
                      sectors[j][i].setSectorCoords(j, i);
                      sectors[j][i].setScaling(scaling);
-                     sectors[j][i].setCenterXy(tempXy);
+                     sectors[j][i].setCenterXy(centerXy);
                   }
                }
+*/
             } catch (IOException e) {
                System.out.println("Image not found");
             }
-         } else {
-            g2 = (Graphics2D) g;
+            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
          }
-         g2.setFont(MAIN_FONT);
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          super.paintComponent(g2);
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         //Sectors
-         int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
-         int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
-         int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
-         int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
+         if (drawArea != null) {
+            g2.clip(drawArea);
+            g2.setFont(MAIN_FONT);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+            //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
+            //Sectors
+            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
+            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
+            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
+            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
 
-         for (int i = startY; i < finalY; i++) {
-            for (int j = startX; j < finalX; j++) {
-               if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
-                  sectors[j][i].drawSector(g2, myPlayer.getXy());
-               }
-            }
-         }
-
-         //Game player
-         for (Player1 currentPlayer : players) {
-            if (currentPlayer != null) {
-               currentPlayer.draw(g2, myPlayer.getXy());
-            }
-         }
-         /*
-         g2.setColor(Color.white);
-         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);
-         g2.setColor(Color.white);
-         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
-           */
-
-
-         g2.setColor(new Color(165, 156, 148));
-         //Minimap
-         g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
-         //Bottom bar
-         g2.drawPolygon(BOTTOM_BAR);
-
-
-         //Stat bars
-         g2.setColor(new Color(190, 40, 40));
-         g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
-
-         g2.setColor(new Color(165, 156, 148));
-         g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-         g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-         //Bottom bar contents
-
-         //Spells
-         g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-         g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-         g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-
-         /*
-         // Draws fog
-         for(int i = -MAX_X/2; i < MAX_X/2; i+= 10*scaling){ // In units of screen pixels
-            for(int j = -MAX_Y/2; j< MAX_Y/2; j+=10*scaling){
-
-               int mapX = (myPlayer.getXy()[0] + (int)(i/scaling))/10; // In units of fog map
-               int mapY = (myPlayer.getXy()[1] + (int)(j/scaling))/10;
-
-               if(mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY< 1000){ // If within bounds of fog
-
-                  int fogValue = fog.getFog()[mapY][mapX];
-                  if(fogValue == 0){ // Unexplored
-                     g2.setColor(Color.black);
-                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
-                  } else if(fogValue == 1){ // Explored but not actively viewed
-                     g2.setColor(new Color(0, 0, 0, 128));
-                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
+            //long time = System.nanoTime();
+            /*
+            for (int i = startY; i < finalY; i++) {
+               for (int j = startX; j < finalX; j++) {
+                  if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
+                     sectors[j][i].setFog(fog.getSingleFog(j, i));
+                     sectors[j][i].drawSector(g2, myPlayer.getXy());
                   }
                }
             }
-         } */
+            */
+            g2.drawImage(sheet, (int) (centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (10000 * scaling), (int) (10000 * scaling), null);
+            //Game player
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  currentPlayer.draw(g2, myPlayer.getXy());
+               }
+            }
+            // System.out.println(System.nanoTime() - time);
+
+
+            g2.setColor(new Color(165, 156, 148));
+            //Minimap
+            g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
+            //Bottom bar
+            g2.drawPolygon(BOTTOM_BAR);
+
+
+            //Stat bars
+            g2.setColor(new Color(190, 40, 40));
+            g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
+
+            g2.setColor(new Color(165, 156, 148));
+            g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
+            g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
+            //Bottom bar contents
+
+            //Spells
+            g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+            g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+            g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+
+
+            // Draws fog
+         /*
+            for (int i = -MAX_X / 2; i < MAX_X / 2; i += 10 * scaling) { // In units of screen pixels
+               for (int j = -MAX_Y / 2; j < MAX_Y / 2; j += 10 * scaling) {
+                  int mapX = (myPlayer.getXy()[0] + (int) (i / scaling)) / 10; // In units of fog map
+                  int mapY = (myPlayer.getXy()[1] + (int) (j / scaling)) / 10;
+                  if (mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY < 1000) { // If within bounds of fog
+                     int fogValue = fog.getFog()[mapY][mapX];
+                     if (fogValue == 0) { // Unexplored
+                        g2.setColor(Color.black);
+                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
+                     } else if (fogValue == 1) { // Explored but not actively viewed
+                        g2.setColor(new Color(0, 0, 0, 128));
+                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
+                     }
+                  }
+               }
+            }
+         */
+         }
+         g2.dispose();
       }
 
    }
@@ -1078,6 +1186,27 @@ public class Client extends JFrame implements WindowListener {
          } else {
             g.setColor(getBackground());
          }
+         g.fillRect(0, 0, getWidth(), getHeight());
+         super.paintComponent(g);
+      }
+   }
+
+   private class CustomTextField extends JTextField {
+      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
+      private Color backgroundColor = new Color(0f, 0f, 0f, 0f);
+      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
+
+      CustomTextField(int row) {
+         super(row);
+         this.setFont(BUTTON_FONT);
+         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
+         this.setForeground(foregroundColor);
+         this.setBackground(backgroundColor);
+      }
+
+      @Override
+      protected void paintComponent(Graphics g) {
+         g.setColor(getBackground());
          g.fillRect(0, 0, getWidth(), getHeight());
          super.paintComponent(g);
       }

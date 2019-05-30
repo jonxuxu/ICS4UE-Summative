@@ -1,5 +1,4 @@
 package server;
-
 /**
  * Status.java
  * This is
@@ -10,5 +9,15 @@ package server;
  */
 
 public class Status {
-
+  int duration;
+  int lifetime;
+  Status(int duration){
+    this.duration = duration;
+  }
+  public void advance(){
+    lifetime++;
+  }
+  public int getRemainingDuration(){
+    return duration-lifetime;
+  }
 }
