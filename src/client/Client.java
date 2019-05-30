@@ -85,8 +85,8 @@ public class Client extends JFrame implements WindowListener {
    private BufferedImage TITLE_SCREEN;
    private BufferedImage TITLE;
    private boolean unableToConnect = false;
-
    private FogMap fog;
+   private boolean testingBegin = false;
 
    public Client() {
       super("Dark");
@@ -145,7 +145,6 @@ public class Client extends JFrame implements WindowListener {
 
       // Setting up fog (should be moved soon TM)
       fog = new FogMap(1000, 1000);
-
    }
 
    public static void main(String[] args) {
@@ -227,9 +226,30 @@ public class Client extends JFrame implements WindowListener {
                   output.flush();
                   waitForInput();
                }
+               if (testingBegin) {
+                  username = Math.random() + "";
+                  myUser = new User1(username);
+                  output.println("T" + username);//test
+                  output.flush();
+                  waitForInput();
+                  host = true;
+                  System.out.println("S" + onlineList.size());
+                  newState = 6;
+                  gameName = "";
+                  gamePassword =  "";
+                  players = new Player1[onlineList.size()];
+                  for (int i = 0; i < onlineList.size(); i++) {
+                     players[i] = new TestClass(onlineList.get(i).getUsername());
+                     if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                        myPlayer = players[i];
+                     }
+                  }
+                  testingBegin = false;
+               }
                repaintPanels();
             } else {
                // TODO: Initialize map ONCE after game begin
+
 
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
@@ -248,17 +268,16 @@ public class Client extends JFrame implements WindowListener {
                   }
 
                   // Updating fog
-                  if(fogTicks > 50){ //50 frames or 0.5 seconds @ 100fps
+                  if (fogTicks > 30) { //50 frames or 0.5 seconds @ 100fps
                      fog.age();
-                     for(int i = 0; i < players.length; i++){
+                     for (int i = 0; i < players.length; i++) {
                         // TODO: Separate by teams
                         // TODO: Account for players that quit?
-                        fog.scout(players[i].getXy()[1]/10, players[i].getXy()[0]/10);
-
+                        fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
                      }
                      fogTicks = 0;
                   }
-                  fogTicks ++;
+                  fogTicks++;
 
 
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
@@ -407,14 +426,17 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'A') {
             String[] allPlayers = input.split(" ", -1);
             for (String aPlayer : allPlayers) {
-               onlineList.add(new User1(aPlayer));
+               if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
+                  onlineList.add(myUser);
+               } else {
+                  onlineList.add(new User1(aPlayer));
+               }
             }
          } else if (initializer == 'N') {
             onlineList.add(new User1(input));
          } else if (initializer == 'X') {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
-                  System.out.println(onlineList.get(i).getUsername());
                   onlineList.remove(i);
                }
             }
@@ -539,6 +561,7 @@ public class Client extends JFrame implements WindowListener {
    private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
       private JTextField nameField = new JTextField(3);
+      private CustomButton testButton = new CustomButton("Test");
 
       public LoginPanel() {
          //Setting up the size
@@ -559,6 +582,13 @@ public class Client extends JFrame implements WindowListener {
          nameField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
          this.add(nameField);
 
+
+         testButton.addActionListener((ActionEvent e) -> {
+            testingBegin = true;
+         });
+
+         testButton.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 2 / 5, (int) (75 * scaling), (int) (15 * scaling));
+         this.add(testButton);
          //Basic visuals
          this.setDoubleBuffered(true);
          this.setBackground(new Color(20, 20, 20));
@@ -581,7 +611,7 @@ public class Client extends JFrame implements WindowListener {
             g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y / 4.0));
          } else if ((connected) && (!unableToConnect)) {
             g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y / 4.0));
-         } else if (unableToConnect){
+         } else if (unableToConnect) {
             g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y / 4.0));
          }
       }
@@ -907,7 +937,10 @@ public class Client extends JFrame implements WindowListener {
       private Area areaRect;
       private Area largeRing;
       private Polygon BOTTOM_BAR = new Polygon();
-      Image offscreen;
+      private Rectangle drawArea;
+      private int[] centerXy = new int[2];
+      private BufferedImage fogMap;
+
 
       public GamePanel() {
          //Basic visuals
@@ -922,6 +955,7 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+         g2 = (Graphics2D) g;
          if ((state == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * scaling / 2);
             midXy[1] = (int) (DESIRED_Y * scaling / 2);
@@ -929,7 +963,6 @@ public class Client extends JFrame implements WindowListener {
                currentPlayer.setScaling(scaling);
                currentPlayer.setCenterXy(midXy);
             }
-            g2 = (Graphics2D) g.create();
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
             largeCircle = new Ellipse2D.Double(400 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
@@ -938,7 +971,6 @@ public class Client extends JFrame implements WindowListener {
             areaRect = new Area(rect);
             largeRing = new Area(largeCircle);
             areaRect.subtract(largeRing);
-
             BOTTOM_BAR.addPoint((int) (272 * scaling), (int) (500 * scaling));
             BOTTOM_BAR.addPoint((int) (265 * scaling), (int) (440 * scaling));
             BOTTOM_BAR.addPoint((int) (270 * scaling), (int) (435 * scaling));
@@ -946,99 +978,104 @@ public class Client extends JFrame implements WindowListener {
             BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
             BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
             //Game set up
-            int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
+            centerXy[0] = (int) (DESIRED_X * scaling / 2);
+            centerXy[1] = (int) (DESIRED_Y * scaling / 2);
             try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
+               /*
                sectors = new Sector[1000][1000];
                for (int i = 0; i < 1000; i++) {
                   for (int j = 0; j < 1000; j++) {
                      sectors[j][i] = new Sector();
-                     sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
+                    // sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
                      sectors[j][i].setSectorCoords(j, i);
                      sectors[j][i].setScaling(scaling);
-                     sectors[j][i].setCenterXy(tempXy);
+                     sectors[j][i].setCenterXy(centerXy);
                   }
                }
+*/
             } catch (IOException e) {
                System.out.println("Image not found");
             }
-         } else {
-            g2 = (Graphics2D) g;
+            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
          }
-         this.setDoubleBuffered(true);
          super.paintComponent(g2);
-         g2.setFont(MAIN_FONT);
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+         if (drawArea != null) {
+            g2.clip(drawArea);
+            g2.setFont(MAIN_FONT);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         //Sectors
-         int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
-         int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
-         int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
-         int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
+            //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
+            //Sectors
+            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
+            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
+            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
+            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
 
-
-         for (int i = startY; i < finalY; i++) {
-            for (int j = startX; j < finalX; j++) {
-               if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
-                  sectors[j][i].drawSector(g2, myPlayer.getXy());
-               }
-            }
-         }
-
-         //Game player
-         for (Player1 currentPlayer : players) {
-            if (currentPlayer != null) {
-               currentPlayer.draw(g2, myPlayer.getXy());
-            }
-         }
-         /*
-         g2.setColor(Color.white);
-         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2) + 100);
-         g2.setColor(Color.white);
-         g2.drawLine((int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2), (int) (DESIRED_X * scaling / 2) + 100, (int) (DESIRED_Y * scaling / 2));
-           */
-
-
-         g2.setColor(new Color(165, 156, 148));
-         //Minimap
-         g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
-         //Bottom bar
-         g2.drawPolygon(BOTTOM_BAR);
-
-
-         //Stat bars
-         g2.setColor(new Color(190, 40, 40));
-         g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
-
-         g2.setColor(new Color(165, 156, 148));
-         g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-         g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-         //Bottom bar contents
-
-         //Spells
-         g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-         g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-         g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-
-
-         // Draws fog
-         for(int i = -MAX_X/2; i < MAX_X/2; i+= 10*scaling){ // In units of screen pixels
-            for(int j = -MAX_Y/2; j< MAX_Y/2; j+=10*scaling){
-               int mapX = (myPlayer.getXy()[0] + (int)(i/scaling))/10; // In units of fog map
-               int mapY = (myPlayer.getXy()[1] + (int)(j/scaling))/10;
-               if(mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY< 1000){ // If within bounds of fog
-                  int fogValue = fog.getFog()[mapY][mapX];
-                  if(fogValue == 0){ // Unexplored
-                     g2.setColor(Color.black);
-                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
-                  } else if(fogValue == 1){ // Explored but not actively viewed
-                     g2.setColor(new Color(0, 0, 0, 128));
-                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
+            //long time = System.nanoTime();
+            /*
+            for (int i = startY; i < finalY; i++) {
+               for (int j = startX; j < finalX; j++) {
+                  if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
+                     sectors[j][i].setFog(fog.getSingleFog(j, i));
+                     sectors[j][i].drawSector(g2, myPlayer.getXy());
                   }
                }
             }
+            */
+            g2.drawImage(sheet, (int) (centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (10000 * scaling), (int) (10000 * scaling), null);
+            //Game player
+            for (Player1 currentPlayer : players) {
+               if (currentPlayer != null) {
+                  currentPlayer.draw(g2, myPlayer.getXy());
+               }
+            }
+           // System.out.println(System.nanoTime() - time);
+
+
+            g2.setColor(new Color(165, 156, 148));
+            //Minimap
+            g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
+            //Bottom bar
+            g2.drawPolygon(BOTTOM_BAR);
+
+
+            //Stat bars
+            g2.setColor(new Color(190, 40, 40));
+            g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
+
+            g2.setColor(new Color(165, 156, 148));
+            g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
+            g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
+            //Bottom bar contents
+
+            //Spells
+            g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+            g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+            g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+
+
+            // Draws fog
+         /*
+            for (int i = -MAX_X / 2; i < MAX_X / 2; i += 10 * scaling) { // In units of screen pixels
+               for (int j = -MAX_Y / 2; j < MAX_Y / 2; j += 10 * scaling) {
+                  int mapX = (myPlayer.getXy()[0] + (int) (i / scaling)) / 10; // In units of fog map
+                  int mapY = (myPlayer.getXy()[1] + (int) (j / scaling)) / 10;
+                  if (mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY < 1000) { // If within bounds of fog
+                     int fogValue = fog.getFog()[mapY][mapX];
+                     if (fogValue == 0) { // Unexplored
+                        g2.setColor(Color.black);
+                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
+                     } else if (fogValue == 1) { // Explored but not actively viewed
+                        g2.setColor(new Color(0, 0, 0, 128));
+                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
+                     }
+                  }
+               }
+            }
+         */
          }
+         g2.dispose();
       }
 
    }

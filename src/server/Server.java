@@ -236,6 +236,19 @@ public class Server {
                         }
                      }
                      stop = true;
+                  } else if (initializer == 'T') {
+                     myUser = new User(inputString);
+                     onlineUsers.add(myUser);
+                     myUser = new User(inputString);
+                     if (games.size() == 0) {
+                        myGame = new GameServer("", "");//Set this game to the specific game for this gameserver
+                        games.add(myGame);
+                        games.get(0).addGamePlayer(myUser, myConnection, this);
+                     } else {
+                        myGame = games.get(0);
+                        games.get(0).addGamePlayer(myUser, myConnection, this);
+                     }
+                     printOnlineList(true);
                   }
                }
             }
@@ -258,15 +271,16 @@ public class Server {
          return (true);
       }
 
-      private void printOnlineList(boolean someoneLeft) {
+      private void printOnlineList(boolean noOneLeft) {
          //N means new player, A means all players
          try {
-            if (someoneLeft) {
+            if (noOneLeft) {
                ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
                String currentPlayerString = myGame.getOnlineGameString();
                for (int i = 0; i < currentSocketList.size(); i++) {
                   //If the error is 0, which it is in this case, no error needs to be printed out
                   output = new PrintWriter(currentSocketList.get(i).getOutputStream());
+
                   if (currentSocketList.get(i).equals(myConnection)) {
                      System.out.println("A" + currentPlayerString);
                      output.println("A" + currentPlayerString); //Print the entire list
@@ -312,7 +326,7 @@ public class Server {
       private int gameTick = 0;
       private int disconnectedPlayerNum = 0;
       private boolean begin;
-      private int playerDisconnected=-1;
+      private int playerDisconnected = -1;
 
       @Override
       public void run() {
@@ -340,7 +354,6 @@ public class Server {
                gameOutputs[i] = new PrintWriter(onlineGameSockets.get(i).getOutputStream());
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
-
                gameOutputs[i].println("B"); //B for begin
                gameOutputs[i].flush();
             }
@@ -368,7 +381,7 @@ public class Server {
                }
 
                // Input from clients
-               for (int i =  0; i < playerNum; i++) {
+               for (int i = 0; i < playerNum; i++) {
                   if (players[i] != null) {
                      if (!allInput[i].isEmpty()) {
                         if (allInput[i].equals("X")) {
@@ -497,8 +510,6 @@ public class Server {
       }
 
       private void removeGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
-         System.out.println(user.getUsername());
-         System.out.println(onlinePlayers.size());
          for (int i = 0; i < onlinePlayers.size(); i++) {
             if (user.getUsername().equals(onlinePlayers.get(i).getUsername())) {
                onlinePlayers.remove(i);
@@ -506,7 +517,6 @@ public class Server {
          }
          onlineGameSockets.remove(playerSocket);
          handlers.remove(handler);
-         System.out.println(onlinePlayers.size());
       }
 
       private int getGameSize() {
