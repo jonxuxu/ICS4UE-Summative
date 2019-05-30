@@ -63,10 +63,10 @@ public class Client extends JFrame implements WindowListener {
    private String attemptedGamePassword;
    private boolean host = false;
    private boolean notifyReady = false;
-   private ArrayList<User1> onlineList = new ArrayList<User1>();
-   private Player1[] players;
-   private User1 myUser;
-   private Player1 myPlayer;
+   private ArrayList<User> onlineList = new ArrayList<User>();
+   private Player[] players;
+   private User myUser;
+   private Player myPlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
@@ -228,16 +228,15 @@ public class Client extends JFrame implements WindowListener {
                }
                if (testingBegin) {
                   username = Math.random() + "";
-                  myUser = new User1(username);
+                  myUser = new User(username);
                   output.println("T" + username);//test
                   output.flush();
                   waitForInput();
                   host = true;
-                  System.out.println("S" + onlineList.size());
                   newState = 6;
                   gameName = "";
-                  gamePassword =  "";
-                  players = new Player1[onlineList.size()];
+                  gamePassword = "";
+                  players = new Player[onlineList.size()];
                   for (int i = 0; i < onlineList.size(); i++) {
                      players[i] = new TestClass(onlineList.get(i).getUsername());
                      if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
@@ -262,10 +261,9 @@ public class Client extends JFrame implements WindowListener {
                   outputString = "";
                   int angleOfMovement = myKeyListener.getAngle();
                   int[] xyPos = new int[2]; //Scaled to the map
-                  if (myMouseAdapter.getPressed()) {
-                     xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
-                     xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
-                  }
+
+                  xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0]; //Make it for hover
+                  xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
 
                   // Updating fog
                   if (fogTicks > 30) { //50 frames or 0.5 seconds @ 100fps
@@ -295,11 +293,19 @@ public class Client extends JFrame implements WindowListener {
                      outputString.append(" "); //Add the seperator
                   }
                   if (angleOfMovement != -10) {
-                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1]);
+                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
+                  }
+                  if (myMouseAdapter.getPressed()) {
+                     if (myMouseAdapter.getLeftRight()[0]) {
+                        outputString.append("A" + xyPos[0] + "," + xyPos[1] + " ");
+                     }
+                     if (myMouseAdapter.getLeftRight()[1]) {
+                        outputString.append("F" + xyPos[0] + "," + xyPos[1] + " ");
+                     }
                   }
                   // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
-                  if (!outputString.toString().isEmpty()) {
-                     output.println(outputString);
+                  if (!outputString.toString().trim().isEmpty()) {
+                     output.println(outputString.toString().trim());
                      output.flush();
                   }
                   repaintPanels();
@@ -397,7 +403,7 @@ public class Client extends JFrame implements WindowListener {
                   newState = 6;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
-                  myUser = new User1(username);//Sets the player
+                  myUser = new User(username);//Sets the player
                   if (state == 3) {
                      host = true;
                      onlineList.add(myUser);
@@ -429,11 +435,11 @@ public class Client extends JFrame implements WindowListener {
                if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
                   onlineList.add(myUser);
                } else {
-                  onlineList.add(new User1(aPlayer));
+                  onlineList.add(new User(aPlayer));
                }
             }
          } else if (initializer == 'N') {
-            onlineList.add(new User1(input));
+            onlineList.add(new User(input));
          } else if (initializer == 'X') {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
@@ -441,7 +447,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          } else if (initializer == 'B') {
-            players = new Player1[onlineList.size()];
+            players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                players[i] = new TestClass(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
@@ -882,7 +888,7 @@ public class Client extends JFrame implements WindowListener {
                buttonRemove = false;
             }
 
-            g2.drawString("LOADING", (int) (MAX_X - metrics.stringWidth("LOADING") / 2.0), MAX_Y / 2);
+            g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), MAX_Y / 2);
          }
       }
    }
@@ -959,7 +965,7 @@ public class Client extends JFrame implements WindowListener {
          if ((state == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * scaling / 2);
             midXy[1] = (int) (DESIRED_Y * scaling / 2);
-            for (Player1 currentPlayer : players) {
+            for (Player currentPlayer : players) {
                currentPlayer.setScaling(scaling);
                currentPlayer.setCenterXy(midXy);
             }
@@ -1025,12 +1031,12 @@ public class Client extends JFrame implements WindowListener {
             */
             g2.drawImage(sheet, (int) (centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (10000 * scaling), (int) (10000 * scaling), null);
             //Game player
-            for (Player1 currentPlayer : players) {
+            for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   currentPlayer.draw(g2, myPlayer.getXy());
                }
             }
-           // System.out.println(System.nanoTime() - time);
+            // System.out.println(System.nanoTime() - time);
 
 
             g2.setColor(new Color(165, 156, 148));
