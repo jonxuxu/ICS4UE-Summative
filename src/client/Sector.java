@@ -1,7 +1,11 @@
 package client;
 
+import javax.imageio.ImageIO;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Sector.java
@@ -16,9 +20,11 @@ public class Sector {
    private BufferedImage image;
    private int[] sectorCoords = new int[2];
    private int[][] corners = new int[4][2];
-   private int SECTOR_SIZE = 500;
+   private int SECTOR_SIZE = 10;
    private int[] centerXy = new int[2];
    private double scaling;
+   private int fog;
+   private Color [] darkness = {Color.black,new Color (0f,0f,0f,0.5f),new Color (0f,0f,0f,0.2f)};
 
    public void setImage(BufferedImage image) {
       this.image = image;
@@ -47,6 +53,19 @@ public class Sector {
    }
 
    public void drawSector(Graphics2D g2, int[] midXy) {
-      g2.drawImage(image, centerXy[0] + (int) (Math.ceil((scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0])) - (SECTOR_SIZE * scaling) / 2)), (int) (centerXy[1] + Math.ceil((scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1])) - (SECTOR_SIZE * scaling) / 2)), (int) (Math.ceil(SECTOR_SIZE * scaling)), (int) (Math.ceil(SECTOR_SIZE * scaling)), null);
+      if (fog == 1) {
+         g2.setColor(darkness[0]);
+         g2.fillRect(centerXy[0] + (int) (Math.ceil((scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0])) - (SECTOR_SIZE * scaling) / 2)), (int) (centerXy[1] + Math.ceil((scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1])) - (SECTOR_SIZE * scaling) / 2)), (int) (Math.ceil(SECTOR_SIZE * scaling)), (int) (Math.ceil(SECTOR_SIZE * scaling)));
+      } else if (fog == 2) {
+         g2.setColor(darkness[1]);
+         g2.fillRect(centerXy[0] + (int) (Math.ceil((scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0])) - (SECTOR_SIZE * scaling) / 2)), (int) (centerXy[1] + Math.ceil((scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1])) - (SECTOR_SIZE * scaling) / 2)), (int) (Math.ceil(SECTOR_SIZE * scaling)), (int) (Math.ceil(SECTOR_SIZE * scaling)));
+      } else{
+         g2.setColor(darkness[2]);
+         g2.fillRect(centerXy[0] + (int) (Math.ceil((scaling * (sectorCoords[0] * SECTOR_SIZE - midXy[0])) - (SECTOR_SIZE * scaling) / 2)), (int) (centerXy[1] + Math.ceil((scaling * (sectorCoords[1] * SECTOR_SIZE - midXy[1])) - (SECTOR_SIZE * scaling) / 2)), (int) (Math.ceil(SECTOR_SIZE * scaling)), (int) (Math.ceil(SECTOR_SIZE * scaling)));
+      }
+   }
+
+   public void setFog(int fog) {
+      this.fog = fog;
    }
 }

@@ -91,13 +91,6 @@ public class CustomKeyListener implements KeyListener {
       }
    }
 
-   public boolean getEnter() {
-      if (pressed.contains(10)) {
-         return true;
-      }else{
-         return false;
-      }
-   }
 
    public boolean[] getSpell() {
       //0 refers to q, 1 refers to e, 2 refers to space
