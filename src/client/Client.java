@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 /*
 Here is how the messages work.
@@ -389,6 +390,7 @@ public class Client extends JFrame implements WindowListener {
             if (state == 0) {
                errors[0] = Integer.parseInt(initializer + "");
                if (initializer == '0') {
+
                   //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
@@ -399,6 +401,7 @@ public class Client extends JFrame implements WindowListener {
                   }
 */
                   cardLayout.show(mainContainer, PANEL_NAMES[2]);
+
                   newState = 2;
                } else {
                   username = null;
@@ -708,8 +711,8 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          //Adds particles
-         if (Math.random() < 0.2) {
-            particles.add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) (5 * scaling), MAX_Y));
+         if(Math.random() < 0.2){
+            particles.add(new AshParticle(Math.random()*MAX_X + MAX_X/20, 0, (int)((Math.random()*3+3)*scaling), MAX_Y));
          }
          //Draws particles
          for (int i = 0; i < particles.size(); i++) {
