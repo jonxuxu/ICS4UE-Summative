@@ -102,7 +102,8 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Bold.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
-         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreen.png"));
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
+         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreenDark.png"));
          TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
          System.out.println("Font not available");
@@ -631,6 +632,8 @@ public class Client extends JFrame implements WindowListener {
       private CustomButton backButton = new CustomButton("Back");
       private double introAlpha = 1;
 
+      private ArrayList<AshParticle> particles = new ArrayList<>();
+
       public MenuPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
@@ -700,6 +703,22 @@ public class Client extends JFrame implements WindowListener {
             g2.fillRect(0, 0, MAX_X, MAX_Y);
             if (introAlpha < 0.03) {
                introAlpha = 0;
+            }
+         }
+         //Adds particles
+         if (Math.random() < 0.2) {
+            particles.add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) (5 * scaling), MAX_Y));
+         }
+         //Draws particles
+         for (int i = 0; i < particles.size(); i++) {
+            try {
+               if (particles.get(i).update()) {
+                  particles.remove(i);
+               } else {
+                  particles.get(i).render(g2);
+               }
+            } catch (Exception e) {
+               e.printStackTrace();
             }
          }
       }
@@ -774,7 +793,7 @@ public class Client extends JFrame implements WindowListener {
          //Server password
          g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
          //Confirm button
-       //  g2.drawString("Confirm", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Confirm")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
+         //  g2.drawString("Confirm", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Confirm")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
       }
    }
 

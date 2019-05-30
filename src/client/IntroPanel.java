@@ -31,7 +31,7 @@ public class IntroPanel extends JPanel {
    static double h = screenSize.getHeight();//This adjusts height to be a bit smaller to fit nicer on screen
    static int x;
    static int y;
-   static ArrayList<Particle> particles = new ArrayList<Particle>();
+   static ArrayList<IntroParticle> particles = new ArrayList<IntroParticle>();
    static final int SIZE = 100;
    static double fade1 = 0;
    static Font font;
@@ -59,12 +59,12 @@ public class IntroPanel extends JPanel {
 
    public void go() {
       for (double i = 0; i < Math.PI * 7 / 2; i += 0.01) {
-         //particles.add(new Particle(x,y,(Math.random()*10-5),(Math.random()*10),(int)(Math.random()*12),(int)(Math.random()*(50)+200),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
+         //particles.add(new IntroParticle(x,y,(Math.random()*10-5),(Math.random()*10),(int)(Math.random()*12),(int)(Math.random()*(50)+200),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
          for (double j = -SIZE / 2; j < SIZE / 2; j += 10) {
             int randomNum = (int) (Math.random() * 5);
-            particles.add(new Particle(x + j, y + Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200), fireColours[randomNum]));
+            particles.add(new IntroParticle(x + j, y + Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200), fireColours[randomNum]));
             //System.out.println(x + " " + y + " " + (x + j) + " " + (y + Math.sqrt(Math.pow(SIZE/2,2) - Math.pow((j),2))));
-            particles.add(new Particle(x + j, y - Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200), fireColours[randomNum]));
+            particles.add(new IntroParticle(x + j, y - Math.sqrt(Math.pow(SIZE / 2, 2) - Math.pow(j, 2)), (w * ((7 * Math.PI - 2 * i) * Math.sin(i) + 2 * Math.cos(i))) / (14 * Math.PI) * Math.random() / 10, -(h * ((7 * Math.PI - 2 * i) * Math.cos(i) - 2 * Math.sin(i))) / (14 * Math.PI) * Math.random() / 10, (int) (Math.random() * 12), (int) (Math.random() * (50) + 200), fireColours[randomNum]));
          }
          double r1 = w / 2 - i * w / (7 * Math.PI);
          double r2 = h / 2 - i * h / (7 * Math.PI);
@@ -104,7 +104,7 @@ public class IntroPanel extends JPanel {
          double angle = (Math.random() * 1) * Math.PI;
          double dx = (Math.random() * 50) * Math.cos(angle);
          double dy = -(Math.random() * 50) * Math.sin(angle);
-         particles.add(new Particle(x + SIZE / 2, y + SIZE / 2, dx, dy, (int) (Math.random() * 12), (int) (Math.random() * (50) + 250), fireColours[randomNum]));
+         particles.add(new IntroParticle(x + SIZE / 2, y + SIZE / 2, dx, dy, (int) (Math.random() * 12), (int) (Math.random() * (50) + 250), fireColours[randomNum]));
          //try{ Thread.sleep(1); } catch (Exception E){}
       }
       try {
@@ -136,12 +136,12 @@ public class IntroPanel extends JPanel {
           System.out.println(i + " " + j + " " + img.getRGB(j,i) + " " + Color.WHITE.getRGB());
         }
         if (img.getRGB(j,i) == Color.WHITE.getRGB()){
-          particles.add(new Particle(j,i,0,0,(int)(Math.random()*12),(int)(Math.random()*(50)+250),Color.WHITE));
+          particles.add(new IntroParticle(j,i,0,0,(int)(Math.random()*12),(int)(Math.random()*(50)+250),Color.WHITE));
         } else if (img.getRGB(j,i) == Color.YELLOW.getRGB()){
-          particles.add(new Particle(j,i,0,0,(int)(Math.random()*12),(int)(Math.random()*(50)+250),Color.YELLOW));
+          particles.add(new IntroParticle(j,i,0,0,(int)(Math.random()*12),(int)(Math.random()*(50)+250),Color.YELLOW));
         }
         /
-        particles.add(new Particle(j,i,Math.random()*10-5,Math.random()*10-5,(int)(Math.random()*12),(int)(Math.random()*(50)+250),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
+        particles.add(new IntroParticle(j,i,Math.random()*10-5,Math.random()*10-5,(int)(Math.random()*12),(int)(Math.random()*(50)+250),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
       }
       try{ Thread.sleep(10); } catch (Exception E){}
     }*/
