@@ -87,6 +87,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean unableToConnect = false;
    private FogMap fog;
    private boolean testingBegin = false;
+   private double introScaling;
 
    public Client() {
       super("Dark");
@@ -101,11 +102,10 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Bold.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
-         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
          TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreen.png"));
          TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
-         System.out.print("Font not available");
+         System.out.println("Font not available");
       }
 
 
@@ -384,16 +384,16 @@ public class Client extends JFrame implements WindowListener {
             if (state == 0) {
                errors[0] = Integer.parseInt(initializer + "");
                if (initializer == '0') {
-                  /*
                   //Start the opening here
+                  /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
                   ((IntroPanel) (allPanels[1])).go();
                   try {
-                     Thread.sleep(2200);
+                     Thread.sleep(3000);
                   } catch (Exception E) {
                   }
-                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
                   */
+                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
                   newState = 2;
                } else {
                   username = null;
@@ -566,7 +566,7 @@ public class Client extends JFrame implements WindowListener {
 
    private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
-      private JTextField nameField = new JTextField(3);
+      private CustomTextField nameField = new CustomTextField(3);
       private CustomButton testButton = new CustomButton("Test");
 
       public LoginPanel() {
@@ -625,11 +625,11 @@ public class Client extends JFrame implements WindowListener {
 
    private class MenuPanel extends JPanel {//State=2
       private Graphics2D g2;
-      private CustomButton createButton = new CustomButton("CREATE GAME");
-      private CustomButton joinButton = new CustomButton("JOIN GAME");
-      private CustomButton instructionButton = new CustomButton("INSTRUCTIONS");
-      private CustomButton backButton = new CustomButton("BACK");
-      private double introScaling;
+      private CustomButton createButton = new CustomButton("Create Game");
+      private CustomButton joinButton = new CustomButton("Join Game");
+      private CustomButton instructionButton = new CustomButton("Instructions");
+      private CustomButton backButton = new CustomButton("Back");
+      private double introAlpha = 1;
 
       public MenuPanel() {
          //Setting up the size
@@ -638,25 +638,25 @@ public class Client extends JFrame implements WindowListener {
          createButton.addActionListener((ActionEvent e) -> {
             newState = 3;
          });
-         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
          this.add(createButton);
 
          joinButton.addActionListener((ActionEvent e) -> {
             newState = 4;
          });
-         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
          this.add(joinButton);
          instructionButton.addActionListener((ActionEvent e) -> {
             newState = 5;//I added this later so I didn't want to move everything around
          });
-         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
 
          this.add(instructionButton);
          backButton.addActionListener((ActionEvent e) -> {
             newState = 0;
             logout = true;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (22 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
 
          //Setting up intro scaling
@@ -686,14 +686,31 @@ public class Client extends JFrame implements WindowListener {
          g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          //Title
          g2.drawImage(TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
+         if (introAlpha != 0) {
+            introAlpha -= 0.03;
+            g2.setColor(new Color(0f, 0f, 0f, (float) (introAlpha)));
+            createButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            createButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            joinButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            joinButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            instructionButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            instructionButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            backButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
+            backButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
+            g2.fillRect(0, 0, MAX_X, MAX_Y);
+            if (introAlpha < 0.03) {
+               introAlpha = 0;
+            }
+         }
       }
    }
 
    private class CreatePanel extends JPanel { //State =3
       private Graphics2D g2;
-      private JTextField gameNameField = new JTextField(3);
-      private JTextField gamePasswordField = new JTextField(3);
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomTextField gameNameField = new CustomTextField(3);
+      private CustomTextField gamePasswordField = new CustomTextField(3);
+      private CustomButton backButton = new CustomButton("Back");
+      private CustomButton confirmButton = new CustomButton("Confirm Game");
 
       public CreatePanel() {
          //Setting up the size
@@ -719,10 +736,19 @@ public class Client extends JFrame implements WindowListener {
          gamePasswordField.setFont(MAIN_FONT);
          gamePasswordField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 3 / 10, (int) (75 * scaling), (int) (15 * scaling));
          this.add(gamePasswordField);
+         confirmButton.addActionListener((ActionEvent e) -> {
+            if (!testGame) {
+               attemptedGameName = gameNameField.getText();
+               attemptedGamePassword = gamePasswordField.getText();
+               testGame = true;
+            }
+         });
+         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 3 / 10 + 20 * scaling), (int) (130 * scaling), (int) (19 * scaling));
+         this.add(confirmButton);
          backButton.addActionListener((ActionEvent e) -> {
             newState = 2;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -736,18 +762,27 @@ public class Client extends JFrame implements WindowListener {
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
          super.paintComponent(g);
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
-         g2.drawString("Create Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Game")) / 2.0), MAX_Y / 5);
+         //g2.setFont(HEADER_FONT);
+         g2.drawString("Create Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Server")) / 2.0), MAX_Y / 5);
+         //Server name
+         g2.setFont(MAIN_FONT);
+         g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y / 5 - g2.getFontMetrics().getHeight()));
+         //Server password
+         g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
+         //Confirm button
+       //  g2.drawString("Confirm", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Confirm")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
       }
    }
 
    private class JoinPanel extends JPanel { //State =4
       private Graphics2D g2;
-      private JTextField gameNameTestField = new JTextField(3);
-      private JTextField gamePasswordTestField = new JTextField(3);
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomTextField gameNameTestField = new CustomTextField(3);
+      private CustomTextField gamePasswordTestField = new CustomTextField(3);
+      private CustomButton backButton = new CustomButton("Back");
 
       public JoinPanel() {
          //Setting up the size
@@ -776,7 +811,7 @@ public class Client extends JFrame implements WindowListener {
          backButton.addActionListener((ActionEvent e) -> {
             newState = 2;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
          //Basic visuals
          this.setDoubleBuffered(true);
@@ -792,6 +827,8 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
          g2.drawString("Join Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Game")) / 2.0), MAX_Y / 5);
       }
@@ -799,7 +836,7 @@ public class Client extends JFrame implements WindowListener {
 
    private class InstructionPanel extends JPanel { //State=5
       private Graphics2D g2;
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomButton backButton = new CustomButton("Back");
 
 
       public InstructionPanel() {
@@ -827,7 +864,8 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
-
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
       }
    }
 
@@ -836,14 +874,14 @@ public class Client extends JFrame implements WindowListener {
       private boolean buttonAdd = true;
       private boolean buttonRemove = true;
       private CustomButton readyGameButton = new CustomButton("Begin game");
-      private CustomButton backButton = new CustomButton("BACK");
+      private CustomButton backButton = new CustomButton("Back");
 
 
       public WaitingPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
          //Setting up buttons
-         readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
          readyGameButton.addActionListener((ActionEvent e) -> {
             notifyReady = true;
          });
@@ -852,7 +890,7 @@ public class Client extends JFrame implements WindowListener {
             newState = 2;
             leaveGame = true;
          });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
+         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
          this.add(backButton);
 
          //Basic visuals
@@ -872,6 +910,8 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g);
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //if host==true, then display the ready button
+         //Background
+         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.white);
          if ((host) && (buttonAdd)) {
             this.add(readyGameButton);
@@ -921,7 +961,7 @@ public class Client extends JFrame implements WindowListener {
             //X is excess
             scaling = 1.0 * MAX_Y / DESIRED_Y;
          }
-         MAIN_FONT = new Font("Quicksand", Font.PLAIN, (int) (8 * scaling));
+         MAIN_FONT = new Font("Cambria Math", Font.PLAIN, (int) (10 * scaling));
       }
 
       public void initializeSize() {
@@ -1121,6 +1161,27 @@ public class Client extends JFrame implements WindowListener {
          } else {
             g.setColor(getBackground());
          }
+         g.fillRect(0, 0, getWidth(), getHeight());
+         super.paintComponent(g);
+      }
+   }
+
+   private class CustomTextField extends JTextField {
+      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
+      private Color backgroundColor = new Color(0f, 0f, 0f, 0f);
+      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
+
+      CustomTextField(int row) {
+         super(row);
+         this.setFont(BUTTON_FONT);
+         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
+         this.setForeground(foregroundColor);
+         this.setBackground(backgroundColor);
+      }
+
+      @Override
+      protected void paintComponent(Graphics g) {
+         g.setColor(getBackground());
          g.fillRect(0, 0, getWidth(), getHeight());
          super.paintComponent(g);
       }

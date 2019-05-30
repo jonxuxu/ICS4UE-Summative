@@ -49,10 +49,10 @@ public class IntroPanel extends JPanel {
    IntroPanel() {
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Richardson Brand Accelerator.ttf")));
-         font = new Font("Richards", Font.PLAIN, 70);
+         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Kiona-Regular.ttf")));
+         font = new Font("Kiona", Font.PLAIN, 70);
       } catch (IOException | FontFormatException e) {
-         System.out.print("Font not available");
+         System.out.println("Font not available");
       }
       this.setBackground(new Color(17, 17, 17));
    }
@@ -113,7 +113,7 @@ public class IntroPanel extends JPanel {
       }
       text = "7";
       fontX = (int) ((w - metrics.stringWidth("7SPEED")) / 2);
-      fontY = (int) (((h - metrics.getHeight()) / 2) + metrics.getAscent());
+      fontY = (int) (((h - 40 - metrics.getHeight()) / 2) + metrics.getAscent());
       for (double i = 0; i < 1; i += 0.01) {
          fade1 = i;
          try {
@@ -153,7 +153,7 @@ public class IntroPanel extends JPanel {
          } catch (Exception E) {
          }
       }
-      fade1=0;
+      fade1 = 0;
    }
 
    /**
@@ -203,9 +203,9 @@ public class IntroPanel extends JPanel {
          g2.fillRect(0, 0, (int) w, lineY);
          //System.out.println(w + " " + lineY);
       }
-     // if (!particles.isEmpty()) {
-         repaint();
-     // }
+      // if (!particles.isEmpty()) {
+      repaint();
+      // }
    }
 
    public boolean checkAnimationOver() {
