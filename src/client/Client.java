@@ -63,10 +63,10 @@ public class Client extends JFrame implements WindowListener {
    private String attemptedGamePassword;
    private boolean host = false;
    private boolean notifyReady = false;
-   private ArrayList<User1> onlineList = new ArrayList<User1>();
-   private Player1[] players;
-   private User1 myUser;
-   private Player1 myPlayer;
+   private ArrayList<User> onlineList = new ArrayList<User>();
+   private Player[] players;
+   private User myUser;
+   private Player myPlayer;
    private boolean gameBegin;
    private String outputString;//This is what is outputted to the game
    private boolean loading = false;
@@ -102,7 +102,7 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
-         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreen.png"));
+         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreenDark.png"));
          TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
          System.out.print("Font not available");
@@ -378,7 +378,7 @@ public class Client extends JFrame implements WindowListener {
                   newState = 6;//Sends to a waiting room
                   gameName = attemptedGameName;
                   gamePassword = attemptedGamePassword;
-                  myUser = new User1(username);//Sets the player
+                  myUser = new User(username);//Sets the player
                   if (state == 3) {
                      host = true;
                      onlineList.add(myUser);
@@ -407,10 +407,10 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'A') {
             String[] allPlayers = input.split(" ", -1);
             for (String aPlayer : allPlayers) {
-               onlineList.add(new User1(aPlayer));
+               onlineList.add(new User(aPlayer));
             }
          } else if (initializer == 'N') {
-            onlineList.add(new User1(input));
+            onlineList.add(new User(input));
          } else if (initializer == 'X') {
             for (int i = 0; i < onlineList.size(); i++) {
                if (onlineList.get(i).getUsername().equals(input)) {
@@ -419,7 +419,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          } else if (initializer == 'B') {
-            players = new Player1[onlineList.size()];
+            players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                players[i] = new TestClass(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
@@ -595,6 +595,8 @@ public class Client extends JFrame implements WindowListener {
       private CustomButton backButton = new CustomButton("BACK");
       private double introScaling;
 
+      private ArrayList<AshParticle> particles = new ArrayList<>();
+
       public MenuPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
@@ -650,6 +652,22 @@ public class Client extends JFrame implements WindowListener {
          g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          //Title
          g2.drawImage(TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
+         //Adds particles
+         if(Math.random() < 0.2){
+            particles.add(new AshParticle(Math.random()*MAX_X + MAX_X/20, 0, (int)(5*scaling), MAX_Y));
+         }
+         //Draws particles
+         for(int i = 0; i < particles.size(); i++){
+            try{
+               if(particles.get(i).update()){
+                  particles.remove(i);
+               } else {
+                  particles.get(i).render(g2);
+               }
+            } catch (Exception e){
+               e.printStackTrace();
+            }
+         }
       }
    }
 
@@ -924,7 +942,7 @@ public class Client extends JFrame implements WindowListener {
          if ((state == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * scaling / 2);
             midXy[1] = (int) (DESIRED_Y * scaling / 2);
-            for (Player1 currentPlayer : players) {
+            for (Player currentPlayer : players) {
                currentPlayer.setScaling(scaling);
                currentPlayer.setCenterXy(midXy);
             }
@@ -984,7 +1002,7 @@ public class Client extends JFrame implements WindowListener {
          }
 
          //Game player
-         for (Player1 currentPlayer : players) {
+         for (Player currentPlayer : players) {
             if (currentPlayer != null) {
                currentPlayer.draw(g2, myPlayer.getXy());
             }
@@ -1018,7 +1036,7 @@ public class Client extends JFrame implements WindowListener {
          g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
          g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
 
-         /*
+
          // Draws fog
          for(int i = -MAX_X/2; i < MAX_X/2; i+= 10*scaling){ // In units of screen pixels
             for(int j = -MAX_Y/2; j< MAX_Y/2; j+=10*scaling){
@@ -1031,14 +1049,15 @@ public class Client extends JFrame implements WindowListener {
                   int fogValue = fog.getFog()[mapY][mapX];
                   if(fogValue == 0){ // Unexplored
                      g2.setColor(Color.black);
-                     g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
                   } else if(fogValue == 1){ // Explored but not actively viewed
                      g2.setColor(new Color(0, 0, 0, 128));
                      g2.fillRect(i+MAX_X/2, j+MAX_Y/2, (int)(10*scaling), (int)(10*scaling));
+                  } else { // Explored
+                     //No need to add fog if already visible on bg.
                   }
                }
             }
-         } */
+         }
       }
 
    }
