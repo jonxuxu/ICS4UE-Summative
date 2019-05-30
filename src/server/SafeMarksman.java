@@ -28,7 +28,7 @@ public class SafeMarksman extends Player{
     setRange(300);
   }
 
- public boolean testSpell(int spellIndex){
+ public boolean castSpell(int spellIndex){
    if (!getStunned()) {
      if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
        lastSpellTicks[spellIndex] = spellTick;

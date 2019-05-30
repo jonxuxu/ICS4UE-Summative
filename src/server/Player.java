@@ -43,8 +43,8 @@ public abstract class Player extends User implements CanIntersect{
    private ArrayList<Player> allies = new ArrayList<Player>();
    private ArrayList<Player> enemies = new ArrayList<Player>();
    private int x,y = 300;
-   private int autoSpeed =1;//TEMP, ASK KAMRON
-   private int autoRange =1;
+   private int autoSpeed = 10;//REE
+   private int autoRange;//REE
    private Rectangle hitbox = new Rectangle(x,y,50,50);
    private boolean illuminated = false;
    private boolean stunned = false;
@@ -112,7 +112,7 @@ public abstract class Player extends User implements CanIntersect{
    }
    public void autoAttack(int mouseX, int mouseY){
       if (!stunned){
-         projectiles.add(new AutoProjectile(x,y,mouseX,mouseY,autoSpeed,autoRange));
+         projectiles.add(new AutoProjectile(x,y,mouseX,mouseY,autoSpeed,range));
       }
    }
    public void flare(int mouseX, int mouseY){
@@ -268,7 +268,7 @@ public abstract class Player extends User implements CanIntersect{
       return allies.size();
    }
    //////////////////////////////////////////////////////////////////////////
-   public abstract boolean testSpell(int spellIndex);
+   public abstract boolean castSpell(int spellIndex);
 
    public abstract int getSpellPercent(int spellIndex);
 

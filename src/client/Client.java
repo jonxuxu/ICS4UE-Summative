@@ -52,6 +52,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean sendName = false;
    private boolean testGame = false;
    private Font MAIN_FONT;
+   private Font HEADER_FONT;
    //State legend:
    private int state = 0;//should be 0
    private int newState = 0;//should be 0
@@ -88,6 +89,7 @@ public class Client extends JFrame implements WindowListener {
    private FogMap fog;
    private boolean testingBegin = false;
    private double introScaling;
+   private ArrayList<AshParticle> particles = new ArrayList<>();
 
    public Client() {
       super("Dark");
@@ -165,88 +167,90 @@ public class Client extends JFrame implements WindowListener {
          //Start with entering the name. This must be separated from the rest
          //Username successfully entered in
          int fogTicks = 0;
-
+         Clock time = new Clock ();
          while (connected) {
             //Otherwise, continue to send messages. The lines below are for when something is going to be sent
             if (!gameBegin) {
-               //Recieves input if possible
-               if (input.ready()) {
-                  decipherInput(input.readLine());
-               }
+               if (time.getFramePassed()) {
+                  //Recieves input if possible
+                  if (input.ready()) {
+                     decipherInput(input.readLine());
+                  }
 
-               //Deal with output when going back through the menu
-               if (logout) {
-                  output.println("B");//for back
-                  output.flush();
-                  username = null;
-                  logout = false;
-               }
-               if (leaveGame) {
-                  output.println("B");//for back
-                  output.flush();
-                  onlineList.clear();
-                  leaveGame = false;
-               }
-               if (sendName) {
-                  sendName = false;
-                  if (username != null) {
-                     if (verifyString(username, 0)) {
-                        output.println("U" + username);
+                  //Deal with output when going back through the menu
+                  if (logout) {
+                     output.println("B");//for back
+                     output.flush();
+                     username = null;
+                     logout = false;
+                  }
+                  if (leaveGame) {
+                     output.println("B");//for back
+                     output.flush();
+                     onlineList.clear();
+                     leaveGame = false;
+                  }
+                  if (sendName) {
+                     sendName = false;
+                     if (username != null) {
+                        if (verifyString(username, 0)) {
+                           output.println("U" + username);
+                           output.flush();
+                           waitForInput();
+                        }
+                        if (errors[0] == 0) {
+                           System.out.println("Valid username");
+                        } else {
+                           System.out.println("Error: " + errorMessages[errors[0]]);
+                        }
+                     }
+                  }
+                  if (testGame) {
+                     testGame = false;
+                     if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
+                        if (state == 3) {
+                           output.println("C" + attemptedGameName + " " + attemptedGamePassword);
+                        } else {
+                           output.println("J" + attemptedGameName + " " + attemptedGamePassword);
+                        }
                         output.flush();
                         waitForInput();
                      }
-                     if (errors[0] == 0) {
-                        System.out.println("Valid username");
+                     System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
+                     if ((errors[1] == 0) && (errors[2] == 0)) {
+                        System.out.println("Valid game");
                      } else {
-                        System.out.println("Error: " + errorMessages[errors[0]]);
+                        System.out.println("Error: " + errorMessages[errors[1]]);
+                        System.out.println("Error: " + errorMessages[errors[2]]);
                      }
                   }
-               }
-               if (testGame) {
-                  testGame = false;
-                  if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
-                     if (state == 3) {
-                        output.println("C" + attemptedGameName + " " + attemptedGamePassword);
-                     } else {
-                        output.println("J" + attemptedGameName + " " + attemptedGamePassword);
-                     }
+                  if (notifyReady) {
+                     notifyReady = false;
+                     output.println("R");
                      output.flush();
                      waitForInput();
                   }
-                  System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
-                  if ((errors[1] == 0) && (errors[2] == 0)) {
-                     System.out.println("Valid game");
-                  } else {
-                     System.out.println("Error: " + errorMessages[errors[1]]);
-                     System.out.println("Error: " + errorMessages[errors[2]]);
-                  }
-               }
-               if (notifyReady) {
-                  notifyReady = false;
-                  output.println("R");
-                  output.flush();
-                  waitForInput();
-               }
-               if (testingBegin) {
-                  username = Math.random() + "";
-                  myUser = new User(username);
-                  output.println("T" + username);//test
-                  output.flush();
-                  waitForInput();
-                  host = true;
-                  newState = 6;
-                  gameName = "";
-                  gamePassword = "";
-                  players = new Player[onlineList.size()];
-                  for (int i = 0; i < onlineList.size(); i++) {
-                     players[i] = new TestClass(onlineList.get(i).getUsername());
-                     if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                        myPlayer = players[i];
+                  if (testingBegin) {
+                     username = Math.random() + "";
+                     myUser = new User(username);
+                     output.println("T" + username);//test
+                     output.flush();
+                     waitForInput();
+                     host = true;
+                     newState = 6;
+                     gameName = "";
+                     gamePassword = "";
+                     players = new Player[onlineList.size()];
+                     for (int i = 0; i < onlineList.size(); i++) {
+                        players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+                        if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                           myPlayer = players[i];
+                        }
                      }
+                     testingBegin = false;
                   }
-                  testingBegin = false;
+                  repaintPanels();
                }
-               repaintPanels();
             } else {
                // TODO: Initialize map ONCE after game begin
 
@@ -386,14 +390,14 @@ public class Client extends JFrame implements WindowListener {
                errors[0] = Integer.parseInt(initializer + "");
                if (initializer == '0') {
                   //Start the opening here
-                  /*
+/*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
                   ((IntroPanel) (allPanels[1])).go();
                   try {
                      Thread.sleep(3000);
                   } catch (Exception E) {
                   }
-                  */
+*/
                   cardLayout.show(mainContainer, PANEL_NAMES[2]);
                   newState = 2;
                } else {
@@ -450,7 +454,7 @@ public class Client extends JFrame implements WindowListener {
          } else if (initializer == 'B') {
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               players[i] = new TestClass(onlineList.get(i).getUsername());
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
                }
@@ -632,8 +636,6 @@ public class Client extends JFrame implements WindowListener {
       private CustomButton backButton = new CustomButton("Back");
       private double introAlpha = 1;
 
-      private ArrayList<AshParticle> particles = new ArrayList<>();
-
       public MenuPanel() {
          //Setting up the size
          this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
@@ -762,7 +764,7 @@ public class Client extends JFrame implements WindowListener {
                testGame = true;
             }
          });
-         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 3 / 10 + 20 * scaling), (int) (130 * scaling), (int) (19 * scaling));
+         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 2 / 5, (int) (130 * scaling), (int) (19 * scaling));
          this.add(confirmButton);
          backButton.addActionListener((ActionEvent e) -> {
             newState = 2;
@@ -785,7 +787,7 @@ public class Client extends JFrame implements WindowListener {
          //Background
          g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
-         //g2.setFont(HEADER_FONT);
+         g2.setFont(HEADER_FONT);
          g2.drawString("Create Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Server")) / 2.0), MAX_Y / 5);
          //Server name
          g2.setFont(MAIN_FONT);
@@ -793,7 +795,7 @@ public class Client extends JFrame implements WindowListener {
          //Server password
          g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
          //Confirm button
-         //  g2.drawString("Confirm", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Confirm")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
+         //Draws particles
       }
    }
 
@@ -981,6 +983,7 @@ public class Client extends JFrame implements WindowListener {
             scaling = 1.0 * MAX_Y / DESIRED_Y;
          }
          MAIN_FONT = new Font("Cambria Math", Font.PLAIN, (int) (10 * scaling));
+         HEADER_FONT = new Font("Akura Popo", Font.PLAIN, (int) (20 * scaling));
       }
 
       public void initializeSize() {

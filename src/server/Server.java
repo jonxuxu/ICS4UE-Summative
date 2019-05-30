@@ -405,7 +405,7 @@ public class Server {
                                        if (initializer == 'M') {
                                           players[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
                                        } else if (initializer == 'S') {
-                                          players[i].setSpell(players[i].testSpell(Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
+                                          players[i].setSpell(players[i].castSpell(Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
                                           //The x y information about the spell is stored as thirdSplit[1] and [2]
                                        } else if (initializer == 'A') {
                                           players[i].autoAttack(Integer.parseInt(thirdSplit[0]),Integer.parseInt(thirdSplit[1]));
@@ -442,7 +442,6 @@ public class Server {
                      }
                   }
                   //Output will be here. The first loop generates the full message, the second distributes it
-
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         outputString[i].append(mainPlayer[i] + " ");
