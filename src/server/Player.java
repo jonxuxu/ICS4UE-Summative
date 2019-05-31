@@ -29,6 +29,7 @@ public abstract class Player extends User implements CanIntersect {
    private int health;
    private int attack;
    private int mobility;
+   private int maxMobility;
    private int range;
    private int spriteID;
    private int mouseX;
@@ -107,8 +108,10 @@ public abstract class Player extends User implements CanIntersect {
       for (int i = 0; i < gamePlayers.length; i++) {
          if (gamePlayers[i].getTeam() == this.team) {
             allies.add(gamePlayers[i]);
+            System.out.println("A");
          } else {
             enemies.add(gamePlayers[i]);
+            System.out.println("E");
          }
       }
    }
@@ -146,13 +149,15 @@ public abstract class Player extends User implements CanIntersect {
          illuminated = false;
          statuses.get(i).advance();
          Status removed = null;
+         mobility=maxMobility;
+         //TODO Adjust max mobility and mobility
          if (statuses.get(i).getRemainingDuration() <= 0) {
             removed = statuses.get(i);
          } else {
             if (statuses.get(i) instanceof Illuminated) {
                illuminated = true;//NOTE REE ILLUMINATED ALWAYS TRUE
             } else if (statuses.get(i) instanceof MSBuff) {
-               mobility += ((MSBuff) (statuses.get(i))).getStrength();
+               mobility = maxMobility + ((MSBuff) (statuses.get(i))).getStrength();
             } else if (statuses.get(i) instanceof Stun) {
                stunned = true;
             }
@@ -231,6 +236,10 @@ public abstract class Player extends User implements CanIntersect {
 
    public AOE getAOE(int i) {
       return aoes.get(i);
+   }
+
+   public ArrayList<AOE> getAllAOES() {
+      return aoes;
    }
 
    public void addAOE(AOE aoe) {
@@ -330,11 +339,12 @@ public abstract class Player extends User implements CanIntersect {
       this.maxHealth = maxHealth;
    }
 
-   public void setMobility(int mobility) {
-      this.mobility = mobility;
-   }
-
    public void setRange(int range) {
       this.range = range;
+   }
+
+   public void setMaxMobility(int maxMobility) {
+      this.maxMobility = maxMobility;
+      this.mobility = maxMobility;
    }
 }

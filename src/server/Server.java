@@ -236,6 +236,8 @@ public class Server {
                         }
                      }
                      stop = true;
+                  } else if (initializer == 'E') {
+                     myGame.setTeam(myUser, Integer.parseInt(inputString));
                   } else if (initializer == 'T') {
                      myUser = new User(inputString);
                      onlineUsers.add(myUser);
@@ -365,6 +367,10 @@ public class Server {
             for (int i = 0; i < allInput.length; i++) {
                allInput[i] = "";
             }
+            //Set the teams
+            for (Player myPlayer : players) {
+               myPlayer.sendInfo(players);
+            }
             while (!stopGame) {
                for (int i = 0; i < playerNum; i++) {
                   if (players[i] != null) {
@@ -424,13 +430,25 @@ public class Server {
                // Output to clients
                if (time.getFramePassed()) {
                   //Check to see if anything was added from disconnecting players. If this is true, then add a space
-                  String[] mainPlayer = new String[playerNum];
-                  String[] otherPlayers = new String[playerNum];
+                  StringBuilder[] mainPlayer = new StringBuilder[playerNum];
+                  StringBuilder[] otherPlayers = new StringBuilder[playerNum];
+                  StringBuilder projectileOutput = new StringBuilder();
+                  StringBuilder aoeOutput = new StringBuilder();
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
+                        mainPlayer[i] = new StringBuilder();
+                        otherPlayers[i] = new StringBuilder();
                         players[i].update();
-                        mainPlayer[i] = "P" + i + "," + players[i].getMainOutput(gameTick);
-                        otherPlayers[i] = "O" + i + "," + players[i].getOtherOutput();
+                        mainPlayer[i].append("P" + i + "," + players[i].getMainOutput(gameTick));
+                        otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
+                        ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
+                        ArrayList<AOE> theseAOES = players[i].getAllAOES();
+                        for (int j = 0; j < theseProjectiles.size(); j++) {
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY());
+                        }
+                        for (int j = 0; j < theseAOES.size(); j++) {
+                           aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius());
+                        }
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
@@ -452,31 +470,28 @@ public class Server {
                               }
                            }
                         }
+                        outputString[i].append(" ");//Place a space at the end
                      }
                   }
+                  //Write out all the projectiles
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        outputString[i].append(" ");
+                        if (!projectileOutput.toString().isEmpty()) {
+                           outputString[i].append(projectileOutput + " ");
+                        }
                      }
                   }
-                  StringBuilder projectileOutput= new StringBuilder();
+                  //Write out all the AOEs
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
-                        for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY());
+                        if (!aoeOutput.toString().isEmpty()) {
+                           outputString[i].append(aoeOutput + " ");
                         }
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        outputString[i].append(projectileOutput);
-                     }
-                  }
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
                         gameOutputs[i].println(outputString[i].toString().trim());
-
                         gameOutputs[i].flush();
                      }
                   }
@@ -498,6 +513,14 @@ public class Server {
             return true;
          } else {
             return false;
+         }
+      }
+
+      private void setTeam(User myUser, int teamNum) {
+         for (Player myPlayer : onlinePlayers) {
+            if (myPlayer.getUsername().equals(myUser.getUsername())) {
+               myPlayer.setTeam(teamNum);
+            }
          }
       }
 
