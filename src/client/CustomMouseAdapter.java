@@ -209,8 +209,8 @@ public class CustomMouseAdapter extends MouseAdapter {
    */
    public int[] getDispXy() { //Returns the displacement from the top left corner
       int[] dispXy = new int[2];
-      dispXy[0] = 475 + (int) ((xy[0] - centerXy[0]) / scaling);
-      dispXy[1] = 250 + (int) ((xy[1] - centerXy[1]) / scaling);
+      dispXy[0] = (int) ((xy[0] - centerXy[0]) / scaling);
+      dispXy[1] = (int) ((xy[1] - centerXy[1]) / scaling);
       return (dispXy);
    }
 
