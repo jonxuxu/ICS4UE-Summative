@@ -90,7 +90,9 @@ public class Client extends JFrame implements WindowListener {
    private FogMap fog;
    private boolean testingBegin = false;
    private double introScaling;
-   private ArrayList<AshParticle> particles = new ArrayList<>();
+   private ArrayList<AshParticle> particles = new ArrayList<AshParticle>();
+   private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+   private int[] centerXy = new int[2];
 
    public Client() {
       super("Dark");
@@ -168,7 +170,7 @@ public class Client extends JFrame implements WindowListener {
          //Start with entering the name. This must be separated from the rest
          //Username successfully entered in
          int fogTicks = 0;
-         Clock time = new Clock ();
+         Clock time = new Clock();
          while (connected) {
             //Otherwise, continue to send messages. The lines below are for when something is going to be sent
             if (!gameBegin) {
@@ -255,7 +257,6 @@ public class Client extends JFrame implements WindowListener {
             } else {
                // TODO: Initialize map ONCE after game begin
 
-
                if (input.ready()) {
                   decipherInput(input.readLine());//read input
                   //This is where everything is output. Output the key controls
@@ -277,7 +278,9 @@ public class Client extends JFrame implements WindowListener {
                      for (int i = 0; i < players.length; i++) {
                         // TODO: Separate by teams
                         // TODO: Account for players that quit?
-                        fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
+                        if (players[i] != null) {
+                           fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
+                        }
                      }
                      fogTicks = 0;
                   }
@@ -304,6 +307,7 @@ public class Client extends JFrame implements WindowListener {
                   if (myMouseAdapter.getPressed()) {
                      if (myMouseAdapter.getLeftRight()[0]) {
                         outputString.append("A" + xyPos[0] + "," + xyPos[1] + " ");
+                        System.out.println(xyPos[0] + " " + xyPos[1]);
                      }
                      if (myMouseAdapter.getLeftRight()[1]) {
                         outputString.append("F" + xyPos[0] + "," + xyPos[1] + " ");
@@ -469,6 +473,7 @@ public class Client extends JFrame implements WindowListener {
             newState = 2;
          }
       } else {
+         projectiles.clear();
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
             char initializer = firstInput.charAt(0);
@@ -507,9 +512,10 @@ public class Client extends JFrame implements WindowListener {
                      for (int j = 8; j < 8 + Integer.parseInt(thirdSplit[8]); j++) {
                         players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
                      }
-
                   } else if (initializer == 'D') {
                      players[Integer.parseInt(thirdSplit[0])] = null;
+                  } else if (initializer == 'R') {
+                     projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling)));
                   }
                }
             }
@@ -711,8 +717,8 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          //Adds particles
-         if(Math.random() < 0.2){
-            particles.add(new AshParticle(Math.random()*MAX_X + MAX_X/20, 0, (int)((Math.random()*3+3)*scaling), MAX_Y));
+         if (Math.random() < 0.2) {
+            particles.add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) * scaling), MAX_Y));
          }
          //Draws particles
          for (int i = 0; i < particles.size(); i++) {
@@ -1009,7 +1015,6 @@ public class Client extends JFrame implements WindowListener {
       private Area largeRing;
       private Polygon BOTTOM_BAR = new Polygon();
       private Rectangle drawArea;
-      private int[] centerXy = new int[2];
       private BufferedImage fogMap;
 
 
@@ -1052,7 +1057,9 @@ public class Client extends JFrame implements WindowListener {
             centerXy[0] = (int) (DESIRED_X * scaling / 2);
             centerXy[1] = (int) (DESIRED_Y * scaling / 2);
             try {
+               long time = System.nanoTime();
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
+               System.out.println(System.nanoTime() - time);
                /*
                sectors = new Sector[1000][1000];
                for (int i = 0; i < 1000; i++) {
@@ -1102,7 +1109,9 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             // System.out.println(System.nanoTime() - time);
-
+            for (Projectile currentProjectile : projectiles) {
+               currentProjectile.draw(g2);
+            }
 
             g2.setColor(new Color(165, 156, 148));
             //Minimap

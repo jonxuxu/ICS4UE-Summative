@@ -4,6 +4,6 @@ class SafeMarksmanQProjectile extends Projectile{
   private static int RANGE = 300;
   SafeMarksmanQProjectile(int spawnX, int spawnY, int targetX, int targetY){
     super(spawnX, spawnY, targetX, targetY, SPEED, RANGE);
-    System.out.println(SPEED);
+    setID(2);
   }
 }

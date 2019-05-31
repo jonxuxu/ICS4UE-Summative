@@ -408,9 +408,9 @@ public class Server {
                                           players[i].setSpell(players[i].castSpell(Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
                                           //The x y information about the spell is stored as thirdSplit[1] and [2]
                                        } else if (initializer == 'A') {
-                                          players[i].autoAttack(Integer.parseInt(thirdSplit[0]),Integer.parseInt(thirdSplit[1]));
+                                          players[i].autoAttack(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
                                        } else if (initializer == 'F') {
-                                          players[i].flare(Integer.parseInt(thirdSplit[0]),Integer.parseInt(thirdSplit[1]));
+                                          players[i].flare(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
                                        }
                                     }
                                  }
@@ -452,6 +452,25 @@ public class Server {
                               }
                            }
                         }
+                     }
+                  }
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        outputString[i].append(" ");
+                     }
+                  }
+                  StringBuilder projectileOutput= new StringBuilder();
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
+                        for (int j = 0; j < theseProjectiles.size(); j++) {
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY());
+                        }
+                     }
+                  }
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        outputString[i].append(projectileOutput);
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
