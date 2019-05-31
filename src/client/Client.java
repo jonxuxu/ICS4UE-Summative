@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -146,7 +147,10 @@ public class Client extends JFrame implements WindowListener {
       ((IntermediatePanel) (allPanels[7])).initializeSize();
 
       // Setting up fog (should be moved soon TM)
-      fog = new FogMap(1000, 1000);
+      int[] xy = {300, 300};
+       fog = new FogMap(xy, scaling);
+      // TODO: Set player spawn xy later
+      // myPlaer.getXy();
    }
 
    public static void main(String[] args) {
@@ -266,18 +270,6 @@ public class Client extends JFrame implements WindowListener {
 
                   xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0]; //Make it for hover
                   xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
-
-                  // Updating fog
-                  if (fogTicks > 30) { //50 frames or 0.5 seconds @ 100fps
-                     fog.age();
-                     for (int i = 0; i < players.length; i++) {
-                        // TODO: Separate by teams
-                        // TODO: Account for players that quit?
-                        fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
-                     }
-                     fogTicks = 0;
-                  }
-                  fogTicks++;
 
 
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
@@ -1008,6 +1000,7 @@ public class Client extends JFrame implements WindowListener {
       private Rectangle drawArea;
       private int[] centerXy = new int[2];
       private BufferedImage fogMap;
+      private int fogTicks = 0;
 
 
       public GamePanel() {
@@ -1074,23 +1067,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-            //Sectors
-            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
-            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
-            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
-            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
 
-            //long time = System.nanoTime();
-            /*
-            for (int i = startY; i < finalY; i++) {
-               for (int j = startX; j < finalX; j++) {
-                  if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
-                     sectors[j][i].setFog(fog.getSingleFog(j, i));
-                     sectors[j][i].drawSector(g2, myPlayer.getXy());
-                  }
-               }
-            }
-            */
             g2.drawImage(sheet, (int) (centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (10000 * scaling), (int) (10000 * scaling), null);
             //Game player
             for (Player currentPlayer : players) {
@@ -1100,6 +1077,25 @@ public class Client extends JFrame implements WindowListener {
             }
             // System.out.println(System.nanoTime() - time);
 
+
+            // Updating fog
+            //fog.age();
+            for (int i = 0; i < players.length; i++) {
+               // TODO: Separate by teams
+               // TODO: Account for players that quit?
+               fog.scout(players[i].getXy());
+            }
+
+            // Draws fog
+            AffineTransform tx = new AffineTransform();
+            tx.translate(centerXy[0] - myPlayer.getXy()[0] * scaling, centerXy[1] - myPlayer.getXy()[1] * scaling);
+            Area darkFog = fog.getFog().createTransformedArea(tx);
+            Area lightFog = fog.getExplored().createTransformedArea(tx);
+
+            g2.setColor(Color.black); //Unexplored
+            g2.fill(darkFog);
+            g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
+            g2.fill(lightFog);
 
             g2.setColor(new Color(165, 156, 148));
             //Minimap
@@ -1121,27 +1117,24 @@ public class Client extends JFrame implements WindowListener {
             g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
             g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
             g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+            //Sectors
+            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
+            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
+            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
+            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
 
-
-            // Draws fog
-         /*
-            for (int i = -MAX_X / 2; i < MAX_X / 2; i += 10 * scaling) { // In units of screen pixels
-               for (int j = -MAX_Y / 2; j < MAX_Y / 2; j += 10 * scaling) {
-                  int mapX = (myPlayer.getXy()[0] + (int) (i / scaling)) / 10; // In units of fog map
-                  int mapY = (myPlayer.getXy()[1] + (int) (j / scaling)) / 10;
-                  if (mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY < 1000) { // If within bounds of fog
-                     int fogValue = fog.getFog()[mapY][mapX];
-                     if (fogValue == 0) { // Unexplored
-                        g2.setColor(Color.black);
-                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
-                     } else if (fogValue == 1) { // Explored but not actively viewed
-                        g2.setColor(new Color(0, 0, 0, 128));
-                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
-                     }
+/*
+            for (int i = startY; i < finalY; i++) {
+               for (int j = startX; j < finalX; j++) {
+                  if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
+                     sectors[j][i].drawFog(g2,myPlayer.getXy(),fog.getSingleFog(j, i));
+                     sectors[j][i].drawSector(g2, myPlayer.getXy());
                   }
                }
             }
-         */
+*/
+
+
          }
          g2.dispose();
       }

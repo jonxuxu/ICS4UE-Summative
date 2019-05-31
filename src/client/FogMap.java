@@ -1,58 +1,48 @@
 package client;
 
+import javafx.scene.shape.Circle;
+import sun.java2d.loops.FillRect;
+
 import javax.imageio.ImageIO;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.*;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
 
 public class FogMap {
-   int[][] fog;
-   boolean[][] currentlyExploring;
+   private Area fogShape;
+   private Area viewedShape;
+   private Area activelyViewing;
+   private double scaling;
+   private static double fogRadius = 150;
 
-   FogMap(int y, int x) {
-      fog = new int[y][x];
-      currentlyExploring = new boolean[y][x];
+   FogMap(int[] xy, double scaling) {
+      //fog = new int[y][x];
+      //currentlyExploring = new boolean[y][x];
+      this.scaling = scaling;
+
+      double x = xy[0] * scaling;
+      double y = xy[1] * scaling;
+      fogShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      activelyViewing = new Area(new Ellipse2D.Double(x, y, fogRadius*scaling, fogRadius*scaling));
    }
 
-   public void age() {
-      for (int i = 0; i < fog.length; i++) {
-         for (int j = 0; j < fog[i].length; j++) {
-            if (fog[i][j] == 2 && !currentlyExploring[i][j]) {
-               fog[i][j] = 1;
-            }
-            currentlyExploring[i][j] = false;
-         }
-      }
+   public void scout(int[] xy) {
+      Area circle = new Area(new Ellipse2D.Double((xy[0]-fogRadius)*scaling, (xy[1]-fogRadius) *scaling, 2*fogRadius*scaling, 2*fogRadius*scaling));
+      activelyViewing.add(circle);
    }
 
-   public void scout(int y, int x) {
-      updateFog(y, x, 5);
+   public Area getFog() {
+      fogShape.subtract(activelyViewing);
+      return(fogShape);
    }
 
-   private void updateFog(int y, int x, int distanceLeft) {
-      // TODO: Implement obstructions
-
-      if (distanceLeft > 0) {
-         for (int i = -2; i <= 2; i++) {
-            for (int j = -2; j <= 2; j++) {
-               if (i + j != 4 && i - j != 4) { // Searches in a rounded square shape (3, 5, 5, 5, 3)
-                  if (y + i >= 0 && y + i < fog.length && x + j >= 0 && x + j < fog.length) {
-                     fog[y + i][x + j] = 2;
-                     currentlyExploring[y + i][x + j] = true;
-                     updateFog(y + i, j + x, distanceLeft - 1);
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   public int[][] getFog() {
-      return fog;
-   }
-
-   public int getSingleFog(int x, int y) {
-      return (fog[y][x]);
+   public Area getExplored(){
+      viewedShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      viewedShape.subtract(fogShape);
+      viewedShape.subtract(activelyViewing);
+      activelyViewing.reset();
+      return viewedShape;
    }
 }
