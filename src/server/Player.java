@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * @since 2019-04-24
  */
 
-public abstract class Player extends User implements CanIntersect{
+public abstract class Player extends User implements CanIntersect {
    //Constants
    private int ID;
    private double[] xy = {300, 300};
@@ -29,6 +29,7 @@ public abstract class Player extends User implements CanIntersect{
    private int health;
    private int attack;
    private int mobility;
+   private int maxMobility;
    private int range;
    private int spriteID;
    private int mouseX;
@@ -42,10 +43,9 @@ public abstract class Player extends User implements CanIntersect{
    private int team;
    private ArrayList<Player> allies = new ArrayList<Player>();
    private ArrayList<Player> enemies = new ArrayList<Player>();
-   private int x,y = 300;
    private int autoSpeed = 10;//REE
    private int autoRange;//REE
-   private Rectangle hitbox = new Rectangle(x,y,50,50);
+   private Rectangle hitbox = new Rectangle(((int) (xy[0])), ((int) (xy[1])), 50, 50);
    private boolean illuminated = false;
    private boolean stunned = false;
 
@@ -62,8 +62,10 @@ public abstract class Player extends User implements CanIntersect{
    }
 
    public void addXy(double xDisp, double yDisp) {
-      this.xy[0] += xDisp;
-      this.xy[1] += yDisp;
+      if (!stunned) {
+         xy[0] += xDisp;
+         xy[1] += yDisp;
+      }
    }
 
    public void setSpell(boolean spell, int spellIndex) {
@@ -100,40 +102,40 @@ public abstract class Player extends User implements CanIntersect{
       }
       return outputString.toString();
    }
+
    //May 25
-   public void sendInfo(Player[] gamePlayers){
-      for (int i = 0; i < gamePlayers.length; i++){
-         if (gamePlayers[i].getTeam() == this.team){
+   public void sendInfo(Player[] gamePlayers) {
+      for (int i = 0; i < gamePlayers.length; i++) {
+         if (gamePlayers[i].getTeam() == this.team) {
             allies.add(gamePlayers[i]);
+            System.out.println("A");
          } else {
             enemies.add(gamePlayers[i]);
+            System.out.println("E");
          }
       }
    }
-   public void autoAttack(int mouseX, int mouseY){
-      if (!stunned){
-         projectiles.add(new AutoProjectile(x,y,mouseX,mouseY,autoSpeed,range));
+
+   public void autoAttack(int mouseX, int mouseY) {
+      if (!stunned) {
+         projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
+         //Check for this
       }
    }
-   public void flare(int mouseX, int mouseY){
-      if (!stunned){
-         projectiles.add(new FlareProjectile(x,y,mouseX,mouseY));
+
+   public void flare(int mouseX, int mouseY) {
+      if (!stunned) {
+         projectiles.add(new FlareProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY));
       }
    }
-   public void move(double angle){
-      if (!stunned){
-         x += mobility * Math.cos(angle);
-         y += mobility * Math.sin(angle);
-      }
-   }
-   
+
    public abstract void update();
 
-   public void damage(int damage){
-      if (shields.isEmpty()){
+   public void damage(int damage) {
+      if (shields.isEmpty()) {
          health -= damage;
       } else {
-         if (shields.get(0).getStrength() - damage > 0){
+         if (shields.get(0).getStrength() - damage > 0) {
             shields.get(0).damage(damage);
          } else {
             health -= damage - shields.get(0).getStrength();
@@ -142,59 +144,69 @@ public abstract class Player extends User implements CanIntersect{
       }
    }
 
-   public void updateStatuses(){
-      for (int i = statuses.size()-1; i >= 0; i--){
+   public void updateStatuses() {
+      for (int i = statuses.size() - 1; i >= 0; i--) {
          illuminated = false;
          statuses.get(i).advance();
          Status removed = null;
-         if (statuses.get(i).getRemainingDuration() <= 0){
+         mobility=maxMobility;
+         //TODO Adjust max mobility and mobility
+         if (statuses.get(i).getRemainingDuration() <= 0) {
             removed = statuses.get(i);
          } else {
-            if (statuses.get(i) instanceof Illuminated){
+            if (statuses.get(i) instanceof Illuminated) {
                illuminated = true;//NOTE REE ILLUMINATED ALWAYS TRUE
-            } else if (statuses.get(i) instanceof MSBuff){
-               mobility += ((MSBuff)(statuses.get(i))).getStrength();
-            } else if (statuses.get(i) instanceof Stun){
+            } else if (statuses.get(i) instanceof MSBuff) {
+               mobility = maxMobility + ((MSBuff) (statuses.get(i))).getStrength();
+            } else if (statuses.get(i) instanceof Stun) {
                stunned = true;
             }
          }
       }
    }
 
-   public Area getHitbox(){
-      hitbox.setLocation(x,y);
+   public Area getHitbox() {
+      hitbox.setLocation(((int) (xy[0])), ((int) (xy[1])));
       return new Area(hitbox);
    }
 
-   public int getTeam(){
+   public int getTeam() {
       return team;
    }
-   public void setTeam(int team){
+
+   public void setTeam(int team) {
       this.team = team;
    }
-   public int getX(){
-      return x;
+
+   public int getX() {
+      return ((int) (xy[0]));
    }
-   public int getY(){
-      return y;
+
+   public int getY() {
+      return ((int) (xy[1]));
    }
-   public void setX(int x){
-      this.x = x;
+
+   public void setX(int x) {
+      xy[0] = x;
    }
-   public void setY(int y){
-      this.y = y;
+
+   public void setY(int y) {
+      xy[1] = y;
    }
-   public int getMouseX(){
+
+   public int getMouseX() {
       return mouseX;
    }
-   public int getMouseY(){
+
+   public int getMouseY() {
       return mouseY;
    }
 
-   public boolean getStunned(){
+   public boolean getStunned() {
       return stunned;
    }
-   public boolean getIlluminated(){
+
+   public boolean getIlluminated() {
       return illuminated;
    }
   /*
@@ -202,71 +214,94 @@ public abstract class Player extends User implements CanIntersect{
    this.illuminated = illuminated;
    }*/
 
-   public Projectile getProjectile(int i){
+   public Projectile getProjectile(int i) {
       return projectiles.get(i);
    }
-   public void addProjectile(Projectile projectile){
+
+   public ArrayList<Projectile> getAllProjectiles() {
+      return projectiles;
+   }
+
+   public void addProjectile(Projectile projectile) {
       projectiles.add(projectile);
    }
-   public Projectile removeProjectile(int i){
+
+   public Projectile removeProjectile(int i) {
       return projectiles.remove(i);
    }
-   public int getProjectilesSize(){
+
+   public int getProjectilesSize() {
       return projectiles.size();
    }
 
-   public AOE getAOE(int i){
+   public AOE getAOE(int i) {
       return aoes.get(i);
    }
-   public void addAOE(AOE aoe){
+
+   public ArrayList<AOE> getAllAOES() {
+      return aoes;
+   }
+
+   public void addAOE(AOE aoe) {
       aoes.add(aoe);
    }
-   public AOE removeAOE(int i){
+
+   public AOE removeAOE(int i) {
       return aoes.remove(i);
    }
-   public int getAOESize(){
+
+   public int getAOESize() {
       return aoes.size();
    }
 
-   public Status getStatus(int i){
+   public Status getStatus(int i) {
       return statuses.get(i);
    }
-   public void addStatus(Status status){
+
+   public void addStatus(Status status) {
       statuses.add(status);
    }
-   public Status removeStatus(int i){
+
+   public Status removeStatus(int i) {
       return statuses.remove(i);
    }
-   public int getStatusesSize(){
+
+   public int getStatusesSize() {
       return statuses.size();
    }
 
-   public Shield getShield(int i){
+   public Shield getShield(int i) {
       return shields.get(i);
    }
-   public void addShield(Shield shield){
+
+   public void addShield(Shield shield) {
       shields.add(shield);
    }
-   public Shield removeShield(int i){
+
+   public Shield removeShield(int i) {
       return shields.remove(i);
    }
-   public int getShieldsSize(){
+
+   public int getShieldsSize() {
       return shields.size();
    }
 
-   public Player getEnemy(int i){
+   public Player getEnemy(int i) {
       return enemies.get(i);
    }
-   public int getEnemiesSize(){
+
+   public int getEnemiesSize() {
       return enemies.size();
    }
 
-   public Player getAlly(int i){
+   public Player getAlly(int i) {
       return allies.get(i);
    }
-   public int getAlliesSize(){
+
+   public int getAlliesSize() {
       return allies.size();
    }
+
    //////////////////////////////////////////////////////////////////////////
    public abstract boolean castSpell(int spellIndex);
 
@@ -304,11 +339,12 @@ public abstract class Player extends User implements CanIntersect{
       this.maxHealth = maxHealth;
    }
 
-   public void setMobility(int mobility) {
-      this.mobility = mobility;
-   }
-
    public void setRange(int range) {
       this.range = range;
+   }
+
+   public void setMaxMobility(int maxMobility) {
+      this.maxMobility = maxMobility;
+      this.mobility = maxMobility;
    }
 }

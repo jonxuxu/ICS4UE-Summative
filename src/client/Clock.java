@@ -15,7 +15,7 @@ public class Clock {
    private long oldTime;
    private long currentTime;
    //Indicate frames per second
-   private final long DELTA_LIMIT = 50;//Every time this much time elapses, a frame is passed
+   private final long DELTA_LIMIT = 20;//Every time this much time elapses, a frame is passed
 
    /**
     * Sets the instance variables upon creation

@@ -18,13 +18,13 @@ public class SafeMarksman extends Player{
   private static int MS_BUFF_STRENGTH = 3;
   private static int MS_BUFF_DURATION = 100;
   private static int STUN_DURATION = 100;
-  
+
   SafeMarksman(String username) {
     super(username);
     setMaxHealth(300);
     setHealth(300);
     setAttack(100);
-    setMobility(10);
+    setMaxMobility(10);
     setRange(300);
   }
 
@@ -88,7 +88,7 @@ public class SafeMarksman extends Player{
         addAOE(new FlareAOE(removed.getX(), removed.getY()));
       }
     }
-    
+
     //Update AOEs
     for (int i = getAOESize()-1; i >= 0; i--){
       getAOE(i).advance();
@@ -145,9 +145,9 @@ public class SafeMarksman extends Player{
         }
       }
     }
-    
+
     updateStatuses();
-    
+
     for (int i = getShieldsSize()-1; i >= 0; i--){
       getShield(i).advance();
       Shield removed = null;
@@ -161,7 +161,7 @@ public class SafeMarksman extends Player{
       }
     }
   }
-  
+
   @Override
   public void damage(int damage){
     if (getShieldsSize() == 0){
