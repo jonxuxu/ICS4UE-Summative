@@ -2,6 +2,7 @@ package client;
 
 import client.map.FogMap;
 import client.particle.AshParticle;
+import client.sound.soundEffectManager;
 import client.ui.CustomTextField;
 import client.ui.IntroPanel;
 
@@ -102,6 +103,7 @@ public class Client extends JFrame implements WindowListener {
    private int[] centerXy = new int[2];
    private int myTeam;
    private boolean teamChosen = false;
+   private soundEffectManager soundEffect = new soundEffectManager();
 
    public Client() {
       super("Dark");
@@ -307,10 +309,11 @@ public class Client extends JFrame implements WindowListener {
                      outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
                   }
                   if (myMouseAdapter.getPressed()) {
-                     if (myMouseAdapter.getLeftRight()[0]) {
+                     if (myMouseAdapter.getLeftRight()[0]) { // There might be a better way
                         outputString.append("A" + xyPos[0] + "," + xyPos[1] + " ");
                      }
                      if (myMouseAdapter.getLeftRight()[1]) {
+                        soundEffect.playSound("cow");
                         outputString.append("F" + xyPos[0] + "," + xyPos[1] + " ");
                      }
                   }
