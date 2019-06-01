@@ -22,12 +22,13 @@ public abstract class Player extends User implements CanIntersect {
    private boolean spells[] = new boolean[3];
    private boolean artifact = false;
    private boolean damaged = false;
+   private ArrayList<Status> allStatus = new ArrayList<Status>();
    private int gold = 0;
    private int maxHealth;
    private int health;
    private int attack;
    private int mobility;
-   //private int maxMobility;
+   private int maxMobility;
    private int range;
    private int spriteID;
    private int mouseX;
@@ -46,7 +47,6 @@ public abstract class Player extends User implements CanIntersect {
    private Rectangle hitbox = new Rectangle(((int) (xy[0])), ((int) (xy[1])), 50, 50);
    private boolean illuminated = false;
    private boolean stunned = false;
-   private boolean invisible = false;
 
    Player(String username) {
       super(username);
@@ -88,9 +88,9 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append(artifact + "," + gold + ",");//General
       outputString.append(spriteID + ",");//Sprite
       outputString.append(getSpellPercent(0) + "," + getSpellPercent(1) + "," + getSpellPercent(2) + ",");//Spells
-      outputString.append(damaged + "," + statuses.size());
-      for (int i = 0; i < statuses.size(); i++) {
-         outputString.append("," + statuses.get(i)); //Status exclusive
+      outputString.append(damaged + "," + allStatus.size());
+      for (int i = 0; i < allStatus.size(); i++) {
+         outputString.append("," + allStatus.get(i)); //Status exclusive
       }
       return outputString.toString();
    }
@@ -101,9 +101,9 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append(health + "," + maxHealth + ",");//stats
       outputString.append(artifact + ",");//General
       outputString.append(spriteID + ",");//Sprite
-      outputString.append(damaged + "," + statuses.size());
-      for (int i = 0; i < statuses.size(); i++) {
-         outputString.append("," + statuses.get(i)); //Status exclusive
+      outputString.append(damaged + "," + allStatus.size());
+      for (int i = 0; i < allStatus.size(); i++) {
+         outputString.append("," + allStatus.get(i)); //Status exclusive
       }
       return outputString.toString();
    }
@@ -112,7 +112,7 @@ public abstract class Player extends User implements CanIntersect {
    public void sendInfo(Player[] gamePlayers) {
       for (int i = 0; i < gamePlayers.length; i++) {
          if (gamePlayers[i].getTeam() == this.team) {
-            allies.add(gamePlayers[i]);//YOU ARE YOUR OWN ALLY!
+            allies.add(gamePlayers[i]);
             System.out.println("A");
          } else {
             enemies.add(gamePlayers[i]);
@@ -133,15 +133,6 @@ public abstract class Player extends User implements CanIntersect {
          projectiles.add(new FlareProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY));
       }
    }
-   
-   public void launch(int targetX, int targetY, int speed, int range){
-     double theta = Math.atan2(targetY-xy[1],targetX-xy[0]);
-     double dx = speed * Math.cos(theta);
-     double dy = speed * Math.sin(theta);
-     int totalTime = (int)Math.round(range*1.0/speed);
-     statuses.add(new Launched(dx, dy, totalTime));
-     statuses.add(new Stun(totalTime));
-   }
 
    public abstract void update();
 
@@ -158,58 +149,31 @@ public abstract class Player extends User implements CanIntersect {
       }
    }
 
-   public void updateStatuses(){
-    for (int i = statuses.size()-1; i >= 0; i--){
-      illuminated = false;
-      statuses.get(i).advance();
-      Status removed = null;
-      if (statuses.get(i).getRemainingDuration() <= 0){
-        removed = statuses.get(i);
-        if (removed instanceof TimeMageQ){
-          addAOE(new TimeMageQAOE(((TimeMageQ)removed).getX(), ((TimeMageQ)removed).getY(), ((TimeMageQ)removed).getTargetX(), ((TimeMageQ)removed).getTargetY()));
-        } else if (removed instanceof TimeMageE){
-          setX(((TimeMageE)removed).getX());
-          setY(((TimeMageE)removed).getY());
-        }
-      } else {
-        applyStatus(statuses.get(i));
+   public void updateStatuses() {
+      for (int i = statuses.size() - 1; i >= 0; i--) {
+         illuminated = false;
+         statuses.get(i).advance();
+         Status removed = null;
+         mobility = maxMobility;
+         //TODO Adjust max mobility and mobility
+         if (statuses.get(i).getRemainingDuration() <= 0) {
+            removed = statuses.get(i);
+         } else {
+            if (statuses.get(i) instanceof Illuminated) {
+               illuminated = true;//NOTE REE ILLUMINATED ALWAYS TRUE
+            } else if (statuses.get(i) instanceof MSBuff) {
+               mobility = maxMobility + ((MSBuff) (statuses.get(i))).getStrength();
+            } else if (statuses.get(i) instanceof Stun) {
+               stunned = true;
+            }
+         }
       }
-    }
-  }
-  
-  public void applyStatus(Status status){
-    ArrayList<Class> buffBlacklist = new ArrayList<Class>();
-    boolean blacklisted = false;
-    if ((status instanceof Illuminated) && (!invisible)){
-      illuminated = true;
-    } else if (status instanceof MSBuff){
-      for (int i = 0; i < buffBlacklist.size(); i++){
-        if (status.getClass().equals(buffBlacklist.get(i))){
-          blacklisted = true;
-        }
-      }
-      if (!blacklisted){
-        mobility += ((MSBuff)(status)).getStrength();
-        buffBlacklist.add(status.getClass());
-      }
-    } else if (status instanceof Stun){
-      stunned = true;
-    } else if (status instanceof Launched){
-      xy[0] += ((Launched)(status)).getDX();
-      xy[1] += ((Launched)(status)).getDY();
-    } else if (status instanceof Invisible){
-      invisible = true;
-      illuminated = false;
-    }
-  }
+   }
 
-  public Area getHitbox() {
-    hitbox.setLocation(((int) (xy[0])), ((int) (xy[1])));
-    return new Area(hitbox);
-  }
-  public boolean contains(int x, int y){
-    return hitbox.contains(x,y);
-  }
+   public Area getHitbox() {
+      hitbox.setLocation(((int) (xy[0])), ((int) (xy[1])));
+      return new Area(hitbox);
+   }
 
    public int getTeam() {
       return team;
@@ -383,13 +347,9 @@ public abstract class Player extends User implements CanIntersect {
    public void setRange(int range) {
       this.range = range;
    }
-   
-   public void setMobility(int mobility){
-     this.mobility = mobility;
-   }
-   /*
+
    public void setMaxMobility(int maxMobility) {
       this.maxMobility = maxMobility;
       this.mobility = maxMobility;
-   }*/
+   }
 }
