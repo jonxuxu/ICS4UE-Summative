@@ -38,9 +38,9 @@ public class SafeMarksman extends Player{
           addShield(new SafeMarksmanEShield());
         }else {//Space
           addAOE(new SafeMarksmanSpaceAOE1(getX(), getY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
-          System.out.println("First AOE made at " + getX() + "," + getY());
+          //System.out.println("First AOE made at " + getX() + "," + getY());
           addAOE(new SafeMarksmanSpaceAOE2(getMouseX(), getMouseY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
-          System.out.println("Second AOE made at " + getMouseX() + "," + getMouseY());
+          //System.out.println("Second AOE made at " + getMouseX() + "," + getMouseY());
         }
         return true;
       } else {
@@ -105,24 +105,25 @@ public class SafeMarksman extends Player{
       if (getAOE(i).getRemainingDuration() <= 0){
         removed = removeAOE(i);
         if (removed instanceof SafeMarksmanSpaceAOE2){
-          System.out.println("AOE Removed");
+          //System.out.println("AOE Removed");
           for (int j = 0; j < getAlliesSize(); j++){
             for (int k = 0; k < getAlly(j).getStatusesSize(); k++){
               if (getAlly(j).getStatus(k) instanceof SafeMarksmanInTPCircle){
-                System.out.println("TP from " + getAlly(j).getX() + "," + getAlly(j).getY() + " to " + removed.getX() + "," + removed.getY());
+                //System.out.println("TP from " + getAlly(j).getX() + "," + getAlly(j).getY() + " to " + removed.getX() + "," + removed.getY());
                 getAlly(j).setX(removed.getX());
                 getAlly(j).setY(removed.getY());
               }
             }
           }
+          /*
           //NEW STUFF
           for (int k = 0; k < getStatusesSize(); k++){
             if (getStatus(k) instanceof SafeMarksmanInTPCircle){
-              System.out.println("TP from " + getX() + "," + getY() + " to " + removed.getX() + "," + removed.getY());
+              //System.out.println("TP from " + getX() + "," + getY() + " to " + removed.getX() + "," + removed.getY());
               setX(removed.getX());
               setY(removed.getY());
             }
-          }
+          }*/ //Ally of self
         }
       } else {
         if (getAOE(i) instanceof FlareAOE){
@@ -148,14 +149,15 @@ public class SafeMarksman extends Player{
             if (getAOE(i).collides(getAlly(j))){
               getAlly(j).addStatus(new Illuminated(2));//REE
               getAlly(j).addStatus(new SafeMarksmanInTPCircle());
-              System.out.println("Ally Afflicted");
+              //System.out.println("Ally Afflicted");
             }
           }
+          /*
           if (getAOE(i).collides(this)){
             addStatus(new Illuminated(2));//REE
             addStatus(new SafeMarksmanInTPCircle());
-            System.out.println("Self Afflicted");
-          }
+            //System.out.println("Self Afflicted");
+          }*///Self ally
         } else if (getAOE(i) instanceof SafeMarksmanSpaceAOE2){
           for (int j = 0; j < getEnemiesSize(); j++){
             if (getAOE(i).collides(getEnemy(j))){

@@ -136,6 +136,7 @@ public class TimeMage extends Player{
               }
             }
           }
+          /*
           for (int k = 0; k < qBlacklist.size(); k++){
             if (this != qBlacklist.get(k)){
               if (getAOE(i).collides(this)){
@@ -143,7 +144,7 @@ public class TimeMage extends Player{
                 qBlacklist.add(this);
               }
             }
-          }
+          }*/
         }
       }
     }
