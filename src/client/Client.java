@@ -1,15 +1,21 @@
 package client;
 
+import client.map.FogMap;
+import client.particle.AshParticle;
+import client.sound.soundEffectManager;
+import client.ui.CustomTextField;
+import client.ui.IntroPanel;
+
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -21,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Random;
 
 /*
 Here is how the messages work.
@@ -100,6 +105,7 @@ public class Client extends JFrame implements WindowListener {
    private int myTeam;
    private boolean teamChosen = false;
    private int[] xyAdjust = new int[2];
+   private soundEffectManager soundEffect = new soundEffectManager();
 
    public Client() {
       super("Dark");
@@ -157,7 +163,10 @@ public class Client extends JFrame implements WindowListener {
       ((IntermediatePanel) (allPanels[7])).initializeSize();
 
       // Setting up fog (should be moved soon TM)
-      fog = new FogMap(1000, 1000);
+      int[] xy = {300, 300};
+      fog = new FogMap(xy, scaling);
+      // TODO: Set player spawn xy later
+      // myPlaer.getXy();
    }
 
    public static void main(String[] args) {
@@ -286,21 +295,6 @@ public class Client extends JFrame implements WindowListener {
                   xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0]; //Make it for hover
                   xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
 
-                  // Updating fog
-                  if (fogTicks > 30) { //50 frames or 0.5 seconds @ 100fps
-                     fog.age();
-                     for (int i = 0; i < players.length; i++) {
-                        // TODO: Separate by teams
-                        // TODO: Account for players that quit?
-                        if (players[i] != null) {
-                           fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
-                        }
-                     }
-                     fogTicks = 0;
-                  }
-                  fogTicks++;
-
-
                   //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
                   //must add the mouse adapter to the JPanel.
 
@@ -325,6 +319,7 @@ public class Client extends JFrame implements WindowListener {
                         System.out.println("1w");
                      }
                      if (myMouseAdapter.getLeftRight()[1]) {
+                        soundEffect.playSound("cow");
                         outputString.append("F" + " ");
                         System.out.println("2wwwdw");
                      }
@@ -615,7 +610,7 @@ public class Client extends JFrame implements WindowListener {
 
    private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
-      private CustomTextField nameField = new CustomTextField(3);
+      private CustomTextField nameField = new CustomTextField(3, scaling);
       private CustomButton testButton = new CustomButton("Test");
 
       public LoginPanel() {
@@ -772,8 +767,8 @@ public class Client extends JFrame implements WindowListener {
 
    private class CreatePanel extends JPanel { //State =3
       private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3);
-      private CustomTextField gamePasswordField = new CustomTextField(3);
+      private CustomTextField gameNameField = new CustomTextField(3, scaling);
+      private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
       private CustomButton backButton = new CustomButton("Back");
       private CustomButton confirmButton = new CustomButton("Confirm Game");
 
@@ -845,8 +840,8 @@ public class Client extends JFrame implements WindowListener {
 
    private class JoinPanel extends JPanel { //State =4
       private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3);
-      private CustomTextField gamePasswordField = new CustomTextField(3);
+      private CustomTextField gameNameField = new CustomTextField(3, scaling);
+      private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
       private CustomButton backButton = new CustomButton("Back");
       private CustomButton confirmButton = new CustomButton("Confirm Game");
 
@@ -1088,6 +1083,7 @@ public class Client extends JFrame implements WindowListener {
       private Polygon BOTTOM_BAR = new Polygon();
       private Rectangle drawArea;
       private BufferedImage fogMap;
+      private int fogTicks = 0;
 
 
       public GamePanel() {
@@ -1171,6 +1167,25 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             // System.out.println(System.nanoTime() - time);
+
+            // Updating fog
+            for (int i = 0; i < players.length; i++) {
+               // TODO: Separate by teams
+               // TODO: Account for players that quit?
+               fog.scout(players[i].getXy());
+            }
+            //Creating shapes
+            AffineTransform tx = new AffineTransform();
+            tx.translate(centerXy[0] - myPlayer.getXy()[0] * scaling, centerXy[1] - myPlayer.getXy()[1] * scaling);
+            Area darkFog = fog.getFog().createTransformedArea(tx);
+            Area lightFog = fog.getExplored().createTransformedArea(tx);
+
+            //Draws fog
+            g2.setColor(Color.black); //Unexplored
+            g2.fill(darkFog);
+            g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
+            g2.fill(lightFog);
+
             for (int i = 0; i < projectiles.size(); i++) { //For some reason, a concurrent modification exception is thrown if i use the other for loop
                projectiles.get(i).draw(g2);
             }
@@ -1197,27 +1212,6 @@ public class Client extends JFrame implements WindowListener {
             g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
             g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
             g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-
-
-            // Draws fog
-         /*
-            for (int i = -MAX_X / 2; i < MAX_X / 2; i += 10 * scaling) { // In units of screen pixels
-               for (int j = -MAX_Y / 2; j < MAX_Y / 2; j += 10 * scaling) {
-                  int mapX = (myPlayer.getXy()[0] + (int) (i / scaling)) / 10; // In units of fog map
-                  int mapY = (myPlayer.getXy()[1] + (int) (j / scaling)) / 10;
-                  if (mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY < 1000) { // If within bounds of fog
-                     int fogValue = fog.getFog()[mapY][mapX];
-                     if (fogValue == 0) { // Unexplored
-                        g2.setColor(Color.black);
-                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
-                     } else if (fogValue == 1) { // Explored but not actively viewed
-                        g2.setColor(new Color(0, 0, 0, 128));
-                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
-                     }
-                  }
-               }
-            }
-         */
          }
          g2.dispose();
       }
@@ -1266,24 +1260,7 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   private class CustomTextField extends JTextField {
-      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
-      private Color backgroundColor = new Color(1f, 1f, 1f, 0f);
-      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
 
-      CustomTextField(int row) {
-         super(row);
-         this.setFont(BUTTON_FONT);
-         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-      }
-
-      @Override
-      protected void paintComponent(Graphics g) {
-         super.paintComponent(g);
-      }
-   }
 }
 
 /*

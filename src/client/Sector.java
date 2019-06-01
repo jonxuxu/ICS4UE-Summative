@@ -29,9 +29,9 @@ public class Sector {
    private int[] centerXy = new int[2];
    private int size;
 
-   public void setImage(BufferedImage image) {
-      this.image = image;
-   }
+  public void setImage(BufferedImage image) {
+    this.image = image;
+  }
 
    public void setSectorCoords(int sectorX, int sectorY) {
       this.sectorCoords[0] = sectorX;
@@ -48,6 +48,7 @@ public class Sector {
     //  g2.fillRect(300, 300, size, size);
 
    }
+
 }
 /* continue with enough memory
   image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);

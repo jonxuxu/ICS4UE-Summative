@@ -1,11 +1,21 @@
 package client;
 
 public class Inventory {
-    private int[] invSlots = new int[9];
-    private int[] invNum = new int[9];
+    private Item[] invSlots;
+    private int[] invNum;
+
+    public Inventory(){
+        invSlots = new Item[9];
+        invNum = new int[9];
+    }
+
+    public Inventory(Item[] inventory, int[] stacks){
+        invSlots = inventory;
+        invNum = stacks;
+    }
 
     public void swapItems(int slot1, int slot2){
-        int tempItem = invSlots[slot2];
+        Item tempItem = invSlots[slot2];
         int tempNum = invNum[slot2];
         invSlots[slot2] = invSlots[slot1];
         invNum[slot2] = invNum[slot1];
@@ -13,25 +23,29 @@ public class Inventory {
         invNum[slot1] = tempNum;
     }
 
-    public boolean useItem(int slot){
+    public Item useItem(int slot){
         if (invNum[slot] == 0){
-            return false;
+            return null;
         } else {
-            //Use item
-            //Remove item
-            return true;
+            Item temp = invSlots[slot];
+            removeItem(slot);
+            return temp;
         }
     }
 
-    public int getItem(int slot){
+    public Item getItem(int slot){
         return invSlots[slot];
     }
 
-    public boolean addItem(int slot, int item){
-        if (invSlots[slot] == 0 && invNum[slot] <= 10){
-            invSlots[slot] = item;
-            invNum[slot] += 1;
-            return true;
+    public boolean addItem(Item item){
+        for (int i = 0; i < 9; i++) {
+            if (invSlots[i] == item && invNum[i] <= 10) {
+                invNum[i] += 1;
+                return true;
+            } else if (invSlots[i] == null){
+                invSlots[i] = item;
+                invNum[i] = 1;
+            }
         }
         return false;
     }
@@ -40,7 +54,7 @@ public class Inventory {
         if (invNum[slot] > 1) {
             invNum[slot] -= 1;
         } else {
-            invSlots[slot] = 0;
+            invSlots[slot] = null;
             invNum[slot] = 0;
         }
     }
