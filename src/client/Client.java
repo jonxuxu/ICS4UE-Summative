@@ -1,11 +1,15 @@
 package client;
 
+import client.map.FogMap;
+import client.particle.AshParticle;
+import client.ui.CustomTextField;
+import client.ui.IntroPanel;
+
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -22,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Random;
 
 /*
 Here is how the messages work.
@@ -596,7 +599,7 @@ public class Client extends JFrame implements WindowListener {
 
    private class LoginPanel extends JPanel { //State=0
       private Graphics2D g2;
-      private CustomTextField nameField = new CustomTextField(3);
+      private CustomTextField nameField = new CustomTextField(3, scaling);
       private CustomButton testButton = new CustomButton("Test");
 
       public LoginPanel() {
@@ -753,8 +756,8 @@ public class Client extends JFrame implements WindowListener {
 
    private class CreatePanel extends JPanel { //State =3
       private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3);
-      private CustomTextField gamePasswordField = new CustomTextField(3);
+      private CustomTextField gameNameField = new CustomTextField(3, scaling);
+      private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
       private CustomButton backButton = new CustomButton("Back");
       private CustomButton confirmButton = new CustomButton("Confirm Game");
 
@@ -826,8 +829,8 @@ public class Client extends JFrame implements WindowListener {
 
    private class JoinPanel extends JPanel { //State =4
       private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3);
-      private CustomTextField gamePasswordField = new CustomTextField(3);
+      private CustomTextField gameNameField = new CustomTextField(3, scaling);
+      private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
       private CustomButton backButton = new CustomButton("Back");
       private CustomButton confirmButton = new CustomButton("Confirm Game");
 
@@ -1149,19 +1152,18 @@ public class Client extends JFrame implements WindowListener {
             // System.out.println(System.nanoTime() - time);
 
             // Updating fog
-            //fog.age();
             for (int i = 0; i < players.length; i++) {
                // TODO: Separate by teams
                // TODO: Account for players that quit?
                fog.scout(players[i].getXy());
             }
-
-            // Draws fog
+            //Creating shapes
             AffineTransform tx = new AffineTransform();
             tx.translate(centerXy[0] - myPlayer.getXy()[0] * scaling, centerXy[1] - myPlayer.getXy()[1] * scaling);
             Area darkFog = fog.getFog().createTransformedArea(tx);
             Area lightFog = fog.getExplored().createTransformedArea(tx);
 
+            //Draws fog
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
@@ -1259,24 +1261,7 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   private class CustomTextField extends JTextField {
-      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
-      private Color backgroundColor = new Color(1f, 1f, 1f, 0f);
-      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
 
-      CustomTextField(int row) {
-         super(row);
-         this.setFont(BUTTON_FONT);
-         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-      }
-
-      @Override
-      protected void paintComponent(Graphics g) {
-         super.paintComponent(g);
-      }
-   }
 }
 
 /*
