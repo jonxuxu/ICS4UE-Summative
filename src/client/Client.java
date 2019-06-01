@@ -316,12 +316,10 @@ public class Client extends JFrame implements WindowListener {
                      System.out.println("wdw");
                      if (myMouseAdapter.getLeftRight()[0]) {
                         outputString.append("A" + " ");
-                        System.out.println("1w");
                      }
                      if (myMouseAdapter.getLeftRight()[1]) {
                         soundEffect.playSound("cow");
                         outputString.append("F" + " ");
-                        System.out.println("2wwwdw");
                      }
                   }
                   // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
@@ -1215,7 +1213,6 @@ public class Client extends JFrame implements WindowListener {
          }
          g2.dispose();
       }
-
    }
 
    private class CustomButton extends JButton {
