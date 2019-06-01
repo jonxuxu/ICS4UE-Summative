@@ -1,8 +1,5 @@
 package client.ui;
 
-import client.Client;
-
-import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -17,14 +14,14 @@ import java.awt.event.ActionEvent;
 
 public class LoginPanel extends GeneralPanel {
    private Graphics2D g2;
-   private final double scaling = super.getScaling();
+   private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
-   private final int MAX_Y= super.getWidth();
+   private final int MAX_Y= super.getHeight();
    private final Font MAIN_FONT = super.getFont("main");
-   private final Font HEADER_FONT = super.getFont("main");
+   private final Font HEADER_FONT = super.getFont("header");
 
-   private CustomTextField nameField = new CustomTextField(3, scaling);
-   private CustomButton testButton = new CustomButton("Test", scaling);
+   private CustomTextField nameField = new CustomTextField(3, SCALING);
+   private CustomButton testButton = new CustomButton("Test", SCALING);
 
    public LoginPanel() {
       //Basic username field
@@ -40,7 +37,7 @@ public class LoginPanel extends GeneralPanel {
          }
       });
       nameField.setFont(super.getFont("main"));
-      nameField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y / 5, (int) (90 * scaling), (int) (19 * scaling));
+      nameField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y / 5, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(nameField);
 
 
@@ -48,7 +45,7 @@ public class LoginPanel extends GeneralPanel {
          testingBegin = true;
       });
 
-      testButton.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 2 / 5, (int) (90 * scaling), (int) (19 * scaling));
+      testButton.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 2 / 5, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(testButton);
       //Basic visuals
       this.setDoubleBuffered(true);
@@ -68,7 +65,7 @@ public class LoginPanel extends GeneralPanel {
       //Begin drawing
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
-      g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
+      g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * SCALING));
       g2.setFont(MAIN_FONT);
       if ((!connected) && (!unableToConnect)) {
          g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y * 5 / 16.0));

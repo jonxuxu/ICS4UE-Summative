@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * @since 2019-05-27
  */
 
-public class IntroPanel extends JPanel {
+public class IntroPanel extends GeneralPanel {
    static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
    static double w = screenSize.getWidth();
    static double h = screenSize.getHeight();//This adjusts height to be a bit smaller to fit nicer on screen

@@ -1,10 +1,7 @@
 package client.ui;
 
-import client.Client;
-
-import javax.swing.JPanel;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -21,10 +18,13 @@ import java.awt.event.ActionEvent;
 
 public class InstructionPanel extends GeneralPanel { //State=5
    private Graphics2D g2;
-   private double scaling = super.getScaling();
-   private int width= super.getWidth();
-   private int height= super.getWidth();
-   private CustomButton backButton = new CustomButton("Back", scaling);
+   private final double SCALING = super.getScaling();
+   private final int MAX_X= super.getWidth();
+   private final int MAX_Y= super.getHeight();
+   private final Font MAIN_FONT = super.getFont("main");
+   private final Font HEADER_FONT = super.getFont("header");
+
+   private CustomButton backButton = new CustomButton("Back", SCALING);
 
 
    public InstructionPanel() {
@@ -33,7 +33,7 @@ public class InstructionPanel extends GeneralPanel { //State=5
          newState = 2;
          leaveGame = true;
       });
-      backButton.setBounds(super.getWidth() / 2 - (int) (65 * scaling), super.getY() * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
+      backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);
 
       //Basic visuals
@@ -48,10 +48,10 @@ public class InstructionPanel extends GeneralPanel { //State=5
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setFont(super.getFont("main"));
+      g2.setFont(MAIN_FONT);
       super.paintComponent(g);
       //Background
-      g2.drawImage(LOADED_TITLE_SCREEN, width - (int) (1800 * introScaling), height - (int) (1198 * introScaling), null);
+      drawBackground(g2);
       drawAllParticles(g2);
    }
 }

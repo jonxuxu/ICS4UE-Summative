@@ -1,10 +1,6 @@
 package client.ui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -18,18 +14,20 @@ import java.awt.event.ActionEvent;
 
 public class JoinPanel extends GeneralPanel { //State =4
    private Graphics2D g2;
-   private double scaling = super.getScaling();
-   private int width = super.getWidth();
-   private int height = super.getHeight();
+   private final double SCALING = super.getScaling();
+   private final int MAX_X = super.getWidth();
+   private final int MAX_Y = super.getHeight();
+   private final Font MAIN_FONT = super.getFont("main");
+   private final Font HEADER_FONT = super.getFont("header");
 
-   private CustomTextField gameNameField = new CustomTextField(3, scaling);
-   private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
-   private CustomButton backButton = new CustomButton("Back", scaling);
-   private CustomButton confirmButton = new CustomButton("Confirm Game", scaling);
+   private CustomTextField gameNameField = new CustomTextField(3, SCALING);
+   private CustomTextField gamePasswordField = new CustomTextField(3, SCALING);
+   private CustomButton backButton = new CustomButton("Back", SCALING);
+   private CustomButton confirmButton = new CustomButton("Confirm Game", SCALING);
 
    public JoinPanel() {
       //Setting up the size
-      this.setPreferredSize(new Dimension(width, height));
+      this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
       gameNameField.addActionListener((ActionEvent e) -> {
          if (!testGame) {
@@ -38,8 +36,8 @@ public class JoinPanel extends GeneralPanel { //State =4
             testGame = true;
          }
       });
-      gameNameField.setFont(super.getFont("main"));
-      gameNameField.setBounds(width / 2 - (int) (45 * scaling), height * 3 / 10, (int) (90 * scaling), (int) (19 * scaling));
+      gameNameField.setFont(MAIN_FONT);
+      gameNameField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 3 / 10, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(gameNameField);
       gamePasswordField.addActionListener((ActionEvent e) -> {
          if (!testGame) {
@@ -48,8 +46,8 @@ public class JoinPanel extends GeneralPanel { //State =4
             testGame = true;
          }
       });
-      gamePasswordField.setFont(super.getFont("main"));
-      gamePasswordField.setBounds(width / 2 - (int) (45 * scaling), height * 2 / 5, (int) (90 * scaling), (int) (19 * scaling));
+      gamePasswordField.setFont(MAIN_FONT);
+      gamePasswordField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 2 / 5, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(gamePasswordField);
       confirmButton.addActionListener((ActionEvent e) -> {
          if (!testGame) {
@@ -58,12 +56,12 @@ public class JoinPanel extends GeneralPanel { //State =4
             testGame = true;
          }
       });
-      confirmButton.setBounds(width / 2 - (int) (65 * scaling), height / 2, (int) (130 * scaling), (int) (19 * scaling));
+      confirmButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y / 2, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(confirmButton);
       backButton.addActionListener((ActionEvent e) -> {
          newState = 2;
       });
-      backButton.setBounds(width / 2 - (int) (65 * scaling), height * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
+      backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);
       //Basic visuals
       this.setDoubleBuffered(true);
@@ -77,18 +75,18 @@ public class JoinPanel extends GeneralPanel { //State =4
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setFont(super.getFont("main"));
+      g2.setFont(MAIN_FONT);
       super.paintComponent(g);
       //Background
-      g2.drawImage(LOADED_TITLE_SCREEN, width - (int) (1800 * introScaling), height - (int) (1198 * introScaling), null);
+      drawBackground(g2);
       g2.setColor(Color.WHITE);
-      g2.setFont(super.getFont("header"));
-      g2.drawString("Join Server", (int) ((width - g2.getFontMetrics().stringWidth("Join Server")) / 2.0), (height / 5));
+      g2.setFont(HEADER_FONT);
+      g2.drawString("Join Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2.0), (MAX_Y / 5));
       //Server name
-      g2.setFont(super.getFont("main"));
-      g2.drawString("Server Name", (int) ((width - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (height * 3 / 10 - g2.getFontMetrics().getHeight()));
+      g2.setFont(MAIN_FONT);
+      g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
       //Server password
-      g2.drawString("Server Password", (int) ((width - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (height * 2 / 5 - g2.getFontMetrics().getHeight()));
+      g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 2 / 5 - g2.getFontMetrics().getHeight()));
       //Draws particles
       drawAllParticles(g2);
    }

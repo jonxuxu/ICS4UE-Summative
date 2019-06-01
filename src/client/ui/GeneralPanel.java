@@ -1,6 +1,7 @@
 package client.ui;
 
 import client.Client;
+import client.particle.AshParticle;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -15,6 +16,7 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,22 +31,22 @@ import java.util.Map;
 
 public abstract class GeneralPanel extends JPanel {
    private static double scaling, introScaling;
-   private static int width, height;
+   private static int width, MAX_Y;
    private static BufferedImage TITLE_SCREEN;
    private static BufferedImage TITLE;
    private static BufferedImage LOADED_TITLE_SCREEN;
    private static BufferedImage LOADED_TITLE;
    private static Client client;
    private static Map<String, Font> fonts = new HashMap<String, Font>();
+   private static ArrayList<AshParticle> particles = new ArrayList<AshParticle>();
 
-   GeneralPanel() {
-      this.setPreferredSize(new Dimension(width, height));
-
+   public GeneralPanel(){
+      this.setPreferredSize(new Dimension(width, MAX_Y));
    }
 
    public static void setParameters(int width1, int height1, double scaling1, double introScaling1, Client client1) {
       width = width1;
-      height = height1;
+      MAX_Y = height1;
       scaling = scaling1;
       introScaling = introScaling1;
       client = client1;
@@ -65,17 +67,19 @@ public abstract class GeneralPanel extends JPanel {
       graphicsTS.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       graphicsTS.drawImage(TITLE_SCREEN, 0, 0, (int) (1800 * introScaling), (int) (1198 * introScaling), null);
       graphicsTS.dispose();
-      LOADED_TITLE = graphicsConfiguration.createCompatibleImage((int) (height / 4.0 * 1316 / 625), (int) (height / 4.0), Transparency.TRANSLUCENT);
+      LOADED_TITLE = graphicsConfiguration.createCompatibleImage((int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), Transparency.TRANSLUCENT);
       Graphics2D graphicsT = LOADED_TITLE.createGraphics();
       graphicsT.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
       graphicsT.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       graphicsT.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      graphicsT.drawImage(TITLE, 0, 0, (int) (height / 4.0 * 1316 / 625), (int) (height / 4.0), null);
+      graphicsT.drawImage(TITLE, 0, 0, (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
       graphicsT.dispose();
 
       // Setting fonts
       fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling)));
       fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (25 * scaling)));
+
+      //Set s
    }
 
    public double getScaling() {
@@ -113,7 +117,16 @@ public abstract class GeneralPanel extends JPanel {
       return fonts.get(fontName);
    }
 
+   public static ArrayList<AshParticle> getParticles() {
+      return particles;
+   }
+
    public void drawBackground(Graphics2D g2) {
-      g2.drawImage(LOADED_TITLE_SCREEN, width - (int) (1800 * introScaling), height - (int) (1198 * introScaling), null);
+      g2.drawImage(LOADED_TITLE_SCREEN, width - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
+   }
+
+
+   public void drawTitle(Graphics2D g2) {
+      g2.drawImage(LOADED_TITLE, (int) ((width - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), null);
    }
 }

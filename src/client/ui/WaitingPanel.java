@@ -8,24 +8,23 @@ import java.awt.event.ActionEvent;
 
 public class WaitingPanel extends GeneralPanel { //State=6
   private Graphics2D g2;
+  private final double scaling = super.getScaling();
+  private final int MAX_X= super.getWidth();
+  private final int MAX_Y= super.getHeight();
+  private final Font MAIN_FONT = super.getFont("main");
+  private final Font HEADER_FONT = super.getFont("header");
 
   private boolean buttonAdd = true;
   private boolean buttonRemove = true;
-  private CustomButton readyGameButton, backButton, teamOneButton, teamTwoButton;
-  private double scaling = super.getScaling();
-  private int width= super.getWidth();
-  private int height= super.getWidth();
+  private CustomButton readyGameButton = new CustomButton("Begin game", scaling);
+  private CustomButton backButton = new CustomButton("Back", scaling);
+  private CustomButton teamOneButton = new CustomButton("Team one", scaling);
+  private CustomButton teamTwoButton = new CustomButton("Team two", scaling);
+
 
   public WaitingPanel() {
-
-    // Scaling panel
-
     // Initializing buttons
-    readyGameButton = new CustomButton("Begin game", scaling);
-    backButton = new CustomButton("Back", scaling);
-    teamOneButton = new CustomButton("Team one", scaling);
-    teamTwoButton = new CustomButton("Team two", scaling);
-    readyGameButton.setBounds(width / 2 - (int) (65 * scaling), height * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
+    readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), height * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
     readyGameButton.addActionListener((ActionEvent e) -> {
       game.setReady(true);
     });
@@ -34,21 +33,21 @@ public class WaitingPanel extends GeneralPanel { //State=6
       myTeam = 1;
       teamChosen = true;
     });
-    teamOneButton.setBounds(width / 2 - (int) (65 * scaling), height * 3 / 10, (int) (130 * scaling), (int) (19 * scaling));
+    teamOneButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 3 / 10, (int) (130 * scaling), (int) (19 * scaling));
     this.add(teamOneButton);
 
     teamTwoButton.addActionListener((ActionEvent e) -> {
       myTeam = 2;
       teamChosen = true;
     });
-    teamTwoButton.setBounds(width / 2 - (int) (65 * scaling), height / 2, (int) (130 * scaling), (int) (19 * scaling));
+    teamTwoButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y / 2, (int) (130 * scaling), (int) (19 * scaling));
     this.add(teamTwoButton);
 
     backButton.addActionListener((ActionEvent e) -> {
       newState = 2;
       leaveGame = true;
     });
-    backButton.setBounds(width / 2 - (int) (65 * scaling), height * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
+    backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
     this.add(backButton);
 
 
@@ -64,7 +63,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
   public void paintComponent(Graphics g) {
     g2 = (Graphics2D) g;
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setFont(super.getFont("main"));
+    g2.setFont(MAIN_FONT);
 
     FontMetrics metrics = g2.getFontMetrics();
     super.paintComponent(g);
@@ -87,7 +86,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
         this.remove(readyGameButton);
         buttonRemove = false;
       }
-      g2.drawString("LOADING", (int) ((width - metrics.stringWidth("LOADING")) / 2.0), height / 2);
+      g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), MAX_Y / 2);
     }
     drawAllParticles(g2);
   }
