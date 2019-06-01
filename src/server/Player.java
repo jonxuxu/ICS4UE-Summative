@@ -27,6 +27,7 @@ public abstract class Player extends User implements CanIntersect {
    private int health;
    private int attack;
    private int mobility;
+   private int mobilityBoost = 0;
    //private int maxMobility;
    private int range;
    private int spriteID;
@@ -37,6 +38,7 @@ public abstract class Player extends User implements CanIntersect {
    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
    private ArrayList<AOE> aoes = new ArrayList<AOE>();
    private ArrayList<Status> statuses = new ArrayList<Status>();
+   private ArrayList<Class> buffBlacklist = new ArrayList<Class>();
    private ArrayList<Shield> shields = new ArrayList<Shield>();
    private int team;
    private ArrayList<Player> allies = new ArrayList<Player>();
@@ -84,14 +86,18 @@ public abstract class Player extends User implements CanIntersect {
    public String getMainOutput(int spellTick) {
       StringBuilder outputString = new StringBuilder();
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
-      outputString.append(health + "," + maxHealth + "," + attack + "," + mobility + "," + range + ",");//Stats
+      outputString.append(health + "," + maxHealth + "," + attack + "," + (mobility+mobilityBoost) + "," + range + ",");//Stats
       outputString.append(artifact + "," + gold + ",");//General
       outputString.append(spriteID + ",");//Sprite
       outputString.append(getSpellPercent(0) + "," + getSpellPercent(1) + "," + getSpellPercent(2) + ",");//Spells
+      /* STATUSES NOT WORKING!!! UNCOMMMENT WHEN SUPPORT FOR STATUSES IS ADDED
       outputString.append(damaged + "," + statuses.size());
       for (int i = 0; i < statuses.size(); i++) {
          outputString.append("," + statuses.get(i)); //Status exclusive
-      }
+      }*/
+      
+      outputString.append(damaged + "," + 0);//Temporary "fix"
+      
       return outputString.toString();
    }
 
@@ -101,10 +107,13 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append(health + "," + maxHealth + ",");//stats
       outputString.append(artifact + ",");//General
       outputString.append(spriteID + ",");//Sprite
+      /* STATUSES NOT WORKING!!! UNCOMMMENT WHEN SUPPORT FOR STATUSES IS ADDED
       outputString.append(damaged + "," + statuses.size());
       for (int i = 0; i < statuses.size(); i++) {
          outputString.append("," + statuses.get(i)); //Status exclusive
-      }
+      }*/
+      
+      outputString.append(damaged + "," + 0);//Temporary "fix"
       return outputString.toString();
    }
 
@@ -159,6 +168,8 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void updateStatuses(){
+     mobilityBoost = 0;
+     buffBlacklist.clear();
     for (int i = statuses.size()-1; i >= 0; i--){
       illuminated = false;
       statuses.get(i).advance();
@@ -178,7 +189,6 @@ public abstract class Player extends User implements CanIntersect {
   }
   
   public void applyStatus(Status status){
-    ArrayList<Class> buffBlacklist = new ArrayList<Class>();
     boolean blacklisted = false;
     if ((status instanceof Illuminated) && (!invisible)){
       illuminated = true;
@@ -189,7 +199,7 @@ public abstract class Player extends User implements CanIntersect {
         }
       }
       if (!blacklisted){
-        mobility += ((MSBuff)(status)).getStrength();
+        mobilityBoost += ((MSBuff)(status)).getStrength();
         buffBlacklist.add(status.getClass());
       }
     } else if (status instanceof Stun){
@@ -365,7 +375,7 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public int getMobility() {
-      return mobility;
+      return mobility+mobilityBoost;
    }
 
    public void setAttack(int attack) {

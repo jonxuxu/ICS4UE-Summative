@@ -26,14 +26,14 @@ public class SafeMarksman extends Player {
    SafeMarksman(String username) {
       super(username);
       try {
-         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\LightningRoomba.png"));
+         BufferedImage movementSheet = ImageIO.read(new File("..\\res\\LightningRoomba.png"));
          ALL_ANIMATIONS[0] = new BufferedImage[12];
          for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
                ALL_ANIMATIONS[0][(i * 3) + j] = movementSheet.getSubimage(j * 15, i * 15, 15, 15);
             }
          }
-         BufferedImage animationSheet = ImageIO.read(new File(".\\res\\LightningRoomba.png"));
+         BufferedImage animationSheet = ImageIO.read(new File("..\\res\\LightningRoomba.png"));
          ALL_ANIMATIONS[1] = new BufferedImage[4];
          for (int i = 0; i < 4; i++) {
             ALL_ANIMATIONS[1][i] = animationSheet.getSubimage(0, i * 15, 15, 15);

@@ -82,8 +82,8 @@ public class SafeMarksman extends Player{
           for (int j = 0; j < getEnemiesSize(); j++){
             if(getProjectile(i).collides(getEnemy(j))){
               getEnemy(j).damage(getAttack());
-              addStatus(new MSBuff(MS_BUFF_STRENGTH, MS_BUFF_DURATION));
-              getEnemy(j).addStatus(new MSBuff(-1*MS_BUFF_STRENGTH, MS_BUFF_DURATION));
+              addStatus(new SafeMarksmanMSBuff());
+              getEnemy(j).addStatus(new SafeMarksmanMSDebuff());
               removed = removeProjectile(i);
             }
           }
