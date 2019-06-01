@@ -1,0 +1,81 @@
+package client.ui;
+
+import client.Client;
+
+import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+/**
+ * LoginPanel.java
+ * This is
+ *
+ * @author Will Jeong
+ * @version 1.0
+ * @since 2019-05-31
+ */
+
+public class LoginPanel extends GeneralPanel {
+   private Graphics2D g2;
+   private final double scaling = super.getScaling();
+   private final int MAX_X= super.getWidth();
+   private final int MAX_Y= super.getWidth();
+   private final Font MAIN_FONT = super.getFont("main");
+   private final Font HEADER_FONT = super.getFont("main");
+
+   private CustomTextField nameField = new CustomTextField(3, scaling);
+   private CustomButton testButton = new CustomButton("Test", scaling);
+
+   public LoginPanel() {
+      //Basic username field
+      //sendName = true;
+      nameField.addActionListener((ActionEvent e) -> {
+         if (!sendName) {
+            if (!(nameField.getText().contains(" "))) {
+               username = nameField.getText();
+               sendName = true;
+            } else {
+               System.out.println("Error: Spaces exist");
+            }
+         }
+      });
+      nameField.setFont(super.getFont("main"));
+      nameField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y / 5, (int) (90 * scaling), (int) (19 * scaling));
+      this.add(nameField);
+
+
+      testButton.addActionListener((ActionEvent e) -> {
+         testingBegin = true;
+      });
+
+      testButton.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 2 / 5, (int) (90 * scaling), (int) (19 * scaling));
+      this.add(testButton);
+      //Basic visuals
+      this.setDoubleBuffered(true);
+      this.setBackground(new Color(20, 20, 20));
+      this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
+      this.setVisible(true);
+      this.setFocusable(true);
+   }
+
+   @Override
+   public void paintComponent(Graphics g) {
+      g2 = (Graphics2D) g;
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setFont(MAIN_FONT);
+      super.paintComponent(g);
+
+      //Begin drawing
+      g2.setColor(Color.WHITE);
+      g2.setFont(HEADER_FONT);
+      g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
+      g2.setFont(MAIN_FONT);
+      if ((!connected) && (!unableToConnect)) {
+         g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y * 5 / 16.0));
+      } else if ((connected) && (!unableToConnect)) {
+         g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y * 5 / 16.0));
+      } else if (unableToConnect) {
+         g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y * 5 / 16.0));
+      }
+   }
+}

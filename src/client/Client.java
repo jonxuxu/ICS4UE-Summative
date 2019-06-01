@@ -3,8 +3,17 @@ package client;
 import client.map.FogMap;
 import client.particle.AshParticle;
 import client.sound.soundEffectManager;
+import client.ui.CreatePanel;
+import client.ui.CustomButton;
 import client.ui.CustomTextField;
+import client.ui.GeneralPanel;
+import client.ui.InstructionPanel;
+import client.ui.IntermediatePanel;
 import client.ui.IntroPanel;
+import client.ui.JoinPanel;
+import client.ui.LoginPanel;
+import client.ui.MenuPanel;
+import client.ui.WaitingPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -57,8 +66,6 @@ public class Client extends JFrame implements WindowListener {
    private CustomKeyListener myKeyListener = new CustomKeyListener();
    private boolean sendName = false;
    private boolean testGame = false;
-   private Font MAIN_FONT;
-   private Font HEADER_FONT;
    //State legend:
    private int state = 0;//should be 0
    private int newState = 0;//should be 0
@@ -90,10 +97,6 @@ public class Client extends JFrame implements WindowListener {
    private BufferedImage loadedSheet;
    private boolean logout = false;
    private boolean leaveGame = false;
-   private BufferedImage TITLE_SCREEN;
-   private BufferedImage TITLE;
-   private BufferedImage LOADED_TITLE_SCREEN;
-   private BufferedImage LOADED_TITLE;
    private boolean unableToConnect = false;
    private FogMap fog;
    private boolean testingBegin = false;
@@ -113,7 +116,7 @@ public class Client extends JFrame implements WindowListener {
       //Control set up (the mouse listeners are attached to the game panel)
       this.addKeyListener(myKeyListener);
 
-      //Font+image set up
+      //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Regular.ttf")));
@@ -121,8 +124,6 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
-         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreenDark.png"));
-         TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
          System.out.println("Font not available");
       }
@@ -139,9 +140,8 @@ public class Client extends JFrame implements WindowListener {
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
       this.setExtendedState(JFrame.MAXIMIZED_BOTH);
       //Creating components
-      allPanels[7] = new IntermediatePanel();
-      ((IntermediatePanel) (allPanels[7])).initializeScaling();//must be called before the rest of the fonts
-
+      initializeScaling();
+      GeneralPanel.setParameters(MAX_X, MAX_Y, scaling, introScaling, this);
       allPanels[0] = new LoginPanel();
       allPanels[1] = new IntroPanel();
       allPanels[2] = new MenuPanel();
@@ -149,6 +149,7 @@ public class Client extends JFrame implements WindowListener {
       allPanels[4] = new JoinPanel();
       allPanels[5] = new InstructionPanel();
       allPanels[6] = new WaitingPanel();
+      allPanels[7] = new IntermediatePanel();
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
       for (int i = 0; i < allPanels.length; i++) {
@@ -160,7 +161,7 @@ public class Client extends JFrame implements WindowListener {
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
-      ((IntermediatePanel) (allPanels[7])).initializeSize();
+      initializeSize();
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
@@ -563,21 +564,6 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   public void drawAllParticles(Graphics2D g2) {
-      //Draws particles
-      for (int i = 0; i < particles.size(); i++) {
-         try {
-            if (particles.get(i).update()) {
-               particles.remove(i);
-            } else {
-               particles.get(i).render(g2);
-            }
-         } catch (Exception e) {
-            e.printStackTrace();
-         }
-      }
-   }
-
    public void windowClosing(WindowEvent e) {
       dispose();
       try {
@@ -590,689 +576,20 @@ public class Client extends JFrame implements WindowListener {
       System.exit(0);
    }
 
-   public void windowOpened(WindowEvent e) {
+   public void setReady(boolean ready) {
+      notifyReady = ready;
    }
 
-   public void windowActivated(WindowEvent e) {
-   }
-
-   public void windowIconified(WindowEvent e) {
-   }
-
-   public void windowDeiconified(WindowEvent e) {
-   }
-
-   public void windowDeactivated(WindowEvent e) {
-   }
-
-   public void windowClosed(WindowEvent e) {
-   }
-
-   private class LoginPanel extends JPanel { //State=0
-      private Graphics2D g2;
-      private CustomTextField nameField = new CustomTextField(3, scaling);
-      private CustomButton testButton = new CustomButton("Test");
-
-      public LoginPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic username field
-         //sendName = true;
-         nameField.addActionListener((ActionEvent e) -> {
-            if (!sendName) {
-               if (!(nameField.getText().contains(" "))) {
-                  username = nameField.getText();
-                  sendName = true;
-               } else {
-                  System.out.println("Error: Spaces exist");
-               }
-            }
-         });
-         nameField.setFont(MAIN_FONT);
-         nameField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y / 5, (int) (90 * scaling), (int) (19 * scaling));
-         this.add(nameField);
-
-
-         testButton.addActionListener((ActionEvent e) -> {
-            testingBegin = true;
-         });
-
-         testButton.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 2 / 5, (int) (90 * scaling), (int) (19 * scaling));
-         this.add(testButton);
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
+   public void initializeScaling() {
+      if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //Make sure that these are doubles
+         scaling = 1.0 * MAX_X / DESIRED_X;
+      } else {
+         scaling = 1.0 * MAX_Y / DESIRED_Y;
       }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-
-         //Begin drawing
-         g2.setColor(Color.WHITE);
-         g2.setFont(HEADER_FONT);
-         g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
-         g2.setFont(MAIN_FONT);
-         if ((!connected) && (!unableToConnect)) {
-            g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y * 5 / 16.0));
-         } else if ((connected) && (!unableToConnect)) {
-            g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y * 5 / 16.0));
-         } else if (unableToConnect) {
-            g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y * 5 / 16.0));
-         }
+      if ((1.0 * MAX_Y / MAX_X) > (1.0 * 1198 / 1800)) { //Make sure that these are doubles
+         introScaling = 1.0 * MAX_Y / 1198;
+      } else {
+         introScaling = 1.0 * MAX_X / 1800;
       }
    }
-
-   private class MenuPanel extends JPanel {//State=2
-      private Graphics2D g2;
-      private CustomButton createButton = new CustomButton("Create Game");
-      private CustomButton joinButton = new CustomButton("Join Game");
-      private CustomButton instructionButton = new CustomButton("Instructions");
-      private CustomButton logoutButton = new CustomButton("Logout");
-      private double introAlpha = 1;
-
-      public MenuPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic create and join server buttons
-         createButton.addActionListener((ActionEvent e) -> {
-            newState = 3;
-         });
-         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-         this.add(createButton);
-
-         joinButton.addActionListener((ActionEvent e) -> {
-            newState = 4;
-         });
-         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-         this.add(joinButton);
-         instructionButton.addActionListener((ActionEvent e) -> {
-            newState = 5;//I added this later so I didn't want to move everything around
-         });
-         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-
-         this.add(instructionButton);
-         logoutButton.addActionListener((ActionEvent e) -> {
-            newState = 0;
-            logout = true;
-         });
-         logoutButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-         this.add(logoutButton);
-
-         //Setting up intro scaling
-         if ((1.0 * MAX_Y / MAX_X) > (1.0 * 1198 / 1800)) { //Make sure that these are doubles
-            //Y is excess
-            introScaling = 1.0 * MAX_Y / 1198;
-         } else {
-            //X is excess
-            introScaling = 1.0 * MAX_X / 1800;
-         }
-         GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-         GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
-         GraphicsConfiguration graphicsConfiguration = graphicsDevice.getDefaultConfiguration();
-         LOADED_TITLE_SCREEN = graphicsConfiguration.createCompatibleImage((int) (1800 * introScaling), (int) (1198 * introScaling), Transparency.TRANSLUCENT);
-         Graphics2D graphicsTS = LOADED_TITLE_SCREEN.createGraphics();
-         graphicsTS.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-         graphicsTS.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-         graphicsTS.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         graphicsTS.drawImage(TITLE_SCREEN, 0, 0, (int) (1800 * introScaling), (int) (1198 * introScaling), null);
-         graphicsTS.dispose();
-         LOADED_TITLE = graphicsConfiguration.createCompatibleImage((int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), Transparency.TRANSLUCENT);
-         Graphics2D graphicsT = LOADED_TITLE.createGraphics();
-         graphicsT.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-         graphicsT.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-         graphicsT.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         graphicsT.drawImage(TITLE, 0, 0, (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
-         graphicsT.dispose();
-
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-         //Adds particles
-         //Background
-         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
-         //Title
-         g2.drawImage(LOADED_TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), null);
-         if (introAlpha != 0) {
-            introAlpha -= 0.05;
-            g2.setColor(new Color(0f, 0f, 0f, (float) (introAlpha)));
-            g2.fillRect(0, 0, MAX_X, MAX_Y);
-            if (introAlpha < 0.05) {
-               introAlpha = 0;
-            }
-         }
-         if (Math.random() < 0.2) {
-            particles.add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) * scaling), MAX_Y));
-         }
-         drawAllParticles(g2);
-      }
-   }
-
-   private class CreatePanel extends JPanel { //State =3
-      private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3, scaling);
-      private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
-      private CustomButton backButton = new CustomButton("Back");
-      private CustomButton confirmButton = new CustomButton("Confirm Game");
-
-      public CreatePanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic create and join server buttons
-         gameNameField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         gameNameField.setFont(MAIN_FONT);
-         gameNameField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 3 / 10, (int) (90 * scaling), (int) (19 * scaling));
-         this.add(gameNameField);
-         gamePasswordField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         gamePasswordField.setFont(MAIN_FONT);
-         gamePasswordField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 2 / 5, (int) (90 * scaling), (int) (19 * scaling));
-         this.add(gamePasswordField);
-         confirmButton.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y / 2, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(confirmButton);
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
-         g2.setColor(Color.WHITE);
-         g2.setFont(HEADER_FONT);
-         g2.drawString("Create Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Server")) / 2.0), (MAX_Y / 5));
-         //Server name
-         g2.setFont(MAIN_FONT);
-         g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
-         //Server password
-         g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 2 / 5 - g2.getFontMetrics().getHeight()));
-         //Draws particles
-         drawAllParticles(g2);
-      }
-   }
-
-   private class JoinPanel extends JPanel { //State =4
-      private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3, scaling);
-      private CustomTextField gamePasswordField = new CustomTextField(3, scaling);
-      private CustomButton backButton = new CustomButton("Back");
-      private CustomButton confirmButton = new CustomButton("Confirm Game");
-
-      public JoinPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic create and join server buttons
-         gameNameField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         gameNameField.setFont(MAIN_FONT);
-         gameNameField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 3 / 10, (int) (90 * scaling), (int) (19 * scaling));
-         this.add(gameNameField);
-         gamePasswordField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         gamePasswordField.setFont(MAIN_FONT);
-         gamePasswordField.setBounds(MAX_X / 2 - (int) (45 * scaling), MAX_Y * 2 / 5, (int) (90 * scaling), (int) (19 * scaling));
-         this.add(gamePasswordField);
-         confirmButton.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y / 2, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(confirmButton);
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
-         g2.setColor(Color.WHITE);
-         g2.setFont(HEADER_FONT);
-         g2.drawString("Join Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2.0), (MAX_Y / 5));
-         //Server name
-         g2.setFont(MAIN_FONT);
-         g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
-         //Server password
-         g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 2 / 5 - g2.getFontMetrics().getHeight()));
-         //Draws particles
-         drawAllParticles(g2);
-      }
-   }
-
-   private class InstructionPanel extends JPanel { //State=5
-      private Graphics2D g2;
-      private CustomButton backButton = new CustomButton("Back");
-
-
-      public InstructionPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Setting up buttons
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-            leaveGame = true;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(150, 150, 150));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
-         drawAllParticles(g2);
-      }
-   }
-
-   private class WaitingPanel extends JPanel { //State=6
-      private Graphics2D g2;
-      private boolean buttonAdd = true;
-      private boolean buttonRemove = true;
-      private CustomButton readyGameButton = new CustomButton("Begin game");
-      private CustomButton backButton = new CustomButton("Back");
-      private CustomButton teamOneButton = new CustomButton("Team one");
-      private CustomButton teamTwoButton = new CustomButton("Team two");
-
-
-      public WaitingPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Setting up buttons
-         readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         readyGameButton.addActionListener((ActionEvent e) -> {
-            notifyReady = true;
-         });
-
-         teamOneButton.addActionListener((ActionEvent e) -> {
-            myTeam = 1;
-            teamChosen = true;
-         });
-         teamOneButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 3 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(teamOneButton);
-
-         teamTwoButton.addActionListener((ActionEvent e) -> {
-            myTeam = 2;
-            teamChosen = true;
-         });
-         teamTwoButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y / 2, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(teamTwoButton);
-
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-            leaveGame = true;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-
-
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(70, 70, 70));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         FontMetrics metrics = g2.getFontMetrics();
-         super.paintComponent(g);
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         //if host==true, then display the ready button
-         //Background
-         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
-         g2.setColor(Color.white);
-         if ((host) && (buttonAdd)) {
-            this.add(readyGameButton);
-            buttonAdd = false;
-         }
-         StringBuilder players = new StringBuilder("Players: ");
-         for (int i = 0; i < onlineList.size(); i++) {
-            players.append(onlineList.get(i).getUsername() + ", ");
-         }
-         g2.drawString(players.toString(), (int) (2 * scaling), (int) (10 * scaling));
-         if (loading) {
-            if (buttonRemove) {
-               this.remove(readyGameButton);
-               buttonRemove = false;
-            }
-
-            g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), MAX_Y / 2);
-         }
-         drawAllParticles(g2);
-      }
-   }
-
-   private class IntermediatePanel extends JPanel { //State=7 (intermediate)=
-      private GamePanel gamePanel;
-      private boolean begin = true;
-
-      public IntermediatePanel() {
-         //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(0, 0, 0));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-      }
-
-      //set a method called initialize
-      public void repaintReal() {
-         gamePanel.repaint();
-      }
-
-      public void initializeScaling() {
-         if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //Make sure that these are doubles
-            //Y is excess
-            scaling = 1.0 * MAX_X / DESIRED_X;
-         } else {
-            //X is excess
-            scaling = 1.0 * MAX_Y / DESIRED_Y;
-         }
-         MAIN_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
-         HEADER_FONT = new Font("Akura Popo", Font.PLAIN, (int) (25 * scaling));
-      }
-
-      public void initializeSize() {
-         int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
-         myMouseAdapter.setCenterXy(tempXy);
-         myMouseAdapter.setScaling(scaling);
-         gamePanel = new GamePanel();
-         gamePanel.setBounds((int) ((this.getWidth() - (DESIRED_X * scaling)) / 2), (int) ((this.getHeight() - (DESIRED_Y * scaling)) / 2), (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
-         this.add(gamePanel);
-      }
-   }
-
-   private class GamePanel extends JPanel {//State=7
-      private Graphics2D g2;
-      private boolean generateGraphics = true;
-      int[] midXy = new int[2];
-      private Shape rect;
-      private Shape largeCircle;
-      private Area areaRect;
-      private Area largeRing;
-      private Polygon BOTTOM_BAR = new Polygon();
-      private Rectangle drawArea;
-      private BufferedImage fogMap;
-      private int fogTicks = 0;
-
-
-      public GamePanel() {
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(40, 40, 40));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.addMouseListener(myMouseAdapter);
-         this.addMouseWheelListener(myMouseAdapter);
-         this.addMouseMotionListener(myMouseAdapter);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         if ((state == 7) && (generateGraphics)) {
-            midXy[0] = (int) (DESIRED_X * scaling / 2);
-            midXy[1] = (int) (DESIRED_Y * scaling / 2);
-            for (Player currentPlayer : players) {
-               currentPlayer.setScaling(scaling);
-               currentPlayer.setCenterXy(midXy);
-            }
-            g2.setFont(MAIN_FONT);
-            generateGraphics = false;
-            largeCircle = new Ellipse2D.Double(400 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
-
-            rect = new Rectangle2D.Double(0, 0, 950 * scaling, 500 * scaling);
-            areaRect = new Area(rect);
-            largeRing = new Area(largeCircle);
-            areaRect.subtract(largeRing);
-            BOTTOM_BAR.addPoint((int) (272 * scaling), (int) (500 * scaling));
-            BOTTOM_BAR.addPoint((int) (265 * scaling), (int) (440 * scaling));
-            BOTTOM_BAR.addPoint((int) (270 * scaling), (int) (435 * scaling));
-            BOTTOM_BAR.addPoint((int) (680 * scaling), (int) (435 * scaling));
-            BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
-            BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
-            //Game set up
-            centerXy[0] = (int) (DESIRED_X * scaling / 2);
-            centerXy[1] = (int) (DESIRED_Y * scaling / 2);
-            try {
-               sheet = ImageIO.read(new File(".\\res\\Map.png"));
-               sectors = new Sector[10][10];
-               for (int i = 0; i < 10; i++) {
-                  for (int j = 0; j < 10; j++) {
-                     sectors[j][i] = new Sector();
-                     sectors[j][i].setImage(sheet.getSubimage(j * 1000, i * 1000, 1000, 1000));
-                     sectors[j][i].setSectorCoords(j, i);
-                     sectors[j][i].setSize((int) (1000 * scaling));
-                  }
-               }
-            } catch (IOException e) {
-               System.out.println("Image not found");
-            }
-            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
-         }
-         super.paintComponent(g2);
-         if (drawArea != null) {
-            g2.clip(drawArea);
-            g2.setFont(MAIN_FONT);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-            //Sectors
-            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 1000.0);
-            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 1000.0)) + 1;
-            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 1000.0);
-            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 1000.0)) + 1;
-
-            for (int i = startY; i < finalY; i++) {
-               for (int j = startX; j < finalX; j++) {
-                  if ((i >= 0) && (j >= 0) && (i < 10) && (j < 10)) {
-                     sectors[j][i].drawSector(g2, xyAdjust);
-                  }
-               }
-            }
-            //Game player
-            for (Player currentPlayer : players) {
-               if (currentPlayer != null) {
-                  currentPlayer.draw(g2, myPlayer.getXy());
-               }
-            }
-            // System.out.println(System.nanoTime() - time);
-
-            // Updating fog
-            for (int i = 0; i < players.length; i++) {
-               // TODO: Separate by teams
-               // TODO: Account for players that quit?
-               fog.scout(players[i].getXy());
-            }
-            //Creating shapes
-            AffineTransform tx = new AffineTransform();
-            tx.translate(centerXy[0] - myPlayer.getXy()[0] * scaling, centerXy[1] - myPlayer.getXy()[1] * scaling);
-            Area darkFog = fog.getFog().createTransformedArea(tx);
-            Area lightFog = fog.getExplored().createTransformedArea(tx);
-
-            //Draws fog
-            g2.setColor(Color.black); //Unexplored
-            g2.fill(darkFog);
-            g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);
-
-            for (int i = 0; i < projectiles.size(); i++) { //For some reason, a concurrent modification exception is thrown if i use the other for loop
-               projectiles.get(i).draw(g2);
-            }
-            for (int i = 0; i < aoes.size(); i++) { //For some reason, a concurrent modification exception is thrown if i use the other for loop
-               aoes.get(i).draw(g2);
-            }
-            g2.setColor(new Color(165, 156, 148));
-            //Minimap
-            g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
-            //Bottom bar
-            g2.drawPolygon(BOTTOM_BAR);
-
-
-            //Stat bars
-            g2.setColor(new Color(190, 40, 40));
-            g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
-
-            g2.setColor(new Color(165, 156, 148));
-            g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-            g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-            //Bottom bar contents
-
-            //Spells
-            g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-            g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-            g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-         }
-         g2.dispose();
-      }
-
-   }
-
-   private class CustomButton extends JButton {
-      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
-      private Color backgroundColor = new Color(0f, 0f, 0f, 0f);
-      private Color rolloverColor = new Color(1f, 1f, 1f, 0.1f);
-      private Color pressedColor = new Color(1f, 1f, 1f, 0.2f);
-      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
-
-      CustomButton(String description) {
-         super(description);
-         super.setContentAreaFilled(false);
-         this.setFont(BUTTON_FONT);
-         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-         this.setFocusPainted(false);
-      }
-
-      CustomButton(String description, Color foregroundColor, Color backgroundColor) {
-         super(description);
-         super.setContentAreaFilled(false);
-         this.setFont(MAIN_FONT);
-         this.foregroundColor = foregroundColor;
-         this.backgroundColor = backgroundColor;
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-         this.setFocusPainted(false);
-      }
-
-      @Override
-      protected void paintComponent(Graphics g) {
-         if (getModel().isPressed()) {
-            g.setColor(pressedColor);
-         } else if (getModel().isRollover()) {
-            g.setColor(rolloverColor);
-         } else {
-            g.setColor(getBackground());
-         }
-         g.fillRect(0, 0, getWidth(), getHeight());
-         super.paintComponent(g);
-      }
-   }
-
-
 }
-
-/*
-            createButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            createButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            joinButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            joinButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            instructionButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            instructionButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            backButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            backButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-
- */
-
-
