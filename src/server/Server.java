@@ -406,17 +406,23 @@ public class Server {
                                  char initializer = firstInput.charAt(0);
                                  String[] secondSplit = firstInput.split(initializer + "", -1);
                                  for (String secondInput : secondSplit) {
-                                    if (!secondInput.equals("")) {
-                                       String[] thirdSplit = secondInput.split(",", -1);
-                                       if (initializer == 'M') {
+                                    String[] thirdSplit = secondInput.split(",", -1);
+                                    if (initializer == 'M') {
+                                       if (!secondInput.equals("")) {
                                           players[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
-                                       } else if (initializer == 'S') {
+                                       }
+                                    } else if (initializer == 'S') {
+                                       if (!secondInput.equals("")) {
                                           players[i].setSpell(players[i].castSpell(Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
-                                          //The x y information about the spell is stored as thirdSplit[1] and [2]
-                                       } else if (initializer == 'A') {
-                                          players[i].autoAttack(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
-                                       } else if (initializer == 'F') {
-                                          players[i].flare(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
+                                       }
+                                       //The x y information about the spell is stored as thirdSplit[1] and [2]
+                                    } else if (initializer == 'A') {
+                                       players[i].autoAttack();
+                                    } else if (initializer == 'F') {
+                                       players[i].flare();
+                                    } else if (initializer == 'P') {
+                                       if (!secondInput.equals("")) {
+                                          players[i].setMouse(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
                                        }
                                     }
                                  }

@@ -24,7 +24,6 @@ public abstract class Player extends User implements CanIntersect {
    private boolean damaged = false;
    private ArrayList<Status> allStatus = new ArrayList<Status>();
    private int gold = 0;
-   private int desiredSpell;
    private int maxHealth;
    private int health;
    private int attack;
@@ -51,6 +50,12 @@ public abstract class Player extends User implements CanIntersect {
 
    Player(String username) {
       super(username);
+   }
+
+
+   public void setMouse(int mouseX, int mouseY) {
+      this.mouseX = mouseX;
+      this.mouseY = mouseY;
    }
 
    public void setID(int ID) {
@@ -116,14 +121,14 @@ public abstract class Player extends User implements CanIntersect {
       }
    }
 
-   public void autoAttack(int mouseX, int mouseY) {
+   public void autoAttack() {
       if (!stunned) {
          projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
          //Check for this
       }
    }
 
-   public void flare(int mouseX, int mouseY) {
+   public void flare() {
       if (!stunned) {
          projectiles.add(new FlareProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY));
       }
@@ -149,7 +154,7 @@ public abstract class Player extends User implements CanIntersect {
          illuminated = false;
          statuses.get(i).advance();
          Status removed = null;
-         mobility=maxMobility;
+         mobility = maxMobility;
          //TODO Adjust max mobility and mobility
          if (statuses.get(i).getRemainingDuration() <= 0) {
             removed = statuses.get(i);

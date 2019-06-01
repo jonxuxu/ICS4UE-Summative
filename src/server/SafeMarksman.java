@@ -9,12 +9,12 @@ package server;
  */
 
 public class SafeMarksman extends Player{
-  private int[] spellCooldowns = {1000,1000,1000};
+  private int[] spellCooldowns = {100,100,100};
   private int[] lastSpellTicks = {-10000,-10000,-10000};//So that they can be used immediately
   private int spellTick;
 
-  private static int SPACE_AOE_DURATION = 500;
-  private static int SPACE_AOE_RADIUS = 300;
+  private static int SPACE_AOE_DURATION = 2;
+  private static int SPACE_AOE_RADIUS = 30;
   private static int MS_BUFF_STRENGTH = 3;
   private static int MS_BUFF_DURATION = 100;
   private static int STUN_DURATION = 100;

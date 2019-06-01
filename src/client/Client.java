@@ -82,6 +82,7 @@ public class Client extends JFrame implements WindowListener {
    private int[] errors = new int[3];
    private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun"};
    private BufferedImage sheet;
+   private BufferedImage loadedSheet;
    private boolean logout = false;
    private boolean leaveGame = false;
    private BufferedImage TITLE_SCREEN;
@@ -98,6 +99,7 @@ public class Client extends JFrame implements WindowListener {
    private int[] centerXy = new int[2];
    private int myTeam;
    private boolean teamChosen = false;
+   private int[] xyAdjust = new int[2];
 
    public Client() {
       super("Dark");
@@ -268,6 +270,8 @@ public class Client extends JFrame implements WindowListener {
                // TODO: Initialize map ONCE after game begin
 
                if (input.ready()) {
+                  xyAdjust[0] = (int) (centerXy[0] - myPlayer.getXy()[0] * scaling);
+                  xyAdjust[1] = (int) (centerXy[1] - myPlayer.getXy()[1] * scaling);
                   decipherInput(input.readLine());//read input
                   //This is where everything is output. Output the key controls
                   //Always begin with clearing the outputString
@@ -305,7 +309,7 @@ public class Client extends JFrame implements WindowListener {
                   StringBuilder outputString = new StringBuilder();
                   for (int i = 0; i < spellsPressed.length; i++) {
                      if (spellsPressed[i]) {
-                        outputString.append("S" + i + "," + xyPos[0] + "," + xyPos[1]);
+                        outputString.append("S" + i);
                      }
                   }
                   if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
@@ -315,14 +319,18 @@ public class Client extends JFrame implements WindowListener {
                      outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
                   }
                   if (myMouseAdapter.getPressed()) {
+                     System.out.println("wdw");
                      if (myMouseAdapter.getLeftRight()[0]) {
-                        outputString.append("A" + xyPos[0] + "," + xyPos[1] + " ");
+                        outputString.append("A" + " ");
+                        System.out.println("1w");
                      }
                      if (myMouseAdapter.getLeftRight()[1]) {
-                        outputString.append("F" + xyPos[0] + "," + xyPos[1] + " ");
+                        outputString.append("F" + " ");
+                        System.out.println("2wwwdw");
                      }
                   }
                   // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
+                  outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
                   if (!outputString.toString().trim().isEmpty()) {
                      output.println(outputString.toString().trim());
                      output.flush();
@@ -657,11 +665,11 @@ public class Client extends JFrame implements WindowListener {
          g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
          g2.setFont(MAIN_FONT);
          if ((!connected) && (!unableToConnect)) {
-            g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y / 4.0));
+            g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y * 5 / 16.0));
          } else if ((connected) && (!unableToConnect)) {
-            g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y / 4.0));
+            g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y * 5 / 16.0));
          } else if (unableToConnect) {
-            g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y / 4.0));
+            g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y * 5 / 16.0));
          }
       }
    }
@@ -715,16 +723,16 @@ public class Client extends JFrame implements WindowListener {
          GraphicsConfiguration graphicsConfiguration = graphicsDevice.getDefaultConfiguration();
          LOADED_TITLE_SCREEN = graphicsConfiguration.createCompatibleImage((int) (1800 * introScaling), (int) (1198 * introScaling), Transparency.TRANSLUCENT);
          Graphics2D graphicsTS = LOADED_TITLE_SCREEN.createGraphics();
-         graphicsTS.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-         graphicsTS.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-         graphicsTS.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+         graphicsTS.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+         graphicsTS.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+         graphicsTS.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          graphicsTS.drawImage(TITLE_SCREEN, 0, 0, (int) (1800 * introScaling), (int) (1198 * introScaling), null);
          graphicsTS.dispose();
          LOADED_TITLE = graphicsConfiguration.createCompatibleImage((int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), Transparency.TRANSLUCENT);
          Graphics2D graphicsT = LOADED_TITLE.createGraphics();
-         graphicsT.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-         graphicsT.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-         graphicsT.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+         graphicsT.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+         graphicsT.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+         graphicsT.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          graphicsT.drawImage(TITLE, 0, 0, (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
          graphicsT.dispose();
 
@@ -821,7 +829,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          super.paintComponent(g);
          //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
+         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
          g2.setFont(HEADER_FONT);
          g2.drawString("Create Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Server")) / 2.0), (MAX_Y / 5));
@@ -895,7 +903,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
+         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
          g2.setColor(Color.WHITE);
          g2.setFont(HEADER_FONT);
          g2.drawString("Join Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2.0), (MAX_Y / 5));
@@ -940,7 +948,7 @@ public class Client extends JFrame implements WindowListener {
          g2.setFont(MAIN_FONT);
          super.paintComponent(g);
          //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
+         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
          drawAllParticles(g2);
       }
    }
@@ -1004,7 +1012,7 @@ public class Client extends JFrame implements WindowListener {
          //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
          //if host==true, then display the ready button
          //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
+         g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), null);
          g2.setColor(Color.white);
          if ((host) && (buttonAdd)) {
             this.add(readyGameButton);
@@ -1121,21 +1129,16 @@ public class Client extends JFrame implements WindowListener {
             centerXy[0] = (int) (DESIRED_X * scaling / 2);
             centerXy[1] = (int) (DESIRED_Y * scaling / 2);
             try {
-               long time = System.nanoTime();
-               sheet = ImageIO.read(new File(".\\res/Map.png"));
-               System.out.println(System.nanoTime() - time);
-               /*
-               sectors = new Sector[1000][1000];
-               for (int i = 0; i < 1000; i++) {
-                  for (int j = 0; j < 1000; j++) {
+               sheet = ImageIO.read(new File(".\\res\\Map.png"));
+               sectors = new Sector[10][10];
+               for (int i = 0; i < 10; i++) {
+                  for (int j = 0; j < 10; j++) {
                      sectors[j][i] = new Sector();
-                    // sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
+                     sectors[j][i].setImage(sheet.getSubimage(j * 1000, i * 1000, 1000, 1000));
                      sectors[j][i].setSectorCoords(j, i);
-                     sectors[j][i].setScaling(scaling);
-                     sectors[j][i].setCenterXy(centerXy);
+                     sectors[j][i].setSize((int) (1000 * scaling));
                   }
                }
-*/
             } catch (IOException e) {
                System.out.println("Image not found");
             }
@@ -1149,23 +1152,18 @@ public class Client extends JFrame implements WindowListener {
 
             //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
             //Sectors
-            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
-            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
-            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
-            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
+            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 1000.0);
+            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 1000.0)) + 1;
+            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 1000.0);
+            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 1000.0)) + 1;
 
-            //long time = System.nanoTime();
-            /*
             for (int i = startY; i < finalY; i++) {
                for (int j = startX; j < finalX; j++) {
-                  if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
-                     sectors[j][i].setFog(fog.getSingleFog(j, i));
-                     sectors[j][i].drawSector(g2, myPlayer.getXy());
+                  if ((i >= 0) && (j >= 0) && (i < 10) && (j < 10)) {
+                     sectors[j][i].drawSector(g2, xyAdjust);
                   }
                }
             }
-            */
-            g2.drawImage(sheet, (int) (centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (10000 * scaling), (int) (10000 * scaling), null);
             //Game player
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
@@ -1299,3 +1297,5 @@ public class Client extends JFrame implements WindowListener {
             backButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
 
  */
+
+
