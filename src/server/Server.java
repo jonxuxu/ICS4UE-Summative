@@ -10,24 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-/*
-General Message Conventions:
-Starting with * means that it is an initializer message
-Sending a number in the beginning indicates whether the msg was a success or failure. Anything other than 0 is a type of error
-Send "" if you want to just communicate back to a blank msg
-Use .trim() at the end before sending to remove final white spaces if there are any
-" " is the major separator, everything else should be dealt using () and ,
-
-Make sure that no special characters are allowed for the password, servername, or username
-*/
-
-/*
-Things to Fix:
-Make sure that it is impossible to leave right before the game begins such that the game only has one player or something along those lines
-Make a window listener that sends X when the program closes
-Pressing leave game will instead send Q, which will do most of the same things
- */
-
 /**
  * Server.java
  * This is
@@ -37,8 +19,6 @@ Pressing leave game will instead send Q, which will do most of the same things
  * @since 2019-04-24
  */
 
-//kustard
-
 public class Server {
    //All for the main server
    private ArrayList<MenuHandler> menuConnections = new ArrayList<MenuHandler>();
@@ -46,7 +26,6 @@ public class Server {
    //Used by all
    private ArrayList<User> onlineUsers = new ArrayList<User>();
    private ArrayList<GameServer> games = new ArrayList<GameServer>();
-   private ArrayList<GameServer> startedGames = new ArrayList<GameServer>();
 
    public static void main(String[] args) {
       new Server().go();
@@ -74,7 +53,7 @@ public class Server {
       private PrintWriter output;
       private BufferedReader input;
       private boolean stop = false;
-      private int error = 0;//0 means no error, anything beyond this can correspond to a different error number
+      private int error;
 
       MenuHandler(Socket newConnection) {
          myConnection = newConnection;
@@ -84,31 +63,14 @@ public class Server {
          } catch (IOException e) {
             e.printStackTrace();
          }
-         //Send a message to the client so that it can now send back the username
       }
-
-
-      /*
-      Data flow:
-      First, the menu handler establishes a connection and waits until it receives the name from the client
-      This is then checked as start=true. If it is valid, it will send a 0 and start will no longer be true for both
-      Otherwise, 1 will be sent and the cycle will repeat itself
-      Then, the client sends messages whenever it wants. It is up to the server whether or not the messages are accepted,
-      but it waits until it receives a response from the server before it continues
-       */
 
       @Override
       public void run() {
          try {
-            //Begin the main loop to receive info on what game they want to join
-            //This process for the menu is not time sensitive, so there is no clock
-            //When a new player joins, send the full list of players to all players
             while (!stop) {
                if (input.ready()) {
                   String inputString = input.readLine();//Reads as fast as it can. Or you could alternatively slow it down here by making a getFramePassed at this instance
-                  //There would normally be a timer on the output, or possibly the input
-                  //System.out.println("I:" + inputString);
-                  //Here, the initializer can be chars. U(Username), J (Join), C (Create), R (Ready), Q (Quit), and X (Close)
                   char initializer = inputString.charAt(0);
                   inputString = inputString.substring(1);//Remove the initializer
                   if (initializer == 'U') { //username
@@ -141,9 +103,10 @@ public class Server {
                         //To the person trying to join, they should have the names of everyone sent to them
                         //To everyone else, they should have the name of the new individual
                         printOnlineList(true);
+                     }else{
+                        output.println(error);
+                        output.flush();
                      }
-                     output.println(error);
-                     output.flush();
                   } else if (initializer == 'C') { //To create, it is C{serverName} {password}
                      String serverName = inputString.substring(0, inputString.indexOf(" "));
                      inputString = inputString.substring(inputString.indexOf(" ") + 1);
@@ -160,7 +123,6 @@ public class Server {
                         myGame.addGamePlayer(myUser, myConnection, this);
                         games.add(myGame);
                      }
-                     System.out.println(error);
                      output.println(error);
                      output.flush();
                   } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
@@ -174,9 +136,7 @@ public class Server {
                         output.flush();
                         myGame.run();
                      }
-                     //Each game is a thread that is run. There is only communication between the game and
-                     //the players
-
+                     //Each game is a thread that is run. There is only communication between the game and the players
                   } else if (initializer == 'B') {
                      if (myGame != null) {
                         if (!myGame.isHost(myUser)) {
@@ -262,7 +222,6 @@ public class Server {
       private void kill() {
          stop = true;
       }
-
       private boolean usernameValid(String attemptedName) {
          //Later on, check for special characters and set a limit
          for (int i = 0; i < onlineUsers.size(); i++) {
@@ -333,7 +292,6 @@ public class Server {
       @Override
       public void run() {
          begin = true;
-         //Not called until the game begins
          //Once it is called, this is all that really occurs
          for (MenuHandler thisHandler : handlers) {
             thisHandler.kill();
@@ -347,9 +305,6 @@ public class Server {
             //gameObjectOutputs = new ObjectOutputStream[players.length];
             //gameObjectInputs = new ObjectInputStream[players.length];
 
-            /*
-            This is where a seed is generated
-            */
             for (int i = 0; i < players.length; i++) {
                players[i] = onlinePlayers.get(i);
                gameSockets[i] = onlineGameSockets.get(i);
@@ -529,7 +484,6 @@ public class Server {
             }
          }
       }
-
       private boolean sameName(String comparedName) {
          if (comparedName.equals(serverName)) {
             return (true);
@@ -544,6 +498,13 @@ public class Server {
          } else {
             return (false);
          }
+      }
+      private String getServerName() {
+         return serverName;
+      }
+
+      private String getServerPassword() {
+         return serverPassword;
       }
 
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
