@@ -11,10 +11,9 @@ class Projectile implements HasID{
    private double dx;
    private double dy;
    private int lifetime;
-   private double x, y;
+   private int x, y;
    private int ID;
    private Rectangle hitbox;
-   private int totalTime;
 
    Projectile(int spawnX, int spawnY, int targetX, int targetY, int speed, int range, int ID) {
       this.spawnX = spawnX;
@@ -25,7 +24,7 @@ class Projectile implements HasID{
       this.range = range;
       x = spawnX;
       y = spawnY;
-      hitbox = new Rectangle((int)x,(int)y,10,10);//10 is abritrary
+      hitbox = new Rectangle(x, y, 10, 10);//10 is arbitrary
       this.ID=ID;
 
       //This could cause problems if trajectory is later updated
@@ -34,38 +33,33 @@ class Projectile implements HasID{
       theta = Math.atan2((targetY - spawnY), (targetX - spawnX));
       dx = speed * Math.cos(theta);
       dy = speed * Math.sin(theta);
-          totalTime = (int)Math.round(range*1.0/speed);
    }
 
    public void advance() {
       lifetime++;
       x += dx;
       y += dy;
-      hitbox.setLocation((int)x, (int)y);
+      hitbox.setLocation(x, y);
    }
 
    public int getRemainingDuration() {
-      return totalTime - lifetime;
+      return range / speed - lifetime;
    }
 
    public boolean collides(CanIntersect object) {
       return object.getHitbox().intersects(hitbox);
    }
 
-   public int getX(){
-     return (int)x;
+   public int getX() {
+      return x;
    }
-   
-   public int getY(){
-     return (int)y;
+
+   public int getY() {
+      return y;
    }
 
    public int getID() {
       return (ID);
    }
-   
-   public void setID(int ID) {
-    this.ID = ID;
-  }
 
 }
