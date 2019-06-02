@@ -1,5 +1,7 @@
 package client.ui;
 
+import client.Client;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -15,8 +17,9 @@ import java.awt.event.ActionEvent;
 public class LoginPanel extends GeneralPanel {
    private Graphics2D g2;
    private final double SCALING = super.getScaling();
-   private final int MAX_X= super.getWidth();
-   private final int MAX_Y= super.getHeight();
+   private final int MAX_X = super.getWidth();
+   private final int MAX_Y = super.getHeight();
+   private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
    private final Font HEADER_FONT = super.getFont("header");
 
@@ -27,22 +30,14 @@ public class LoginPanel extends GeneralPanel {
       //Basic username field
       //sendName = true;
       nameField.addActionListener((ActionEvent e) -> {
-         if (!sendName) {
-            if (!(nameField.getText().contains(" "))) {
-               username = nameField.getText();
-               sendName = true;
-            } else {
-               System.out.println("Error: Spaces exist");
-            }
-         }
+         CLIENT.testName(nameField.getText());
       });
       nameField.setFont(super.getFont("main"));
       nameField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y / 5, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(nameField);
 
-
       testButton.addActionListener((ActionEvent e) -> {
-         testingBegin = true;
+         CLIENT.testingBegin();
       });
 
       testButton.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 2 / 5, (int) (90 * SCALING), (int) (19 * SCALING));
@@ -61,17 +56,17 @@ public class LoginPanel extends GeneralPanel {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setFont(MAIN_FONT);
       super.paintComponent(g);
-
       //Begin drawing
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
       g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * SCALING));
       g2.setFont(MAIN_FONT);
-      if ((!connected) && (!unableToConnect)) {
+      int tempConnectionState = CLIENT.getConnectionState();
+      if (tempConnectionState == 0) {
          g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y * 5 / 16.0));
-      } else if ((connected) && (!unableToConnect)) {
+      } else if (tempConnectionState == 1) {
          g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y * 5 / 16.0));
-      } else if (unableToConnect) {
+      } else {
          g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y * 5 / 16.0));
       }
    }

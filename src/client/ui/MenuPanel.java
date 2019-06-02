@@ -1,5 +1,6 @@
 package client.ui;
 
+import client.Client;
 import client.particle.AshParticle;
 
 import java.awt.*;
@@ -19,6 +20,7 @@ public class MenuPanel extends GeneralPanel {//State=2
    private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
    private final int MAX_Y= super.getHeight();
+   private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
 
    private CustomButton createButton = new CustomButton("Create Game", SCALING);
@@ -33,25 +35,25 @@ public class MenuPanel extends GeneralPanel {//State=2
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
       createButton.addActionListener((ActionEvent e) -> {
-         newState = 3;
+       CLIENT.setNewState(3);
       });
       createButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(createButton);
 
       joinButton.addActionListener((ActionEvent e) -> {
-         newState = 4;
+         CLIENT.setNewState(4);
       });
       joinButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(joinButton);
       instructionButton.addActionListener((ActionEvent e) -> {
-         newState = 5;//I added this later so I didn't want to move everything around
+         CLIENT.setNewState(5);
       });
       instructionButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
 
       this.add(instructionButton);
       logoutButton.addActionListener((ActionEvent e) -> {
-         newState = 0;
-         logout = true;
+         CLIENT.setNewState(0);
+         CLIENT.logout();
       });
       logoutButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(logoutButton);

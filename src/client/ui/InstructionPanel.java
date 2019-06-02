@@ -1,5 +1,7 @@
 package client.ui;
 
+import client.Client;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -21,6 +23,7 @@ public class InstructionPanel extends GeneralPanel { //State=5
    private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
    private final int MAX_Y= super.getHeight();
+   private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
    private final Font HEADER_FONT = super.getFont("header");
 
@@ -30,8 +33,9 @@ public class InstructionPanel extends GeneralPanel { //State=5
    public InstructionPanel() {
       //Setting up buttons
       backButton.addActionListener((ActionEvent e) -> {
-         newState = 2;
-         leaveGame = true;
+         CLIENT.setNewState(2);
+       //  CLIENT.setAction(2);
+         CLIENT.leaveGame();
       });
       backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);

@@ -20,9 +20,9 @@ import java.awt.Font;
 public class IntermediatePanel extends GeneralPanel { //State=7 (intermediate)=
    private boolean begin = true;
    private final double SCALING = super.getScaling();
+   private final Client CLIENT = super.getClient();
    private final int MAX_X= super.getWidth();
    private final int MAX_Y= super.getHeight();
-
    private Client.GamePanel gamePanel;
 
    public IntermediatePanel() {
@@ -34,6 +34,7 @@ public class IntermediatePanel extends GeneralPanel { //State=7 (intermediate)=
       this.setBackground(new Color(0, 0, 0));
       this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
       this.setVisible(true);
+      gamePanel= CLIENT.new GamePanel();
    }
    public void initializeSize(int DESIRED_X,int DESIRED_Y) {
       gamePanel.setBounds((int) ((this.getWidth() - (DESIRED_X * SCALING)) / 2), (int) ((this.getHeight() - (DESIRED_Y * SCALING)) / 2), (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));

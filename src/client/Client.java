@@ -53,8 +53,7 @@ public class Client extends JFrame implements WindowListener {
    private BufferedReader input;
    private PrintWriter output;
    private String username;
-   private boolean connected = false;
-   private  GeneralPanel[] allPanels = new GeneralPanel[8];
+   private GeneralPanel[] allPanels = new GeneralPanel[8];
    private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CustomMouseAdapter myMouseAdapter = new CustomMouseAdapter();
    private CustomKeyListener myKeyListener = new CustomKeyListener();
@@ -91,7 +90,7 @@ public class Client extends JFrame implements WindowListener {
    private BufferedImage loadedSheet;
    private boolean logout = false;
    private boolean leaveGame = false;
-   private boolean unableToConnect = false;
+   private int connectionState = 0; //-1 means unable to connect, 0 means trying to connect, 1 means connected
    private FogMap fog;
    private boolean testingBegin = false;
    private double introScaling;
@@ -102,7 +101,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean teamChosen = false;
    private int[] xyAdjust = new int[2];
    private soundEffectManager soundEffect = new soundEffectManager();
-
+   private Clock time = new Clock();
 
    public Client() {
       super("Dark");
@@ -155,7 +154,7 @@ public class Client extends JFrame implements WindowListener {
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
-      ((IntermediatePanel)(allPanels[7])).initializeSize(DESIRED_X,DESIRED_Y);
+      ((IntermediatePanel) (allPanels[7])).initializeSize(DESIRED_X, DESIRED_Y);
       int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
       myMouseAdapter.setCenterXy(tempXy);
       myMouseAdapter.setScaling(scaling);
@@ -171,201 +170,164 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void go() {
-      boolean inputReady = false;
-      while (!connected) {
-         //Idle
-         repaintPanels();
-         connect();
-      }
-      try {
+      try{
          input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
          output = new PrintWriter(socket.getOutputStream());
-         //Start with entering the name. This must be separated from the rest
-         //Username successfully entered in
-         int fogTicks = 0;
-         Clock time = new Clock();
-         while (connected) {
-            //Otherwise, continue to send messages. The lines below are for when something is going to be sent
-            if (!gameBegin) {
-               if (time.getFramePassed()) {
-                  repaintPanels();
-               }
-               //Recieves input if possible
-               if (input.ready()) {
-                  decipherInput(input.readLine());
-               }
-
-               //Deal with output when going back through the menu
-               if (logout) {
-                  output.println("B");//for back
-                  output.flush();
-                  username = null;
-                  logout = false;
-               }
-               if (leaveGame) {
-                  output.println("B");//for back
-                  output.flush();
-                  onlineList.clear();
-                  leaveGame = false;
-               }
-               if (sendName) {
-                  sendName = false;
-                  if (username != null) {
-                     if (verifyString(username, 0)) {
-                        output.println("U" + username);
-                        output.flush();
-                        waitForInput();
-                     }
-                     if (errors[0] == 0) {
-                        System.out.println("Valid username");
-                     } else {
-                        System.out.println("Error: " + errorMessages[errors[0]]);
-                     }
-                  }
-               }
-               if (testGame) {
-                  testGame = false;
-                  if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
-                     if (state == 3) {
-                        output.println("C" + attemptedGameName + " " + attemptedGamePassword);
-                     } else {
-                        output.println("J" + attemptedGameName + " " + attemptedGamePassword);
-                     }
-                     output.flush();
-                     waitForInput();
-                  }
-                  System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
-                  if ((errors[1] == 0) && (errors[2] == 0)) {
-                     System.out.println("Valid game");
-                  } else {
-                     System.out.println("Error: " + errorMessages[errors[1]]);
-                     System.out.println("Error: " + errorMessages[errors[2]]);
-                  }
-               }
-               if (notifyReady) {
-                  notifyReady = false;
-                  output.println("R");
-                  output.flush();
-                  waitForInput();
-               }
-               if (teamChosen) {
-                  teamChosen = false;
-                  output.println("E" + myTeam);//E for now, when testing is removed it will be T
-                  output.flush();
-               }
-               if (testingBegin) {
-                  username = Math.random() + "";
-                  myUser = new User(username);
-                  output.println("T" + username);//test
-                  output.flush();
-                  waitForInput();
-                  host = true;
-                  newState = 6;
-                  gameName = "";
-                  gamePassword = "";
-                  players = new Player[onlineList.size()];
-                  for (int i = 0; i < onlineList.size(); i++) {
-                     players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-                     if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                        myPlayer = players[i];
-                     }
-                  }
-                  testingBegin = false;
-               }
-            } else {
-               // TODO: Initialize map ONCE after game begin
-
-               if (input.ready()) {
-                  xyAdjust[0] = (int) (centerXy[0] - myPlayer.getXy()[0] * scaling);
-                  xyAdjust[1] = (int) (centerXy[1] - myPlayer.getXy()[1] * scaling);
-                  decipherInput(input.readLine());//read input
-                  //This is where everything is output. Output the key controls
-                  //Always begin with clearing the outputString
-                  //The output string contains all the information required for the server.
-                  //I'm unsure if I should process some here, or just send all the raw data
-                  //If the raw data was to be sent, the following should be sent: MAX_X/MAX_Y (only once),
-                  //the x and y of the mouse, the relevant keyboard presses maybe? (not all)
-                  outputString = "";
-                  int angleOfMovement = myKeyListener.getAngle();
-                  int[] xyPos = new int[2]; //Scaled to the map
-
-                  xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0]; //Make it for hover
-                  xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
-
-                  //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
-                  //must add the mouse adapter to the JPanel.
-
-                  boolean[] spellsPressed = myKeyListener.getSpell();
-                  boolean[] leftRight = myMouseAdapter.getLeftRight();
-                  StringBuilder outputString = new StringBuilder();
-                  for (int i = 0; i < spellsPressed.length; i++) {
-                     if (spellsPressed[i]) {
-                        outputString.append("S" + i);
-                     }
-                  }
-                  if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
-                     outputString.append(" "); //Add the seperator
-                  }
-                  if (angleOfMovement != -10) {
-                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
-                  }
-                  if (myMouseAdapter.getPressed()) {
-                     System.out.println("wdw");
-                     if (myMouseAdapter.getLeftRight()[0]) {
-                        outputString.append("A" + " ");
-                        System.out.println("1w");
-                     }
-                     if (myMouseAdapter.getLeftRight()[1]) {
-                        soundEffect.playSound("cow");
-                        outputString.append("F" + " ");
-                        System.out.println("2wwwdw");
-                     }
-                  }
-                  // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
-                  outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
-                  if (!outputString.toString().trim().isEmpty()) {
-                     output.println(outputString.toString().trim());
-                     output.flush();
-                  }
-                  repaintPanels();
-               }
-            }
-         }
-         //If a message is sent, wait until a response is received before doing anything
-      } catch (IOException e) {
-         System.out.println("Unable to read/write");
+      }catch (IOException e){
+         e.printStackTrace();
       }
-   }
-
-   public boolean verifyString(String testString, int errorIndex) {
-      errors[errorIndex] = 0;
-      if (testString.length() < 15) {
-         if (testString.isEmpty()) {
-            errors[errorIndex] = 4;
+      while (true) {  //Main game loop
+         if (connectionState < 1) {
+            repaintPanels();
+            connect();
          } else {
-            for (int i = 0; i < testString.length(); i++) {
-               if (!letterOrNumber(testString.charAt(i))) {
-                  errors[errorIndex] = 2;
-               }
+            if (!gameBegin) {
+               menuLogic();
+            } else {
+               gameLogic();
             }
          }
-      } else {
-         errors[errorIndex] = 3;
-      }
-      if (errors[errorIndex] == 0) {
-         return true;
-      } else {
-         return false;
       }
    }
 
-   public boolean letterOrNumber(char letter) {
-      if (((letter >= 97) && (letter <= 122)) || ((letter >= 65) && (letter <= 90)) || ((letter >= 48) && (letter <= 57))) {
-         return true;
-      } else {
-         return false;
+   public void menuLogic() {
+      try {
+         if (time.getFramePassed()) {
+            repaintPanels();
+         }
+         if (input.ready()) {
+            decipherMenuInput(input.readLine());
+         }
+         //Deal with output when going back through the menu
+         if (logout) {
+            output.println("B");//for back
+            output.flush();
+            username = null;
+            logout = false;
+         }
+         if (leaveGame) {
+            output.println("B");//for back
+            output.flush();
+            onlineList.clear();
+            leaveGame = false;
+         }
+         if (sendName) {
+            sendName = false;
+            if (username != null) {
+               if (verifyString(username, 0)) {
+                  output.println("U" + username);
+                  output.flush();
+                  waitForInput();
+               }
+               if (errors[0] == 0) {
+                  System.out.println("Valid username");
+               } else {
+                  System.out.println("Error: " + errorMessages[errors[0]]);
+               }
+            }
+         }
+         if (testGame) {
+            testGame = false;
+            if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
+               if (state == 3) {
+                  output.println("C" + attemptedGameName + " " + attemptedGamePassword);
+               } else {
+                  output.println("J" + attemptedGameName + " " + attemptedGamePassword);
+               }
+               output.flush();
+               waitForInput();
+            }
+            System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
+            if ((errors[1] == 0) && (errors[2] == 0)) {
+               System.out.println("Valid game");
+            } else {
+               System.out.println("Error: " + errorMessages[errors[1]]);
+               System.out.println("Error: " + errorMessages[errors[2]]);
+            }
+         }
+         if (notifyReady) {
+            notifyReady = false;
+            output.println("R");
+            output.flush();
+            waitForInput();
+         }
+         if (teamChosen) {
+            teamChosen = false;
+            output.println("E" + myTeam);//E for now, when testing is removed it will be T
+            output.flush();
+         }
+         if (testingBegin) {
+            username = Math.random() + "";
+            myUser = new User(username);
+            output.println("T" + username);//test
+            output.flush();
+            waitForInput();
+            host = true;
+            newState = 6;
+            gameName = "";
+            gamePassword = "";
+            players = new Player[onlineList.size()];
+            for (int i = 0; i < onlineList.size(); i++) {
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
+               }
+            }
+            testingBegin = false;
+         }
+      } catch (IOException e) {
+         e.printStackTrace();
       }
    }
+
+   public void gameLogic() {
+      // TODO: Initialize map ONCE after game begin
+      try {
+         if (input.ready()) {
+            xyAdjust[0] = (int) (centerXy[0] - myPlayer.getXy()[0] * scaling);
+            xyAdjust[1] = (int) (centerXy[1] - myPlayer.getXy()[1] * scaling);
+            decipherMenuInput(input.readLine());
+            outputString = "";
+            int angleOfMovement = myKeyListener.getAngle();
+            int[] xyPos = new int[2]; //Scaled to the map
+            xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
+            xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
+            boolean[] spellsPressed = myKeyListener.getSpell();
+            boolean[] leftRight = myMouseAdapter.getLeftRight();
+            StringBuilder outputString = new StringBuilder();
+            for (int i = 0; i < spellsPressed.length; i++) {
+               if (spellsPressed[i]) {
+                  outputString.append("S" + i);
+               }
+            }
+            if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
+               outputString.append(" "); //Add the separator
+            }
+            if (angleOfMovement != -10) {
+               outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
+            }
+            if (myMouseAdapter.getPressed()) {
+               if (leftRight[0]) {
+                  outputString.append("A" + " ");
+               }
+               if (leftRight[1]) {
+                  soundEffect.playSound("cow");
+                  outputString.append("F" + " ");
+               }
+            }
+             outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
+            if (!outputString.toString().trim().isEmpty()) {
+               output.println(outputString.toString().trim());
+               output.flush();
+            }
+            repaintPanels();
+         }
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+
 
    public void waitForInput() {
       boolean inputReady = false;
@@ -373,7 +335,11 @@ public class Client extends JFrame implements WindowListener {
          while (!inputReady) {
             if (input.ready()) {
                inputReady = true;
-               decipherInput(input.readLine());
+               if (!gameBegin) {
+                  decipherMenuInput(input.readLine().trim());
+               } else {
+                  decipherGameInput(input.readLine().trim());
+               }
             }
          }
       } catch (IOException e) {
@@ -390,21 +356,14 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   public void decipherInput(String input) {
-      //Hopefully, every message should have something
-      //For the menu, numbers represent error/success, A represents add all (if you join),
-      //N represents add one new player, and B represents begin the game
-      //Remove the initializer
-      input = input.trim();//in case something is wrong
-      if (!gameBegin) {
-         char initializer = input.charAt(0);
-         input = input.substring(1);
-         if (isParsable(initializer)) {
-            if (state == 0) {
-               errors[0] = Integer.parseInt(initializer + "");
-               if (initializer == '0') {
-
-                  //Start the opening here
+   public void decipherMenuInput(String input) {
+      char initializer = input.charAt(0);
+      input = input.substring(1);
+      if (isParsable(initializer)) {
+         if (state == 0) {
+            errors[0] = Integer.parseInt(initializer + "");
+            if (initializer == '0') {
+               //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
                   ((IntroPanel) (allPanels[1])).go();
@@ -413,122 +372,111 @@ public class Client extends JFrame implements WindowListener {
                   } catch (Exception E) {
                   }
 */
-                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
-
-                  newState = 2;
-               } else {
-                  username = null;
-               }
-            } else if ((state == 3) || (state == 4)) {
-               if (initializer == '0') {
-                  newState = 6;//Sends to a waiting room
-                  gameName = attemptedGameName;
-                  gamePassword = attemptedGamePassword;
-                  myUser = new User(username);//Sets the player
-                  if (state == 3) {
-                     host = true;
-                     onlineList.add(myUser);
-                  }
-               }
-               errors[1] = Integer.parseInt(initializer + "");
-               /*
-               else if (initializer == '1') {
-                  if (state == 2) {
-                     System.out.println("Game name in use");
-                  } else {
-                     System.out.println("Wrong username/password"); //Make this one print out state==5
-                  }
-               } else if (initializer == '2') {
-                  System.out.println("Game is full");//Make this one print out state==6
-               }
-               */
-            } else if (state == 6) {
-               if (initializer == '0') {
-                  System.out.println("Starting Game");
-                  loading = true;
-               } else {
-                  System.out.println("Unable to Start Game");
-               }
+               cardLayout.show(mainContainer, PANEL_NAMES[2]);
+               newState = 2;
+            } else {
+               username = null;
             }
-         } else if (initializer == 'A') {
-            String[] allPlayers = input.split(" ", -1);
-            for (String aPlayer : allPlayers) {
-               if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
+         } else if ((state == 3) || (state == 4)) {
+            if (initializer == '0') {
+               newState = 6;//Sends to a waiting room
+               gameName = attemptedGameName;
+               gamePassword = attemptedGamePassword;
+               myUser = new User(username);//Sets the player
+               if (state == 3) {
+                  host = true;
                   onlineList.add(myUser);
-               } else {
-                  onlineList.add(new User(aPlayer));
                }
             }
-         } else if (initializer == 'N') {
-            onlineList.add(new User(input));
-         } else if (initializer == 'X') {
-            for (int i = 0; i < onlineList.size(); i++) {
-               if (onlineList.get(i).getUsername().equals(input)) {
-                  onlineList.remove(i);
-               }
+            errors[1] = Integer.parseInt(initializer + "");
+         } else if (state == 6) {
+            if (initializer == '0') {
+               System.out.println("Starting Game");
+               loading = true;
+            } else {
+               System.out.println("Unable to Start Game");
             }
-         } else if (initializer == 'B') {
-            players = new Player[onlineList.size()];
-            for (int i = 0; i < onlineList.size(); i++) {
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
-            }
-            newState = 7;//Sends to the game screen
-            gameBegin = true;
-         } else if (initializer == 'P') { //Then leave the game
-            onlineList.clear();
-            newState = 2;
          }
-      } else {
-         projectiles.clear();
-         aoes.clear();
-         String[] firstSplit = input.split(" ", -1);
-         for (String firstInput : firstSplit) {
-            char initializer = firstInput.charAt(0);
-            String[] secondSplit = firstInput.split(initializer + "", -1);
-            for (String secondInput : secondSplit) {
-               if (!secondInput.equals("")) {
-                  String[] thirdSplit = secondInput.split(",", -1);
-                  if (initializer == 'P') {
-                     //REPLACE THIS WITH A SET PLAYER METHOD.
-                     int playerID = Integer.parseInt(thirdSplit[0]);
-                     players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
-                     players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
-                     players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
-                     players[playerID].setAttack(Integer.parseInt(thirdSplit[5]));
-                     players[playerID].setMobility(Integer.parseInt(thirdSplit[6]));
-                     players[playerID].setRange(Integer.parseInt(thirdSplit[7]));
-                     players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[8]));
-                     players[playerID].setGold(Integer.parseInt(thirdSplit[9]));
-                     players[playerID].setSpriteID(Integer.parseInt(thirdSplit[10]));
-                     for (int j = 11; j < 14; j++) {
-                        players[playerID].setSpellPercent(Integer.parseInt(thirdSplit[j]), j - 11);
-                     }
-                     players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[14]));
-                     for (int j = 15; j < 15 + Integer.parseInt(thirdSplit[15]); j++) {
-                        players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
-                     }
-                  } else if (initializer == 'O') {
-                     //REPLACE THIS WITH A SET OTHERS METHOD.
-                     int playerID = Integer.parseInt(thirdSplit[0]);
-                     players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
-                     players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
-                     players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
-                     players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[5]));
-                     players[playerID].setSpriteID(Integer.parseInt(thirdSplit[6]));
-                     players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[7]));
-                     for (int j = 8; j < 8 + Integer.parseInt(thirdSplit[8]); j++) {
-                        players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
-                     }
-                  } else if (initializer == 'D') {
-                     players[Integer.parseInt(thirdSplit[0])] = null;
-                  } else if (initializer == 'R') {
-                     projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling)));
-                  } else if (initializer == 'E') {
-                     aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (Integer.parseInt(thirdSplit[3]) * scaling)));
+      } else if (initializer == 'A') {
+         String[] allPlayers = input.split(" ", -1);
+         for (String aPlayer : allPlayers) {
+            if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
+               onlineList.add(myUser);
+            } else {
+               onlineList.add(new User(aPlayer));
+            }
+         }
+      } else if (initializer == 'N') {
+         onlineList.add(new User(input));
+      } else if (initializer == 'X') {
+         for (int i = 0; i < onlineList.size(); i++) {
+            if (onlineList.get(i).getUsername().equals(input)) {
+               onlineList.remove(i);
+            }
+         }
+      } else if (initializer == 'B') {
+         players = new Player[onlineList.size()];
+         for (int i = 0; i < onlineList.size(); i++) {
+            players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+               myPlayer = players[i];
+            }
+         }
+         newState = 7;//Sends to the game screen
+         gameBegin = true;
+      } else if (initializer == 'P') { //Then leave the game
+         onlineList.clear();
+         newState = 2;
+      }
+   }
+
+   public void decipherGameInput(String input) {
+      projectiles.clear();
+      aoes.clear();
+      String[] firstSplit = input.split(" ", -1);
+      for (String firstInput : firstSplit) {
+         char initializer = firstInput.charAt(0);
+         String[] secondSplit = firstInput.split(initializer + "", -1);
+         for (String secondInput : secondSplit) {
+            if (!secondInput.equals("")) {
+               String[] thirdSplit = secondInput.split(",", -1);
+               if (initializer == 'P') {
+                  //REPLACE THIS WITH A SET PLAYER METHOD.
+                  int playerID = Integer.parseInt(thirdSplit[0]);
+                  players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
+                  players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
+                  players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
+                  players[playerID].setAttack(Integer.parseInt(thirdSplit[5]));
+                  players[playerID].setMobility(Integer.parseInt(thirdSplit[6]));
+                  players[playerID].setRange(Integer.parseInt(thirdSplit[7]));
+                  players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[8]));
+                  players[playerID].setGold(Integer.parseInt(thirdSplit[9]));
+                  players[playerID].setSpriteID(Integer.parseInt(thirdSplit[10]));
+                  for (int j = 11; j < 14; j++) {
+                     players[playerID].setSpellPercent(Integer.parseInt(thirdSplit[j]), j - 11);
                   }
+                  players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[14]));
+                  for (int j = 15; j < 15 + Integer.parseInt(thirdSplit[15]); j++) {
+                     players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
+                  }
+               } else if (initializer == 'O') {
+                  //REPLACE THIS WITH A SET OTHERS METHOD.
+                  int playerID = Integer.parseInt(thirdSplit[0]);
+                  players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
+                  players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
+                  players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
+                  players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[5]));
+                  players[playerID].setSpriteID(Integer.parseInt(thirdSplit[6]));
+                  players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[7]));
+                  for (int j = 8; j < 8 + Integer.parseInt(thirdSplit[8]); j++) {
+                     players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
+                  }
+               } else if (initializer == 'D') {
+                  players[Integer.parseInt(thirdSplit[0])] = null;
+               } else if (initializer == 'R') {
+                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling)));
+               } else if (initializer == 'E') {
+                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (Integer.parseInt(thirdSplit[3]) * scaling)));
                }
             }
          }
@@ -551,12 +499,10 @@ public class Client extends JFrame implements WindowListener {
       try {
          socket = new Socket("localhost", 5001);
          System.out.println("Successfully connected");
-         connected = true;
-         unableToConnect = false;
+         connectionState = 1;
       } catch (Exception e) {
          System.out.println("Unable to connect");
-         unableToConnect = true;
-         connected = false;
+         connectionState = -1;
       }
    }
 
@@ -590,10 +536,6 @@ public class Client extends JFrame implements WindowListener {
    public void windowClosed(WindowEvent e) {
    }
 
-   public void setReady(boolean ready) {
-      notifyReady = ready;
-   }
-
    public void initializeScaling() {
       if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //Make sure that these are doubles
          scaling = 1.0 * MAX_X / DESIRED_X;
@@ -606,6 +548,71 @@ public class Client extends JFrame implements WindowListener {
          introScaling = 1.0 * MAX_X / 1800;
       }
    }
+
+   //Booleans to clients
+   public void leaveGame() {
+      leaveGame = true;
+   }
+
+   public void logout() {
+      logout = true;
+   }
+
+   public void testingBegin() {
+      testingBegin = true;
+   }
+
+   public void ready() {
+      notifyReady = true;
+   }
+
+   //Tested input to clients
+   public void testGame(String attemptedGameName, String attemptedGamePassword) {
+      if (!testGame) {
+         this.attemptedGameName = attemptedGameName;
+         this.attemptedGamePassword = attemptedGamePassword;
+         testGame = true;
+      }
+   }
+
+   public void testName(String username) {
+      if (!sendName) {
+         if (!(username.contains(" "))) {
+            this.username = username;
+            sendName = true;
+         } else {
+            System.out.println("Error: Spaces exist");
+         }
+      }
+   }
+
+   //Sets the teams
+   public void setTeam(int myTeam) {
+      this.myTeam = myTeam;
+      teamChosen = true;
+   }
+
+   public void setNewState(int newState) {
+      this.newState = newState;
+   }
+
+   //Info to panels
+   public int getConnectionState() {
+      return (connectionState);
+   }
+
+   public boolean getHost() {
+      return (host);
+   }
+
+   public boolean getLoading() {
+      return (loading);
+   }
+
+   public ArrayList<User> getOnlineList() {
+      return (onlineList);
+   }
+
 
    /**
     * GamePanel.java
@@ -715,9 +722,10 @@ public class Client extends JFrame implements WindowListener {
 
             // Updating fog
             for (int i = 0; i < players.length; i++) {
-               // TODO: Separate by teams
-               // TODO: Account for players that quit?
-               fog.scout(players[i].getXy());
+               if (players[i] != null) {
+                  // TODO: Separate by teams
+                  fog.scout(players[i].getXy());
+               }
             }
             //Creating shapes
             AffineTransform tx = new AffineTransform();

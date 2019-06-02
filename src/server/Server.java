@@ -74,7 +74,7 @@ public class Server {
       private PrintWriter output;
       private BufferedReader input;
       private boolean stop = false;
-      private int error = 0;//0 means no error, anything beyond this can correspond to a different error number
+      private int error;
 
       MenuHandler(Socket newConnection) {
          myConnection = newConnection;
@@ -112,12 +112,10 @@ public class Server {
                   char initializer = inputString.charAt(0);
                   inputString = inputString.substring(1);//Remove the initializer
                   if (initializer == 'U') { //username
-                     if (usernameValid(inputString)) {
+                     int error = checkStringError(inputString, onlineUsers);
+                     if (error == 0) {
                         myUser = new User(inputString);
                         onlineUsers.add(myUser);
-                        error = 0;
-                     } else {
-                        error = 1;
                      }
                      output.println(error);
                      output.flush();
@@ -125,26 +123,59 @@ public class Server {
                      String attemptServerName = inputString.substring(0, inputString.indexOf(" "));
                      inputString = inputString.substring(inputString.indexOf(" ") + 1);
                      String attemptServerPassword = inputString;
-                     error = 5;//Slightly different, this should give an error message which tells the client that the password/username is wrong
+                     int errorName = 5;//Slightly different, this should give an error message which tells the client that the password/username is wrong
+                     int errorPass = 5;
                      for (GameServer thisGame : games) {
-                        if ((thisGame.sameName(attemptServerName)) && (thisGame.samePassword(attemptServerPassword))) {
-                           if (thisGame.addGamePlayer(myUser, myConnection, this)) {
-                              myGame = thisGame;
-                              error = 0;
-                           } else {
-                              error = 6; //2 indicates that the game is full
-                           }
+                        ArrayList<String> gameName = new ArrayList<String>();
+                        ArrayList<String> gamePass = new ArrayList<String>();
+                        gameName.add(thisGame.getServerName());
+                        gamePass.add(thisGame.getServerName());
+                        errorName = checkStringError(attemptServerName, gameName);
+                        errorPass = checkStringError(attemptServerPassword, gamePass);
+                        if (errorName<=1){
+                           errorName=Math.abs(errorName-1);
+                        }
+                        if (errorPass<=1){
+                           errorPass=Math.abs(errorPass-1);
+                        }
+                        if ((errorPass==0)&&(errorName==0)){
+                           thisGame.addGamePlayer(myUser, myConnection, this);
+                           myGame = thisGame;
+                           printOnlineList(true);
                         }
                      }
-                     //If nothing happens at all, error ends as 1
-                     if (error == 0) {
-                        //To the person trying to join, they should have the names of everyone sent to them
-                        //To everyone else, they should have the name of the new individual
-                        printOnlineList(true);
-                     }
-                     output.println(error);
+                     output.println(errorName + " " + errorPass);
                      output.flush();
                   } else if (initializer == 'C') { //To create, it is C{serverName} {password}
+                     String attemptServerName = inputString.substring(0, inputString.indexOf(" "));
+                     inputString = inputString.substring(inputString.indexOf(" ") + 1);
+                     String attemptServerPassword = inputString;
+                     int errorName = 5;//Slightly different, this should give an error message which tells the client that the password/username is wrong
+                     int errorPass = 5;
+                     for (GameServer thisGame : games) {
+                        ArrayList<String> gameName = new ArrayList<String>();
+                        ArrayList<String> gamePass = new ArrayList<String>();
+                        gameName.add(thisGame.getServerName());
+                        gamePass.add(thisGame.getServerName());
+                        errorName = checkStringError(attemptServerName, gameName);
+                        errorPass = checkStringError(attemptServerPassword, gamePass);
+                        if (errorName<=1){
+                           errorName=Math.abs(errorName-1);
+                        }
+                        if (errorPass<=1){
+                           errorPass=Math.abs(errorPass-1);
+                        }
+                        if ((errorPass==0)&&(errorName==0)){
+                           thisGame.addGamePlayer(myUser, myConnection, this);
+                           myGame = thisGame;
+                           printOnlineList(true);
+                        }
+                     }
+                     output.println(errorName + " " + errorPass);
+                     output.flush();
+
+
+
                      String serverName = inputString.substring(0, inputString.indexOf(" "));
                      inputString = inputString.substring(inputString.indexOf(" ") + 1);
                      String serverPassword = inputString;
@@ -263,14 +294,48 @@ public class Server {
          stop = true;
       }
 
-      private boolean usernameValid(String attemptedName) {
-         //Later on, check for special characters and set a limit
-         for (int i = 0; i < onlineUsers.size(); i++) {
-            if (onlineUsers.get(i).getUsername().equals(attemptedName)) {
-               return (false);
+      private <E> int checkStringError(String testString, ArrayList<E> inputArray) {
+         int error;
+         error = testRepeated(testString, inputArray);
+         if (error == 0) {
+            error = verifyString(testString); //This takes priority in error messages
+         }
+         return (error);
+      }
+
+      private int verifyString(String testString) {
+         int error = 0;
+         if (testString.length() < 15) {
+            if (testString.isEmpty()) {
+               error = 4;
+            } else {
+               for (int i = 0; i < testString.length(); i++) {
+                  if (!letterOrNumber(testString.charAt(i))) {
+                     error = 2;
+                  }
+               }
+            }
+         } else {
+            error = 3;
+         }
+         return error;
+      }
+
+      private boolean letterOrNumber(char letter) {
+         if (((letter >= 97) && (letter <= 122)) || ((letter >= 65) && (letter <= 90)) || ((letter >= 48) && (letter <= 57))) {
+            return true;
+         } else {
+            return false;
+         }
+      }
+
+      private <E> int testRepeated(String testString, ArrayList<E> inputArray) {
+         for (E element : inputArray) {
+            if (element.equals(testString)) {
+               return (1);
             }
          }
-         return (true);
+         return (0);
       }
 
       private void printOnlineList(boolean noOneLeft) {
@@ -530,20 +595,12 @@ public class Server {
          }
       }
 
-      private boolean sameName(String comparedName) {
-         if (comparedName.equals(serverName)) {
-            return (true);
-         } else {
-            return (false);
-         }
+      private String getServerName() {
+         return serverName;
       }
 
-      private boolean samePassword(String comparedPassword) {
-         if (comparedPassword.equals(serverPassword)) {
-            return (true);
-         } else {
-            return (false);
-         }
+      private String getServerPassword() {
+         return serverPassword;
       }
 
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {

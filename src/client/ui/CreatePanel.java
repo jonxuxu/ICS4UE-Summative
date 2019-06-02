@@ -1,5 +1,7 @@
 package client.ui;
 
+import client.Client;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -22,6 +24,7 @@ public class CreatePanel extends GeneralPanel { //State =3
    private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
    private final int MAX_Y= super.getHeight();
+   private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
    private final Font HEADER_FONT = super.getFont("header");
 
@@ -37,36 +40,24 @@ public class CreatePanel extends GeneralPanel { //State =3
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
       gameNameField.addActionListener((ActionEvent e) -> {
-         if (!testGame) {
-            attemptedGameName = gameNameField.getText();
-            attemptedGamePassword = gamePasswordField.getText();
-            testGame = true;
-         }
+         CLIENT.testGame(gameNameField.getText(),gamePasswordField.getText());
       });
       gameNameField.setFont(MAIN_FONT);
       gameNameField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 3 / 10, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(gameNameField);
       gamePasswordField.addActionListener((ActionEvent e) -> {
-         if (!testGame) {
-            attemptedGameName = gameNameField.getText();
-            attemptedGamePassword = gamePasswordField.getText();
-            testGame = true;
-         }
+         CLIENT.testGame(gameNameField.getText(),gamePasswordField.getText());
       });
       gamePasswordField.setFont(MAIN_FONT);
       gamePasswordField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 2 / 5, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(gamePasswordField);
       confirmButton.addActionListener((ActionEvent e) -> {
-         if (!testGame) {
-            attemptedGameName = gameNameField.getText();
-            attemptedGamePassword = gamePasswordField.getText();
-            testGame = true;
-         }
+         CLIENT.testGame(gameNameField.getText(),gamePasswordField.getText());
       });
       confirmButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y / 2, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(confirmButton);
       backButton.addActionListener((ActionEvent e) -> {
-         newState = 2;
+         CLIENT.setNewState(2);
       });
       backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);

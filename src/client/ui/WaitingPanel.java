@@ -1,16 +1,19 @@
 package client.ui;
 
 import client.Client;
+import client.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 public class WaitingPanel extends GeneralPanel { //State=6
   private Graphics2D g2;
   private final double scaling = super.getScaling();
   private final int MAX_X= super.getWidth();
   private final int MAX_Y= super.getHeight();
+  private final Client CLIENT = super.getClient();
   private final Font MAIN_FONT = super.getFont("main");
   private final Font HEADER_FONT = super.getFont("header");
 
@@ -21,31 +24,31 @@ public class WaitingPanel extends GeneralPanel { //State=6
   private CustomButton teamOneButton = new CustomButton("Team one", scaling);
   private CustomButton teamTwoButton = new CustomButton("Team two", scaling);
 
+  private ArrayList<User> onlineList;
+
 
   public WaitingPanel() {
     // Initializing buttons
-    readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), height * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
+    readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
     readyGameButton.addActionListener((ActionEvent e) -> {
-      game.setReady(true);
+      CLIENT.ready();
     });
 
     teamOneButton.addActionListener((ActionEvent e) -> {
-      myTeam = 1;
-      teamChosen = true;
+      CLIENT.setTeam(1);
     });
     teamOneButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 3 / 10, (int) (130 * scaling), (int) (19 * scaling));
     this.add(teamOneButton);
 
     teamTwoButton.addActionListener((ActionEvent e) -> {
-      myTeam = 2;
-      teamChosen = true;
+      CLIENT.setTeam(2);
     });
     teamTwoButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y / 2, (int) (130 * scaling), (int) (19 * scaling));
     this.add(teamTwoButton);
 
     backButton.addActionListener((ActionEvent e) -> {
-      newState = 2;
-      leaveGame = true;
+      CLIENT.setNewState(2);
+      CLIENT.leaveGame();
     });
     backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
     this.add(backButton);
@@ -57,6 +60,9 @@ public class WaitingPanel extends GeneralPanel { //State=6
     this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
     this.setVisible(true);
     this.setFocusable(true);
+
+    //Test if this works
+    onlineList = CLIENT.getOnlineList();
   }
 
   @Override
@@ -72,7 +78,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
     //Background
     drawBackground(g2);
     g2.setColor(Color.white);
-    if ((host) && (buttonAdd)) {
+    if ((CLIENT.getHost()) && (buttonAdd)) {
       this.add(readyGameButton);
       buttonAdd = false;
     }
@@ -81,7 +87,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
       players.append(onlineList.get(i).getUsername() + ", ");
     }
     g2.drawString(players.toString(), (int) (2 * scaling), (int) (10 * scaling));
-    if (loading) {
+    if (CLIENT.getLoading()) {
       if (buttonRemove) {
         this.remove(readyGameButton);
         buttonRemove = false;
