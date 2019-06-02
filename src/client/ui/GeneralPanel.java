@@ -39,6 +39,8 @@ public abstract class GeneralPanel extends JPanel {
    private static Client CLIENT;
    private static Map<String, Font> fonts = new HashMap<String, Font>();
    private static ArrayList<AshParticle> particles = new ArrayList<AshParticle>();
+   private static final int BG_Y = 1198;
+   private static final int BG_X = 1800;
 
    public GeneralPanel(){
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
@@ -60,12 +62,12 @@ public abstract class GeneralPanel extends JPanel {
       GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
       GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
       GraphicsConfiguration graphicsConfiguration = graphicsDevice.getDefaultConfiguration();
-      LOADED_TITLE_SCREEN = graphicsConfiguration.createCompatibleImage((int) (1800 * INTRO_SCALING), (int) (1198 * INTRO_SCALING), Transparency.TRANSLUCENT);
+      LOADED_TITLE_SCREEN = graphicsConfiguration.createCompatibleImage((int) (BG_X * INTRO_SCALING), (int) (BG_Y * INTRO_SCALING), Transparency.TRANSLUCENT);
       Graphics2D graphicsTS = LOADED_TITLE_SCREEN.createGraphics();
       graphicsTS.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
       graphicsTS.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       graphicsTS.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      graphicsTS.drawImage(TITLE_SCREEN, 0, 0, (int) (1800 * INTRO_SCALING), (int) (1198 * INTRO_SCALING), null);
+      graphicsTS.drawImage(TITLE_SCREEN, 0, 0, (int) (BG_X * INTRO_SCALING), (int) (BG_Y * INTRO_SCALING), null);
       graphicsTS.dispose();
       LOADED_TITLE = graphicsConfiguration.createCompatibleImage((int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), Transparency.TRANSLUCENT);
       Graphics2D graphicsT = LOADED_TITLE.createGraphics();
@@ -126,9 +128,8 @@ public abstract class GeneralPanel extends JPanel {
    }
 
    public void drawBackground(Graphics2D g2) {
-      g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (1800 * INTRO_SCALING), MAX_Y - (int) (1198 * INTRO_SCALING), null);
+      g2.drawImage(LOADED_TITLE_SCREEN, MAX_X - (int) (BG_X * INTRO_SCALING), MAX_Y - (int) (BG_Y * INTRO_SCALING), null);
    }
-
 
    public void drawTitle(Graphics2D g2) {
       g2.drawImage(LOADED_TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), null);

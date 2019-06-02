@@ -47,6 +47,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
     this.add(teamTwoButton);
 
     backButton.addActionListener((ActionEvent e) -> {
+      System.out.println("wdwd");
       CLIENT.setNewState(2);
       CLIENT.leaveGame();
     });

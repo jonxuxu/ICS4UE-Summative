@@ -19,14 +19,21 @@ public class CustomMouseAdapter extends MouseAdapter {
    //The xy when it is clicked
    private int[] clickXy = new int[2];
    //The xy at all times
-   private int[] xy = new int[2];
+   private int[] state = new int[3];
    //The following booleans control the state of the mouse
-   private boolean pressed;
    private int rotation;
    private boolean rotated = false;
    private double scaling;
-   private int[] centerXy = new int[2];
+   private int[] centerXy;
    private boolean[] leftRight = new boolean[2];
+
+   private Client main;
+
+   public CustomMouseAdapter(Client main, double scaling, int[] centerXy){
+      this.main = main;
+      this.scaling = scaling;
+      this.centerXy = centerXy;
+   }
 
 //Methods that are implemented from MouseListener
 
@@ -50,18 +57,19 @@ public class CustomMouseAdapter extends MouseAdapter {
       clickXy[1] = e.getY();
       dragXy[0] = e.getX();
       dragXy[1] = e.getY();
-      xy[0] = e.getX();
-      xy[1] = e.getY();
-      pressed = true;
+      state[0] = e.getX();
+      state[1] = e.getY();
+      state[2] = 1;
       leftRight[0] = false;
       leftRight[1] = false;
       if (e.getButton() == 1) {
          leftRight[0] = true;
-
       }
       if (e.getButton() == 3) {
          leftRight[1] = true;
       }
+
+      main.updateMouse(state);
    }
 
    /**
@@ -71,8 +79,8 @@ public class CustomMouseAdapter extends MouseAdapter {
     */
    @Override
    public void mouseReleased(MouseEvent e) {
-      pressed = false;
-
+      state[2] = 0;
+      main.updateMouse(state);
    }
 
    /**
@@ -133,8 +141,8 @@ public class CustomMouseAdapter extends MouseAdapter {
     */
    @Override
    public void mouseMoved(MouseEvent e) {
-      xy[0] = e.getX();
-      xy[1] = e.getY();
+      state[0] = e.getX();
+      state[1] = e.getY();
    }
 
    /**
@@ -146,8 +154,8 @@ public class CustomMouseAdapter extends MouseAdapter {
    public void mouseDragged(MouseEvent e) {
       dragXy[0] = e.getX();
       dragXy[1] = e.getY();
-      xy[0] = e.getX();
-      xy[1] = e.getY();
+      state[0] = e.getX();
+      state[1] = e.getY();
    }
    //End of methods that are implemented from MouseAdapter
 
@@ -176,27 +184,12 @@ public class CustomMouseAdapter extends MouseAdapter {
     *
     * @return xy, an int[] with the x as the 0 index and y as the 1 index
     */
-   public int[] getMouseXy() {
-      return xy;
-   }
 
    /**
     * Returns the pressed state.
     *
     * @return pressed, a boolean
     */
-   public boolean getPressed() {
-      return pressed;
-   }
-
-   public void setCenterXy(int[] centerXy) {
-      this.centerXy[0] = centerXy[0];
-      this.centerXy[1] = centerXy[1];
-   }
-
-   public void setScaling(double scaling) {
-      this.scaling = scaling;
-   }
 
    /*
       public double getAngleOfClick() {
@@ -207,14 +200,15 @@ public class CustomMouseAdapter extends MouseAdapter {
          return (Math.sqrt(Math.pow((centerXy[0] - clickXy[0]) / scaling, 2) + Math.pow((centerXy[1] - clickXy[1]) / scaling, 2)));
       }
    */
-   public int[] getDispXy() { //Returns the displacement from the top left corner
+   // TODO: Streamline for even driven w/ kameron
+   public int[] getDispXy() { //Returns the displacement from the top left corner in game coordinates
       int[] dispXy = new int[2];
-      dispXy[0] = (int) ((xy[0] - centerXy[0]) / scaling);
-      dispXy[1] = (int) ((xy[1] - centerXy[1]) / scaling);
+      dispXy[0] = (int) ((state[0] - centerXy[0]) / scaling);
+      dispXy[1] = (int) ((state[1] - centerXy[1]) / scaling);
       return (dispXy);
    }
 
-   public boolean[] getLeftRight() { //Returns the displacement from the top left corner
+   public boolean[] getLeftRight() { //Determines whether the left or right buttons were clicked
       return (leftRight);
    }
 }
