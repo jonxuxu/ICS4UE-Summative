@@ -23,29 +23,29 @@ public class JoinPanel extends GeneralPanel { //State =4
    private final Font MAIN_FONT = super.getFont("main");
    private final Font HEADER_FONT = super.getFont("header");
 
-   private final  CustomTextField gameNameField = new CustomTextField(3, SCALING);
-   private final  CustomTextField gamePasswordField = new CustomTextField(3, SCALING);
-   private final  CustomButton backButton = new CustomButton("Back", SCALING);
-   private final  CustomButton confirmButton = new CustomButton("Confirm Game", SCALING);
+   private final CustomTextField gameNameField = new CustomTextField(3, SCALING);
+   private final CustomTextField gamePasswordField = new CustomTextField(3, SCALING);
+   private final CustomButton backButton = new CustomButton("Back", SCALING);
+   private final CustomButton confirmButton = new CustomButton("Confirm Game", SCALING);
 
    public JoinPanel() {
       //Setting up the size
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
       gameNameField.addActionListener((ActionEvent e) -> {
-         CLIENT.testGame(gameNameField.getText(),gamePasswordField.getText());
+         CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gameNameField.setFont(MAIN_FONT);
       gameNameField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 3 / 10, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(gameNameField);
       gamePasswordField.addActionListener((ActionEvent e) -> {
-         CLIENT.testGame(gameNameField.getText(),gamePasswordField.getText());
+         CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gamePasswordField.setFont(MAIN_FONT);
       gamePasswordField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 2 / 5, (int) (90 * SCALING), (int) (19 * SCALING));
       this.add(gamePasswordField);
       confirmButton.addActionListener((ActionEvent e) -> {
-         CLIENT.testGame(gameNameField.getText(),gamePasswordField.getText());
+         CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       confirmButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y / 2, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(confirmButton);
@@ -77,6 +77,8 @@ public class JoinPanel extends GeneralPanel { //State =4
       g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
       //Server password
       g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 2 / 5 - g2.getFontMetrics().getHeight()));
+      //Write error
+      writeError(g2, MAX_X / 2, (int) (MAX_Y * 9.0 / 16.0));
       //Draws particles
       drawAllParticles(g2);
    }

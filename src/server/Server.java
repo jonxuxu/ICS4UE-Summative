@@ -100,9 +100,7 @@ public class Server {
                      }
                      //If nothing happens at all, error ends as 1
                      if (error == 0) {
-                        //To the person trying to join, they should have the names of everyone sent to them
-                        //To everyone else, they should have the name of the new individual
-                        printOnlineList(true);
+                        adjustPlayerList(true);
                      }else{
                         output.println(error);
                         output.flush();
@@ -123,8 +121,12 @@ public class Server {
                         myGame.addGamePlayer(myUser, myConnection, this);
                         games.add(myGame);
                      }
-                     output.println(error);
-                     output.flush();
+                     if (error == 0) {
+                        adjustPlayerList(true);
+                     }else{
+                        output.println(error);
+                        output.flush();
+                     }
                   } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
                      error = 0;
                      if (myGame.getGameSize() <= 1) {
@@ -144,7 +146,7 @@ public class Server {
                            if (myGame.getGameSize() == 0) {
                               games.remove(myGame);
                            } else {
-                              printOnlineList(false);
+                              adjustPlayerList(false);
                            }
                            myGame = null;
                         } else {
@@ -179,7 +181,7 @@ public class Server {
                            if (myGame.getGameSize() == 0) {
                               games.remove(myGame);
                            } else {
-                              printOnlineList(false);
+                              adjustPlayerList(false);
                            }
                            myGame = null;
                         } else {
@@ -210,7 +212,7 @@ public class Server {
                         myGame = games.get(0);
                         games.get(0).addGamePlayer(myUser, myConnection, this);
                      }
-                     printOnlineList(true);
+                     adjustPlayerList(true);
                   }
                }
             }
@@ -232,7 +234,7 @@ public class Server {
          return (true);
       }
 
-      private void printOnlineList(boolean noOneLeft) {
+      private void adjustPlayerList(boolean noOneLeft) {
          //N means new player, A means all players
          try {
             if (noOneLeft) {
@@ -241,7 +243,6 @@ public class Server {
                for (int i = 0; i < currentSocketList.size(); i++) {
                   //If the error is 0, which it is in this case, no error needs to be printed out
                   output = new PrintWriter(currentSocketList.get(i).getOutputStream());
-
                   if (currentSocketList.get(i).equals(myConnection)) {
                      System.out.println("A" + currentPlayerString);
                      output.println("A" + currentPlayerString); //Print the entire list

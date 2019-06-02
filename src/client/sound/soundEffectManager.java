@@ -14,6 +14,7 @@ public class soundEffectManager {
 
   public soundEffectManager (){
     urls.put("cow", "cow-moo.wav");
+    urls.put("error", "error.wav");
   }
 
   public void playSound(String name) { // Add synchronized?

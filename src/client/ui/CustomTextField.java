@@ -14,10 +14,6 @@ public class CustomTextField extends JTextField {
     this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
     this.setForeground(foregroundColor);
     this.setBackground(backgroundColor);
-  }
-
-  @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
+    this.setOpaque(false);
   }
 }

@@ -41,8 +41,9 @@ public abstract class GeneralPanel extends JPanel {
    private static ArrayList<AshParticle> particles = new ArrayList<AshParticle>();
    private static final int BG_Y = 1198;
    private static final int BG_X = 1800;
+   private String errorMessage = "";
 
-   public GeneralPanel(){
+   public GeneralPanel() {
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
    }
 
@@ -83,6 +84,19 @@ public abstract class GeneralPanel extends JPanel {
 
    }
 
+   public void setErrorUpdate(String errorMessage) {
+      this.errorMessage = errorMessage;
+   }
+
+   public void writeError(Graphics2D g2, int x, int y) {
+      if (!errorMessage.isEmpty()) {
+         String[] errorMessages = errorMessage.split("_", -1);
+         for (int i = 0; i < errorMessages.length; i++) {
+            g2.drawString(errorMessages[i], x - g2.getFontMetrics().stringWidth(errorMessages[i]) / 2, y + g2.getFontMetrics().getHeight() * i);
+         }
+      }
+   }
+
    public double getScaling() {
       return (SCALING);
    }
@@ -99,7 +113,7 @@ public abstract class GeneralPanel extends JPanel {
       return (MAX_Y);
    }
 
-   public Client getClient(){
+   public Client getClient() {
       return CLIENT;
    }
 

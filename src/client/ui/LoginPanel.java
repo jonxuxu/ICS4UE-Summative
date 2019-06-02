@@ -69,5 +69,7 @@ public class LoginPanel extends GeneralPanel {
       } else {
          g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y * 5 / 16.0));
       }
+      //Write error
+      writeError(g2, MAX_X / 2, (int) (MAX_Y * 3 / 8.0));
    }
 }

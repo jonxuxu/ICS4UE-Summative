@@ -203,16 +203,17 @@ public class Client extends JFrame implements WindowListener {
                   output.flush();
                   waitForInput();
                }
-               if (errors[0] == 0) {
-                  System.out.println("Valid username");
-               } else {
-                  System.out.println("Error: " + errorMessages[errors[0]]);
+               if (errors[0] != 0) {
+                  allPanels[state].setErrorUpdate("Error: " + errorMessages[errors[0]]);
+                  soundEffect.playSound("error");
                }
             }
          }
          if (testGame) {
             testGame = false;
-            if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
+            boolean checkName = (verifyString(attemptedGameName, 1));
+            boolean checkPass = (verifyString(attemptedGamePassword, 2));
+            if ((checkName) && (checkPass)) {
                if (state == 3) {
                   output.println("C" + attemptedGameName + " " + attemptedGamePassword);
                } else {
@@ -220,13 +221,18 @@ public class Client extends JFrame implements WindowListener {
                }
                output.flush();
                waitForInput();
-            }
-            System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
-            if ((errors[1] == 0) && (errors[2] == 0)) {
-               System.out.println("Valid game");
-            } else {
-               System.out.println("Error: " + errorMessages[errors[1]]);
-               System.out.println("Error: " + errorMessages[errors[2]]);
+            }else {
+               soundEffect.playSound("error");
+               String totalErrorOutput = "";
+               if ((errors[1] != 0)) {
+                  System.out.println("ww");
+                  totalErrorOutput += ("Name Error: " + errorMessages[errors[1]] + "_");
+               }
+               if ((errors[2] != 0)) {
+                  System.out.println("1w");
+                  totalErrorOutput += ("Password Error: " + errorMessages[errors[2]]);
+               }
+               allPanels[state].setErrorUpdate(totalErrorOutput);
             }
          }
          if (notifyReady) {
@@ -250,6 +256,7 @@ public class Client extends JFrame implements WindowListener {
             newState = 6;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
+               //TODO: Add class select here
                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
@@ -267,7 +274,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void gameLogic() {
-      // TODO: Initialize map ONCE after game begin
+      // TODO: InitializSe map ONCE after game begin
       try {
          if (input.ready()) {
             xyAdjust[0] = (int) (centerXy[0] - myPlayer.getXy()[0] * scaling);
@@ -278,7 +285,6 @@ public class Client extends JFrame implements WindowListener {
             int[] xyPos = new int[2]; //Scaled to the map
             xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
             xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
-            System.out.println(xyPos[0] + " " + xyPos[1]);
             boolean[] spellsPressed = myKeyListener.getSpell();
             boolean[] leftRight = myMouseAdapter.getLeftRight();
             StringBuilder outputString = new StringBuilder();
@@ -287,6 +293,7 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("S" + i);
                }
             }
+
             if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
                outputString.append(" "); //Add the separator
             }
@@ -372,7 +379,6 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      System.out.println(input);
       char initializer = input.charAt(0);
       input = input.substring(1);
       if (isParsable(initializer)) {
@@ -389,18 +395,11 @@ public class Client extends JFrame implements WindowListener {
                   }
 */
                cardLayout.show(mainContainer, PANEL_NAMES[2]);
-               System.out.println("here");
                newState = 2;
             } else {
                username = null;
             }
          } else if ((state == 3) || (state == 4)) {
-            if (initializer == '0') {
-               newState = 6;//Sends to a waiting room
-               myUser = new User(username);//Sets the player
-               host = true;
-               onlineList.add(myUser);
-            }
             errors[1] = Integer.parseInt(initializer + "");
          } else if (state == 6) {
             if (initializer == '0') {
@@ -408,6 +407,7 @@ public class Client extends JFrame implements WindowListener {
                loading = true;
             } else {
                System.out.println("Unable to Start Game");
+               soundEffect.playSound("error");
             }
          }
       } else if (initializer == 'A') {
@@ -421,6 +421,9 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          newState = 6;
+         if (state == 3) {
+            host = true;
+         }
       } else if (initializer == 'N') {
          onlineList.add(new User(input));
       } else if (initializer == 'X') {
@@ -506,6 +509,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void repaintPanels() {
       if (state != newState) {
+         allPanels[state].setErrorUpdate("");
          state = newState;
          cardLayout.show(mainContainer, PANEL_NAMES[state]);
       }
@@ -600,12 +604,8 @@ public class Client extends JFrame implements WindowListener {
 
    public void testName(String username) {
       if (!sendName) {
-         if (!(username.contains(" "))) {
-            this.username = username;
-            sendName = true;
-         } else {
-            System.out.println("Error: Spaces exist");
-         }
+         this.username = username;
+         sendName = true;
       }
    }
 
