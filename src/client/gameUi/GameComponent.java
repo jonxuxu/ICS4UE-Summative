@@ -1,6 +1,8 @@
 package client.gameUi;
 
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * GameComponent.java
@@ -14,6 +16,7 @@ import java.awt.Graphics2D;
 public abstract class GameComponent {
    private static double SCALING;
    private static int DESIRED_X, DESIRED_Y;
+   private static Map<String, Font> fonts = new HashMap<String, Font>();
 
    public abstract void draw(Graphics2D g2);
 
@@ -21,6 +24,10 @@ public abstract class GameComponent {
       SCALING = SCALING1;
       DESIRED_X = DESIRED_X1;
       DESIRED_Y = DESIRED_Y1;
+      // Setting fonts
+      fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (12 * SCALING)));
+      fonts.put("regular", new Font("Cambria Math", Font.PLAIN, (int) (5 * SCALING)));
+      fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (25 * SCALING)));
    }
 
    public double getSCALING() {
@@ -36,5 +43,9 @@ public abstract class GameComponent {
    }
    public int scale(int unscaled){
       return((int)(unscaled*SCALING));
+   }
+
+   public Font getFont(String fontName) {
+      return fonts.get(fontName);
    }
 }

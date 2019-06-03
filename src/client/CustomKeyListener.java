@@ -18,7 +18,7 @@ public class CustomKeyListener implements KeyListener {
 
    //W is -1, S is 1, A is -1, D is 1
    //Instance variables
-   private Set<Integer> pressed = new HashSet<Integer>();
+   private Set<Character> pressed = new HashSet<Character>();
    private int[] direction = new int[2];//WASD
    private boolean[] spellsUsed = new boolean[3];
 
@@ -40,7 +40,7 @@ public class CustomKeyListener implements KeyListener {
     */
    @Override
    public void keyPressed(KeyEvent e) {
-      pressed.add(e.getKeyCode());
+      pressed.add(e.getKeyChar());
    }
 
    /**
@@ -50,7 +50,7 @@ public class CustomKeyListener implements KeyListener {
     */
    @Override
    public void keyReleased(KeyEvent e) {
-      pressed.remove(e.getKeyCode());
+      pressed.remove(e.getKeyChar());
    }
 
    //End of methods that are implemented from KeyListener
@@ -60,25 +60,19 @@ public class CustomKeyListener implements KeyListener {
    public int getAngle() {
       direction[0] = 0;
       direction[1] = 0;
-      if (pressed.contains(87)) {
-         direction[1] = -1;
+      if (pressed.contains('w')) {
+         direction[1] += -1;
       }
-      if (pressed.contains(65)) {
-         direction[0] = -1;
+      if (pressed.contains('a')) {
+         direction[0] += -1;
       }
-      if (pressed.contains(83)) {
-         direction[1] = 1;
+      if (pressed.contains('s')) {
+         direction[1] += 1;
       }
-      if (pressed.contains(68)) {
-         direction[0] = 1;
+      if (pressed.contains('d')) {
+         direction[0] += 1;
       }
       double tempAngle;
-      if ((pressed.contains(87)) && (pressed.contains(83))) {
-         direction[1] = 0;
-      }
-      if ((pressed.contains(68)) && (pressed.contains(65))) {
-         direction[0] = 0;
-      }
       //direction[0] is for the x values, direction[1] is for the y values
       tempAngle = Math.atan2(direction[1], direction[0]);
       int roundedAngle = (int) (4 * (tempAngle / Math.PI));
@@ -97,16 +91,21 @@ public class CustomKeyListener implements KeyListener {
       spellsUsed[0] = false;
       spellsUsed[1] = false;
       spellsUsed[2] = false;
-      if (pressed.contains(81)) {
+      if (pressed.contains('q')) {
          spellsUsed[0] = true;
       }
-      if (pressed.contains(69)) {
+      if (pressed.contains('e')) {
          spellsUsed[1] = true;
       }
-      if (pressed.contains(32)) {
+      if (pressed.contains(' ')) {
          spellsUsed[2] = true;
       }
       return (spellsUsed);
    }
+/*
+   public HashSet<> getKeysPressed(){
+
+   }
+   */
 }
 

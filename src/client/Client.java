@@ -1,6 +1,7 @@
 package client;
 
 import client.gameUi.BottomComponent;
+import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
 import client.gameUi.InventoryComponent;
 import client.gameUi.MinimapComponent;
@@ -658,7 +659,7 @@ public class Client extends JFrame implements WindowListener {
       private BufferedImage sheet;
       private int[][] currentXy;
       //Game components
-      private GameComponent[] allComponents = new GameComponent[4];
+      private GameComponent[] allComponents = new GameComponent[5];
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -672,6 +673,7 @@ public class Client extends JFrame implements WindowListener {
          allComponents[1] = new BottomComponent();
          allComponents[2] = new MinimapComponent();
          allComponents[3] = new InventoryComponent();
+         allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
       }
 
@@ -742,12 +744,14 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
 
+            // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
                projectiles.get(i).draw(g2);
             }
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
+
             ((PauseComponent) (allComponents[0])).checkPressed(myMouseAdapter.getMouseState());
             ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             //draw all components
