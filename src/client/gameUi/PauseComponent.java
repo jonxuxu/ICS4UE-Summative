@@ -56,7 +56,7 @@ public class PauseComponent extends GameComponent {
       BORDER_FILL4.subtract(tempArea);
    }
 
-   public void openMenu() {
+   public void toggle() {
       visible = !visible;
    }
 

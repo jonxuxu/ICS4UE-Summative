@@ -66,12 +66,15 @@ public class Client extends JFrame implements WindowListener {
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
-   private CustomKeyListener myKeyListener = new CustomKeyListener();
+   private CustomKeyListener myKeyListener = new CustomKeyListener(this);
    private GeneralPanel[] allPanels = new GeneralPanel[8];
    private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CardLayout cardLayout = new CardLayout(5, 5);
    private JPanel mainContainer = new JPanel(cardLayout);
    private int currentPanel, nextPanel; // 0 by default
+   private boolean keyPressed = false;
+   private char lastKeyTyped;
+
 
    // Game states
    private ArrayList<User> onlineList = new ArrayList<User>();
@@ -276,6 +279,10 @@ public class Client extends JFrame implements WindowListener {
 
    public void updateMouse(int[] state) {
       this.mouseState = state;
+   }
+   public void typeKey(char c){
+      keyPressed = true;
+      lastKeyTyped = c;
    }
 
    public void gameLogic() {
@@ -661,7 +668,6 @@ public class Client extends JFrame implements WindowListener {
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
       private boolean menuCooldown  = true;
-      private CustKeyListener gameKeyListener = new CustKeyListener(this);
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -670,7 +676,6 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
-         this.addKeyListener(gameKeyListener);
          GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
          allComponents[0] = new PauseComponent();
          allComponents[1] = new BottomComponent();
@@ -679,12 +684,6 @@ public class Client extends JFrame implements WindowListener {
          allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
       }
-
-     public void typeKey(char c){
-       if(((int)c) == 112){ // If F1 pressed
-         ((DebugComponent)allComponents[4]).toggle();
-       }
-     }
 
       @Override
       public void paintComponent(Graphics g) {
@@ -763,13 +762,14 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
-            if (myKeyListener.getMenu()) {
-               if (!menuCooldown) {
-                  ((PauseComponent) (allComponents[0])).openMenu();
-                  menuCooldown=true;
+            if (keyPressed) {
+               if(lastKeyTyped == 27){ // Esc key
+                  ((PauseComponent) (allComponents[0])).toggle();
+               } else if(lastKeyTyped == 8){ // Back key
+                  ((DebugComponent) (allComponents[4])).toggle();
+                  System.out.println("F1");
                }
-            }else{
-               menuCooldown=false;
+               keyPressed = false;
             }
             ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             //draw all components

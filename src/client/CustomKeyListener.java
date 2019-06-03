@@ -21,16 +21,19 @@ public class CustomKeyListener implements KeyListener {
    private Set<Character> pressed = new HashSet<Character>();
    private int[] direction = new int[2];//WASD
    private boolean[] spellsUsed = new boolean[3];
+   private Client main;
    //Characters
    private char ESC = ((char) (27));
 
    //Start of methods that are implemented from KeyListener
    // TODO: Split keylisteners??
-   public CustomKeyListener() {
+   public CustomKeyListener(Client main) {
+      this.main = main;
    }
 
    @Override
    public void keyTyped(KeyEvent e) {
+      main.typeKey(e.getKeyChar());
    }
 
    /**
