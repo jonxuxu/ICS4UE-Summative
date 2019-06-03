@@ -1,4 +1,4 @@
-package client.ui;
+package client.gameUi;
 
 import java.awt.Graphics2D;
 
@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
  * @since 2019-06-02
  */
 
-public class InventoryComponent extends GameComponent{
+public class InventoryComponent extends GameComponent {
    private final int MAX_X = super.getMAX_X();
    private final int MAX_Y = super.getMAX_Y();
    public InventoryComponent(){

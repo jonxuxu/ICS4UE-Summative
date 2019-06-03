@@ -1,4 +1,6 @@
-package client.ui;
+package client.gameUi;
+
+import client.gameUi.GameComponent;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -1,4 +1,4 @@
-package client.ui;
+package client.gameUi;
 
 import java.awt.Graphics2D;
 

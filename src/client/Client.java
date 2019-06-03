@@ -1,5 +1,10 @@
 package client;
 
+import client.gameUi.BottomComponent;
+import client.gameUi.GameComponent;
+import client.gameUi.InventoryComponent;
+import client.gameUi.MinimapComponent;
+import client.gameUi.PauseComponent;
 import client.map.*;
 import client.sound.*;
 import client.ui.*;
@@ -56,7 +61,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock();
+   private Clock time = new Clock(20);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
