@@ -58,8 +58,8 @@ public class PauseComponent extends GameComponent {
       MENU_RECT = new Rectangle(MAX_X - scale(24), scale(1), scale(23), scale(23));
       //Home
       try {
-         ImageIO.read(new File(".\\res\\HomeIcon.png"));
-      }catch(IOException e){
+         HOME_ICON = ImageIO.read(new File(".\\res\\HomeIcon.png"));
+      } catch (IOException e) {
          e.printStackTrace();
       }
    }
@@ -102,7 +102,7 @@ public class PauseComponent extends GameComponent {
          g2.setColor(new Color(141, 130, 103));
          g2.fill(MENU_RECT);
          g2.setColor(new Color(205, 205, 205));
-         g2.fill(HOME_ICON);
+         g2.drawImage(HOME_ICON, MAX_X - scale(24), scale(1), scale(23), scale(23), null);
       }
    }
 }
