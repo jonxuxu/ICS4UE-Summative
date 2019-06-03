@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
 /**
- * MenuComponent.java
+ * PauseComponent.java
  * This is
  *
  * @author Will Jeong
@@ -15,7 +15,7 @@ import java.awt.geom.Rectangle2D;
  * @since 2019-06-02
  */
 
-public class MenuComponent extends GameComponent {
+public class PauseComponent extends GameComponent {
    private final int MAX_X = super.getMAX_X();
    private final int MAX_Y = super.getMAX_Y();
    private Rectangle2D BORDER_RECT;
@@ -31,7 +31,7 @@ public class MenuComponent extends GameComponent {
    private boolean visible;
    private boolean justPressed;
 
-   public MenuComponent() {
+   public PauseComponent() {
       BORDER_RECT = new Rectangle(MAX_X / 2 - scale(200), MAX_Y / 2 - scale(150), scale(400), scale(300));
       BORDER_RECT2 = new Rectangle(MAX_X / 2 - scale(198), MAX_Y / 2 - scale(148), scale(396), scale(296));
       BORDER_RECT3 = new Rectangle(MAX_X / 2 - scale(197), MAX_Y / 2 - scale(147), scale(394), scale(294));

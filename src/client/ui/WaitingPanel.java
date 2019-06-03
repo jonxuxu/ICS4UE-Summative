@@ -3,7 +3,6 @@ package client.ui;
 import client.Client;
 import client.User;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
 
     backButton.addActionListener((ActionEvent e) -> {
       System.out.println("wdwd");
-      CLIENT.setNewState(2);
+      CLIENT.setNextPanel(2);
       CLIENT.leaveGame();
     });
     backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
