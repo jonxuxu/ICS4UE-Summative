@@ -273,7 +273,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void gameLogic() {
-      // TODO: InitializSe map ONCE after game begin
+      // TODO: Initialize map ONCE after game begin
       try {
          if (input.ready()) {
             decipherGameInput(input.readLine());
