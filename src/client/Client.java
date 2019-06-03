@@ -162,8 +162,10 @@ public class Client extends JFrame implements WindowListener {
 
    public void go() {
       while (true) {  //Main game loop
-         if (connectionState < 1) { // If not connected
+         if (time.getFramePassed()) {
             repaintPanels();
+         }
+         if (connectionState < 1) {
             connect();
          } else {
             try {
@@ -183,9 +185,6 @@ public class Client extends JFrame implements WindowListener {
 
    public void menuLogic() {
       try {
-         if (time.getFramePassed()) {
-            repaintPanels();
-         }
          if (input.ready()) {
             decipherMenuInput(input.readLine());
          }
@@ -258,7 +257,6 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
             waitForInput();
             host = true;
-            nextPanel = 6;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                //TODO: Add class select here
@@ -268,6 +266,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             testingBegin = false;
+            nextPanel = 6;
          }
       } catch (IOException e) {
          e.printStackTrace();
@@ -318,7 +317,6 @@ public class Client extends JFrame implements WindowListener {
                output.flush();
             }
          }
-         repaintPanels();
       } catch (IOException e) {
          e.printStackTrace();
       }

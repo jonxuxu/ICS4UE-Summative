@@ -1,10 +1,14 @@
 package client.gameUi;
 
+import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * PauseComponent.java
@@ -23,11 +27,14 @@ public class PauseComponent extends GameComponent {
    private Rectangle2D BORDER_RECT3;
    private Rectangle2D BORDER_RECT4;
    private Rectangle2D INNER_RECT;
-   private Rectangle MENU_BUTTON;
    private Area BORDER_FILL;
    private Area BORDER_FILL2;
    private Area BORDER_FILL3;
    private Area BORDER_FILL4;
+   private Rectangle2D MENU_BUTTON;
+   private Rectangle2D MENU_RECT;
+   private BufferedImage HOME_ICON;
+
    private boolean visible;
    private boolean justPressed;
 
@@ -46,9 +53,15 @@ public class PauseComponent extends GameComponent {
       BORDER_FILL2.subtract(BORDER_FILL3);
       BORDER_FILL3.subtract(BORDER_FILL4);
       BORDER_FILL4.subtract(tempArea);
-
       //Pause
       MENU_BUTTON = new Rectangle(MAX_X - scale(25), 0, scale(25), scale(25));
+      MENU_RECT = new Rectangle(MAX_X - scale(24), scale(1), scale(23), scale(23));
+      //Home
+      try {
+         ImageIO.read(new File(".\\res\\HomeIcon.png"));
+      }catch(IOException e){
+         e.printStackTrace();
+      }
    }
 
    public void checkPressed(int[] state) {
@@ -84,8 +97,12 @@ public class PauseComponent extends GameComponent {
          g2.setColor(new Color(33, 35, 37));
          g2.fill(INNER_RECT);
       } else {
-         g2.setColor(new Color(166, 175, 181));
+         g2.setColor(new Color(72, 60, 32));
          g2.fill(MENU_BUTTON);
+         g2.setColor(new Color(141, 130, 103));
+         g2.fill(MENU_RECT);
+         g2.setColor(new Color(205, 205, 205));
+         g2.fill(HOME_ICON);
       }
    }
 }

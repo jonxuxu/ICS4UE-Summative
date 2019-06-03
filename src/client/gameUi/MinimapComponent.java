@@ -33,7 +33,7 @@ public class MinimapComponent extends GameComponent {
       BORDER_RECT2 = new Rectangle(scale(832), scale(381), scale(116), scale(116));
       BORDER_RECT3 = new Rectangle(scale(833), scale(382), scale(114), scale(114));
       BORDER_RECT4 = new Rectangle(scale(835), scale(384), scale(110), scale(110));
-      INNER_RECT =  new Rectangle(scale(836), scale(385), scale(108), scale(108));
+      INNER_RECT = new Rectangle(scale(836), scale(385), scale(108), scale(108));
       BORDER_FILL = new Area(BORDER_RECT);
       BORDER_FILL2 = new Area(BORDER_RECT2);
       BORDER_FILL3 = new Area(BORDER_RECT3);
