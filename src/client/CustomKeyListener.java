@@ -116,11 +116,11 @@ public class CustomKeyListener implements KeyListener {
          return (false);
       }
    }
+}
 /*
    public HashSet<> getKeysPressed(){
    public Set<Character> getKeysPressed(){
       return pressed;
    }
 
-}
-
+*/
