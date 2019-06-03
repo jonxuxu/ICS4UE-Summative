@@ -680,6 +680,12 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
+        // Toggles debug
+        if(myKeyListener.getKeysPressed().contains((char)112)){
+          // If F1 pressed
+          ((DebugComponent) (allComponents[4])).toggle();
+        }
+
          if (players.length != 0) {
             currentXy = new int[players.length][2];
             for (int i = 0; i < players.length; i++) {

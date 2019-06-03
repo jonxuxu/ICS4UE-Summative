@@ -19,6 +19,7 @@ public class CustomKeyListener implements KeyListener {
    //W is -1, S is 1, A is -1, D is 1
    //Instance variables
    private Set<Character> pressed = new HashSet<Character>();
+   private char typed;
    private int[] direction = new int[2];//WASD
    private boolean[] spellsUsed = new boolean[3];
 
@@ -34,6 +35,7 @@ public class CustomKeyListener implements KeyListener {
     */
    @Override
    public void keyTyped(KeyEvent e) {
+      typed = e.getKeyChar();
    }
 
    /**
@@ -106,6 +108,7 @@ public class CustomKeyListener implements KeyListener {
       return (spellsUsed);
    }
 
+
    public boolean getMenu() {
       if (pressed.contains(ESC)) {
          return (true);
@@ -115,8 +118,9 @@ public class CustomKeyListener implements KeyListener {
    }
 /*
    public HashSet<> getKeysPressed(){
-
+   public Set<Character> getKeysPressed(){
+      return pressed;
    }
-   */
+
 }
 
