@@ -663,6 +663,7 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
+      private boolean menuCooldown  = true;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -758,7 +759,12 @@ public class Client extends JFrame implements WindowListener {
                aoes.get(i).draw(g2);
             }
             if (myKeyListener.getMenu()) {
-               ((PauseComponent) (allComponents[0])).openMenu();
+               if (!menuCooldown) {
+                  ((PauseComponent) (allComponents[0])).openMenu();
+                  menuCooldown=true;
+               }
+            }else{
+               menuCooldown=false;
             }
             ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             //draw all components
