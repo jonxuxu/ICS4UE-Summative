@@ -15,12 +15,13 @@ public class Clock {
    private long oldTime;
    private long currentTime;
    //Indicate frames per second
-   private final long DELTA_LIMIT = 20;//Every time this much time elapses, a frame is passed
+   private long DELTA_LIMIT;//Every time this much time elapses, a frame is passed
 
    /**
     * Sets the instance variables upon creation
     */
-   public Clock() {
+   public Clock(int delay) {
+      DELTA_LIMIT = delay;
       this.oldTime = System.currentTimeMillis();
       this.currentTime =System.currentTimeMillis();
    }

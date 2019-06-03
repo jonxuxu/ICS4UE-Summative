@@ -1,4 +1,4 @@
-package client.ui;
+package client.gameUi;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
