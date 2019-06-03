@@ -277,6 +277,9 @@ public class Client extends JFrame implements WindowListener {
    public void updateMouse(int[] state) {
       this.mouseState = state;
    }
+   public void typeKey(char c){
+
+   }
 
    public void gameLogic() {
       // TODO: Initialize map ONCE after game begin
@@ -679,11 +682,6 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
-        // Toggles debug
-        if(myKeyListener.getKeysPressed().contains((char)112)){
-          // If F1 pressed
-          ((DebugComponent) (allComponents[4])).toggle();
-        }
 
          if (players.length != 0) {
             currentXy = new int[players.length][2];

@@ -19,23 +19,20 @@ public class CustomKeyListener implements KeyListener {
    //W is -1, S is 1, A is -1, D is 1
    //Instance variables
    private Set<Character> pressed = new HashSet<Character>();
-   private char typed;
    private int[] direction = new int[2];//WASD
    private boolean[] spellsUsed = new boolean[3];
-
+   private Client main;
    //Characters
    private char ESC = ((char) (27));
 
    //Start of methods that are implemented from KeyListener
+   public CustomKeyListener(Client main) {
+      this.main = main;
+   }
 
-   /**
-    * This is not used, just implemented.
-    *
-    * @param e, a KeyEvent
-    */
    @Override
    public void keyTyped(KeyEvent e) {
-      typed = e.getKeyChar();
+      main.typeKey(e.getKeyChar());
    }
 
    /**
@@ -116,6 +113,7 @@ public class CustomKeyListener implements KeyListener {
          return (false);
       }
    }
+}
 /*
    public HashSet<> getKeysPressed(){
    public Set<Character> getKeysPressed(){
