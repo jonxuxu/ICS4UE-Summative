@@ -37,7 +37,7 @@ public class IntermediatePanel extends GeneralPanel { //State=7 (intermediate)=
       gamePanel= CLIENT.new GamePanel();
    }
    public void initializeSize(int DESIRED_X,int DESIRED_Y) {
-      gamePanel.setBounds((int) ((this.getWidth() - (DESIRED_X * SCALING)) / 2), (int) ((this.getHeight() - (DESIRED_Y * SCALING)) / 2), (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
+      gamePanel.setBounds((int) ((MAX_X - (DESIRED_X * SCALING)) / 2), (int) ((MAX_Y - (DESIRED_Y * SCALING)) / 2), (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
       this.add(gamePanel);
    }
 

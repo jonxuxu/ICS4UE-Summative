@@ -52,10 +52,12 @@ public class InstructionPanel extends GeneralPanel { //State=5
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setFont(MAIN_FONT);
       super.paintComponent(g);
       //Background
       drawBackground(g2);
       drawAllParticles(g2);
+      g2.setColor(Color.WHITE);
+      g2.setFont(HEADER_FONT);
+      g2.drawString("Instructions", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Instructions")) / 2.0), (MAX_Y / 5));
    }
 }

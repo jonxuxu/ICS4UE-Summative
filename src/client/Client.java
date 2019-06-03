@@ -3,6 +3,7 @@ package client;
 import client.map.*;
 import client.sound.*;
 import client.ui.*;
+import client.ui.MenuComponent;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -12,8 +13,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,7 +50,7 @@ public class Client extends JFrame implements WindowListener {
    private final int DESIRED_Y = 500;
    private final int DESIRED_X = 950;
    private int MAX_Y, MAX_X;
-   private double scaling, introScaling;
+   private double SCALING, introScaling;
    private int[] xyAdjust = new int[2];
    private int[] centerXy = new int[2];
    private int[] mouseState = new int[3];
@@ -79,6 +78,7 @@ public class Client extends JFrame implements WindowListener {
    private int[] errors = new int[3];
    private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun"};
    private int myTeam; //TODO: make better way
+   private int myPlayerID;
 
    // Game itself
    private FogMap fog;
@@ -110,6 +110,8 @@ public class Client extends JFrame implements WindowListener {
       this.setSize(MAX_X, MAX_Y);
       this.setVisible(true);
       Dimension actualSize = this.getContentPane().getSize();
+      MAX_X = actualSize.width;
+      MAX_Y = actualSize.height;
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
@@ -118,11 +120,11 @@ public class Client extends JFrame implements WindowListener {
       //Control set up (the mouse listeners are attached to the game panel)
       initializeScaling();
       this.addKeyListener(myKeyListener);
-      int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
-      myMouseAdapter = new CustomMouseAdapter(this, scaling, tempXy);
+      int[] tempXy = {(int) (DESIRED_X * SCALING / 2), (int) (DESIRED_Y * SCALING / 2)};
+      myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
 
       //Creating components
-      GeneralPanel.setParameters(MAX_X, MAX_Y, scaling, introScaling, this);
+      GeneralPanel.setParameters(MAX_X, MAX_Y, SCALING, introScaling, this);
       allPanels[0] = new LoginPanel();
       allPanels[1] = new IntroPanel();
       allPanels[2] = new MenuPanel();
@@ -145,7 +147,7 @@ public class Client extends JFrame implements WindowListener {
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
-      fog = new FogMap(xy, scaling);
+      fog = new FogMap(xy, SCALING);
       // TODO: Set player spawn xy later
    }
 
@@ -221,15 +223,13 @@ public class Client extends JFrame implements WindowListener {
                }
                output.flush();
                waitForInput();
-            }else {
+            } else {
                soundEffect.playSound("error");
                String totalErrorOutput = "";
                if ((errors[1] != 0)) {
-                  System.out.println("ww");
                   totalErrorOutput += ("Name Error: " + errorMessages[errors[1]] + "_");
                }
                if ((errors[2] != 0)) {
-                  System.out.println("1w");
                   totalErrorOutput += ("Password Error: " + errorMessages[errors[2]]);
                }
                allPanels[state].setErrorUpdate(totalErrorOutput);
@@ -277,8 +277,6 @@ public class Client extends JFrame implements WindowListener {
       // TODO: InitializSe map ONCE after game begin
       try {
          if (input.ready()) {
-            xyAdjust[0] = (int) (centerXy[0] - myPlayer.getXy()[0] * scaling);
-            xyAdjust[1] = (int) (centerXy[1] - myPlayer.getXy()[1] * scaling);
             decipherGameInput(input.readLine());
             int angleOfMovement = myKeyListener.getAngle();
             // TODO: Update/improve when kameron is done
@@ -314,8 +312,8 @@ public class Client extends JFrame implements WindowListener {
                output.println(outputString.toString().trim());
                output.flush();
             }
-            repaintPanels();
          }
+         repaintPanels();
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -438,6 +436,7 @@ public class Client extends JFrame implements WindowListener {
             players[i] = new SafeMarksman(onlineList.get(i).getUsername());
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
+               myPlayerID = i;
             }
          }
          newState = 7;//Sends to the game screen
@@ -465,9 +464,9 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'D') {
                   players[Integer.parseInt(thirdSplit[0])] = null;
                } else if (initializer == 'R') {
-                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling)));
+                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING + xyAdjust[0]), (int) (Integer.parseInt(thirdSplit[2]) * SCALING + xyAdjust[1])));
                } else if (initializer == 'E') {
-                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * scaling + centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (Integer.parseInt(thirdSplit[2]) * scaling + centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (Integer.parseInt(thirdSplit[3]) * scaling)));
+                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING + xyAdjust[0]), (int) (Integer.parseInt(thirdSplit[2]) * SCALING + xyAdjust[1]), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
                }
             }
          }
@@ -563,9 +562,9 @@ public class Client extends JFrame implements WindowListener {
 
    public void initializeScaling() {
       if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //
-         scaling = 1.0 * MAX_X / DESIRED_X;
+         SCALING = 1.0 * MAX_X / DESIRED_X;
       } else {
-         scaling = 1.0 * MAX_Y / DESIRED_Y;
+         SCALING = 1.0 * MAX_Y / DESIRED_Y;
       }
       int BG_Y = 1198;
       int BG_X = 1800;
@@ -650,91 +649,68 @@ public class Client extends JFrame implements WindowListener {
       private Graphics2D g2;
       private boolean generateGraphics = true;
       int[] midXy = new int[2];
-      private Shape rect, largeCircle;
-      private Area areaRect, largeRing;
-      private Polygon BOTTOM_BAR = new Polygon();
       private Rectangle drawArea;
-      private int fogTicks = 0;
       private final Font MAIN_FONT = super.getFont("main");
-
       private BufferedImage sheet;
-      private Sector[][] sectors;
-
+      private int[][] currentXy;
+      //Game components
+      private GameComponent[] allComponents = new GameComponent[4];
 
       public GamePanel() {
-         super();
-         this.setDoubleBuffered(true);
          this.setBackground(new Color(0, 0, 0));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.setVisible(true);
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
+         GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
+         allComponents[0] = new MenuComponent();
+         allComponents[1] = new BottomComponent();
+         allComponents[2] = new MinimapComponent();
+         allComponents[3] = new InventoryComponent();
+         this.setDoubleBuffered(true);
       }
 
       @Override
       public void paintComponent(Graphics g) {
+         if (players.length != 0) {
+            currentXy= new int[players.length][2];
+            for (int i = 0; i < players.length; i++) {
+               currentXy[i][0] = players[i].getXy()[0];
+               currentXy[i][1] = players[i].getXy()[1];
+            }
+            xyAdjust[0] = (int) (centerXy[0] - currentXy[myPlayerID][0] * SCALING);
+            xyAdjust[1] = (int) (centerXy[1] - currentXy[myPlayerID][1] * SCALING);
+         }
          g2 = (Graphics2D) g;
+         super.paintComponent(g2);
          if ((state == 7) && (generateGraphics)) {
-            midXy[0] = (int) (DESIRED_X * scaling / 2);
-            midXy[1] = (int) (DESIRED_Y * scaling / 2);
+            midXy[0] = (int) (DESIRED_X * SCALING / 2);
+            midXy[1] = (int) (DESIRED_Y * SCALING / 2);
             for (Player currentPlayer : players) {
-               currentPlayer.setScaling(scaling);
+               currentPlayer.setScaling(SCALING);
                currentPlayer.setCenterXy(midXy);
             }
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
-            largeCircle = new Ellipse2D.Double(400 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
-
-            rect = new Rectangle2D.Double(0, 0, 950 * scaling, 500 * scaling);
-            areaRect = new Area(rect);
-            largeRing = new Area(largeCircle);
-            areaRect.subtract(largeRing);
-            BOTTOM_BAR.addPoint((int) (272 * scaling), (int) (500 * scaling));
-            BOTTOM_BAR.addPoint((int) (265 * scaling), (int) (440 * scaling));
-            BOTTOM_BAR.addPoint((int) (270 * scaling), (int) (435 * scaling));
-            BOTTOM_BAR.addPoint((int) (680 * scaling), (int) (435 * scaling));
-            BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
-            BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
             //Game set up
-            centerXy[0] = (int) (DESIRED_X * scaling / 2);
-            centerXy[1] = (int) (DESIRED_Y * scaling / 2);
+            centerXy[0] = (int) (DESIRED_X * SCALING / 2);
+            centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
             try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
-               sectors = new Sector[10][10];
-               for (int i = 0; i < 10; i++) {
-                  for (int j = 0; j < 10; j++) {
-                     sectors[j][i] = new Sector();
-                     sectors[j][i].setImage(sheet.getSubimage(j * 1000, i * 1000, 1000, 1000));
-                     sectors[j][i].setSectorCoords(j, i);
-                     sectors[j][i].setSize((int) (1000 * scaling));
-                  }
-               }
             } catch (IOException e) {
                System.out.println("Image not found");
             }
-            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
+            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
          }
-         super.paintComponent(g2);
          if (drawArea != null) {
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-            //Sectors
-            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 1000.0);
-            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 1000.0)) + 1;
-            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 1000.0);
-            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 1000.0)) + 1;
+            //Map
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
 
-            for (int i = startY; i < finalY; i++) {
-               for (int j = startX; j < finalX; j++) {
-                  if ((i >= 0) && (j >= 0) && (i < 10) && (j < 10)) {
-                     sectors[j][i].drawSector(g2, xyAdjust);
-                  }
-               }
-            }
             //Game player
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
@@ -746,12 +722,13 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   // TODO: Separate by teams
-                  fog.scout(players[i].getXy());
+                  fog.scout(currentXy[i]);
                }
             }
+
             //Creating shapes
             AffineTransform tx = new AffineTransform();
-            tx.translate(centerXy[0] - myPlayer.getXy()[0] * scaling, centerXy[1] - myPlayer.getXy()[1] * scaling);
+            tx.translate(xyAdjust[0], xyAdjust[1]);
             Area darkFog = fog.getFog().createTransformedArea(tx);
             Area lightFog = fog.getExplored().createTransformedArea(tx);
 
@@ -761,32 +738,18 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
 
-            for (int i = 0; i < projectiles.size(); i++) { //For some reason, a concurrent modification exception is thrown if i use the other for loop
+            for (int i = 0; i < projectiles.size(); i++) {
                projectiles.get(i).draw(g2);
             }
-            for (int i = 0; i < aoes.size(); i++) { //For some reason, a concurrent modification exception is thrown if i use the other for loop
+            for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
-            g2.setColor(new Color(165, 156, 148));
-            //Minimap
-            g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
-            //Bottom bar
-            g2.drawPolygon(BOTTOM_BAR);
-
-
-            //Stat bars
-            g2.setColor(new Color(190, 40, 40));
-            g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
-
-            g2.setColor(new Color(165, 156, 148));
-            g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-            g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-            //Bottom bar contents
-
-            //Spells
-            g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-            g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-            g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
+            ((MenuComponent) (allComponents[0])).checkPressed(myMouseAdapter.getMouseState());
+            ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
+            //draw all components
+            for (GameComponent gameComponent : allComponents) {
+               gameComponent.draw(g2);
+            }
          }
          g2.dispose();
       }

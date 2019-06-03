@@ -166,8 +166,8 @@ public class CustomMouseAdapter extends MouseAdapter {
     *
     * @return dragXy, an int[] with the x as the 0 index and y as the 1 index
     */
-   public int[] getMouseDragXy() {
-      return dragXy;
+   public int[] getMouseState() {
+      return(state);
    }
 
    /**
