@@ -38,7 +38,6 @@ public class PauseComponent extends GameComponent {
    private Area BORDER_FILL4;
 
    private boolean visible;
-   private boolean justPressed;
 
    public PauseComponent() {
       BORDER_RECT = new Rectangle(MAX_X / 2 - scale(200), MAX_Y / 2 - scale(150), scale(400), scale(300));
@@ -58,11 +57,7 @@ public class PauseComponent extends GameComponent {
    }
 
    public void openMenu() {
-      if (visible) {
-         visible = false;
-      } else {
-         visible = true;
-      }
+      visible = !visible;
    }
 
    public void draw(Graphics2D g2) {

@@ -277,9 +277,6 @@ public class Client extends JFrame implements WindowListener {
    public void updateMouse(int[] state) {
       this.mouseState = state;
    }
-   public void typeKey(char c){
-
-   }
 
    public void gameLogic() {
       // TODO: Initialize map ONCE after game begin
@@ -664,6 +661,7 @@ public class Client extends JFrame implements WindowListener {
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
       private boolean menuCooldown  = true;
+      private CustKeyListener gameKeyListener = new CustKeyListener(this);
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -672,6 +670,7 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
+         this.addKeyListener(gameKeyListener);
          GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
          allComponents[0] = new PauseComponent();
          allComponents[1] = new BottomComponent();
@@ -680,6 +679,12 @@ public class Client extends JFrame implements WindowListener {
          allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
       }
+
+     public void typeKey(char c){
+       if(((int)c) == 112){ // If F1 pressed
+         ((DebugComponent)allComponents[4]).toggle();
+       }
+     }
 
       @Override
       public void paintComponent(Graphics g) {
