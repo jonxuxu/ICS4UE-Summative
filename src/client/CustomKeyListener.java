@@ -44,7 +44,6 @@ public class CustomKeyListener implements KeyListener {
    @Override
    public void keyPressed(KeyEvent e) {
       pressed.add(e.getKeyChar());
-      System.out.println(e.getKeyChar());
    }
 
    /**
