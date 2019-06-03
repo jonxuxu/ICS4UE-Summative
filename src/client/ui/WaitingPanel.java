@@ -92,7 +92,7 @@ public class WaitingPanel extends GeneralPanel { //State=6
         this.remove(readyGameButton);
         buttonRemove = false;
       }
-      g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), MAX_Y / 2);
+      g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), (int)(MAX_Y*9.0/16.0));
     }
     drawAllParticles(g2);
   }

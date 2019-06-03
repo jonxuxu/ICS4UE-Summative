@@ -515,7 +515,7 @@ public class Client extends JFrame implements WindowListener {
       } else {
          ((IntermediatePanel) (allPanels[currentPanel])).repaintReal();
       }
-      frames ++;
+      frames++;
    }
 
    public void connect() {
@@ -673,10 +673,12 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          if (players.length != 0) {
-            currentXy= new int[players.length][2];
+            currentXy = new int[players.length][2];
             for (int i = 0; i < players.length; i++) {
-               currentXy[i][0] = players[i].getXy()[0];
-               currentXy[i][1] = players[i].getXy()[1];
+               if (players[i] != null) {
+                  currentXy[i][0] = players[i].getXy()[0];
+                  currentXy[i][1] = players[i].getXy()[1];
+               }
             }
             xyAdjust[0] = (int) (centerXy[0] - currentXy[myPlayerID][0] * SCALING);
             xyAdjust[1] = (int) (centerXy[1] - currentXy[myPlayerID][1] * SCALING);
@@ -743,7 +745,9 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
-            ((PauseComponent) (allComponents[0])).checkPressed(myMouseAdapter.getMouseState());
+            if (myKeyListener.getMenu()) {
+               ((PauseComponent) (allComponents[0])).openMenu();
+            }
             ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             //draw all components
             for (GameComponent gameComponent : allComponents) {
