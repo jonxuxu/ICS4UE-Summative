@@ -20,6 +20,9 @@ public class BottomComponent extends GameComponent {
    private final int MAX_Y = super.getMAX_Y();
    private final Polygon BOTTOM_BORDER = new Polygon();
    private final Polygon BOTTOM_BORDER2 = new Polygon();
+   private final Polygon BOTTOM_BORDER3 = new Polygon();
+   private final Polygon BOTTOM_BORDER4 = new Polygon();
+   private final Polygon BOTTOM_INNER = new Polygon();
    private final Polygon BOTTOM_POLYGON = new Polygon();
 
    private int health;
@@ -32,6 +35,13 @@ public class BottomComponent extends GameComponent {
       BOTTOM_BORDER.addPoint(scale(680), scale(435));
       BOTTOM_BORDER.addPoint(scale(685), scale(440));
       BOTTOM_BORDER.addPoint(scale(678), scale(500));
+
+      BOTTOM_BORDER2.addPoint(scale(274), scale(498));
+      BOTTOM_BORDER2.addPoint(scale(267), scale(442));
+      BOTTOM_BORDER2.addPoint(scale(272), scale(437));
+      BOTTOM_BORDER2.addPoint(scale(678), scale(437));
+      BOTTOM_BORDER2.addPoint(scale(683), scale(442));
+      BOTTOM_BORDER2.addPoint(scale(676), scale(298));
    }
 
 

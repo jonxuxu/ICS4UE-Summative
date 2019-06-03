@@ -3,7 +3,12 @@ package client.gameUi;
 import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -31,9 +36,6 @@ public class PauseComponent extends GameComponent {
    private Area BORDER_FILL2;
    private Area BORDER_FILL3;
    private Area BORDER_FILL4;
-   private Rectangle2D MENU_BUTTON;
-   private Rectangle2D MENU_RECT;
-   private BufferedImage HOME_ICON;
 
    private boolean visible;
    private boolean justPressed;
@@ -53,34 +55,13 @@ public class PauseComponent extends GameComponent {
       BORDER_FILL2.subtract(BORDER_FILL3);
       BORDER_FILL3.subtract(BORDER_FILL4);
       BORDER_FILL4.subtract(tempArea);
-      //Pause
-      MENU_BUTTON = new Rectangle(MAX_X - scale(25), 0, scale(25), scale(25));
-      MENU_RECT = new Rectangle(MAX_X - scale(24), scale(1), scale(23), scale(23));
-      //Home
-      try {
-         HOME_ICON = ImageIO.read(new File(".\\res\\HomeIcon.png"));
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
    }
 
-   public void checkPressed(int[] state) {
-      if (state[2] == 1) {
-         if (!justPressed) {
-            if (!visible) {
-               if (MENU_BUTTON.contains(state[0], state[1])) {
-                  visible = true;
-               }
-
-            } else {
-               if (!BORDER_RECT.contains(state[0], state[1])) {
-                  visible = false;
-               }
-            }
-            justPressed = true;
-         }
+   public void openMenu() {
+      if (visible) {
+         visible = false;
       } else {
-         justPressed = false;
+         visible = true;
       }
    }
 
@@ -96,13 +77,6 @@ public class PauseComponent extends GameComponent {
          g2.fill(BORDER_FILL4);
          g2.setColor(new Color(33, 35, 37));
          g2.fill(INNER_RECT);
-      } else {
-         g2.setColor(new Color(72, 60, 32));
-         g2.fill(MENU_BUTTON);
-         g2.setColor(new Color(141, 130, 103));
-         g2.fill(MENU_RECT);
-         g2.setColor(new Color(205, 205, 205));
-         g2.drawImage(HOME_ICON, MAX_X - scale(24), scale(1), scale(23), scale(23), null);
       }
    }
 }
