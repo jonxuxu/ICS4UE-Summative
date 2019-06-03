@@ -3,7 +3,6 @@ package client;
 import client.map.*;
 import client.sound.*;
 import client.ui.*;
-import client.ui.MenuComponent;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -66,7 +65,7 @@ public class Client extends JFrame implements WindowListener {
    private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CardLayout cardLayout = new CardLayout(5, 5);
    private JPanel mainContainer = new JPanel(cardLayout);
-   private int state, newState; // 0 by default
+   private int currentPanel, nextPanel; // 0 by default
 
    // Game states
    private ArrayList<User> onlineList = new ArrayList<User>();
@@ -79,6 +78,7 @@ public class Client extends JFrame implements WindowListener {
    private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun"};
    private int myTeam; //TODO: make better way
    private int myPlayerID;
+   private int frames, fps;
 
    // Game itself
    private FogMap fog;
@@ -127,7 +127,7 @@ public class Client extends JFrame implements WindowListener {
       GeneralPanel.setParameters(MAX_X, MAX_Y, SCALING, introScaling, this);
       allPanels[0] = new LoginPanel();
       allPanels[1] = new IntroPanel();
-      allPanels[2] = new MenuPanel();
+      allPanels[2] = new StartPanel();
       allPanels[3] = new CreatePanel();
       allPanels[4] = new JoinPanel();
       allPanels[5] = new InstructionPanel();
@@ -205,7 +205,7 @@ public class Client extends JFrame implements WindowListener {
                   waitForInput();
                }
                if (errors[0] != 0) {
-                  allPanels[state].setErrorUpdate("Error: " + errorMessages[errors[0]]);
+                  allPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[0]]);
                   soundEffect.playSound("error");
                }
             }
@@ -215,7 +215,7 @@ public class Client extends JFrame implements WindowListener {
             boolean checkName = (verifyString(attemptedGameName, 1));
             boolean checkPass = (verifyString(attemptedGamePassword, 2));
             if ((checkName) && (checkPass)) {
-               if (state == 3) {
+               if (currentPanel == 3) {
                   output.println("C" + attemptedGameName + " " + attemptedGamePassword);
                } else {
                   output.println("J" + attemptedGameName + " " + attemptedGamePassword);
@@ -231,7 +231,7 @@ public class Client extends JFrame implements WindowListener {
                if ((errors[2] != 0)) {
                   totalErrorOutput += ("Password Error: " + errorMessages[errors[2]]);
                }
-               allPanels[state].setErrorUpdate(totalErrorOutput);
+               allPanels[currentPanel].setErrorUpdate(totalErrorOutput);
             }
          }
          if (notifyReady) {
@@ -261,7 +261,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             testingBegin = false;
-            newState = 6;
+            nextPanel = 6;
          }
       } catch (IOException e) {
          e.printStackTrace();
@@ -378,7 +378,7 @@ public class Client extends JFrame implements WindowListener {
       char initializer = input.charAt(0);
       input = input.substring(1);
       if (isParsable(initializer)) {
-         if (state == 0) {
+         if (currentPanel == 0) {
             errors[0] = Integer.parseInt(initializer + "");
             if (initializer == '0') {
                //Start the opening here
@@ -391,13 +391,13 @@ public class Client extends JFrame implements WindowListener {
                   }
 */
                cardLayout.show(mainContainer, PANEL_NAMES[2]);
-               newState = 2;
+               nextPanel = 2;
             } else {
                username = null;
             }
-         } else if ((state == 3) || (state == 4)) {
+         } else if ((currentPanel == 3) || (currentPanel == 4)) {
             errors[1] = Integer.parseInt(initializer + "");
-         } else if (state == 6) {
+         } else if (currentPanel == 6) {
             if (initializer == '0') {
                System.out.println("Starting Game");
                loading = true;
@@ -416,8 +416,8 @@ public class Client extends JFrame implements WindowListener {
                onlineList.add(new User(aPlayer));
             }
          }
-         newState = 6;
-         if (state == 3) {
+         nextPanel = 6;
+         if (currentPanel == 3) {
             host = true;
          }
       } else if (initializer == 'N') {
@@ -437,11 +437,11 @@ public class Client extends JFrame implements WindowListener {
                myPlayerID = i;
             }
          }
-         newState = 7;//Sends to the game screen
+         nextPanel = 7;//Sends to the game screen
          gameBegin = true;
       } else if (initializer == 'P') { //Then leave the game
          onlineList.clear();
-         newState = 2;
+         nextPanel = 2;
       }
    }
 
@@ -505,16 +505,17 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void repaintPanels() {
-      if (state != newState) {
-         allPanels[state].setErrorUpdate("");
-         state = newState;
-         cardLayout.show(mainContainer, PANEL_NAMES[state]);
+      if (currentPanel != nextPanel) {
+         allPanels[currentPanel].setErrorUpdate("");
+         currentPanel = nextPanel;
+         cardLayout.show(mainContainer, PANEL_NAMES[currentPanel]);
       }
-      if (state != 7) {
-         allPanels[state].repaint();
+      if (currentPanel != 7) {
+         allPanels[currentPanel].repaint();
       } else {
-         ((IntermediatePanel) (allPanels[state])).repaintReal();
+         ((IntermediatePanel) (allPanels[currentPanel])).repaintReal();
       }
+      frames ++;
    }
 
    public void connect() {
@@ -612,8 +613,8 @@ public class Client extends JFrame implements WindowListener {
       teamChosen = true;
    }
 
-   public void setNewState(int newState) {
-      this.newState = newState;
+   public void setNextPanel(int nextPanel) {
+      this.nextPanel = nextPanel;
    }
 
    //Info to panels
@@ -662,7 +663,7 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
          GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
-         allComponents[0] = new MenuComponent();
+         allComponents[0] = new PauseComponent();
          allComponents[1] = new BottomComponent();
          allComponents[2] = new MinimapComponent();
          allComponents[3] = new InventoryComponent();
@@ -682,7 +683,7 @@ public class Client extends JFrame implements WindowListener {
          }
          g2 = (Graphics2D) g;
          super.paintComponent(g2);
-         if ((state == 7) && (generateGraphics)) {
+         if ((currentPanel == 7) && (generateGraphics)) {
             midXy[0] = (int) (DESIRED_X * SCALING / 2);
             midXy[1] = (int) (DESIRED_Y * SCALING / 2);
             for (Player currentPlayer : players) {
@@ -742,7 +743,7 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
-            ((MenuComponent) (allComponents[0])).checkPressed(myMouseAdapter.getMouseState());
+            ((PauseComponent) (allComponents[0])).checkPressed(myMouseAdapter.getMouseState());
             ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             //draw all components
             for (GameComponent gameComponent : allComponents) {

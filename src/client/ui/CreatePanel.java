@@ -57,7 +57,7 @@ public class CreatePanel extends GeneralPanel { //State =3
       confirmButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y / 2, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(confirmButton);
       backButton.addActionListener((ActionEvent e) -> {
-         CLIENT.setNewState(2);
+         CLIENT.setNextPanel(2);
       });
       backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);

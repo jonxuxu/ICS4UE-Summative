@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
- * MenuPanel.java
+ * StartPanel.java
  * This is
  *
  * @author Will Jeong
@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
  * @since 2019-05-31
  */
 
-public class MenuPanel extends GeneralPanel {//State=2
+public class StartPanel extends GeneralPanel {//State=2
    private Graphics2D g2;
    private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
@@ -30,29 +30,29 @@ public class MenuPanel extends GeneralPanel {//State=2
 
    private double introAlpha = 1;
 
-   public MenuPanel() {
+   public StartPanel() {
       //Setting up the size
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
       createButton.addActionListener((ActionEvent e) -> {
-       CLIENT.setNewState(3);
+       CLIENT.setNextPanel(3);
       });
       createButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(createButton);
 
       joinButton.addActionListener((ActionEvent e) -> {
-         CLIENT.setNewState(4);
+         CLIENT.setNextPanel(4);
       });
       joinButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(joinButton);
       instructionButton.addActionListener((ActionEvent e) -> {
-         CLIENT.setNewState(5);
+         CLIENT.setNextPanel(5);
       });
       instructionButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
 
       this.add(instructionButton);
       logoutButton.addActionListener((ActionEvent e) -> {
-         CLIENT.setNewState(0);
+         CLIENT.setNextPanel(0);
          CLIENT.logout();
       });
       logoutButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));

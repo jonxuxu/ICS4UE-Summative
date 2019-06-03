@@ -33,7 +33,7 @@ public class InstructionPanel extends GeneralPanel { //State=5
    public InstructionPanel() {
       //Setting up buttons
       backButton.addActionListener((ActionEvent e) -> {
-         CLIENT.setNewState(2);
+         CLIENT.setNextPanel(2);
        //  CLIENT.setAction(2);
          CLIENT.leaveGame();
       });
