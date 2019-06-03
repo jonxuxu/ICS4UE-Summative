@@ -108,6 +108,6 @@ public class CustomKeyListener implements KeyListener {
       }
       return (spellsUsed);
    }
-   
+
 }
 
