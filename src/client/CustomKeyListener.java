@@ -23,6 +23,9 @@ public class CustomKeyListener implements KeyListener {
    private int[] direction = new int[2];//WASD
    private boolean[] spellsUsed = new boolean[3];
 
+   //Characters
+   private char ESC = ((char) (27));
+
    //Start of methods that are implemented from KeyListener
 
    /**
@@ -105,6 +108,16 @@ public class CustomKeyListener implements KeyListener {
       return (spellsUsed);
    }
 
+
+   public boolean getMenu() {
+      if (pressed.contains(ESC)) {
+         return (true);
+      } else {
+         return (false);
+      }
+   }
+/*
+   public HashSet<> getKeysPressed(){
    public Set<Character> getKeysPressed(){
       return pressed;
    }
