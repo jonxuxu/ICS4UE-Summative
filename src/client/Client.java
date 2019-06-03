@@ -165,9 +165,22 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void go() {
+      // Sets up frame rate timer
+      new java.util.Timer().schedule(
+              new java.util.TimerTask() {
+                 @Override
+                 public void run() {
+                    fps = frames;
+                    frames = 0;
+                 }
+              },
+              1000
+      );
+
       while (true) {  //Main game loop
          if (time.getFramePassed()) {
             repaintPanels();
+            frames ++;
          }
          if (connectionState < 1) {
             connect();
@@ -762,6 +775,9 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
+
+            //draw all components
+            ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped);
             if (keyPressed) {
                if(lastKeyTyped == 27){ // Esc key
                   ((PauseComponent) (allComponents[0])).toggle();
@@ -772,7 +788,6 @@ public class Client extends JFrame implements WindowListener {
                keyPressed = false;
             }
             ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
-            //draw all components
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
