@@ -25,8 +25,8 @@ public class BottomComponent extends GameComponent {
    private final Polygon BOTTOM_INNER = new Polygon();
    private final Polygon BOTTOM_POLYGON = new Polygon();
 
-   private int health;
-   private int maxHealth;
+   private int health=1;
+   private int maxHealth=1 ;
 
    public BottomComponent() {
       BOTTOM_BORDER.addPoint(scale(272), scale(500));
