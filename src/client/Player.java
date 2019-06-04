@@ -18,7 +18,7 @@ public abstract class Player extends User {
    private int[] xy = {300, 300};
    private int[] centerXy = new int[2];
    private double scaling;
-   private int desiredSpell;
+   private int desiredSpell=-1;
    private int[] spellPercent = {100, 100, 100};
    private ArrayList<Status> allStatus = new ArrayList<Status>();
    private int gold = 0;
@@ -136,6 +136,8 @@ public abstract class Player extends User {
    public abstract void move(Graphics2D g2, int x, int y, int width, int height);
 
    public abstract void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex);
+
+   public abstract void setMovementIndex(int positionIndex,boolean moving);
 
    public int getAttack() {
       return attack;

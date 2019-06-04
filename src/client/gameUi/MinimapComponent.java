@@ -1,4 +1,7 @@
-package client.ui;
+package client.gameUi;
+
+import client.Player;
+import client.map.FogMap;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -16,8 +19,13 @@ import java.awt.geom.Rectangle2D;
  */
 
 public class MinimapComponent extends GameComponent {
+   private FogMap fog;
+   private Player[] players;
+
    private final int MAX_X = super.getMAX_X();
    private final int MAX_Y = super.getMAX_Y();
+   private double zoom = 1;
+
    private Rectangle2D BORDER_RECT;
    private Rectangle2D BORDER_RECT2;
    private Rectangle2D BORDER_RECT3;
@@ -28,7 +36,12 @@ public class MinimapComponent extends GameComponent {
    private Area BORDER_FILL3;
    private Area BORDER_FILL4;
 
-   public MinimapComponent() {
+   public MinimapComponent(FogMap fog, Player[] players) {
+      // Setting up refs
+      this.fog = fog;
+      this.players = players;
+
+      // Border
       BORDER_RECT = new Rectangle(scale(830), scale(379), scale(120), scale(120));
       BORDER_RECT2 = new Rectangle(scale(832), scale(381), scale(116), scale(116));
       BORDER_RECT3 = new Rectangle(scale(833), scale(382), scale(114), scale(114));
@@ -47,6 +60,13 @@ public class MinimapComponent extends GameComponent {
 
 
    public void draw(Graphics2D g2) {
+      // Fills inside
+
+
+      // Draws player
+      g2.setColor(Color.green);
+
+      // Draws border
       g2.setColor(new Color(72, 60, 32));
       g2.fill(BORDER_FILL);
       g2.setColor(new Color(141, 130, 103));
@@ -57,5 +77,9 @@ public class MinimapComponent extends GameComponent {
       g2.fill(BORDER_FILL4);
       g2.setColor(new Color(33, 35, 37));
       g2.fill(INNER_RECT);
+   }
+
+   public void update(){
+
    }
 }

@@ -36,23 +36,27 @@ public class StartPanel extends GeneralPanel {//State=2
       //Basic create and join server buttons
       createButton.addActionListener((ActionEvent e) -> {
        CLIENT.setNextPanel(3);
+       System.out.println("3");
       });
       createButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(createButton);
 
       joinButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(4);
+         System.out.println("4");
       });
       joinButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(joinButton);
       instructionButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(5);
+         System.out.println("5");
       });
       instructionButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
 
       this.add(instructionButton);
       logoutButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(0);
+         System.out.println("0");
          CLIENT.logout();
       });
       logoutButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));

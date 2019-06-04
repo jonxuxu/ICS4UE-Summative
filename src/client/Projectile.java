@@ -13,9 +13,10 @@ import java.awt.Graphics2D;
  */
 
 public class Projectile {
-   int ID;
-   int x;
-   int y;
+   private int ID;
+   private int x;
+   private int y;
+   private static int[] xyAdjust;
 
    Projectile(int ID, int x, int y) {
       this.ID = ID;
@@ -25,6 +26,10 @@ public class Projectile {
 
    public void draw(Graphics2D g2) {
       g2.setColor(Color.WHITE);
-      g2.fillRect(x, y, 10, 10);
+      g2.fillRect(x+xyAdjust[0], y+xyAdjust[1], 10, 10);
+   }
+
+   public static void setXyAdjust(int[] xyAdjust1) {
+      xyAdjust = xyAdjust1;
    }
 }

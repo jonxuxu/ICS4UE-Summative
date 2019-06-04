@@ -2,6 +2,7 @@ package server;
 
 import java.awt.Rectangle;
 import java.awt.geom.Area;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -167,6 +168,34 @@ public abstract class Player extends User implements CanIntersect {
     }
   }
   
+  private int teamNumber = 9;//Which means that it is invalid
+  
+  //Movement
+  private int positionIndex;
+  private boolean walking;
+  
+  public void setTeam(int teamNumber) {
+    this.teamNumber = teamNumber;
+  }
+  
+  public int getTeam() {
+    return (teamNumber);
+  }
+  
+  //Movement
+  public void setWalking(boolean walking){
+    this.walking=walking;
+  }
+  public void setPositionIndex(int positionIndex){
+    this.positionIndex=positionIndex;
+  }
+  public boolean getWalking(){
+    return(walking);
+  }
+  public int getPositionIndex(){
+    return(positionIndex);
+  }
+  
   public void updateStatuses(){
     mobilityBoost = 0;
     buffBlacklist.clear();
@@ -190,20 +219,28 @@ public abstract class Player extends User implements CanIntersect {
     }
   }
   
-  public void applyStatus(Status status){
+  public void applyStatus(Status status) {
     boolean blacklisted = false;
-    if ((status instanceof Illuminated) && (!invisible)){
+    if ((status instanceof Illuminated) && (!invisible)) {
       illuminated = true;
-    } else if (status instanceof MSBuff){
-      for (int i = 0; i < buffBlacklist.size(); i++){
-        if (status.getClass().equals(buffBlacklist.get(i))){
+    } else if (status instanceof MSBuff) {
+      for (int i = 0; i < buffBlacklist.size(); i++) {
+        if (status.getClass().equals(buffBlacklist.get(i))) {
           blacklisted = true;
         }
       }
-      if (!blacklisted){
-        mobilityBoost += ((MSBuff)(status)).getStrength();
+      if (!blacklisted) {
+        mobilityBoost += ((MSBuff) (status)).getStrength();
         buffBlacklist.add(status.getClass());
       }
+    } else if (status instanceof Stun) {
+      stunned = true;
+    } else if (status instanceof Launched) {
+      xy[0] += ((Launched) (status)).getDX();
+      xy[1] += ((Launched) (status)).getDY();
+    } else if (status instanceof Invisible) {
+      invisible = true;
+      illuminated = false;
     } else if (status instanceof Stun){
       stunned = true;
     } else if (status instanceof Launched){
@@ -265,10 +302,9 @@ public abstract class Player extends User implements CanIntersect {
   public boolean getIlluminated() {
     return illuminated;
   }
-  /*
-   public void setIlluminated(boolean illuminated){
-   this.illuminated = illuminated;
-   }*/
+  public void setIlluminated(boolean illuminated){
+    this.illuminated = illuminated;
+  }
   
   public Projectile getProjectile(int i) {
     return projectiles.get(i);
@@ -358,7 +394,6 @@ public abstract class Player extends User implements CanIntersect {
     return allies.size();
   }
   
-  //////////////////////////////////////////////////////////////////////////
   public abstract boolean castSpell(int spellIndex);
   
   public abstract int getSpellPercent(int spellIndex);
@@ -402,9 +437,4 @@ public abstract class Player extends User implements CanIntersect {
   public void setMobility(int mobility){
     this.mobility = mobility;
   }
-  /*
-   public void setMaxMobility(int maxMobility) {
-   this.maxMobility = maxMobility;
-   this.mobility = maxMobility;
-   }*/
 }

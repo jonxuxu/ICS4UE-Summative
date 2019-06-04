@@ -14,15 +14,17 @@ public class Clock {
    //Set as long to maintain precision
    private long oldTime;
    private long currentTime;
+   private int frame;
+   private int fps;
    //Indicate frames per second
-   private final long DELTA_LIMIT = 20;//Every time this much time elapses, a frame is passed
-
+   private long DELTA_LIMIT;//Every time this much time elapses, a frame is passed
    /**
     * Sets the instance variables upon creation
     */
-   public Clock() {
+   public Clock(int delay) {
+      DELTA_LIMIT = delay;
       this.oldTime = System.currentTimeMillis();
-      this.currentTime =System.currentTimeMillis();
+      this.currentTime = System.currentTimeMillis();
    }
 
    //Getters and setters
@@ -34,11 +36,18 @@ public class Clock {
     */
    public boolean getFramePassed() {
       currentTime = System.currentTimeMillis();
+      frame++;
       if ((currentTime - oldTime) >= DELTA_LIMIT) {
          oldTime = currentTime;
+         fps = frame;
+         frame = 0;
          return (true);
       } else {
          return (false);
       }
+   }
+
+   public int getFPS() {
+      return fps;
    }
 }
