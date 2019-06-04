@@ -55,6 +55,7 @@ public abstract class Player extends User implements CanIntersect {
    private boolean walking;
    //Lighting
    private double flashlightAngle;
+   private double damageReduction;
 
    Player(String username) {
       super(username);
@@ -139,18 +140,9 @@ public abstract class Player extends User implements CanIntersect {
    public void setFlashlightAngle(double flashlightAngle) {
       this.flashlightAngle = flashlightAngle;
    }
+
    public double getFlashlightAngle() {
-      return(flashlightAngle);
-   }
-
-
-   public void setTeam(int teamNumber) {
-      this.teamNumber = teamNumber;
-   }
-
-
-   public int getTeam() {
-      return (teamNumber);
+      return (flashlightAngle);
    }
 
 
@@ -178,7 +170,8 @@ public abstract class Player extends User implements CanIntersect {
 
    public abstract void update();
 
-   public void damage(int damage) {
+   public void damage(int damage) {//Watch out this is overridden sometimes
+      damage = (int) (damage * (1 - damageReduction));
       if (shields.isEmpty()) {
          health -= damage;
       } else {
@@ -189,6 +182,15 @@ public abstract class Player extends User implements CanIntersect {
             shields.remove(0);
          }
       }
+   }
+
+
+   public void setTeam(int teamNumber) {
+      this.teamNumber = teamNumber;
+   }
+
+   public int getTeam() {
+      return (teamNumber);
    }
 
    //Movement
@@ -211,8 +213,11 @@ public abstract class Player extends User implements CanIntersect {
    public void updateStatuses() {
       mobilityBoost = 0;
       buffBlacklist.clear();
+      illuminated = false;
+      stunned = false;
+      invisible = false;
+      damageReduction = 0;
       for (int i = statuses.size() - 1; i >= 0; i--) {
-         illuminated = false;
          statuses.get(i).advance();
          Status removed = null;
          if (statuses.get(i).getRemainingDuration() <= 0) {
@@ -228,6 +233,9 @@ public abstract class Player extends User implements CanIntersect {
          }
       }
    }
+
+
+
 
    public void applyStatus(Status status) {
       boolean blacklisted = false;
@@ -251,6 +259,21 @@ public abstract class Player extends User implements CanIntersect {
       } else if (status instanceof Invisible) {
          invisible = true;
          illuminated = false;
+      } else if (status instanceof Stun) {
+         stunned = true;
+      } else if (status instanceof Launched) {
+         xy[0] += ((Launched) (status)).getDX();
+         xy[1] += ((Launched) (status)).getDY();
+      } else if (status instanceof Invisible) {
+         invisible = true;
+         illuminated = false;
+      } else if (status instanceof GhostE) {
+         ((GhostE) status).setProjectedX(xy[0]);
+         ((GhostE) status).setProjectedY(xy[1]);
+      } else if (status instanceof ReduceDamage) {
+         if (((ReduceDamage) status).getDamageReduction() > damageReduction) {
+            damageReduction = ((ReduceDamage) status).getDamageReduction();
+         }
       }
    }
 
@@ -294,10 +317,10 @@ public abstract class Player extends User implements CanIntersect {
    public boolean getIlluminated() {
       return illuminated;
    }
-  /*
-   public void setIlluminated(boolean illuminated){
-   this.illuminated = illuminated;
-   }*/
+
+   public void setIlluminated(boolean illuminated) {
+      this.illuminated = illuminated;
+   }
 
    public Projectile getProjectile(int i) {
       return projectiles.get(i);
@@ -387,7 +410,6 @@ public abstract class Player extends User implements CanIntersect {
       return allies.size();
    }
 
-   //////////////////////////////////////////////////////////////////////////
    public abstract boolean castSpell(int spellIndex);
 
    public abstract int getSpellPercent(int spellIndex);
@@ -431,9 +453,8 @@ public abstract class Player extends User implements CanIntersect {
    public void setMobility(int mobility) {
       this.mobility = mobility;
    }
-   /*
-   public void setMaxMobility(int maxMobility) {
-      this.maxMobility = maxMobility;
-      this.mobility = maxMobility;
-   }*/
+
+   public double getDamageReduction() {
+      return damageReduction;
+   }
 }

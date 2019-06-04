@@ -8,21 +8,28 @@ package server;
  * @since 2019-05-19
  */
 import java.util.ArrayList;
-public class TimeMage extends Player{
+public class Ghost extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
-  private static int Q_DAMAGE = 50;
-  private static int E_RANGE = 500;
+  private int[] passiveTimers = new int[getEnemiesSize()];
+  private static int PASSIVE_COOLDOWN = 50;
+  private static int PASSIVE_RANGE = 300;
+  private static int Q_BASE_DAMAGE = 100;
+  private static int Q_DAMAGE_PER_STACK = 10;
+  private static int Q_SPEED = 5;
+  private static int Q_RANGE = 200;
+  private static int Q_DURATION = Q_RANGE/Q_SPEED;
+  private boolean inE = false;
   private static int SPACE_DURATION = 100;
   
   private ArrayList<Player> qBlacklist = new ArrayList<Player>();
   
-  TimeMage(String username) {
+  Ghost(String username) {
     super(username);
-    setMaxHealth(200);
-    setHealth(200);
+    setMaxHealth(300);
+    setHealth(300);
     setAttack(300);
-    setMobility(30);
+    setMobility(10);
     setRange(10);//REE Change to -1 when add support for melee attacks
   }
   
@@ -31,29 +38,14 @@ public class TimeMage extends Player{
       if (spellTimers[spellIndex]<=0) {
         spellTimers[spellIndex] = spellCooldowns[spellIndex];
         if (spellIndex==0) { //Q
-          addStatus(new TimeMageQ(getX(), getY(), getMouseX(), getMouseY()));
+          launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+          addAOE(new GhostQAOE(getX(), getY(), Q_DURATION));
           qBlacklist.clear();
         }else if (spellIndex==1){//E
-          boolean eCast = false;
-          for (int i = 0; (i < getEnemiesSize() && (!eCast)); i++){
-            if (getEnemy(i).contains(getMouseX(), getMouseY()) && (Math.sqrt(Math.pow(getEnemy(i).getX()-getX(),2) + Math.pow(getEnemy(i).getY()-getY(),2)) < E_RANGE)){
-              getEnemy(i).addStatus(new TimeMageE(getEnemy(i).getX(), getEnemy(i).getY()));//REE NOTE APPLIES TO ANYONE
-              eCast = true;
-            }
-          }
-          for (int i = 0; (i < getAlliesSize() && (!eCast)); i++){
-            if (getAlly(i).contains(getMouseX(), getMouseY()) && (Math.sqrt(Math.pow(getAlly(i).getX()-getX(),2) + Math.pow(getAlly(i).getY()-getY(),2)) < E_RANGE)){
-              getAlly(i).addStatus(new TimeMageE(getAlly(i).getX(), getAlly(i).getY()));//REE NOTE APPLIES TO ANYONE
-              eCast = true;
-            }
-          }
-          if (!eCast){
-            addStatus(new TimeMageE(getX(), getY()));//REE NOTE APPLIES TO ANYONE
-            eCast = true;
-          }
+          addStatus(new GhostE(getX(), getY(), getMouseX(), getMouseY()));
+          inE = true;
         }else {//Space
           addStatus(new Uncollidable(SPACE_DURATION));
-          addStatus(new Stun(SPACE_DURATION));
           addStatus(new Invisible(SPACE_DURATION));
         }
         return true;
@@ -80,6 +72,24 @@ public class TimeMage extends Player{
         spellTimers[i]--;
       }
     }
+    if (inE){
+      spellTimers[1] = spellCooldowns[1];
+    }
+    for (int i = 0; i < passiveTimers.length; i++){
+      if (passiveTimers[i] > 0){
+        passiveTimers[i]--;
+      }
+    }
+    //Passive
+    for (int i = 0; i <getEnemiesSize(); i++){
+      if (passiveTimers[i]<=0){
+        if (Math.sqrt(Math.pow(getEnemy(i).getX()-getX(),2) + Math.pow(getEnemy(i).getY()-getY(),2)) < PASSIVE_RANGE){
+          getEnemy(i).addStatus(new GhostPassive());
+          passiveTimers[i] = PASSIVE_COOLDOWN;
+        }
+      }
+    }
+    
     //Update Projectiles
     for (int i = getProjectilesSize()-1; i >= 0; i--){
       getProjectile(i).advance();
@@ -115,36 +125,25 @@ public class TimeMage extends Player{
               getEnemy(j).addStatus(new Illuminated(500));
             }
           }
-        } else if  (getAOE(i) instanceof TimeMageQAOE){
+        } else if  (getAOE(i) instanceof GhostQAOE){
+          ((GhostQAOE)getAOE(i)).setX(getX());
+          ((GhostQAOE)getAOE(i)).setY(getY());
           for (int j = 0; j < getEnemiesSize(); j++){
             for (int k = 0; k < qBlacklist.size(); k++){
               if (getEnemy(j) != qBlacklist.get(k)){
                 if (getAOE(i).collides(getEnemy(j))){
-                  getEnemy(j).damage(Q_DAMAGE);
+                  int numStacks = 0;
+                  for (int m = 0; m < getEnemy(j).getStatusesSize(); m++){
+                    if (getEnemy(j).getStatus(m) instanceof GhostPassive){
+                      numStacks++;
+                    }
+                  }
+                  getEnemy(j).damage(Q_BASE_DAMAGE + Q_DAMAGE_PER_STACK * numStacks);
                   qBlacklist.add(getEnemy(j));
                 }
               }
             }
           }
-          for (int j = 0; j < getAlliesSize(); j++){
-            for (int k = 0; k < qBlacklist.size(); k++){
-              if (getAlly(j) != qBlacklist.get(k)){
-                if (getAOE(i).collides(getAlly(j))){
-                  getAlly(j).addShield(new TimeMageQShield());
-                  qBlacklist.add(getAlly(j));
-                }
-              }
-            }
-          }
-          /*
-          for (int k = 0; k < qBlacklist.size(); k++){
-            if (this != qBlacklist.get(k)){
-              if (getAOE(i).collides(this)){
-                addShield(new TimeMageQShield());
-                qBlacklist.add(this);
-              }
-            }
-          }*/
         }
       }
     }
@@ -156,6 +155,30 @@ public class TimeMage extends Player{
       Shield removed = null;
       if (getShield(i).getRemainingDuration() <= 0){
         removed = removeShield(i);
+      }
+    }
+  }
+  
+  @Override
+  public void damage(int damage) {
+    damage = (int)(damage*(1-getDamageReduction()));
+    if (getShieldsSize() == 0) {
+      setHealth(getHealth() - damage);
+    } else {
+      if (getShield(0).getStrength() - damage > 0) {
+        getShield(0).damage(damage);
+      } else {
+        setHealth(getHealth() - (damage - getShield(0).getStrength()));
+        removeShield(0);
+      }
+    }
+    if (inE){
+      inE = false;
+      for (int i = 0; i < getStatusesSize(); i++){
+        if (getStatus(i) instanceof GhostE){
+          setX(((GhostE)getStatus(i)).getX());
+          setY(((GhostE)getStatus(i)).getY());
+        }
       }
     }
   }

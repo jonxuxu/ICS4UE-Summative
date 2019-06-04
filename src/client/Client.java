@@ -821,7 +821,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             //Calculate flashlight
-            
+
 
             //Map
             //g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
