@@ -29,7 +29,7 @@ public class CustomMouseAdapter extends MouseAdapter {
 
    private Client main;
 
-   public CustomMouseAdapter(Client main, double scaling, int[] centerXy){
+   public CustomMouseAdapter(Client main, double scaling, int[] centerXy) {
       this.main = main;
       this.scaling = scaling;
       this.centerXy = centerXy;
@@ -162,15 +162,6 @@ public class CustomMouseAdapter extends MouseAdapter {
 //Getters and setters
 
    /**
-    * Returns the mouse coordinates.
-    *
-    * @return dragXy, an int[] with the x as the 0 index and y as the 1 index
-    */
-   public int[] getMouseState() {
-      return(state);
-   }
-
-   /**
     * Returns the mouse clicking coordinates.
     *
     * @return clickXy, an int[] with the x as the 0 index and y as the 1 index
@@ -210,5 +201,15 @@ public class CustomMouseAdapter extends MouseAdapter {
 
    public boolean[] getLeftRight() { //Determines whether the left or right buttons were clicked
       return (leftRight);
+   }
+
+   public int getAngle() {
+      double tempAngle = 0;
+      //direction[0] is for the x values, direction[1] is for the y values
+      if (((state[0] - centerXy[0]) != 0) && ((state[1] - centerXy[1]) != 0)) {
+         tempAngle = Math.atan2(state[1] - centerXy[1], state[0] - centerXy[0]);
+      }
+      int roundedAngle = (int) (4 * (tempAngle / Math.PI));
+      return (roundedAngle);
    }
 }

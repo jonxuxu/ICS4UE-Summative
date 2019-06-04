@@ -84,7 +84,7 @@ public class CustomKeyListener implements KeyListener {
          return (-10);//Check to see if the return works
       } else {
          // System.out.println("tempAngle"+tempAngle);
-         return (roundedAngle);
+         return (roundedAngle); //So pi becomes 4, 3pi/4 becomes 3,pi/2 becomes 2 ...
       }
    }
 
