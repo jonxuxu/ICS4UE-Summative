@@ -10,7 +10,6 @@ import client.map.*;
 import client.sound.*;
 import client.ui.*;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.*;
@@ -45,6 +44,11 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
+   //Finds memory usage before program starts
+   Runtime runtime = Runtime.getRuntime();
+   double maxMem = runtime.maxMemory();
+   double usedMem;
+
    // Networking
    private Socket socket;
    private BufferedReader input;
@@ -166,7 +170,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void go() {
       // Sets up frame rate timer
-      new java.util.Timer().schedule(
+      new java.util.Timer().scheduleAtFixedRate(
               new java.util.TimerTask() {
                  @Override
                  public void run() {
@@ -174,6 +178,7 @@ public class Client extends JFrame implements WindowListener {
                     frames = 0;
                  }
               },
+              1000,
               1000
       );
 
@@ -194,6 +199,8 @@ public class Client extends JFrame implements WindowListener {
             if (!gameBegin) {
                menuLogic();
             } else {
+               //Finds memory usage after code execution
+               usedMem = maxMem - runtime.freeMemory();
                gameLogic();
             }
          }
@@ -692,7 +699,7 @@ public class Client extends JFrame implements WindowListener {
          GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
          allComponents[0] = new PauseComponent();
          allComponents[1] = new BottomComponent();
-         allComponents[2] = new MinimapComponent();
+         allComponents[2] = new MinimapComponent(fog, players);
          allComponents[3] = new InventoryComponent();
          allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
@@ -726,11 +733,11 @@ public class Client extends JFrame implements WindowListener {
             //Game set up
             centerXy[0] = (int) (DESIRED_X * SCALING / 2);
             centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
-            try {
-               sheet = ImageIO.read(new File(".\\res\\Map.png"));
+            /*try {
+              sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
-            }
+            }*/
             drawArea = new Rectangle(0, 0, (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
          }
          if (drawArea != null) {
@@ -739,7 +746,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             //Map
-            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
+            //g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
 
             //Game player
             for (Player currentPlayer : players) {
@@ -777,7 +784,7 @@ public class Client extends JFrame implements WindowListener {
             }
 
             //draw all components
-            ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped);
+            ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
             if (keyPressed) {
                if(lastKeyTyped == 27){ // Esc key
                   ((PauseComponent) (allComponents[0])).toggle();

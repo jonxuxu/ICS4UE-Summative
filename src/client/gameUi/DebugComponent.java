@@ -1,9 +1,6 @@
 package client.gameUi;
 
-import client.Client;
-
 import java.awt.*;
-import java.io.FileWriter;
 
 public class DebugComponent extends GameComponent {
   private final int MAX_X = super.getMAX_X();
@@ -17,6 +14,8 @@ public class DebugComponent extends GameComponent {
   private int[] mouse;
   private String[] mouseMessage = {"standby", "click"};
   private char keyPress;
+  private double mb = 1024 *1024;
+  private double usedMem, maxMem;
 
   public void draw(Graphics2D g2) {
     if(visible){
@@ -28,6 +27,7 @@ public class DebugComponent extends GameComponent {
       g2.drawString("Fps: " + fps, 0, (int)(35*scaling));
       g2.drawString("Mouse: " + mouse[0] + "x " + mouse[1] + "y " + mouseMessage[mouse[2]], 0, (int)(50*scaling));
       g2.drawString("Keyboard: " + keyPress, 0, (int)(65*scaling));
+      g2.drawString("Memory: " + String.format("%.2f", usedMem) + "mb out of " + maxMem + "mb   " + String.format("%.2f", usedMem/maxMem*100) + "%", 0, (int)(80*scaling));
     }
   }
 
@@ -35,9 +35,11 @@ public class DebugComponent extends GameComponent {
     visible = !visible;
   }
 
-  public void update(int fps, int[] mouseState, char keyPress){
+  public void update(int fps, int[] mouseState, char keyPress, double usedMem, double totalMem){
     this.fps = fps;
     this.mouse = mouseState;
     this.keyPress = keyPress;
+    this.usedMem = usedMem/mb;
+    this.maxMem = totalMem/mb;
   }
 }
