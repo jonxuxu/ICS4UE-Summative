@@ -10,6 +10,7 @@ import client.map.*;
 import client.sound.*;
 import client.ui.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.*;
@@ -66,7 +67,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock(20);
+   private Clock time = new Clock(16);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
@@ -208,7 +209,7 @@ public class Client extends JFrame implements WindowListener {
                menuLogic();
             } else {
                //Finds memory usage after code execution
-               usedMem = maxMem - runtime.freeMemory();
+               usedMem = runtime.totalMemory() - runtime.freeMemory();
                gameLogic();
             }
          }
@@ -597,7 +598,6 @@ public class Client extends JFrame implements WindowListener {
       } else {
          ((IntermediatePanel) (allPanels[currentPanel])).repaintReal();
       }
-      frames++;
    }
 
    public void connect() {
@@ -790,20 +790,19 @@ public class Client extends JFrame implements WindowListener {
             //Game set up
             centerXy[0] = (int) (DESIRED_X * SCALING / 2);
             centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
-            /*try {
+            try {
               sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
-            }*/
+            }
             drawArea = new Rectangle(0, 0, (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
          }
          if (drawArea != null) {
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             //Map
-            //g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
 
             //Game player
             for (Player currentPlayer : players) {
