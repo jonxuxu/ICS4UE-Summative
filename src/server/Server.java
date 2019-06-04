@@ -410,6 +410,10 @@ public class Server {
                                           players[i].setPositionIndex(Integer.parseInt(thirdSplit[0]));
                                           players[i].setWalking(Boolean.parseBoolean(thirdSplit[1]));
                                        }
+                                    }else if (initializer == 'L'){
+                                       if (!secondInput.equals("")) {
+                                          players[i].setFlashlightAngle(Double.parseDouble(thirdSplit[0]));
+                                       }
                                     }
                                  }
                               }
@@ -489,6 +493,11 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         outputString[i].append("W"+i +","+players[i].getPositionIndex()+","+players[i].getWalking() +" ");
+                     }
+                  }
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        outputString[i].append("L"+i +","+players[i].getFlashlightAngle()+" ");
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {

@@ -24,6 +24,7 @@ public class CustomKeyListener implements KeyListener {
    private Client main;
    //Characters
    private char ESC = ((char) (27));
+   private char CAPS_LOCK = ((char) (20));
 
    //Start of methods that are implemented from KeyListener
    // TODO: Split keylisteners??
@@ -111,6 +112,14 @@ public class CustomKeyListener implements KeyListener {
 
    public boolean getMenu() {
       if (pressed.contains(ESC)) {
+         return (true);
+      } else {
+         return (false);
+      }
+   }
+
+   public boolean getFlashlight(){
+      if (pressed.contains(CAPS_LOCK)) {
          return (true);
       } else {
          return (false);

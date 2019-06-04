@@ -203,13 +203,12 @@ public class CustomMouseAdapter extends MouseAdapter {
       return (leftRight);
    }
 
-   public int getAngle() {
+   public double getAngle() {
       double tempAngle = 0;
       //direction[0] is for the x values, direction[1] is for the y values
       if (((state[0] - centerXy[0]) != 0) && ((state[1] - centerXy[1]) != 0)) {
          tempAngle = Math.atan2(state[1] - centerXy[1], state[0] - centerXy[0]);
       }
-      int roundedAngle = (int) (4 * (tempAngle / Math.PI));
-      return (roundedAngle);
+      return (tempAngle);
    }
 }

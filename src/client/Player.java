@@ -31,6 +31,7 @@ public abstract class Player extends User {
    private int range;
    private boolean damaged;
    private int spriteID;
+   private double flashlightAngle;
    private double ROOT2O2 = 0.70710678118;
 
    Player(String username) {
@@ -95,7 +96,13 @@ public abstract class Player extends User {
          this.desiredSpell = spellIndex;
       }
    }
+   public void setFlashlightAngle(double flashlightAngle){
+      this.flashlightAngle=flashlightAngle;
+   }
 
+   public double getFlashlightAngle(){
+      return(flashlightAngle);
+   }
    public void setSpellPercent(int spellPercent, int spellIndex) {
       this.spellPercent[spellIndex] = spellPercent;
    }

@@ -53,6 +53,8 @@ public abstract class Player extends User implements CanIntersect {
    //Movement
    private int positionIndex;
    private boolean walking;
+   //Lighting
+   private double flashlightAngle;
 
    Player(String username) {
       super(username);
@@ -134,6 +136,14 @@ public abstract class Player extends User implements CanIntersect {
       }
    }
 
+   public void setFlashlightAngle(double flashlightAngle) {
+      this.flashlightAngle = flashlightAngle;
+   }
+   public double getFlashlightAngle() {
+      return(flashlightAngle);
+   }
+
+
    public void setTeam(int teamNumber) {
       this.teamNumber = teamNumber;
    }
@@ -182,17 +192,20 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    //Movement
-   public void setWalking(boolean walking){
-      this.walking=walking;
+   public void setWalking(boolean walking) {
+      this.walking = walking;
    }
-   public void setPositionIndex(int positionIndex){
-      this.positionIndex=positionIndex;
+
+   public void setPositionIndex(int positionIndex) {
+      this.positionIndex = positionIndex;
    }
-   public boolean getWalking(){
-      return(walking);
+
+   public boolean getWalking() {
+      return (walking);
    }
-   public int getPositionIndex(){
-      return(positionIndex);
+
+   public int getPositionIndex() {
+      return (positionIndex);
    }
 
    public void updateStatuses() {

@@ -100,7 +100,8 @@ public class Client extends JFrame implements WindowListener {
    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
    private ArrayList<AOE> aoes = new ArrayList<AOE>();
    private ArrayList<Player>[] teams = new ArrayList[2];
-
+   private double mouseAngle;
+   private int keyAngle;
    // Debugging
    private boolean testingBegin = false;
 
@@ -331,6 +332,8 @@ public class Client extends JFrame implements WindowListener {
             int[] xyPos = new int[2]; //Scaled to the map
             xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
             xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
+            mouseAngle = myMouseAdapter.getAngle();
+            keyAngle = myKeyListener.getAngle();
             boolean[] spellsPressed = myKeyListener.getSpell();
             boolean[] leftRight = myMouseAdapter.getLeftRight();
             StringBuilder outputString = new StringBuilder();
@@ -355,21 +358,27 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("F" + " ");
                }
             }
+            if (myKeyListener.getFlashlight()) {
+               outputString.append("L" + mouseAngle);
+            }
             outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
             boolean walking = false;
-            int positionIndex;
+            int positionIndex = -10;
             //Refreshes the players animation
-            int roundedKeyAngle = myKeyListener.getAngle();
-            double roundedMouseAngle = myMouseAdapter.getAngle();
-            if (roundedKeyAngle != -10) {
-               positionIndex = (int) Math.abs(2 - Math.ceil(roundedKeyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
+            keyAngle = -10;
+            if (keyAngle != -10) {
+               positionIndex = (int) Math.abs(2 - Math.ceil(keyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
                //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
                //Adding one more gives 3,2,1,0, which refer to left, up,right,down
                walking = true;
             } else {
-               positionIndex = (int) Math.abs(2 - Math.ceil(roundedMouseAngle / 2.0));
+               if (mouseState[2] == 1) {
+                  positionIndex = (int) Math.abs(2 - Math.ceil((int) (4 * (mouseAngle / Math.PI)) / 2.0));
+               }
             }
-            outputString.append("W" + positionIndex + "," + walking);//TODO: make this event driven
+            if (positionIndex != -10) {
+               outputString.append("W" + positionIndex + "," + walking);//TODO: make this event driven
+            }
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
                output.flush();
@@ -545,6 +554,8 @@ public class Client extends JFrame implements WindowListener {
                   //Set the spell of the appropriate player to the correct one using setSpell
                } else if (initializer == 'W') { //Walking
                   players[Integer.parseInt(thirdSplit[0])].setMovementIndex(Integer.parseInt(thirdSplit[1]), Boolean.parseBoolean(thirdSplit[2]));
+               } else if (initializer == 'L') {// Flash light
+                  players[Integer.parseInt(thirdSplit[0])].setFlashlightAngle(Double.parseDouble(thirdSplit[1]));
                }
             }
          }
@@ -802,6 +813,15 @@ public class Client extends JFrame implements WindowListener {
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            // Updating fog
+            for (int i = 0; i < players.length; i++) {
+               if (players[i] != null) {
+                  // TODO: Separate by teams
+                  fog.scout(currentXy[i]);
+               }
+            }
+            //Calculate flashlight
+            
 
             //Map
             //g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
@@ -812,15 +832,9 @@ public class Client extends JFrame implements WindowListener {
                   currentPlayer.draw(g2, myPlayer.getXy());
                }
             }
-            /*
-            // Updating fog
-            for (int i = 0; i < players.length; i++) {
-               if (players[i] != null) {
-                  // TODO: Separate by teams
-                  fog.scout(currentXy[i]);
-               }
-            }
-             */
+
+
+
             //Creating shapes
             AffineTransform tx = new AffineTransform();
             tx.translate(xyAdjust[0], xyAdjust[1]);
@@ -832,6 +846,8 @@ public class Client extends JFrame implements WindowListener {
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
+
+
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
