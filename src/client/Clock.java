@@ -14,8 +14,6 @@ public class Clock {
    //Set as long to maintain precision
    private long oldTime;
    private long currentTime;
-   private int frame;
-   private int fps;
    //Indicate frames per second
    private long DELTA_LIMIT;//Every time this much time elapses, a frame is passed
    /**
@@ -36,18 +34,11 @@ public class Clock {
     */
    public boolean getFramePassed() {
       currentTime = System.currentTimeMillis();
-      frame++;
-      if ((currentTime - oldTime) >= DELTA_LIMIT) {
+      if ((currentTime - oldTime)    >= DELTA_LIMIT) {
          oldTime = currentTime;
-         fps = frame;
-         frame = 0;
          return (true);
       } else {
          return (false);
       }
-   }
-
-   public int getFPS() {
-      return fps;
    }
 }

@@ -452,6 +452,7 @@ public class Server {
                      }
                   }
                   //Output will be here. The first loop generates the full message, the second distributes it
+                  boolean otherPExist=false;
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         outputString[i].append(mainPlayer[i] + " ");
@@ -459,10 +460,13 @@ public class Server {
                            if (i != j) {
                               if (players[j] != null) {
                                  outputString[i].append(otherPlayers[j]);
+                                 otherPExist = true;
                               }
                            }
                         }
-                        outputString[i].append(" ");//Place a space at the end
+                        if (otherPExist) {
+                           outputString[i].append(" ");//Place a space at the end
+                        }
                      }
                   }
                   //Write out all the projectiles

@@ -10,6 +10,7 @@ import client.map.*;
 import client.sound.*;
 import client.ui.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.*;
@@ -66,7 +67,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock(20);
+   private Clock time = new Clock(30);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
@@ -361,15 +362,14 @@ public class Client extends JFrame implements WindowListener {
             int roundedKeyAngle = myKeyListener.getAngle();
             double roundedMouseAngle = myMouseAdapter.getAngle();
             if (roundedKeyAngle != -10) {
-               positionIndex = (int) Math.abs(2-Math.ceil(roundedKeyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
+               positionIndex = (int) Math.abs(2 - Math.ceil(roundedKeyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
                //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
                //Adding one more gives 3,2,1,0, which refer to left, up,right,down
                walking = true;
             } else {
-               positionIndex = (int) Math.abs(2-Math.ceil(roundedMouseAngle / 2.0));
+               positionIndex = (int) Math.abs(2 - Math.ceil(roundedMouseAngle / 2.0));
             }
-
-            outputString.append("W" + positionIndex +","+ walking);
+            outputString.append("W" + positionIndex + "," + walking);//TODO: make this event driven
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
                output.flush();
@@ -602,7 +602,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void connect() {
       try {
-         socket = new Socket("10.242.182.130", 5001);
+         socket = new Socket("localhost", 5001);
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -790,8 +790,9 @@ public class Client extends JFrame implements WindowListener {
             //Game set up
             centerXy[0] = (int) (DESIRED_X * SCALING / 2);
             centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
-            /*try {
-              sheet = ImageIO.read(new File(".\\res\\Map.png"));
+
+           /* try {
+               sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
             }*/
@@ -811,7 +812,7 @@ public class Client extends JFrame implements WindowListener {
                   currentPlayer.draw(g2, myPlayer.getXy());
                }
             }
-
+            /*
             // Updating fog
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
@@ -819,7 +820,7 @@ public class Client extends JFrame implements WindowListener {
                   fog.scout(currentXy[i]);
                }
             }
-
+             */
             //Creating shapes
             AffineTransform tx = new AffineTransform();
             tx.translate(xyAdjust[0], xyAdjust[1]);

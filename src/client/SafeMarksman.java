@@ -73,7 +73,7 @@ public class SafeMarksman extends Player {
       if (movementIndex==10){
          movementIndex=0;
       }
-      g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex/5], x, y, width, height, null);
+     // g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex/5], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {
