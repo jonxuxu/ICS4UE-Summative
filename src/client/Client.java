@@ -82,10 +82,11 @@ public class Client extends JFrame implements WindowListener {
    private User myUser;
    private Player myPlayer;
    private String username, attemptedGameName, attemptedGamePassword;
-   private boolean host, notifyReady, sendName, testGame, loading, logout, leaveGame, teamChosen, gameBegin; // False by default
-   private int[] errors = new int[3];
-   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun"};
-   private int myTeam; //TODO: make better way
+   private boolean host, notifyReady, sendName, testGame, loading, logout, leaveGame, teamChosen, classChosen, gameBegin; // False by default
+   private int[] errors = new int[4];
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team"};
+   private int myTeam;
+   private int classID;
    private int myPlayerID;
    private int frames, fps;
 
@@ -93,6 +94,7 @@ public class Client extends JFrame implements WindowListener {
    private FogMap fog;
    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
    private ArrayList<AOE> aoes = new ArrayList<AOE>();
+   private ArrayList<Player>[] teams = new ArrayList[2];
 
    // Debugging
    private boolean testingBegin = false;
@@ -158,6 +160,12 @@ public class Client extends JFrame implements WindowListener {
       int[] xy = {300, 300};
       fog = new FogMap(xy, SCALING);
       // TODO: Set player spawn xy later
+
+      //Variable set up
+      teams[0] = new ArrayList<Player>();
+      teams[1] = new ArrayList<Player>();
+      Projectile.setXyAdjust(xyAdjust);
+      AOE.setXyAdjust(xyAdjust);
    }
 
    public static void main(String[] args) {
@@ -180,7 +188,7 @@ public class Client extends JFrame implements WindowListener {
       while (true) {  //Main game loop
          if (time.getFramePassed()) {
             repaintPanels();
-            frames ++;
+            frames++;
          }
          if (connectionState < 1) {
             connect();
@@ -216,6 +224,7 @@ public class Client extends JFrame implements WindowListener {
             output.println("B");//for back
             output.flush();
             onlineList.clear();
+            myUser.setTeam(9);
             leaveGame = false;
          }
          if (sendName) {
@@ -261,6 +270,11 @@ public class Client extends JFrame implements WindowListener {
             output.println("R");
             output.flush();
             waitForInput();
+            if (errors[3] != 0) {
+               allPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+               System.out.println(errorMessages[errors[3]]);
+               soundEffect.playSound("error");
+            }
          }
          if (teamChosen) {
             teamChosen = false;
@@ -293,7 +307,8 @@ public class Client extends JFrame implements WindowListener {
    public void updateMouse(int[] state) {
       this.mouseState = state;
    }
-   public void typeKey(char c){
+
+   public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
    }
@@ -333,6 +348,21 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
+            boolean walking = false;
+            int positionIndex;
+            //Refreshes the players animation
+            int roundedKeyAngle = myKeyListener.getAngle();
+            double roundedMouseAngle = myMouseAdapter.getAngle();
+            if (roundedKeyAngle != -10) {
+               positionIndex = (int) Math.abs(2-Math.ceil(roundedKeyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
+               //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
+               //Adding one more gives 3,2,1,0, which refer to left, up,right,down
+               walking = true;
+            } else {
+               positionIndex = (int) Math.abs(2-Math.ceil(roundedMouseAngle / 2.0));
+            }
+
+            outputString.append("W" + positionIndex +","+ walking);
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
                output.flush();
@@ -401,6 +431,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
+      System.out.println("d:" + input);
       char initializer = input.charAt(0);
       input = input.substring(1);
       if (isParsable(initializer)) {
@@ -425,21 +456,26 @@ public class Client extends JFrame implements WindowListener {
             errors[1] = Integer.parseInt(initializer + "");
          } else if (currentPanel == 6) {
             if (initializer == '0') {
-               System.out.println("Starting Game");
                loading = true;
             } else {
-               System.out.println("Unable to Start Game");
-               soundEffect.playSound("error");
+               errors[3] = Integer.parseInt(initializer + "");
             }
          }
       } else if (initializer == 'A') {
          String[] allPlayers = input.split(" ", -1);
          myUser = new User(username);
          for (String aPlayer : allPlayers) {
-            if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
+            if ((testingBegin) && (myUser.getUsername().equals(aPlayer.substring(1)))) {
+               if (aPlayer.charAt(0) != '9') {
+                  myUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+               }
                onlineList.add(myUser);
             } else {
-               onlineList.add(new User(aPlayer));
+               User tempUser = new User(aPlayer.substring(1));
+               if (aPlayer.charAt(0) != '9') {
+                  tempUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+               }
+               onlineList.add(tempUser);
             }
          }
          nextPanel = 6;
@@ -462,12 +498,19 @@ public class Client extends JFrame implements WindowListener {
                myPlayer = players[i];
                myPlayerID = i;
             }
+            teams[onlineList.get(i).getTeam()].add(players[i]);
          }
          nextPanel = 7;//Sends to the game screen
          gameBegin = true;
       } else if (initializer == 'P') { //Then leave the game
          onlineList.clear();
          nextPanel = 2;
+      } else if (initializer == 'E') { //This is similar to when E was sent, it is for switching teams
+         for (int i = 0; i < onlineList.size(); i++) {
+            if (onlineList.get(i).getUsername().equals(input.substring(1))) {
+               onlineList.get(i).setTeam(Integer.parseInt(input.charAt(0) + ""));
+            }
+         }
       }
    }
 
@@ -488,9 +531,13 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'D') {
                   players[Integer.parseInt(thirdSplit[0])] = null;
                } else if (initializer == 'R') {
-                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING + xyAdjust[0]), (int) (Integer.parseInt(thirdSplit[2]) * SCALING + xyAdjust[1])));
+                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING)));
                } else if (initializer == 'E') {
-                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING + xyAdjust[0]), (int) (Integer.parseInt(thirdSplit[2]) * SCALING + xyAdjust[1]), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
+                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
+               } else if (initializer == 'S') {
+                  //Set the spell of the appropriate player to the correct one using setSpell
+               } else if (initializer == 'W') { //Walking
+                  players[Integer.parseInt(thirdSplit[0])].setMovementIndex(Integer.parseInt(thirdSplit[1]), Boolean.parseBoolean(thirdSplit[2]));
                }
             }
          }
@@ -532,6 +579,8 @@ public class Client extends JFrame implements WindowListener {
 
    public void repaintPanels() {
       if (currentPanel != nextPanel) {
+         System.out.println("C" + currentPanel);
+         System.out.println("V" + nextPanel);
          allPanels[currentPanel].setErrorUpdate("");
          currentPanel = nextPanel;
          cardLayout.show(mainContainer, PANEL_NAMES[currentPanel]);
@@ -639,8 +688,14 @@ public class Client extends JFrame implements WindowListener {
       teamChosen = true;
    }
 
+
    public void setNextPanel(int nextPanel) {
       this.nextPanel = nextPanel;
+   }
+
+   public void setClassID(int classID) {
+      this.classID = classID;
+      classChosen = true;
    }
 
    //Info to panels
@@ -660,6 +715,9 @@ public class Client extends JFrame implements WindowListener {
       return (onlineList);
    }
 
+   public int[] getMouseState() {
+      return (mouseState);
+   }
 
    /**
     * GamePanel.java
@@ -680,7 +738,7 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
-      private boolean menuCooldown  = true;
+      private boolean menuCooldown = true;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -700,7 +758,6 @@ public class Client extends JFrame implements WindowListener {
 
       @Override
       public void paintComponent(Graphics g) {
-
          if (players.length != 0) {
             currentXy = new int[players.length][2];
             for (int i = 0; i < players.length; i++) {
@@ -776,12 +833,12 @@ public class Client extends JFrame implements WindowListener {
                aoes.get(i).draw(g2);
             }
 
-            //draw all components
+            //Draw all components
             ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped);
             if (keyPressed) {
-               if(lastKeyTyped == 27){ // Esc key
+               if (lastKeyTyped == 27) { // Esc key
                   ((PauseComponent) (allComponents[0])).toggle();
-               } else if(lastKeyTyped == 8){ // Back key
+               } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[4])).toggle();
                   System.out.println("F1");
                }

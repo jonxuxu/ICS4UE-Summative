@@ -11,10 +11,19 @@ package client;
 
 public class User {
    private String username ="";
+   private int teamNumber=9;//which means that it is invalid
    User(String username){
       this.username=username;
    }
    public String getUsername(){
       return (username);
+   }
+
+   public void setTeam(int teamNumber){
+      this.teamNumber=teamNumber;
+   }
+
+   public int getTeam(){
+      return teamNumber;
    }
 }
