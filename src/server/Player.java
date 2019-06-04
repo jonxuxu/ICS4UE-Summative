@@ -50,6 +50,7 @@ public abstract class Player extends User implements CanIntersect {
   private boolean illuminated = false;
   private boolean stunned = false;
   private boolean invisible = false;
+  private double damageReduction = 0;
   
   Player(String username) {
     super(username);
@@ -121,7 +122,7 @@ public abstract class Player extends User implements CanIntersect {
   //May 25
   public void sendInfo(Player[] gamePlayers) {
     for (int i = 0; i < gamePlayers.length; i++) {
-      if (gamePlayers[i].getTeam() == this.team) {
+      if (gamePlayers[i].getTeam() == getTeam()) {
         allies.add(gamePlayers[i]);//YOU ARE YOUR OWN ALLY!
         System.out.println("A");
       } else {
@@ -155,7 +156,8 @@ public abstract class Player extends User implements CanIntersect {
   
   public abstract void update();
   
-  public void damage(int damage) {
+  public void damage(int damage) {//Watch out this is overridden sometimes
+    damage = (int)(damage * (1 - damageReduction));
     if (shields.isEmpty()) {
       health -= damage;
     } else {
@@ -202,6 +204,7 @@ public abstract class Player extends User implements CanIntersect {
     illuminated = false;
     stunned = false;
     invisible = false;
+    damageReduction = 0;
     for (int i = statuses.size()-1; i >= 0; i--){
       statuses.get(i).advance();
       Status removed = null;
@@ -252,6 +255,10 @@ public abstract class Player extends User implements CanIntersect {
     } else if (status instanceof GhostE){
       ((GhostE)status).setProjectedX(xy[0]);
       ((GhostE)status).setProjectedY(xy[1]);
+    } else if (status instanceof ReduceDamage){
+      if (((ReduceDamage)status).getDamageReduction() > damageReduction){
+        damageReduction = ((ReduceDamage)status).getDamageReduction();
+      }
     }
   }
   
@@ -261,14 +268,6 @@ public abstract class Player extends User implements CanIntersect {
   }
   public boolean contains(int x, int y){
     return hitbox.contains(x,y);
-  }
-  
-  public int getTeam() {
-    return team;
-  }
-  
-  public void setTeam(int team) {
-    this.team = team;
   }
   
   public int getX() {
@@ -436,5 +435,9 @@ public abstract class Player extends User implements CanIntersect {
   
   public void setMobility(int mobility){
     this.mobility = mobility;
+  }
+  
+  public double getDamageReduction(){
+    return damageReduction;
   }
 }
