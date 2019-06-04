@@ -327,7 +327,6 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (input.ready()) {
             decipherGameInput(input.readLine());
-            int angleOfMovement = myKeyListener.getAngle();
             // TODO: Update/improve when kameron is done
             int[] xyPos = new int[2]; //Scaled to the map
             xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
@@ -346,8 +345,8 @@ public class Client extends JFrame implements WindowListener {
             if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
                outputString.append(" "); //Add the separator
             }
-            if (angleOfMovement != -10) {
-               outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
+            if (keyAngle != -10) {
+               outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
             }
             if (mouseState[2] == 1) { // If mouse pressed
                if (leftRight[0]) {
@@ -365,7 +364,6 @@ public class Client extends JFrame implements WindowListener {
             boolean walking = false;
             int positionIndex = -10;
             //Refreshes the players animation
-            keyAngle = -10;
             if (keyAngle != -10) {
                positionIndex = (int) Math.abs(2 - Math.ceil(keyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
                //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
@@ -802,11 +800,11 @@ public class Client extends JFrame implements WindowListener {
             centerXy[0] = (int) (DESIRED_X * SCALING / 2);
             centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
 
-           /* try {
+            try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
-            }*/
+            }
             drawArea = new Rectangle(0, 0, (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
          }
          if (drawArea != null) {
@@ -824,7 +822,7 @@ public class Client extends JFrame implements WindowListener {
 
 
             //Map
-            //g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
 
             //Game player
             for (Player currentPlayer : players) {

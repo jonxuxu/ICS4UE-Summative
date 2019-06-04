@@ -57,7 +57,7 @@ public abstract class Player extends User {
    }
 
    public void draw(Graphics2D g2, int[] midXy) {
-      drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (100 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (100 * scaling) / 2, (int) (100 * scaling), (int) (100 * scaling), desiredSpell);
+      drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (50 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (50 * scaling) / 2, (int) (50 * scaling), (int) (50 * scaling), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
