@@ -595,7 +595,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void connect() {
       try {
-         socket = new Socket("localhost", 5001);
+         socket = new Socket("10.242.182.130", 5001);
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
