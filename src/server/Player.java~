@@ -6,7 +6,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
- * User.java
+ * Player.java
  * This is
  *
  * @author Will Jeong
@@ -55,7 +55,10 @@ public abstract class Player extends User implements CanIntersect {
    private boolean walking;
    //Lighting
    private double flashlightAngle;
+   private boolean flashlightOn;
+
    private double damageReduction;
+
 
    Player(String username) {
       super(username);
@@ -144,7 +147,12 @@ public abstract class Player extends User implements CanIntersect {
    public double getFlashlightAngle() {
       return (flashlightAngle);
    }
-
+   public boolean getFlashlightOn(){
+      return(flashlightOn);
+   }
+   public void setFlashlightOn(boolean flashlightOn){
+      this.flashlightOn=flashlightOn;
+   }
 
    public void autoAttack() {
       if (!stunned) {
@@ -221,7 +229,7 @@ public abstract class Player extends User implements CanIntersect {
          statuses.get(i).advance();
          Status removed = null;
          if (statuses.get(i).getRemainingDuration() <= 0) {
-            removed = statuses.get(i);
+            removed = statuses.remove(i);
             if (removed instanceof TimeMageQ) {
                addAOE(new TimeMageQAOE(((TimeMageQ) removed).getX(), ((TimeMageQ) removed).getY(), ((TimeMageQ) removed).getTargetX(), ((TimeMageQ) removed).getTargetY()));
             } else if (removed instanceof TimeMageE) {

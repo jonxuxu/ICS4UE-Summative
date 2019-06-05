@@ -306,7 +306,7 @@ public class Client extends JFrame implements WindowListener {
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                //TODO: Add class select here
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               players[i] = new TimeMage(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
                }
@@ -514,7 +514,7 @@ public class Client extends JFrame implements WindowListener {
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
          for (int i = 0; i < onlineList.size(); i++) {
-            players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            players[i] = new TimeMage(onlineList.get(i).getUsername());
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;
@@ -559,7 +559,18 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'R') {
                   projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING)));
                } else if (initializer == 'E') {
-                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
+                 int id = Integer.parseInt(thirdSplit[0]);
+                 if (id != 4){
+                   aoes.add(new AOE(id, (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
+                 } else {
+                   int[][] points = new int[2][4];
+                   for (int m = 0; m < 2; m++){
+                     for (int n = 0; n < 4; n++){
+                       points[m][n] = (int)(Integer.parseInt(thirdSplit[1+m*4+n]) * SCALING);
+                     }
+                   }
+                   aoes.add(new TimeMageAOE(id, points));
+                 }
                } else if (initializer == 'S') {
                   //Set the spell of the appropriate player to the correct one using setSpell
                } else if (initializer == 'W') { //Walking
