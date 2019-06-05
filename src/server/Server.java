@@ -225,11 +225,10 @@ public class Server {
                         output.flush();
                      }
                   } else if (initializer == 'T') {
-                     myUser = new User(inputString);
+                     myUser = new User(inputString.substring(0,inputString.indexOf(",")));
                      onlineUsers.add(myUser);
-                     myUser = new User(inputString);
                      if (games.size() == 0) {
-                        myGame = new GameServer("", "");//Set this game to the specific game for this gameserver
+                        myGame = new GameServer(inputString.substring(inputString.indexOf(",")+1), "0");//Set this game to the specific game for this gameserver
                         games.add(myGame);
                         games.get(0).addGamePlayer(myUser, myConnection, this);
                      } else {

@@ -55,6 +55,8 @@ public class Client extends JFrame implements WindowListener {
    private BufferedReader input;
    private PrintWriter output;
    private int connectionState = 0; //-1 means unable to connect, 0 means trying to connect, 1 means connected
+   private String serverName;
+   private String serverPassword;
 
    // Screen stuff
    private final int DESIRED_Y = 500;
@@ -294,7 +296,10 @@ public class Client extends JFrame implements WindowListener {
          if (testingBegin) {
             username = Math.random() + "";
             myUser = new User(username);
-            output.println("T" + username);//test
+            serverName=Integer.toString((int)(Math.random()*10000));
+            serverPassword="0";
+            System.out.println(serverName);
+            output.println("T" + username+","+serverName);//test
             output.flush();
             waitForInput();
             host = true;
@@ -698,6 +703,8 @@ public class Client extends JFrame implements WindowListener {
       if (!testGame) {
          this.attemptedGameName = attemptedGameName;
          this.attemptedGamePassword = attemptedGamePassword;
+         serverName=this.attemptedGameName;
+         serverPassword=this.attemptedGamePassword;
          testGame = true;
       }
    }
@@ -744,6 +751,14 @@ public class Client extends JFrame implements WindowListener {
 
    public int[] getMouseState() {
       return (mouseState);
+   }
+
+   public String getGameName() {
+      return (serverName);
+   }
+
+   public String getGamePassword() {
+      return (serverPassword);
    }
 
    /**
@@ -831,7 +846,6 @@ public class Client extends JFrame implements WindowListener {
 
             //Map
             g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
-
 
             //Flash light
             for (Player currentPlayer : players) {
