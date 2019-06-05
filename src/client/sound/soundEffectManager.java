@@ -25,7 +25,7 @@ public class soundEffectManager {
         //System.out.println(System.getProperty("user.dir") + "/res/sound/effects/" + urls.get(name));
         File file = new File(System.getProperty("user.dir") + "/res/sound/effects/" + urls.get(name)).getAbsoluteFile();
         AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);
-        System.out.println(file.getAbsolutePath());
+        //System.out.println(file.getAbsolutePath());
         // Opens clip and load samples from input stream
         clip.open(inputStream);
 

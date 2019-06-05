@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * GeneralPanel.java
+ * MenuPanel.java
  * This is
  *
  * @author Will Jeong
@@ -29,7 +29,7 @@ import java.util.Map;
  * @since 2019-05-31
  */
 
-public abstract class GeneralPanel extends JPanel {
+public abstract class MenuPanel extends JPanel {
    private static double SCALING, INTRO_SCALING;
    private static int MAX_X, MAX_Y;
    private static BufferedImage TITLE_SCREEN;
@@ -43,7 +43,7 @@ public abstract class GeneralPanel extends JPanel {
    private static final int BG_X = 1800;
    private String errorMessage = "";
 
-   public GeneralPanel() {
+   public MenuPanel() {
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
    }
 

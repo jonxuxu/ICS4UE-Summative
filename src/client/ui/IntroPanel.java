@@ -2,7 +2,6 @@ package client.ui;
 
 import client.particle.IntroParticle;
 
-import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -11,7 +10,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -27,7 +25,7 @@ import java.util.ArrayList;
  * @since 2019-05-27
  */
 
-public class IntroPanel extends GeneralPanel {
+public class IntroPanel extends MenuPanel {
    static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
    static double w = screenSize.getWidth();
    static double h = screenSize.getHeight();//This adjusts height to be a bit smaller to fit nicer on screen

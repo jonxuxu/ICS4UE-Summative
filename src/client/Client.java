@@ -1,6 +1,7 @@
 package client;
 
 import client.gameUi.BottomComponent;
+import client.gameUi.ChatComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
 import client.gameUi.InventoryComponent;
@@ -11,8 +12,7 @@ import client.sound.*;
 import client.ui.*;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -69,12 +69,13 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock(30);
+   private Clock time = new Clock(16);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
    private CustomKeyListener myKeyListener = new CustomKeyListener(this);
-   private GeneralPanel[] allPanels = new GeneralPanel[8];
+   private MenuPanel[] menuPanels = new MenuPanel[7];
+   private IntermediatePanel intermediatePanel;
    private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CardLayout cardLayout = new CardLayout(5, 5);
    private JPanel mainContainer = new JPanel(cardLayout);
@@ -144,26 +145,26 @@ public class Client extends JFrame implements WindowListener {
       myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
 
       //Creating components
-      GeneralPanel.setParameters(MAX_X, MAX_Y, SCALING, introScaling, this);
-      allPanels[0] = new LoginPanel();
-      allPanels[1] = new IntroPanel();
-      allPanels[2] = new StartPanel();
-      allPanels[3] = new CreatePanel();
-      allPanels[4] = new JoinPanel();
-      allPanels[5] = new InstructionPanel();
-      allPanels[6] = new WaitingPanel();
-      allPanels[7] = new IntermediatePanel();
+      MenuPanel.setParameters(MAX_X, MAX_Y, SCALING, introScaling, this);
+      menuPanels[0] = new LoginPanel();
+      menuPanels[1] = new IntroPanel();
+      menuPanels[2] = new StartPanel();
+      menuPanels[3] = new CreatePanel();
+      menuPanels[4] = new JoinPanel();
+      menuPanels[5] = new InstructionPanel();
+      menuPanels[6] = new WaitingPanel();
+      intermediatePanel = new IntermediatePanel(MAX_X, MAX_Y, SCALING, this);
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
-      for (int i = 0; i < allPanels.length; i++) {
-         mainContainer.add(allPanels[i], PANEL_NAMES[i]);
+      for (int i = 0; i < menuPanels.length; i++) {
+         mainContainer.add(menuPanels[i], PANEL_NAMES[i]);
       }
+      mainContainer.add(intermediatePanel, PANEL_NAMES[7]);
       this.add(mainContainer);
       cardLayout.show(mainContainer, PANEL_NAMES[0]);
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
-      ((IntermediatePanel) (allPanels[7])).initializeSize(DESIRED_X, DESIRED_Y);
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
@@ -213,7 +214,7 @@ public class Client extends JFrame implements WindowListener {
                menuLogic();
             } else {
                //Finds memory usage after code execution
-               usedMem = maxMem - runtime.freeMemory();
+               usedMem = runtime.totalMemory() - runtime.freeMemory();
                gameLogic();
             }
          }
@@ -248,7 +249,7 @@ public class Client extends JFrame implements WindowListener {
                   waitForInput();
                }
                if (errors[0] != 0) {
-                  allPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[0]]);
+                  menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[0]]);
                   soundEffect.playSound("error");
                }
             }
@@ -274,7 +275,7 @@ public class Client extends JFrame implements WindowListener {
                if ((errors[2] != 0)) {
                   totalErrorOutput += ("Password Error: " + errorMessages[errors[2]]);
                }
-               allPanels[currentPanel].setErrorUpdate(totalErrorOutput);
+               menuPanels[currentPanel].setErrorUpdate(totalErrorOutput);
             }
          }
          if (notifyReady) {
@@ -283,7 +284,7 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
             waitForInput();
             if (errors[3] != 0) {
-               allPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+               menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
                System.out.println(errorMessages[errors[3]]);
                soundEffect.playSound("error");
             }
@@ -462,7 +463,7 @@ public class Client extends JFrame implements WindowListener {
                //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
-                  ((IntroPanel) (allPanels[1])).go();
+                  ((IntroPanel) (menuPanels[1])).go();
                   try {
                      Thread.sleep(3000);
                   } catch (Exception E) {
@@ -624,16 +625,15 @@ public class Client extends JFrame implements WindowListener {
       if (currentPanel != nextPanel) {
          System.out.println("C" + currentPanel);
          System.out.println("V" + nextPanel);
-         allPanels[currentPanel].setErrorUpdate("");
+         menuPanels[currentPanel].setErrorUpdate("");
          currentPanel = nextPanel;
          cardLayout.show(mainContainer, PANEL_NAMES[currentPanel]);
       }
       if (currentPanel != 7) {
-         allPanels[currentPanel].repaint();
+         menuPanels[currentPanel].repaint();
       } else {
-         ((IntermediatePanel) (allPanels[currentPanel])).repaintReal();
+         intermediatePanel.repaintReal();
       }
-      frames++;
    }
 
    public void connect() {
@@ -781,7 +781,7 @@ public class Client extends JFrame implements WindowListener {
     * @since 2019-05-31
     */
 
-   public class GamePanel extends GeneralPanel {//State=7
+   public class GamePanel extends MenuPanel {//State=7
       private Graphics2D g2;
       private boolean generateGraphics = true;
       int[] midXy = new int[2];
@@ -791,22 +791,21 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
-      private boolean menuCooldown = true;
+      private ChatComponent chatPanel;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
-         GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
          allComponents[0] = new PauseComponent();
          allComponents[1] = new BottomComponent();
          allComponents[2] = new MinimapComponent(fog, players);
          allComponents[3] = new InventoryComponent();
          allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
+         this.setVisible(true);
       }
 
       @Override
@@ -836,9 +835,8 @@ public class Client extends JFrame implements WindowListener {
             //Game set up
             centerXy[0] = (int) (DESIRED_X * SCALING / 2);
             centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
-
             try {
-               sheet = ImageIO.read(new File(".\\res\\Map.png"));
+              sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
             }
@@ -908,6 +906,7 @@ public class Client extends JFrame implements WindowListener {
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
+            //chatPanel.draw(g2);
          }
          g2.dispose();
       }
