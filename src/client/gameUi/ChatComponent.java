@@ -21,7 +21,6 @@ public class ChatComponent extends JPanel{
   private JButton send = new JButton("Send");
 
   public ChatComponent(double scaling, int bigX, int bigY){
-    this.add(new JButton("customer"));
     SCALING = scaling;
     WIDTH = scale(bigY/2);
     HEIGHT = scale(bigX/6);

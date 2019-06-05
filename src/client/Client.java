@@ -1,6 +1,7 @@
 package client;
 
 import client.gameUi.BottomComponent;
+import client.gameUi.ChatComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
 import client.gameUi.InventoryComponent;
@@ -68,7 +69,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock(30);
+   private Clock time = new Clock(16);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
@@ -214,7 +215,7 @@ public class Client extends JFrame implements WindowListener {
                menuLogic();
             } else {
                //Finds memory usage after code execution
-               usedMem = maxMem - runtime.freeMemory();
+               usedMem = runtime.totalMemory() - runtime.freeMemory();
                gameLogic();
             }
          }
@@ -623,7 +624,6 @@ public class Client extends JFrame implements WindowListener {
       } else {
          intermediatePanel.repaintReal();
       }
-      frames++;
    }
 
    public void connect() {
@@ -781,7 +781,7 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
-      private boolean menuCooldown = true;
+      private ChatComponent chatPanel;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -826,9 +826,8 @@ public class Client extends JFrame implements WindowListener {
             //Game set up
             centerXy[0] = (int) (DESIRED_X * SCALING / 2);
             centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
-
             try {
-               sheet = ImageIO.read(new File(".\\res\\Map.png"));
+              sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
             }
@@ -898,6 +897,7 @@ public class Client extends JFrame implements WindowListener {
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
+            //chatPanel.draw(g2);
          }
          g2.dispose();
       }
