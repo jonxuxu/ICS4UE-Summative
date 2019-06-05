@@ -35,6 +35,8 @@ public class MobileSupport extends Player{
     setAttack(100);
     setMobility(30);
     setRange(300);
+    setAutoAttackCooldown(5);
+    setFlareCooldown(100);
   }
   
   public boolean castSpell(int spellIndex){
@@ -129,7 +131,7 @@ public class MobileSupport extends Player{
     if (passiveTimer > 0){
       passiveTimer--;
     }
-    
+    updateBasicTimers();
     //Update Passive
     if (passiveTimer == 0){
       passiveTimer = PASSIVE_COOLDOWN;

@@ -307,7 +307,7 @@ public class Client extends JFrame implements WindowListener {
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                //TODO: Add class select here
-               players[i] = new TimeMage(onlineList.get(i).getUsername());
+               players[i] = new Ghost(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
                }
@@ -515,7 +515,7 @@ public class Client extends JFrame implements WindowListener {
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
          for (int i = 0; i < onlineList.size(); i++) {
-            players[i] = new TimeMage(onlineList.get(i).getUsername());
+            players[i] = new Ghost(onlineList.get(i).getUsername());
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;

@@ -613,7 +613,7 @@ public class Server {
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
          if (!begin) {
             if (onlinePlayers.size() < 6) {
-               onlinePlayers.add(new TimeMage(user.getUsername()));
+               onlinePlayers.add(new Ghost(user.getUsername()));
                onlineGameSockets.add(playerSocket);
                handlers.add(handler);
                return (true);
