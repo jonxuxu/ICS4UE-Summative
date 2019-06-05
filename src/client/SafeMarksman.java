@@ -62,18 +62,18 @@ public class SafeMarksman extends Player {
    }
 
    public void setMovementIndex(int positionIndex, boolean moving) {
-     this.moving=moving;
+      this.moving = moving;
       this.positionIndex = positionIndex;
    }
 
    public void move(Graphics2D g2, int x, int y, int width, int height) {
       if (moving) {
-         movementIndex++;//Alternates between 1 and 0
+         movementIndex++;
       }
-      if (movementIndex==10){
-         movementIndex=0;
+      if (movementIndex == 10) {
+         movementIndex = 0;
       }
-      g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex/5], x, y, width, height, null);
+      g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex / 5], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {

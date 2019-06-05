@@ -1,7 +1,7 @@
 package server;
-class SafeMarksmanInTPCircle extends Status{
+class MobileSupportEStatus extends Status{
   private static int DURATION = 2;
-  SafeMarksmanInTPCircle(){
+  MobileSupportEStatus(){
     super(DURATION);
   }
 }

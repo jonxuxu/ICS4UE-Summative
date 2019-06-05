@@ -82,7 +82,6 @@ public class WaitingPanel extends GeneralPanel { //State=6
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setFont(MAIN_FONT);
 
       FontMetrics metrics = g2.getFontMetrics();
@@ -129,6 +128,8 @@ public class WaitingPanel extends GeneralPanel { //State=6
       if (!onlineList.isEmpty()) {
          g2.drawString(players.toString().substring(0, players.toString().lastIndexOf(",")), (int) (2 * scaling), (int) (10 * scaling));
       }
+      g2.drawString("Server name: "+CLIENT.getGameName(), (int) (2 * scaling), (int) (10 * scaling)+metrics.getHeight());
+      g2.drawString("Server password: "+CLIENT.getGamePassword(), (int) (2 * scaling), (int) (10 * scaling)+2*metrics.getHeight());
       if (CLIENT.getLoading()) {
          if (buttonRemove) {
             this.remove(readyGameButton);

@@ -73,7 +73,6 @@ public class StartPanel extends GeneralPanel {//State=2
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setFont(MAIN_FONT);
       super.paintComponent(g);
       //Adds particles

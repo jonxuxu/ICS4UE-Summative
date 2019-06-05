@@ -56,6 +56,8 @@ public class Client extends JFrame implements WindowListener {
    private BufferedReader input;
    private PrintWriter output;
    private int connectionState = 0; //-1 means unable to connect, 0 means trying to connect, 1 means connected
+   private String serverName;
+   private String serverPassword;
 
    // Screen stuff
    private final int DESIRED_Y = 500;
@@ -101,7 +103,9 @@ public class Client extends JFrame implements WindowListener {
    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
    private ArrayList<AOE> aoes = new ArrayList<AOE>();
    private ArrayList<Player>[] teams = new ArrayList[2];
-
+   private double mouseAngle;
+   private int keyAngle;
+   private boolean flashlightOn;
    // Debugging
    private boolean testingBegin = false;
 
@@ -293,7 +297,10 @@ public class Client extends JFrame implements WindowListener {
          if (testingBegin) {
             username = Math.random() + "";
             myUser = new User(username);
-            output.println("T" + username);//test
+            serverName=Integer.toString((int)(Math.random()*10000));
+            serverPassword="0";
+            System.out.println(serverName);
+            output.println("T" + username+","+serverName);//test
             output.flush();
             waitForInput();
             host = true;
@@ -327,11 +334,12 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (input.ready()) {
             decipherGameInput(input.readLine());
-            int angleOfMovement = myKeyListener.getAngle();
             // TODO: Update/improve when kameron is done
             int[] xyPos = new int[2]; //Scaled to the map
             xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
             xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
+            mouseAngle = myMouseAdapter.getAngle();
+            keyAngle = myKeyListener.getAngle();
             boolean[] spellsPressed = myKeyListener.getSpell();
             boolean[] leftRight = myMouseAdapter.getLeftRight();
             StringBuilder outputString = new StringBuilder();
@@ -344,8 +352,8 @@ public class Client extends JFrame implements WindowListener {
             if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
                outputString.append(" "); //Add the separator
             }
-            if (angleOfMovement != -10) {
-               outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
+            if (keyAngle != -10) {
+               outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
             }
             if (mouseState[2] == 1) { // If mouse pressed
                if (leftRight[0]) {
@@ -356,28 +364,33 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("F" + " ");
                }
             }
+            if (myKeyListener.getFlashlightOn()) {
+               outputString.append("L" + mouseAngle + " ");
+            }
             outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
             boolean walking = false;
-            int positionIndex;
+            int positionIndex = -10;
             //Refreshes the players animation
-            int roundedKeyAngle = myKeyListener.getAngle();
-            double roundedMouseAngle = myMouseAdapter.getAngle();
-            if (roundedKeyAngle != -10) {
-               positionIndex = (int) Math.abs(2-Math.ceil(roundedKeyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
+            if (keyAngle != -10) {
+               positionIndex = (int) Math.abs(2 - Math.ceil(keyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
                //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
                //Adding one more gives 3,2,1,0, which refer to left, up,right,down
                walking = true;
             } else {
-               positionIndex = (int) Math.abs(2-Math.ceil(roundedMouseAngle / 2.0));
+               if (mouseState[2] == 1) {
+                  positionIndex = (int) Math.abs(2 - Math.ceil((int) (4 * (mouseAngle / Math.PI)) / 2.0));
+               }
             }
-
-            outputString.append("W" + positionIndex +","+ walking);
+            if (positionIndex != -10) {
+               outputString.append("W" + positionIndex + "," + walking);//TODO: make this event driven
+            }
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
                output.flush();
             }
          }
-      } catch (IOException e) {
+      } catch (
+              IOException e) {
          e.printStackTrace();
       }
    }
@@ -507,7 +520,12 @@ public class Client extends JFrame implements WindowListener {
                myPlayer = players[i];
                myPlayerID = i;
             }
-            teams[onlineList.get(i).getTeam()].add(players[i]);
+            try {
+               teams[0].add(players[i]);
+               teams[onlineList.get(i).getTeam()].add(players[i]);
+            } catch (Exception e) {
+               System.out.println("Testing mode error");
+            }
          }
          nextPanel = 7;//Sends to the game screen
          gameBegin = true;
@@ -547,6 +565,9 @@ public class Client extends JFrame implements WindowListener {
                   //Set the spell of the appropriate player to the correct one using setSpell
                } else if (initializer == 'W') { //Walking
                   players[Integer.parseInt(thirdSplit[0])].setMovementIndex(Integer.parseInt(thirdSplit[1]), Boolean.parseBoolean(thirdSplit[2]));
+               } else if (initializer == 'L') {// Flash light
+                  players[Integer.parseInt(thirdSplit[0])].setFlashlightAngle(Double.parseDouble(thirdSplit[1]));
+                  players[Integer.parseInt(thirdSplit[0])].setFlashlightOn(true);
                }
             }
          }
@@ -571,6 +592,8 @@ public class Client extends JFrame implements WindowListener {
       for (int j = 15; j < 15 + Integer.parseInt(data[15]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
+      //Turn off flashlight
+      players[playerID].setFlashlightOn(false);
    }
 
    public void updateOthers(String[] data) {
@@ -584,6 +607,7 @@ public class Client extends JFrame implements WindowListener {
       for (int j = 8; j < 8 + Integer.parseInt(data[8]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
+      players[playerID].setFlashlightOn(false);
    }
 
    public void repaintPanels() {
@@ -679,6 +703,8 @@ public class Client extends JFrame implements WindowListener {
       if (!testGame) {
          this.attemptedGameName = attemptedGameName;
          this.attemptedGamePassword = attemptedGamePassword;
+         serverName=this.attemptedGameName;
+         serverPassword=this.attemptedGamePassword;
          testGame = true;
       }
    }
@@ -725,6 +751,14 @@ public class Client extends JFrame implements WindowListener {
 
    public int[] getMouseState() {
       return (mouseState);
+   }
+
+   public String getGameName() {
+      return (serverName);
+   }
+
+   public String getGamePassword() {
+      return (serverPassword);
    }
 
    /**
@@ -805,22 +839,28 @@ public class Client extends JFrame implements WindowListener {
          if (drawArea != null) {
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
-
-            //Map
-            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
-
-            //Game player
-            for (Player currentPlayer : players) {
-               if (currentPlayer != null) {
-                  currentPlayer.draw(g2, myPlayer.getXy());
-               }
-            }
-
             // Updating fog
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   // TODO: Separate by teams
                   fog.scout(currentXy[i]);
+               }
+            }
+
+            //Map
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
+            
+            //Flash light
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  currentPlayer.drawFlashlight(g2, myPlayer.getXy());
+               }
+            }
+
+            //Game player
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  currentPlayer.draw(g2, myPlayer.getXy());
                }
             }
 
@@ -835,6 +875,7 @@ public class Client extends JFrame implements WindowListener {
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
+
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
