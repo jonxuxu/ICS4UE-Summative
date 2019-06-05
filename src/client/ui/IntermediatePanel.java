@@ -46,6 +46,16 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       this.add(chat, new Integer(2));
    }
 
+   public void toggleFocus(int focus){
+      if(focus == 1){ // Focus on chat
+         chat.requestFocus();
+         System.out.println("Chatt");
+      } else if(focus == 2){ // Focus on game panel
+         gamePanel.requestFocus();
+         System.out.println("Game");
+      }
+   }
+
    public void repaintReal() {
       gamePanel.repaint();
    }

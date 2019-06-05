@@ -78,12 +78,12 @@ public class ChatComponent extends JPanel{
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
     textField.setBackground(new Color(0,0,0,0));
     textField.setFont(new Font("Arial", Font.PLAIN, (int) (10 * SCALING)));
+    textField.setForeground(Color.white);
+    this.setFocusTraversalKeysEnabled(false);
     bottomPanel.add(textField);
-    bottomPanel.add(send);
     bottomPanel.setPreferredSize(new Dimension(width, height/10));
     this.add(bottomPanel, BorderLayout.SOUTH);
     this.setVisible(true);
-    this.setFocusable(false);
   }
 
   public void draw(Graphics g) {
