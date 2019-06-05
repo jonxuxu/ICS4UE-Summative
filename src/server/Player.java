@@ -93,7 +93,7 @@ public abstract class Player extends User implements CanIntersect {
       return spells[spellIndex];
    }
 
-   public String getMainOutput(int spellTick) {
+   public String getMainOutput() {
       StringBuilder outputString = new StringBuilder();
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
       outputString.append(health + "," + maxHealth + "," + attack + "," + (mobility + mobilityBoost) + "," + range + ",");//Stats
