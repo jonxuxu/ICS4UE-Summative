@@ -1,18 +1,13 @@
 package client.ui;
 
 import client.Client;
-import client.Player;
 import client.User;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
-public class WaitingPanel extends GeneralPanel { //State=6
+public class WaitingPanel extends MenuPanel { //State=6
    private Graphics2D g2;
    private final double scaling = super.getScaling();
    private final int MAX_X = super.getWidth();

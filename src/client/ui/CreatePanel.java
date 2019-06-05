@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 
 /**
@@ -19,7 +18,7 @@ import java.awt.event.ActionEvent;
  * @since 2019-05-31
  */
 
-public class CreatePanel extends GeneralPanel { //State =3
+public class CreatePanel extends MenuPanel { //State =3
    private Graphics2D g2;
    private final double SCALING = super.getScaling();
    private final int MAX_X = super.getWidth();
