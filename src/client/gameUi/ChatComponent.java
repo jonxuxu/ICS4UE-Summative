@@ -35,7 +35,7 @@ public class ChatComponent extends JPanel{
 
     // Setting up styles
     StyleConstants.setFontFamily(regular, "Arial");
-    StyleConstants.setFontSize(regular, (int)(8 * SCALING));
+    StyleConstants.setFontSize(regular, (int)(10 * SCALING));
     friendly.addAttributes(regular);
     StyleConstants.setBold(friendly, true);
     StyleConstants.setForeground(friendly, Color.green);
@@ -46,12 +46,12 @@ public class ChatComponent extends JPanel{
 
     // Styling panel
     this.setLayout(new BorderLayout());
-    this.setBackground(new Color(0,0,0,0));
+    this.setBackground(new Color(255,255,255,20 ));
 
     // Adding components
     JTextPane textPane = new JTextPane();
     textPane.setEditable(false);
-    textPane.setBackground(new Color(0, 0, 0, 128));
+    textPane.setBackground(new Color(0, 0, 0, 0));
     doc = textPane.getStyledDocument();
     try{
       doc.insertString(doc.getLength(), "HELLO", friendly);
@@ -59,25 +59,31 @@ public class ChatComponent extends JPanel{
       e.printStackTrace();
     }
     JScrollPane chatPane = new JScrollPane(textPane);
+    chatPane.setBackground(new Color(0,0,0,0));
+    chatPane.setBorder(null);
     this.add(chatPane, BorderLayout.CENTER);
 
     send.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
       {
+        //TODO: add support for dm and teams
         if(!textField.getText().equals("")){ // If text field ins't empty
-          CLIENT.sendMessage(textField.getText());
+          CLIENT.sendMessage(textField.getText(), 1);
           textField.setText("");
         }
       }
     });
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
+    textField.setBackground(new Color(0,0,0,0));
+    textField.setFont(new Font("Arial", Font.PLAIN, (int) (10 * SCALING)));
     bottomPanel.add(textField);
     bottomPanel.add(send);
     bottomPanel.setPreferredSize(new Dimension(width, height/10));
     this.add(bottomPanel, BorderLayout.SOUTH);
     this.setVisible(true);
+    this.setFocusable(false);
   }
 
   public void draw(Graphics g) {

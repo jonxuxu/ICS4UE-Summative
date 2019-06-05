@@ -6,6 +6,9 @@ TODO:
 - background sound
 - minimap
 
+Issues:
+- client sends "C" to server for a bunch of things
+
 Work log:
 
 June 5:
