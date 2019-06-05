@@ -1,6 +1,7 @@
 package client;
 
 import client.gameUi.BottomComponent;
+import client.gameUi.ChatComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
 import client.gameUi.InventoryComponent;
@@ -602,7 +603,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void connect() {
       try {
-         socket = new Socket("10.242.182.130", 5001);
+         socket = new Socket("localhost", 5001);
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -745,7 +746,7 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
-      private boolean menuCooldown = true;
+      private ChatComponent chatPanel;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -761,6 +762,10 @@ public class Client extends JFrame implements WindowListener {
          allComponents[3] = new InventoryComponent();
          allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
+
+         // Chat panel
+         chatPanel = new ChatComponent(SCALING, DESIRED_X, DESIRED_Y);
+         this.add(chatPanel);
       }
 
       @Override
@@ -854,6 +859,7 @@ public class Client extends JFrame implements WindowListener {
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
+            //chatPanel.draw(g2);
          }
          g2.dispose();
       }
