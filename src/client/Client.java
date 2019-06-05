@@ -328,7 +328,7 @@ public class Client extends JFrame implements WindowListener {
    public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
-      System.out.println("type");
+      //System.out.println("type");
       if(currentPanel == 7){
          if(c == 9){ // Tab key
             intermediatePanel.toggleFocus(1);

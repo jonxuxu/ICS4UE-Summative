@@ -227,7 +227,7 @@ public abstract class Player extends User implements CanIntersect {
      return autoAttackTimer;
    }*/
    public void setAutoAttackCooldown(int cooldown){
-     autoAttackTimer = cooldown;
+     autoAttackCooldown = cooldown;
    }
    public void updateBasicTimers(){
      if (autoAttackTimer > 0){
@@ -242,7 +242,7 @@ public abstract class Player extends User implements CanIntersect {
      return flareTimer;
    }*/
    public void setFlareCooldown(int cooldown){
-     flareTimer = cooldown;
+     flareCooldown = cooldown;
    }
 
    public void updateStatuses() {
