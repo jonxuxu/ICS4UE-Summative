@@ -192,6 +192,7 @@ public class SafeMarksman extends Player{
 
   @Override
   public void damage(int damage){
+    damage = (int)(damage*(1-getDamageReduction()));
     if (getShieldsSize() == 0){
       setHealth(getHealth() - damage);
     } else {

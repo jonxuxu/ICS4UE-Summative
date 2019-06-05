@@ -221,7 +221,7 @@ public abstract class Player extends User implements CanIntersect {
          statuses.get(i).advance();
          Status removed = null;
          if (statuses.get(i).getRemainingDuration() <= 0) {
-            removed = statuses.get(i);
+            removed = statuses.remove(i);
             if (removed instanceof TimeMageQ) {
                addAOE(new TimeMageQAOE(((TimeMageQ) removed).getX(), ((TimeMageQ) removed).getY(), ((TimeMageQ) removed).getTargetX(), ((TimeMageQ) removed).getTargetY()));
             } else if (removed instanceof TimeMageE) {
