@@ -22,7 +22,7 @@ public class TimeMage extends Player{
     setMaxHealth(200);
     setHealth(200);
     setAttack(300);
-    setMobility(300);
+    setMobility(30);
     setRange(10);//REE Change to -1 when add support for melee attacks
   }
   
