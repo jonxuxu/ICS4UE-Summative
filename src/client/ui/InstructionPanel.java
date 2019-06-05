@@ -51,7 +51,6 @@ public class InstructionPanel extends GeneralPanel { //State=5
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       super.paintComponent(g);
       //Background
       drawBackground(g2);
