@@ -1,5 +1,6 @@
 TODO:
 - clean up client code more
+- make chat send base64 once will splits by space only
 
 - volume gain
 - background sound
@@ -7,6 +8,5 @@ TODO:
 
 Work log:
 
-June 4:
-- working on chat
-- optimized fog
+June 5:
+- sending chat info
