@@ -40,10 +40,20 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       gamePanel.setBounds(0, 0, MAX_X, MAX_Y);
 
       chat = new ChatComponent(SCALING,  MAX_X/6, MAX_Y/4, CLIENT);
-      chat.setBounds(0, MAX_Y/4*3, MAX_X/4, MAX_Y/4);
+      chat.setBounds(0, MAX_Y/8*5, MAX_X/4, MAX_Y/4);
 
       this.add(gamePanel, new Integer(1));
       this.add(chat, new Integer(2));
+   }
+
+   public void toggleFocus(int focus){
+      if(focus == 1){ // Focus on chat
+         chat.requestFocus();
+         System.out.println("Chatt");
+      } else if(focus == 2){ // Focus on game panel
+         gamePanel.requestFocus();
+         System.out.println("Game");
+      }
    }
 
    public void repaintReal() {

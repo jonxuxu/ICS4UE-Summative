@@ -416,7 +416,18 @@ public class Server {
                                        }
                                     } else if (initializer == 'C') { // Chat coming in
                                        if (!secondInput.isEmpty()) {
+                                          String mode = thirdSplit[0];
+                                          String message = thirdSplit[1];
+                                          if(mode.equals("1")){ // To everyone
+                                             for(int j = 0; j < playerNum; j++){
+                                                gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
+                                                gameOutputs[j].flush();
+                                             }
+                                          } else if(mode.equals("2")){ // To team
 
+                                          } else if(mode.equals("3")){ // DM
+
+                                          }
                                        }
                                     }
                                  }

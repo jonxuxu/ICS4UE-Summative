@@ -141,6 +141,7 @@ public class Client extends JFrame implements WindowListener {
       //Control set up (the mouse listeners are attached to the game panel)
       initializeScaling();
       this.addKeyListener(myKeyListener);
+      this.setFocusTraversalKeysEnabled(false);
       int[] tempXy = {(int) (DESIRED_X * SCALING / 2), (int) (DESIRED_Y * SCALING / 2)};
       myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
 
@@ -327,6 +328,14 @@ public class Client extends JFrame implements WindowListener {
    public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
+      System.out.println("type");
+      if(currentPanel == 7){
+         if(c == 9){ // Tab key
+            intermediatePanel.toggleFocus(1);
+         } else if (c == 13){ // Enter key
+            intermediatePanel.toggleFocus(2);
+         }
+      }
    }
 
    public void gameLogic() {
@@ -797,7 +806,6 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
-      private ChatComponent chatPanel;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
