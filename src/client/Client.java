@@ -732,6 +732,12 @@ public class Client extends JFrame implements WindowListener {
       classChosen = true;
    }
 
+   // Chat methods
+   public void sendMessage(String message, int mode){
+     output.println("C" + message + "," + mode);
+     output.flush();
+   }
+
    //Info to panels
    public int getConnectionState() {
       return (connectionState);
