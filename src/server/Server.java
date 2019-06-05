@@ -131,22 +131,22 @@ public class Server {
                      }
                   } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
                      System.out.println(inputString);
+                     /*
                      if (myGame.getGameSize() <= 1) {
-                        System.out.println("1");
                         output.println(7);
                         output.flush();
                      } else if ((myGame.emptyTeam(0)) || (myGame.emptyTeam(1))) {
-                        System.out.println("2");
                         output.println(8);
                         output.flush();
                      } else if (myGame.noTeam()) {
-                        System.out.println("3");
                         output.println(9);
                         output.flush();
                      } else {
-                        System.out.println("4");
                         myGame.run();
                      }
+                     */
+                     //Error verification is ignored
+                     myGame.run();
                      //Each game is a thread that is run. There is only communication between the game and the players
                   } else if (initializer == 'B') {
                      if (myGame != null) {
@@ -413,6 +413,7 @@ public class Server {
                                     }else if (initializer == 'L'){
                                        if (!secondInput.equals("")) {
                                           players[i].setFlashlightAngle(Double.parseDouble(thirdSplit[0]));
+                                          players[i].setFlashlightOn(true);
                                        }
                                     }
                                  }
@@ -497,7 +498,9 @@ public class Server {
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        outputString[i].append("L"+i +","+players[i].getFlashlightAngle()+" ");
+                        if (players[i].getFlashlightOn()) {
+                           outputString[i].append("L" + i + "," + players[i].getFlashlightAngle() + " ");
+                        }
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {

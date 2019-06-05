@@ -162,8 +162,6 @@ public class IntroPanel extends GeneralPanel {
    @Override
    public void paintComponent(Graphics g) {
       Graphics2D g2 = (Graphics2D) g;
-      RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-      g2.setRenderingHints(rh);
       super.paintComponent(g2); //required
       setDoubleBuffered(true);
       g2.setBackground(Color.BLACK);

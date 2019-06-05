@@ -55,7 +55,10 @@ public abstract class Player extends User implements CanIntersect {
    private boolean walking;
    //Lighting
    private double flashlightAngle;
+   private boolean flashlightOn;
+
    private double damageReduction;
+
 
    Player(String username) {
       super(username);
@@ -144,7 +147,12 @@ public abstract class Player extends User implements CanIntersect {
    public double getFlashlightAngle() {
       return (flashlightAngle);
    }
-
+   public boolean getFlashlightOn(){
+      return(flashlightOn);
+   }
+   public void setFlashlightOn(boolean flashlightOn){
+      this.flashlightOn=flashlightOn;
+   }
 
    public void autoAttack() {
       if (!stunned) {
