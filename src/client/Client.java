@@ -165,7 +165,6 @@ public class Client extends JFrame implements WindowListener {
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
-      intermediatePanel.initializeSize(DESIRED_X, DESIRED_Y);
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
@@ -789,7 +788,6 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
-         GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
          allComponents[0] = new PauseComponent();
          allComponents[1] = new BottomComponent();
          allComponents[2] = new MinimapComponent(fog, players);

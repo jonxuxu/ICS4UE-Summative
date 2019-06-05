@@ -37,15 +37,13 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
       this.setVisible(true);
       gamePanel= CLIENT.new GamePanel();
-   }
-   public void initializeSize(int DESIRED_X, int DESIRED_Y) {
-      gamePanel.setBounds((int) ((MAX_X - (DESIRED_X * SCALING)) / 2), (int) ((MAX_Y - (DESIRED_Y * SCALING)) / 2), (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
+      gamePanel.setBounds(0, 0, MAX_X, MAX_Y);
 
-      chat = new ChatComponent(SCALING, DESIRED_X, DESIRED_Y);
-      chat.setBounds(0, (int)(SCALING*DESIRED_Y/4*3 - 20), (int)(SCALING*DESIRED_X/6), (int)(SCALING*DESIRED_Y/4));
+      chat = new ChatComponent(SCALING,  MAX_X, MAX_Y);
+      chat.setBounds(0, MAX_Y/2, MAX_X/6, MAX_Y/4);
 
-      this.add(gamePanel, 1);
-      this.add(chat, 2);
+      this.add(gamePanel, new Integer(1));
+      this.add(chat, new Integer(2));
    }
 
    public void repaintReal() {
