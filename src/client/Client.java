@@ -299,10 +299,10 @@ public class Client extends JFrame implements WindowListener {
          if (testingBegin) {
             username = Math.random() + "";
             myUser = new User(username);
-            serverName=Integer.toString((int)(Math.random()*10000));
-            serverPassword="0";
+            serverName = Integer.toString((int) (Math.random() * 10000));
+            serverPassword = "0";
             System.out.println(serverName);
-            output.println("T" + username+","+serverName);//test
+            output.println("T" + username + "," + serverName);//test
             output.flush();
             waitForInput();
             host = true;
@@ -475,7 +475,6 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      System.out.println("d:" + input);
       char initializer = input.charAt(0);
       input = input.substring(1);
       if (isParsable(initializer)) {
@@ -736,8 +735,8 @@ public class Client extends JFrame implements WindowListener {
       if (!testGame) {
          this.attemptedGameName = attemptedGameName;
          this.attemptedGamePassword = attemptedGamePassword;
-         serverName=this.attemptedGameName;
-         serverPassword=this.attemptedGamePassword;
+         serverName = this.attemptedGameName;
+         serverPassword = this.attemptedGamePassword;
          testGame = true;
       }
    }
@@ -819,6 +818,9 @@ public class Client extends JFrame implements WindowListener {
       private int[][] currentXy;
       //Game components
       private GameComponent[] allComponents = new GameComponent[5];
+      private boolean menuCooldown = true;
+      private int[] xPoints = new int[4];
+      private int[] yPoints = new int[4];
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -882,14 +884,7 @@ public class Client extends JFrame implements WindowListener {
 
             //Map
             g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
-            
-            //Flash light
-            for (Player currentPlayer : players) {
-               if (currentPlayer != null) {
-                  currentPlayer.drawFlashlight(g2, myPlayer.getXy());
-               }
-            }
-
+            g2.setColor(Color.black);
             //Game player
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
