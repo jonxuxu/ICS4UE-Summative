@@ -330,10 +330,8 @@ public class Client extends JFrame implements WindowListener {
       lastKeyTyped = c;
       System.out.println("type");
       if(currentPanel == 7){
-         if(c == 9){ // Tab key
+         if(c == 9){ // Tab key switches focus to game chat panel
             intermediatePanel.toggleFocus(1);
-         } else if (c == 13){ // Enter key
-            intermediatePanel.toggleFocus(2);
          }
       }
    }
