@@ -1,11 +1,15 @@
 TODO:
 - clean up client code more
+- make chat send base64 once will splits by space only
 
 - volume gain
 - background sound
 - minimap
 
+Issues:
+- client sends "C" to server for a bunch of things
+
 Work log:
 
-June3:
-- working on minimap
+June 5:
+- sending chat info

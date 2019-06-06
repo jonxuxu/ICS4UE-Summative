@@ -15,7 +15,7 @@ import java.io.IOException;
  * @since 2019-05-19
  */
 
-public class SafeMarksman extends Player {
+public class Ghost extends Player {
    private int positionIndex;
    private int movementIndex;
    private boolean moving;
@@ -23,7 +23,7 @@ public class SafeMarksman extends Player {
    private int[] ANIMATION_LENGTH = {80, 80, 80};
    private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[4][][];
 
-   SafeMarksman(String username) {
+   Ghost(String username) {
       super(username);
       try {
          BufferedImage movementSheet = ImageIO.read(new File(".\\res\\SafeMarksman.png"));

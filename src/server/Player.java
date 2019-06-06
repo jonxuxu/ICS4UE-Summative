@@ -45,6 +45,10 @@ public abstract class Player extends User implements CanIntersect {
    private ArrayList<Player> enemies = new ArrayList<Player>();
    private int autoSpeed = 10;//REE
    private int autoRange;//REE
+   private int autoAttackCooldown;
+   private int autoAttackTimer;
+   private int flareCooldown;
+   private int flareTimer;
    private int teamNumber = 9;//Which means that it is invalid
    private Rectangle hitbox = new Rectangle(((int) (xy[0])), ((int) (xy[1])), 50, 50);
    private boolean illuminated = false;
@@ -93,7 +97,7 @@ public abstract class Player extends User implements CanIntersect {
       return spells[spellIndex];
    }
 
-   public String getMainOutput(int spellTick) {
+   public String getMainOutput() {
       StringBuilder outputString = new StringBuilder();
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
       outputString.append(health + "," + maxHealth + "," + attack + "," + (mobility + mobilityBoost) + "," + range + ",");//Stats
@@ -155,15 +159,16 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void autoAttack() {
-      if (!stunned) {
+      if (!stunned && (autoAttackTimer<=0)) {
          projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
-         //Check for this
+         autoAttackTimer = autoAttackCooldown;
       }
    }
 
    public void flare() {
-      if (!stunned) {
+      if (!stunned && (flareTimer<=0)) {
          projectiles.add(new FlareProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY));
+         flareTimer = flareCooldown;
       }
    }
 
@@ -217,6 +222,28 @@ public abstract class Player extends User implements CanIntersect {
    public int getPositionIndex() {
       return (positionIndex);
    }
+   /*
+   public int getAutoAttackTimer(){
+     return autoAttackTimer;
+   }*/
+   public void setAutoAttackCooldown(int cooldown){
+     autoAttackCooldown = cooldown;
+   }
+   public void updateBasicTimers(){
+     if (autoAttackTimer > 0){
+       autoAttackTimer--;
+     }
+     if (flareTimer > 0){
+       flareTimer--;
+     }
+   }
+   /*
+   public int getFlareTimer(){
+     return flareTimer;
+   }*/
+   public void setFlareCooldown(int cooldown){
+     flareCooldown = cooldown;
+   }
 
    public void updateStatuses() {
       mobilityBoost = 0;
@@ -229,7 +256,7 @@ public abstract class Player extends User implements CanIntersect {
          statuses.get(i).advance();
          Status removed = null;
          if (statuses.get(i).getRemainingDuration() <= 0) {
-            removed = statuses.get(i);
+            removed = statuses.remove(i);
             if (removed instanceof TimeMageQ) {
                addAOE(new TimeMageQAOE(((TimeMageQ) removed).getX(), ((TimeMageQ) removed).getY(), ((TimeMageQ) removed).getTargetX(), ((TimeMageQ) removed).getTargetY()));
             } else if (removed instanceof TimeMageE) {

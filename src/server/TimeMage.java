@@ -24,6 +24,8 @@ public class TimeMage extends Player{
     setAttack(300);
     setMobility(30);
     setRange(10);//REE Change to -1 when add support for melee attacks
+    setAutoAttackCooldown(10);
+    setFlareCooldown(100);
   }
   
   public boolean castSpell(int spellIndex){
@@ -80,6 +82,7 @@ public class TimeMage extends Player{
         spellTimers[i]--;
       }
     }
+    updateBasicTimers();
     //Update Projectiles
     for (int i = getProjectilesSize()-1; i >= 0; i--){
       getProjectile(i).advance();

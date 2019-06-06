@@ -11,9 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class FogMap {
-   private Area fogShape;
-   private Area viewedShape;
-   private Area activelyViewing;
+   private Area fogShape, viewedShape, activelyViewing, outputShape;
    private double scaling;
    private static double fogRadius = 250;
 
@@ -35,7 +33,9 @@ public class FogMap {
 
    public Area getFog() {
       fogShape.subtract(activelyViewing);
-      return(fogShape);
+      outputShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      outputShape.intersect(fogShape);
+      return outputShape;
    }
 
    public Area getExplored(){
@@ -43,6 +43,8 @@ public class FogMap {
       viewedShape.subtract(fogShape);
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
-      return viewedShape;
+      outputShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      outputShape.intersect(viewedShape);
+      return outputShape;
    }
 }

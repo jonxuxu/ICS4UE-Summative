@@ -12,8 +12,8 @@ public class SafeMarksman extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
 
-  private static int SPACE_AOE_DURATION = 2;
-  private static int SPACE_AOE_RADIUS = 30;
+  private static int SPACE_AOE_DURATION = 50;
+  private static int SPACE_AOE_RADIUS = 100;
   private static int MS_BUFF_STRENGTH = 3;
   private static int MS_BUFF_DURATION = 100;
   private static int STUN_DURATION = 100;
@@ -24,7 +24,7 @@ public class SafeMarksman extends Player{
     setHealth(300);
     setAttack(100);
     //setMaxMobility(10);
-    setMobility(20);
+    setMobility(10);
     setRange(300);
   }
   
@@ -192,6 +192,7 @@ public class SafeMarksman extends Player{
 
   @Override
   public void damage(int damage){
+    damage = (int)(damage*(1-getDamageReduction()));
     if (getShieldsSize() == 0){
       setHealth(getHealth() - damage);
     } else {

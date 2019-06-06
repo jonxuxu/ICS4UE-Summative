@@ -31,6 +31,8 @@ public class Ghost extends Player{
     setAttack(300);
     setMobility(10);
     setRange(10);//REE Change to -1 when add support for melee attacks
+    setAutoAttackCooldown(10);
+    setFlareCooldown(100);
   }
   
   public boolean castSpell(int spellIndex){
@@ -80,6 +82,7 @@ public class Ghost extends Player{
         passiveTimers[i]--;
       }
     }
+    updateBasicTimers();
     //Passive
     for (int i = 0; i <getEnemiesSize(); i++){
       if (passiveTimers[i]<=0){

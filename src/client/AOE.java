@@ -34,4 +34,7 @@ public class AOE {
    public static void setXyAdjust(int[] xyAdjust1) {
       xyAdjust = xyAdjust1;
    }
+   public int[] getXyAdjust(){
+     return xyAdjust;
+   }
 }
