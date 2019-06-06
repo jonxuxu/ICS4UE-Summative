@@ -462,7 +462,6 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      System.out.println("d:" + input);
       char initializer = input.charAt(0);
       input = input.substring(1);
       if (isParsable(initializer)) {
@@ -872,14 +871,7 @@ public class Client extends JFrame implements WindowListener {
 
             //Map
             g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
-            
-            //Flash light
-            for (Player currentPlayer : players) {
-               if (currentPlayer != null) {
-                  currentPlayer.drawFlashlight(g2, currentPlayer.getXy(), xyAdjust);
-               }
-            }
-            g2.drawPolygon(xPoints,yPoints,4);
+            g2.setColor(Color.black);
             //Game player
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {

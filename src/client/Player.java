@@ -38,11 +38,14 @@ public abstract class Player extends User {
    private boolean flashlightOn;
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
+   private Polygon test = new Polygon();
    private ArrayList<CustomPolygon> shapes = new ArrayList<CustomPolygon>();
    private int FLASHLIGHT_RADIUS = 200;
    private int xCo;
    private int yCo;
    private int cVal;
+   private int []xP={100,200,300,400,100};
+   private int []yP={100,300,500,400,400};
 
    Player(String username) {
       super(username);
@@ -57,6 +60,20 @@ public abstract class Player extends User {
       yPoints.add(400);
       yPoints.add(400);
       shapes.add(new CustomPolygon(4, xPoints, yPoints));
+      ArrayList<Integer> x2Points = new ArrayList<Integer>();
+      ArrayList<Integer> y2Points = new ArrayList<Integer>();
+      x2Points.add(100);
+      x2Points.add(200);
+      x2Points.add(300);
+      x2Points.add(400);
+      x2Points.add(100);
+      y2Points.add(100);
+      y2Points.add(300);
+      y2Points.add(500);
+      y2Points.add(400);
+      y2Points.add(400);
+      shapes.add(new CustomPolygon(5, x2Points, y2Points));
+      test = new Polygon(xP,yP,5);
    }
 
    public void setID(int ID) {
@@ -78,16 +95,20 @@ public abstract class Player extends User {
    }
 
    public void draw(Graphics2D g2, int[] midXy) {
+      int[] tempXy = {(int) (centerXy[0] - xy[0] * scaling), (int) (centerXy[1] - xy[1] * scaling)};
+      drawFlashlight(g2, tempXy);
       drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (60 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (60 * scaling) / 2, (int) (60 * scaling), (int) (60 * scaling), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
+
    }
 
-   public void drawFlashlight(Graphics2D g2, int[] playerXy, int[] xyAdjust) {
+   public void drawFlashlight(Graphics2D g2, int[] xyAdjust) {
+      g2.fillRect(xyAdjust[0] + (int) (300 * scaling), xyAdjust[1] + (int) (300 * scaling), (int) (100 * scaling), (int) (100 * scaling));
       if (flashlightOn) {
          flashlightBeam.reset();
-         flashlightBeam.addPoint((int) (playerXy[0] * scaling), (int) (playerXy[1] * scaling));
+         flashlightBeam.addPoint((int) (xy[0] * scaling), (int) (xy[1] * scaling));
          int shapeIndex = -2;
          int intersectionIndex = -2;
          int[] savedPoint = new int[2];
@@ -97,19 +118,19 @@ public abstract class Player extends User {
          int points = 1;
          boolean hit;
          double tempFlashlightAngle = flashlightAngle;
-         g2.drawRect(xyAdjust[0] + (int) (300 * scaling), xyAdjust[1] + (int) (300 * scaling), (int) (100 * scaling), (int) (100 * scaling));
-         tempFlashlightAngle -= 0.5;
-         for (double k = 0; k < 100; k++) {
+         tempFlashlightAngle -= 0.25;
+         for (double k = 0; k < 50; k++) {
             hit = false;
-            tempFlashlightAngle+= 0.01;
-            setPlayerVector(playerXy, playerXy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), playerXy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
-            int smallestDist = FLASHLIGHT_RADIUS * FLASHLIGHT_RADIUS;
+            tempFlashlightAngle += 0.01;
+            setPlayerVector(xy, xy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), xy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
+            int smallestDist = 100000000;
             for (int i = 0; i < shapes.size(); i++) {
                shapes.get(i).setPlayerScalar(xCo, yCo, cVal);
-               shapes.get(i).setPlayerVector(Math.cos(tempFlashlightAngle),Math.sin(tempFlashlightAngle));
-               if (shapes.get(i).intersect(playerXy)) {
-                  if (distance(shapes.get(i).getIntersect(), playerXy) < smallestDist) {
-                     smallestDist = distance(shapes.get(i).getIntersect(), playerXy);
+               shapes.get(i).setPlayerVector(Math.cos(tempFlashlightAngle), Math.sin(tempFlashlightAngle));
+               shapes.get(i).setVectorMagnitude(Math.abs(tempFlashlightAngle - flashlightAngle));
+               if (shapes.get(i).intersect(xy)) {
+                  if ((distance(shapes.get(i).getIntersect(), xy) < smallestDist)) {
+                     smallestDist = distance(shapes.get(i).getIntersect(), xy);
                      newShapeIndex = i;
                      newIntersectionIndex = shapes.get(i).getIntersectionIndex();
                      savedPoint[0] = shapes.get(i).getIntersect()[0];
@@ -118,33 +139,33 @@ public abstract class Player extends User {
                   }
                }
             }
-            if (!hit){
-               newShapeIndex=-1;
-               newIntersectionIndex=-1;
+            if (!hit) {
+               newShapeIndex = -1;
+               newIntersectionIndex = -1;
             }
-            if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex)||(k==0)||(k==99)) {
+            if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == 49)) {
                points++;
                shapeIndex = newShapeIndex;
                intersectionIndex = newIntersectionIndex;
-               if (!((prevPoint[0]==0)&&(prevPoint[1]==0))) {
+               if (!((prevPoint[0] == 0) && (prevPoint[1] == 0))) {
                   flashlightBeam.addPoint((int) (prevPoint[0] * scaling), (int) (prevPoint[1] * scaling));
                }
                if (shapeIndex != -1) {
                   flashlightBeam.addPoint((int) (savedPoint[0] * scaling), (int) (savedPoint[1] * scaling));
                } else {
-                  flashlightBeam.addPoint((int) ((playerXy[0] + FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)) * scaling), (int) ((playerXy[1] + FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)) * scaling));
+                  flashlightBeam.addPoint((int) ((xy[0] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.cos(tempFlashlightAngle)) * scaling), (int) ((xy[1] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.sin(tempFlashlightAngle)) * scaling));
                }
             }
-            if (hit){
+            if (hit) {
                prevPoint[0] = savedPoint[0];
                prevPoint[1] = savedPoint[1];
-            }else{
-               prevPoint[0] = (int) ((playerXy[0] + FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)));
-               prevPoint[1] = (int) ((playerXy[1] + FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
+            } else {
+               prevPoint[0] = (int) ((xy[0] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.cos(tempFlashlightAngle)));
+               prevPoint[1] = (int) ((xy[1] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.sin(tempFlashlightAngle)));
             }
          }
          if (points < 3) {
-            flashlightBeam.addPoint((int) ((playerXy[0] + FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle + 0.1)) * scaling), (int) ((playerXy[1] + FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle + 0.1)) * scaling));
+            flashlightBeam.addPoint((int) ((xy[0] + FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle + 0.1)) * scaling), (int) ((xy[1] + FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle + 0.1)) * scaling));
          }
          g2.setColor(Color.WHITE);
          flashlightBeam.translate(xyAdjust[0], xyAdjust[1]);

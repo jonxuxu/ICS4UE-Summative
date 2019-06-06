@@ -12,19 +12,21 @@ import java.util.ArrayList;
  */
 
 public class CustomPolygon {
-   int pointNum;
-   int[][] points;
-   int[][] vectors;
-   int[] intersection = new int[2];
-   int[] savedIntersection = new int[2];
-   double[] xyVector = new double[2];
+   private int pointNum;
+   private int[][] points;
+   private int[][] vectors;
+   private int[] intersection = new int[2];
+   private int[] savedIntersection = new int[2];
+   private double[] xyVector = new double[2];
+   private int magnitude;
+   private int FLASHLIGHT_RADIUS =200;
 
-   int xCo;//x coefficient
-   int yCo;//y coefficient
-   int cVal; //last value
+   private int xCo;//x coefficient
+   private int yCo;//y coefficient
+   private int cVal; //last value
 
-   double tVal;
-   int intersectingVectorIndex;
+   private double tVal;
+   private int intersectingVectorIndex;
 
    CustomPolygon(int pointNum, ArrayList<Integer> xPoints, ArrayList<Integer> yPoints) {
       this.pointNum = pointNum;
@@ -58,7 +60,6 @@ public class CustomPolygon {
    public boolean intersect(int[] playerXy) {
       //No need to check the entire shape? thought this is easier
       intersectingVectorIndex = -1;
-      int smallestDistance = 40000;//The range of the flashlight squared is this parameter
       tVal = -1;
       for (int i = 0; i < pointNum; i++) {
          double possibleT = -1.0 * (cVal + yCo * points[i][1] + xCo * points[i][0]) / (xCo * vectors[i][0] + yCo * vectors[i][1]);
@@ -67,9 +68,9 @@ public class CustomPolygon {
             intersection[1] = (int) (points[i][1] + vectors[i][1] * possibleT);
             if ((((intersection[0] - playerXy[0]) * xyVector[0]) >= 0) && (((intersection[1] - playerXy[1]) * xyVector[1]) >= 0)) {
                int distance = ((intersection[0] - playerXy[0]) * (intersection[0] - playerXy[0]) + (intersection[1] - playerXy[1]) * (intersection[1] - playerXy[1]));
-               if (distance < smallestDistance) {
+               if (distance < magnitude) {
                   tVal = possibleT;
-                  smallestDistance = distance;
+                  magnitude = distance;
                   intersectingVectorIndex = i;
                   savedIntersection[0] = intersection[0];
                   savedIntersection[1] = intersection[1];
@@ -88,6 +89,11 @@ public class CustomPolygon {
 
    public int[] getIntersect() {
       return (savedIntersection);
+   }
+
+   public void setVectorMagnitude(double angle) {
+      magnitude = (int)(FLASHLIGHT_RADIUS/Math.cos(angle));
+      magnitude = magnitude*magnitude;//Because it must be squared
    }
 
    public int getIntersectionIndex() { //If these are both the same, then no point is added.
