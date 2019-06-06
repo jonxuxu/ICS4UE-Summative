@@ -308,7 +308,7 @@ public class Client extends JFrame implements WindowListener {
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
                //TODO: Add class select here
-               players[i] = new TimeMage(onlineList.get(i).getUsername());
+               players[i] = new Ghost(onlineList.get(i).getUsername());
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
                }
@@ -328,7 +328,7 @@ public class Client extends JFrame implements WindowListener {
    public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
-      System.out.println("type");
+      //System.out.println("type");
       if(currentPanel == 7){
          if(c == 9){ // Tab key switches focus to game chat panel
             intermediatePanel.toggleFocus(1);
@@ -522,7 +522,7 @@ public class Client extends JFrame implements WindowListener {
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
          for (int i = 0; i < onlineList.size(); i++) {
-            players[i] = new TimeMage(onlineList.get(i).getUsername());
+            players[i] = new Ghost(onlineList.get(i).getUsername());
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;
