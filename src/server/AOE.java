@@ -17,7 +17,7 @@ class AOE implements HasID{
     this.y = y;
     this.duration = duration;
     this.radius = radius;
-    hitbox = new Ellipse2D.Double(x, y, radius * 2, radius * 2);
+    hitbox = new Ellipse2D.Double(x-radius, y-radius, radius * 2, radius * 2);
     this.ID = ID;
   }
   
@@ -34,9 +34,11 @@ class AOE implements HasID{
   }
   
   public void setX(int x){
+    hitbox = new Ellipse2D.Double(x-radius, y-radius, radius * 2, radius * 2);
     this.x = x;
   }
   public void setY(int y){
+    hitbox = new Ellipse2D.Double(x-radius, y-radius, radius * 2, radius * 2);
     this.y = y;
   }
   

@@ -45,7 +45,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-  private String playerClass = "Support";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+  private String playerClass = "SafeMarksman";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();

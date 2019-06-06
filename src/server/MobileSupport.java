@@ -9,14 +9,14 @@ package server;
  */
 import java.util.ArrayList;
 public class MobileSupport extends Player{
-  private int[] spellCooldowns = {100,100,100};
+  private int[] spellCooldowns = {50,100,100};
   private int PASSIVE_COOLDOWN = 100;
   private int[] spellTimers = {0,0,0};
   private int passiveTimer = 0;
   private int stacks = 0;
   private static int PASSIVE_RANGE = 500;
-  private static int Q_RANGE = 500;
-  private static int Q_SPEED = 100;
+  private static int Q_RANGE = 1000;
+  private static int Q_SPEED = 50;
   private static int Q_DURATION = Q_RANGE/Q_SPEED;
   private static int Q_STUN_DURATION = 100;
   private static int E_RANGE = 500;
@@ -50,11 +50,11 @@ public class MobileSupport extends Player{
               spellTimers[spellIndex] = spellCooldowns[spellIndex];
               cast = true;
               stacks++;
-              launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+              moveTo(getMouseX(), getMouseY(), Q_SPEED);
               for (int j = 0; j < getAlliesSize(); j++){
                 for (int k = 0; k < getStatusesSize(); k++){
                   if (getAlly(j).getStatus(k) instanceof MobileSupportEStatus){
-                    launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+                    moveTo(getMouseX(), getMouseY(), Q_SPEED);
                   }
                 }
               }
@@ -70,11 +70,11 @@ public class MobileSupport extends Player{
                 spellTimers[spellIndex] = spellCooldowns[spellIndex];
                 cast = true;
                 stacks++;
-                launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);//Could be AOE x and y
+                moveTo(getAOE(i).getX(), getAOE(i).getY(), Q_SPEED);//Could be AOE x and y
                 for (int j = 0; j < getAlliesSize(); j++){
                   for (int k = 0; k < getStatusesSize(); k++){
                     if (getAlly(j).getStatus(k) instanceof MobileSupportEStatus){
-                      launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+                      moveTo(getAOE(i).getX(), getAOE(i).getY(), Q_SPEED);//Could be AOE x and y
                     }
                   }
                 }

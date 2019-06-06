@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 
 public class Server {
-  private String playerClass = "Support";
+  private String playerClass = "SafeMarksman";
    //REMEMBER: output = new PrintWriter(myConnection.getOutputStream()); is very important
 
    //All for the main server
