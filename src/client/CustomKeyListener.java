@@ -23,6 +23,7 @@ public class CustomKeyListener implements KeyListener {
    private boolean[] spellsUsed = new boolean[3];
    private Client main;
    private boolean flashlightOn;
+   private boolean released;
    //Characters
    private char ESC = ((char) (27));
    private char CAPS_LOCK = ((char) (20));
@@ -55,6 +56,9 @@ public class CustomKeyListener implements KeyListener {
     */
    @Override
    public void keyReleased(KeyEvent e) {
+      if ((e.getKeyChar() == 'f') || (e.getKeyChar() == 'F')) {
+         released = true;
+      }
       pressed.remove(e.getKeyChar());
    }
 
@@ -109,15 +113,18 @@ public class CustomKeyListener implements KeyListener {
       return (spellsUsed);
    }
 
-   public boolean getFlashlightOn(){
+   public boolean getFlashlightOn() {
       if ((pressed.contains('f')) || (pressed.contains('F'))) {
-         if (flashlightOn) {
-            flashlightOn = false;
-         } else {
-            flashlightOn = true;
+         if (released) {
+            if (flashlightOn) {
+               flashlightOn = false;
+            } else {
+               flashlightOn = true;
+            }
+            released=false;
          }
       }
-      return(flashlightOn);
+      return (flashlightOn);
    }
 
    //TODO: Seems like these functions are used only in gamePanel
