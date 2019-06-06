@@ -46,7 +46,7 @@ public class MobileSupport extends Player{
         if (spellIndex==0) { //Q
           boolean qCast = false;
           for (int i = 0; (i < getAlliesSize() && (!qCast)); i++){
-            if (getAlly(i).contains(getMouseX(), getMouseY()) && (Math.sqrt(Math.pow(getAlly(i).getX()-getX(),2) + Math.pow(getAlly(i).getY()-getY(),2)) < Q_RANGE)){
+            if (getAlly(i).contains(getMouseX(), getMouseY()) && (Math.sqrt(Math.pow(getAlly(i).getX()-getX(),2) + Math.pow(getAlly(i).getY()-getY(),2)) < Q_RANGE) && (getAlly(i)!=this)){
               spellTimers[spellIndex] = spellCooldowns[spellIndex];
               cast = true;
               stacks++;
@@ -133,12 +133,12 @@ public class MobileSupport extends Player{
     }
     updateBasicTimers();
     //Update Passive
-    if (passiveTimer == 0){
+    if (passiveTimer <= 0){
       passiveTimer = PASSIVE_COOLDOWN;
       double angle = Math.random() * 2 * Math.PI;
       double radius = PASSIVE_RANGE * Math.sqrt(Math.random());
-      double passiveX = radius * Math.cos(angle);
-      double passiveY = radius * Math.sin(angle);
+      double passiveX = radius * Math.cos(angle) + getX();
+      double passiveY = radius * Math.sin(angle) + getY();
       addAOE(new MobileSupportPassiveAOE((int)passiveX, (int)passiveY));
     }
     

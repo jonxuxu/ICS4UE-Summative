@@ -61,4 +61,8 @@ class AOE implements HasID{
   public int getRadius() {
     return (radius);
   }
+  
+  public void removeNextTurn(){
+    lifetime=duration;
+  }
 }
