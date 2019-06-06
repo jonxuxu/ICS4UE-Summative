@@ -5,6 +5,7 @@ import client.Client;
 import client.gameUi.ChatComponent;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -50,6 +51,10 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       if(focus == 1){ // Focus on chat
          chat.requestFocus();
       }
+   }
+
+   public void messageIn(String player, String message, int team) {
+      chat.messageIn(player, message, team);
    }
 
    public void repaintReal() {

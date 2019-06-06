@@ -57,10 +57,13 @@ public class ChatComponent extends JPanel{
     } catch (Exception e){
       e.printStackTrace();
     }
-    JScrollPane chatPane = new JScrollPane(textPane);
-    chatPane.setBackground(new Color(0,0,0,0));
-    chatPane.setBorder(null);
-    this.add(chatPane, BorderLayout.CENTER);
+    JPanel textPanel = new JPanel(new BorderLayout());
+    textPanel.setBackground(new Color(0,0,0,0));
+    textPanel.add(textPane, BorderLayout.SOUTH);
+    JScrollPane scrollPane = new JScrollPane(textPanel);
+    scrollPane.setBackground(new Color(0,0,0,0));
+    scrollPane.setBorder(null);
+    this.add(scrollPane, BorderLayout.CENTER);
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
     textField.setBackground(new Color(0,0,0,0));
@@ -72,9 +75,10 @@ public class ChatComponent extends JPanel{
       public void actionPerformed(ActionEvent e)
       {
         //TODO: add support for dm and teams
-        client.requestFocus();
-        //CLIENT.sendMessage(textField.getText(), 1);
+        CLIENT.sendMessage(textField.getText(), 1);
         textField.setText("");
+        client.requestFocus();
+
       }
     });
     bottomPanel.add(textField);
@@ -87,13 +91,17 @@ public class ChatComponent extends JPanel{
   }
 
 
-  public void messageIn(String player, String message, int team) throws BadLocationException {
-    if(team == 0){ // Friendly
-      doc.insertString(doc.getLength(), player, friendly);
-    } else if (team == 1){
-      doc.insertString(doc.getLength(), player, enemy);
+  public void messageIn(String player, String message, int team){
+    try {
+      if (team == 0) { // Friendly
+        doc.insertString(doc.getLength(), player, friendly);
+      } else if (team == 1) {
+        doc.insertString(doc.getLength(), player, enemy);
+      }
+      doc.insertString(doc.getLength(), message + "\n", regular);
+    } catch (Exception e){
+      e.printStackTrace();
     }
-    doc.insertString(doc.getLength(), message + "\n", regular);
   }
 
   public void requestFocus(){

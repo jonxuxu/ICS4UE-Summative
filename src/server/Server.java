@@ -415,9 +415,11 @@ public class Server {
                                           players[i].setFlashlightOn(true);
                                        }
                                     } else if (initializer == 'C') { // Chat coming in
+                                      System.out.println("MEssage");
                                        if (!secondInput.isEmpty()) {
                                           String mode = thirdSplit[0];
                                           String message = thirdSplit[1];
+                                          System.out.println(message);
                                           if(mode.equals("1")){ // To everyone
                                              for(int j = 0; j < playerNum; j++){
                                                 gameOutputs[j].println("C" + players[i].getUsername() + "," + message);

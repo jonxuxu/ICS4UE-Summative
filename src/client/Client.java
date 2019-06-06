@@ -586,6 +586,9 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'L') {// Flash light
                   players[Integer.parseInt(thirdSplit[0])].setFlashlightAngle(Double.parseDouble(thirdSplit[1]));
                   players[Integer.parseInt(thirdSplit[0])].setFlashlightOn(true);
+               } else if (initializer == 'C') { //Message in
+                  // TODO: Figrue out team
+                  intermediatePanel.messageIn(thirdSplit[0], thirdSplit[1], 1);
                }
             }
          }
