@@ -40,7 +40,7 @@ class MapGenTester extends JFrame{
     }
     
     private void drawLineCustom(Point start, Point end, Graphics g) {
-    	g.drawLine(start.x,start.y,end.x,end.y);
+     g.drawLine(start.x,start.y,end.x,end.y);
     }
     
     public void paintComponent(Graphics g) {
@@ -57,19 +57,19 @@ class MapGenTester extends JFrame{
       
       for (int i = 0; i < activeNodes.size(); i++) {
         g.fillOval((int)activeNodes.get(i).getPoint().getX() - 5,
-        		(int)activeNodes.get(i).getPoint().getY() - 5,10,10);
+          (int)activeNodes.get(i).getPoint().getY() - 5,10,10);
         for (int j = 0; j < activeNodes.get(i).connections.size(); j++) {
-        	this.drawLineCustom(activeNodes.get(i).location,activeNodes.get(i).connections.get(j),g);
+         this.drawLineCustom(activeNodes.get(i).location,activeNodes.get(i).connections.get(j),g);
         }
         
       }
     }
 
-	private void setCenter(Graphics g) {
-		g.translate( (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2,
+ private void setCenter(Graphics g) {
+  g.translate( (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2,
                 (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2);
-		
-	}
+  
+ }
 
        
     
@@ -104,134 +104,134 @@ class MapGenTester extends JFrame{
     }
     
     public void tetherAllNodes() {
-    	int numOfNodes = nodes.size();
-    	
-    	int[] xDeltas = new int[numOfNodes];
-    	int[] yDeltas = new int[numOfNodes];
-    	int tempDeltaX, tempDeltaY;
-    	int negativeBest;
-    	int positiveBest;
-    	int positiveBestIdx = 0;
-    	int negativeBestIdx = 0;    	
-    	for (int idx = 0; idx < numOfNodes; idx++) {
-    		positiveBest = 999;
-    		negativeBest = 999;
-    		for (int idx2 = 0; idx2 < numOfNodes; idx2++) {
-    			xDeltas[idx2] = nodes.get(idx).location.x - nodes.get(idx2).location.x;
-    			yDeltas[idx2] = nodes.get(idx).location.y - nodes.get(idx2).location.y;
-    			
-    			tempDeltaX = xDeltas[idx2];
-    			tempDeltaY = yDeltas[idx2];
-    			
-    			
-    			if (tempDeltaX > 0) {
-    				if (tempDeltaX < positiveBest) {
-    					positiveBest = tempDeltaX;
-    					positiveBestIdx = idx2;    					
-    				}
-    			} else {
-    				if (tempDeltaX > negativeBest) {
-    					negativeBest = tempDeltaX;
-    					negativeBestIdx = idx2;    					
-    				}
-    			}
-    			
-    			if (tempDeltaY > 0) {
-    				if (tempDeltaY < positiveBest) {
-    					positiveBest = tempDeltaY;
-    					positiveBestIdx = idx2;    					
-    				}
-    			} else {
-    				if (tempDeltaY > negativeBest) {
-    					negativeBest = tempDeltaY;
-    					negativeBestIdx = idx2;    					
-    				}
-    			}
-    			
-    			if (idx == idx2 + 1) {
-    				idx2++;
-    			}
-    			
-    		}
-    		
-    		nodes.get(idx).connections.add(nodes.get(positiveBestIdx).location);
-    		nodes.get(idx).connections.add(nodes.get(negativeBestIdx).location);
-    		
-    		
-    	}   
-    	
-    	
+     int numOfNodes = nodes.size();
+     
+     int[] xDeltas = new int[numOfNodes];
+     int[] yDeltas = new int[numOfNodes];
+     int tempDeltaX, tempDeltaY;
+     int negativeBest;
+     int positiveBest;
+     int positiveBestIdx = 0;
+     int negativeBestIdx = 0;     
+     for (int idx = 0; idx < numOfNodes; idx++) {
+      positiveBest = 999;
+      negativeBest = 999;
+      for (int idx2 = 0; idx2 < numOfNodes; idx2++) {
+       xDeltas[idx2] = nodes.get(idx).location.x - nodes.get(idx2).location.x;
+       yDeltas[idx2] = nodes.get(idx).location.y - nodes.get(idx2).location.y;
+       
+       tempDeltaX = xDeltas[idx2];
+       tempDeltaY = yDeltas[idx2];
+       
+       
+       if (tempDeltaX > 0) {
+        if (tempDeltaX < positiveBest) {
+         positiveBest = tempDeltaX;
+         positiveBestIdx = idx2;         
+        }
+       } else {
+        if (tempDeltaX > negativeBest) {
+         negativeBest = tempDeltaX;
+         negativeBestIdx = idx2;         
+        }
+       }
+       
+       if (tempDeltaY > 0) {
+        if (tempDeltaY < positiveBest) {
+         positiveBest = tempDeltaY;
+         positiveBestIdx = idx2;         
+        }
+       } else {
+        if (tempDeltaY > negativeBest) {
+         negativeBest = tempDeltaY;
+         negativeBestIdx = idx2;         
+        }
+       }
+       
+       if (idx == idx2 + 1) {
+        idx2++;
+       }
+       
+      }
+      
+      nodes.get(idx).connections.add(nodes.get(positiveBestIdx).location);
+      nodes.get(idx).connections.add(nodes.get(negativeBestIdx).location);
+      
+      
+     }   
+     
+     
     }    
     
     public void tetherAllNodes2() {
-    	int quad1Best,quad2Best,quad3Best,quad4Best;
-    	int q1Idx,q2Idx,q3Idx,q4Idx;
-    	
-    	int tempDeltaX, tempDeltaY;
-    	
-    	int numOfNodes = nodes.size();
-    	
-    	for (int sourceIdx = 0; sourceIdx < numOfNodes; sourceIdx++) {
-    		quad1Best = 9999;
-    		quad2Best = 9999;
-    		quad3Best = 9999;
-    		quad4Best = 9999;
-    		q1Idx = 0;
-    		q2Idx = 0;
-    		q3Idx = 0;
-    		q4Idx = 0;
-    		
-    		for (int targetIdx = 0; targetIdx < numOfNodes; targetIdx++) {
-    			tempDeltaX = nodes.get(sourceIdx).location.x - nodes.get(targetIdx).location.x;
-    			tempDeltaY = nodes.get(sourceIdx).location.y - nodes.get(targetIdx).location.y;
-    			
-    			int tempDeltaSum = Math.abs(tempDeltaX) + Math.abs(tempDeltaY);
-    			
-    			if (tempDeltaX >= 0 && tempDeltaY >= 0) {
-    				if (tempDeltaSum < quad2Best) {
-    					quad2Best = tempDeltaSum;
-    					q2Idx = targetIdx;
-    				}
-    			} else if (tempDeltaX >= 0 && tempDeltaY <= 0) {
-    				if (tempDeltaSum < quad3Best) {
-    					quad3Best = tempDeltaSum;
-    					q3Idx = targetIdx;
-    				}
-    			} else if (tempDeltaX <= 0 && tempDeltaY <= 0) {
-    				if (tempDeltaSum < quad4Best) {
-    					quad4Best = tempDeltaSum;
-    					q4Idx = targetIdx;
-    				}
-    			} else if (tempDeltaX <= 0 && tempDeltaY >= 0) {
-    				if (tempDeltaSum < quad1Best) {
-    					quad1Best = tempDeltaSum;
-    					q1Idx = targetIdx;
-    				}
-    			}
-    		}
-    		
-    		ArrayList newConnections = new ArrayList<Point>(0);    		
-    		
-    		if (quad1Best < 150) {
-    			newConnections.add(nodes.get(q1Idx).location);
-    		}
-    		if (quad2Best < 150) {
-    			newConnections.add(nodes.get(q2Idx).location);
-    		}
-    		if (quad3Best < 150) {
-    			newConnections.add(nodes.get(q3Idx).location);
-    		}
-    		if (quad4Best < 150) {
-    			newConnections.add(nodes.get(q4Idx).location);
-    		}
-    		
-    		
-    		nodes.get(sourceIdx).connections = newConnections;
-    		
-    		
-    		
-    	}
-    	
+     int quad1Best,quad2Best,quad3Best,quad4Best;
+     int q1Idx,q2Idx,q3Idx,q4Idx;
+     
+     int tempDeltaX, tempDeltaY;
+     
+     int numOfNodes = nodes.size();
+     
+     for (int sourceIdx = 0; sourceIdx < numOfNodes; sourceIdx++) {
+      quad1Best = 9999;
+      quad2Best = 9999;
+      quad3Best = 9999;
+      quad4Best = 9999;
+      q1Idx = 0;
+      q2Idx = 0;
+      q3Idx = 0;
+      q4Idx = 0;
+      
+      for (int targetIdx = 0; targetIdx < numOfNodes; targetIdx++) {
+       tempDeltaX = nodes.get(sourceIdx).location.x - nodes.get(targetIdx).location.x;
+       tempDeltaY = nodes.get(sourceIdx).location.y - nodes.get(targetIdx).location.y;
+       
+       int tempDeltaSum = Math.abs(tempDeltaX) + Math.abs(tempDeltaY);
+       
+       if (tempDeltaX >= 0 && tempDeltaY >= 0) {
+        if (tempDeltaSum < quad2Best) {
+         quad2Best = tempDeltaSum;
+         q2Idx = targetIdx;
+        }
+       } else if (tempDeltaX >= 0 && tempDeltaY <= 0) {
+        if (tempDeltaSum < quad3Best) {
+         quad3Best = tempDeltaSum;
+         q3Idx = targetIdx;
+        }
+       } else if (tempDeltaX <= 0 && tempDeltaY <= 0) {
+        if (tempDeltaSum < quad4Best) {
+         quad4Best = tempDeltaSum;
+         q4Idx = targetIdx;
+        }
+       } else if (tempDeltaX <= 0 && tempDeltaY >= 0) {
+        if (tempDeltaSum < quad1Best) {
+         quad1Best = tempDeltaSum;
+         q1Idx = targetIdx;
+        }
+       }
+      }
+      
+      ArrayList<Point> newConnections = new ArrayList<Point>(0);      
+      
+      if (quad1Best < 150) {
+       newConnections.add(nodes.get(q1Idx).location);
+      }
+      if (quad2Best < 150) {
+       newConnections.add(nodes.get(q2Idx).location);
+      }
+      if (quad3Best < 150) {
+       newConnections.add(nodes.get(q3Idx).location);
+      }
+      if (quad4Best < 150) {
+       newConnections.add(nodes.get(q4Idx).location);
+      }
+      
+      
+      nodes.get(sourceIdx).connections = newConnections;
+      
+      
+      
+     }
+     
     }
 
     

@@ -51,7 +51,9 @@ public abstract class Player extends User implements CanIntersect {
    private int flareCooldown;
    private int flareTimer;
    private int teamNumber = 9;//Which means that it is invalid
-   private Rectangle hitbox = new Rectangle(((int) (xy[0])), ((int) (xy[1])), 50, 50);
+   private static int WIDTH = 16;
+   private static int HEIGHT = 50;
+   private Rectangle hitbox = new Rectangle(((int) (xy[0])-WIDTH/2), ((int) (xy[1])-HEIGHT/2), WIDTH, HEIGHT);
    private boolean illuminated = false;
    private boolean stunned = false;
    private boolean invisible = false;
@@ -287,6 +289,16 @@ public abstract class Player extends User implements CanIntersect {
       statuses.add(new Launched(dx, dy, totalTime));
       statuses.add(new Stun(totalTime));
    }
+   
+   public void moveTo(int targetX, int targetY, int speed){
+     double range = Math.sqrt(Math.pow(targetX-xy[0],2) + Math.pow(targetY-xy[1],2));
+     double theta = Math.atan2(targetY - xy[1], targetX - xy[0]);
+     double dx = speed * Math.cos(theta);
+     double dy = speed * Math.sin(theta);
+     int totalTime = (int) Math.round(range * 1.0 / speed);
+     statuses.add(new Launched(dx, dy, totalTime));
+     statuses.add(new Stun(totalTime));
+   }
 
    public abstract void update();
 
@@ -421,7 +433,7 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Area getHitbox() {
-      hitbox.setLocation(((int) (xy[0])), ((int) (xy[1])));
+      hitbox.setLocation(((int) (xy[0]-WIDTH/2)), ((int) (xy[1]-HEIGHT/2)));
       return new Area(hitbox);
    }
 
