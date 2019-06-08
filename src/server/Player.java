@@ -50,7 +50,9 @@ public abstract class Player extends User implements CanIntersect {
    private int flareCooldown;
    private int flareTimer;
    private int teamNumber = 9;//Which means that it is invalid
-   private Rectangle hitbox = new Rectangle(((int) (xy[0])-30), ((int) (xy[1])-30), 60, 60);
+   private static int WIDTH = 16;
+   private static int HEIGHT = 50;
+   private Rectangle hitbox = new Rectangle(((int) (xy[0])-WIDTH/2), ((int) (xy[1])-HEIGHT/2), WIDTH, HEIGHT);
    private boolean illuminated = false;
    private boolean stunned = false;
    private boolean invisible = false;
@@ -323,7 +325,7 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Area getHitbox() {
-      hitbox.setLocation(((int) (xy[0])), ((int) (xy[1])));
+      hitbox.setLocation(((int) (xy[0]-WIDTH/2)), ((int) (xy[1]-HEIGHT/2)));
       return new Area(hitbox);
    }
 

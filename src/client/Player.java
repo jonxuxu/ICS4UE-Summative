@@ -105,7 +105,7 @@ public abstract class Player extends User {
    }
 
    public void drawFlashlight(Graphics2D g2, int[] xyAdjust) {
-      g2.fillRect(xyAdjust[0] + (int) (300 * scaling), xyAdjust[1] + (int) (300 * scaling), (int) (100 * scaling), (int) (100 * scaling));
+      //g2.fillRect(xyAdjust[0] + (int) (300 * scaling), xyAdjust[1] + (int) (300 * scaling), (int) (100 * scaling), (int) (100 * scaling));
       if (flashlightOn) {
          flashlightBeam.reset();
          flashlightBeam.addPoint((int) (xy[0] * scaling), (int) (xy[1] * scaling));
