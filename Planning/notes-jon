@@ -6,11 +6,12 @@ TODO:
 - background sound
 - minimap
 
-Issues:
-- client sends "C" to server for a bunch of things
 
 Work log:
 
-June 5:
-- sending chat protocol
-- added focus transition
+June 6:
+- Auto scroll pane
+
+June 7:
+
+June 8:

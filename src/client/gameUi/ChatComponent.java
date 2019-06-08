@@ -3,13 +3,14 @@ package client.gameUi;
 import client.Client;
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 public class ChatComponent extends JPanel{
   private Client CLIENT;
@@ -18,11 +19,12 @@ public class ChatComponent extends JPanel{
   private static int HEIGHT, WIDTH;
   private static int PARENT_WIDTH, PARENT_HEIGHT;
 
-  SimpleAttributeSet regular = new SimpleAttributeSet();
-  SimpleAttributeSet friendly = new SimpleAttributeSet();
-  SimpleAttributeSet enemy = new SimpleAttributeSet();
+  private SimpleAttributeSet regular = new SimpleAttributeSet();
+  private SimpleAttributeSet friendly = new SimpleAttributeSet();
+  private SimpleAttributeSet enemy = new SimpleAttributeSet();
 
   private JTextField textField = new JTextField();
+  private JScrollPane scrollPane;
   Document doc;
 
 
@@ -60,9 +62,14 @@ public class ChatComponent extends JPanel{
     JPanel textPanel = new JPanel(new BorderLayout());
     textPanel.setBackground(new Color(0,0,0,0));
     textPanel.add(textPane, BorderLayout.SOUTH);
-    JScrollPane scrollPane = new JScrollPane(textPanel);
+    scrollPane = new JScrollPane(textPanel);
     scrollPane.setBackground(new Color(0,0,0,0));
     scrollPane.setBorder(null);
+    scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+      public void adjustmentValueChanged(AdjustmentEvent e) {
+        e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+      }
+    });
     this.add(scrollPane, BorderLayout.CENTER);
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
@@ -70,15 +77,14 @@ public class ChatComponent extends JPanel{
     textField.setFont(new Font("Arial", Font.PLAIN, (int) (10 * SCALING)));
     textField.setForeground(Color.white);
     //this.setFocusTraversalKeysEnabled(false);
-    textField.addActionListener(new ActionListener() // Do when enter key is pressed
-    {
-      public void actionPerformed(ActionEvent e)
-      {
+    textField.addActionListener(new ActionListener(){ // Do when enter key is pressed
+      public void actionPerformed(ActionEvent e){
         //TODO: add support for dm and teams
-        CLIENT.sendMessage(textField.getText(), 1);
-        textField.setText("");
-        client.requestFocus();
-
+        if(!textField.getText().isEmpty()){
+          CLIENT.sendMessage(textField.getText(), 1);
+          textField.setText("");
+          client.requestFocus(); // Change focus back to game
+        }
       }
     });
     bottomPanel.add(textField);
@@ -92,6 +98,7 @@ public class ChatComponent extends JPanel{
 
 
   public void messageIn(String player, String message, int team){
+    // Format and insert messages
     try {
       if (team == 0) { // Friendly
         doc.insertString(doc.getLength(), player, friendly);

@@ -383,56 +383,39 @@ public class Server {
                         } else {
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
-                              if (!firstInput.isEmpty()) {
-                                 char initializer = firstInput.charAt(0);
-                                 firstInput = firstInput.substring(1);
-                                 String[] secondSplit = firstInput.split(",", -1);
-                                 for (String secondInput : secondSplit) {
-                                    if (initializer == 'M') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
-                                       }
-                                    } else if (initializer == 'S') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
-                                       }
-                                       //The x y information about the spell is stored as secondSplit[1] and [2]
-                                    } else if (initializer == 'A') {
-                                       players[i].autoAttack();
-                                    } else if (initializer == 'F') {
-                                       players[i].flare();
-                                    } else if (initializer == 'P') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
-                                       }
-                                    } else if (initializer == 'W') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setPositionIndex(Integer.parseInt(secondSplit[0]));
-                                          players[i].setWalking(Boolean.parseBoolean(secondSplit[1]));
-                                       }
-                                    } else if (initializer == 'L') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setFlashlightOn(true);
-                                          players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
-                                       }
-                                    } else if (initializer == 'C') { // Chat coming in
-                                      System.out.println("Message");
-                                       if (!secondInput.isEmpty()) {
-                                          String mode = secondSplit[0];
-                                          String message = secondSplit[1];
-                                          System.out.println(message);
-                                          if (mode.equals("1")) { // To everyone
-                                             for (int j = 0; j < playerNum; j++) {
-                                                gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
-                                                gameOutputs[j].flush();
-                                             }
-                                          } else if (mode.equals("2")) { // To team
-
-                                          } else if (mode.equals("3")) { // DM
-
-                                          }
-                                       }
+                              char initializer = firstInput.charAt(0);
+                              firstInput = firstInput.substring(1);
+                              String[] secondSplit = firstInput.split(",", -1);
+                              if (initializer == 'M') {
+                                 players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
+                              } else if (initializer == 'S') {
+                                 players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
+                                 //The x y information about the spell is stored as secondSplit[1] and [2]
+                              } else if (initializer == 'A') {
+                                 players[i].autoAttack();
+                              } else if (initializer == 'F') {
+                                 players[i].flare();
+                              } else if (initializer == 'P') {
+                                 players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
+                              } else if (initializer == 'W') {
+                                 players[i].setPositionIndex(Integer.parseInt(secondSplit[0]));
+                                 players[i].setWalking(Boolean.parseBoolean(secondSplit[1]));
+                              } else if (initializer == 'L') {
+                                 players[i].setFlashlightOn(true);
+                                 players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
+                              } else if (initializer == 'C') { // Chat coming in
+                                 String mode = secondSplit[0];
+                                 String message = secondSplit[1];
+                                 System.out.println("Message: " + message);
+                                 if (mode.equals("1")) { // To everyone
+                                    for (int j = 0; j < playerNum; j++) {
+                                       gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
+                                       gameOutputs[j].flush();
                                     }
+                                 } else if (mode.equals("2")) { // To team
+
+                                 } else if (mode.equals("3")) { // DM
+
                                  }
                               }
                            }

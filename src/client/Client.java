@@ -780,8 +780,9 @@ public class Client extends JFrame implements WindowListener {
 
    // Chat methods
    public void sendMessage(String message, int mode) {
-      //System.out.println("sending" + message);
-      output.println(" C" + mode + "," + message);
+      System.out.println("Sending: " + message);
+      output.flush();
+      output.println("C" + mode + "," + message);
       output.flush();
    }
 
