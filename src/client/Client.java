@@ -349,11 +349,10 @@ public class Client extends JFrame implements WindowListener {
    public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
-      if (currentPanel == 7) {
-         if (c == 9) { // Tab key
+      //System.out.println("type");
+      if(currentPanel == 7){
+         if(c == 9){ // Tab key switches focus to game chat panel
             intermediatePanel.toggleFocus(1);
-         } else if (c == 13) { // Enter key
-            intermediatePanel.toggleFocus(2);
          }
       }
    }
@@ -578,40 +577,46 @@ public class Client extends JFrame implements WindowListener {
          char initializer = firstInput.charAt(0);
          firstInput = firstInput.substring(1);
          String[] secondSplit = firstInput.split(",", -1);
-         for (String secondInput : secondSplit) {
-            if (!secondInput.equals("")) {
-               if (initializer == 'P') {
-                  updatePlayer(secondSplit);
-               } else if (initializer == 'O') {
-                  updateOthers(secondSplit);
-               } else if (initializer == 'D') {
-                  players[Integer.parseInt(secondSplit[0])] = null;
-               } else if (initializer == 'R') {
-                  projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
-               } else if (initializer == 'E') {
-                  int id = Integer.parseInt(secondSplit[0]);
-                  if (id != 4) {
-                     aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
-                  } else {
-                     int[][] points = new int[2][4];
-                     for (int m = 0; m < 2; m++) {
-                        for (int n = 0; n < 4; n++) {
-                           points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
-                        }
-                     }
-                     aoes.add(new TimeMageAOE(id, points));
-                  }
-               } else if (initializer == 'S') {
-                  //Set the spell of the appropriate player to the correct one using setSpell
-               } else if (initializer == 'W') { //Walking
-                  players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
-               } else if (initializer == 'L') {// Flash light
-                  players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
-                  for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
-                     players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
-                  }
+         if(secondSplit.length > 0){
+           if (initializer == 'P') {
+             updatePlayer(secondSplit);
+           } else if (initializer == 'O') {
+             updateOthers(secondSplit);
+           } else if (initializer == 'D') {
+             players[Integer.parseInt(secondSplit[0])] = null;
+           } else if (initializer == 'R') {
+             projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
+           } else if (initializer == 'E') {
+             int id = Integer.parseInt(secondSplit[0]);
+             if (id != 4) {
+               aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+             } else {
+               int[][] points = new int[2][4];
+               for (int m = 0; m < 2; m++) {
+                 for (int n = 0; n < 4; n++) {
+                   points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                 }
                }
-            }
+               aoes.add(new TimeMageAOE(id, points));
+             }
+           } else if (initializer == 'S') {
+             //Set the spell of the appropriate player to the correct one using setSpell
+           } else if (initializer == 'W') { //Walking
+             players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
+           } else if (initializer == 'L') {// Flash light
+             players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+             for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+               players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
+             }
+           } else if (initializer == 'C') { //Message in
+             boolean isFriendly = false;
+             for(Player player: teams[myTeam]){ // Checks to see if username belongs to a player in 1st team
+               if(player.getUsername().equals(secondSplit[0])){
+                 isFriendly = true;
+               }
+             }
+             intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
+           }
          }
       }
    }
@@ -776,7 +781,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Chat methods
    public void sendMessage(String message, int mode) {
-      output.println("C" + message + "," + mode);
+      output.println("C" + mode + "," + message);
       output.flush();
    }
 
@@ -870,8 +875,6 @@ public class Client extends JFrame implements WindowListener {
                System.out.println("Image not found");
             }
             drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
-            System.out.println(MAX_GAME_X + " " + this.getWidth());
-            System.out.println(MAX_GAME_Y + " " + this.getHeight());
          }
          if (drawArea != null) {
             g2.clip(drawArea);
@@ -933,7 +936,7 @@ public class Client extends JFrame implements WindowListener {
                   ((PauseComponent) (allComponents[0])).toggle();
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[4])).toggle();
-                  System.out.println("F1");
+                  System.out.println("Debug mode");
                }
                keyPressed = false;
             }

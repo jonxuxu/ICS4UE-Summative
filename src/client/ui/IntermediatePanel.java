@@ -5,6 +5,7 @@ import client.Client;
 import client.gameUi.ChatComponent;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -51,11 +52,12 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
    public void toggleFocus(int focus){
       if(focus == 1){ // Focus on chat
          chat.requestFocus();
-         System.out.println("Chat");
-      } else if(focus == 2){ // Focus on game panel
-         gamePanel.requestFocus();
-         System.out.println("Game");
+         //System.out.println("Chat");
       }
+   }
+
+   public void messageIn(String player, String message, boolean friendly) {
+      chat.messageIn(player, message, friendly);
    }
 
    public void repaintReal() {

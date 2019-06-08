@@ -328,27 +328,27 @@ public class Server {
          Polygon[] sampleObstacles = new Polygon[2];
          int[] xPoints = new int[4];
          int[] yPoints = new int[4];
-         xPoints[0]=300;
-         xPoints[1]=400;
-         xPoints[2]=400;
-         xPoints[3]=300;
-         yPoints[0]=300;
-         yPoints[1]=300;
-         yPoints[2]=400;
-         yPoints[3]=400;
+         xPoints[0] = 300;
+         xPoints[1] = 400;
+         xPoints[2] = 400;
+         xPoints[3] = 300;
+         yPoints[0] = 300;
+         yPoints[1] = 300;
+         yPoints[2] = 400;
+         yPoints[3] = 400;
          sampleObstacles[0] = (new Polygon(xPoints, yPoints, 4));
          int[] x2Points = new int[5];
          int[] y2Points = new int[5];
-         x2Points[0]=100;
-         x2Points[1]=200;
-         x2Points[2]=300;
-         x2Points[3]=400;
-         x2Points[4]=500;
-         y2Points[0]=100;
-         y2Points[1]=200;
-         y2Points[2]=200;
-         y2Points[3]=100;
-         y2Points[4]=0;
+         x2Points[0] = 100;
+         x2Points[1] = 200;
+         x2Points[2] = 300;
+         x2Points[3] = 400;
+         x2Points[4] = 500;
+         y2Points[0] = 100;
+         y2Points[1] = 200;
+         y2Points[2] = 200;
+         y2Points[3] = 100;
+         y2Points[4] = 0;
          sampleObstacles[1] = (new Polygon(x2Points, y2Points, 5));
          try {
             players = new Player[onlinePlayers.size()];
@@ -370,7 +370,7 @@ public class Server {
             }
             playerNum = players.length;
             //Set up the players in each player
-            Player.setPlayerReference(players,playerNum);
+            Player.setPlayerReference(players, playerNum);
             for (int i = 0; i < playerNum; i++) {
                players[i].setID(i);
             }//Set the gameplayer ID's
@@ -417,54 +417,43 @@ public class Server {
                         } else {
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
-                              if (!firstInput.isEmpty()) {
-                                 char initializer = firstInput.charAt(0);
-                                 firstInput = firstInput.substring(1);
-                                 String[] secondSplit = firstInput.split(",", -1);
-                                 for (String secondInput : secondSplit) {
-                                    if (initializer == 'M') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
+                              char initializer = firstInput.charAt(0);
+                              firstInput = firstInput.substring(1);
+                              String[] secondSplit = firstInput.split(",", -1);
+                              if (secondSplit.length > 0) {
+                                 if (initializer == 'M') {
+                                    players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
+                                 } else if (initializer == 'S') {
+                                    players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
+                                    //The x y information about the spell is stored as secondSplit[1] and [2]
+                                 } else if (initializer == 'A') {
+                                    players[i].autoAttack();
+                                 } else if (initializer == 'F') {
+                                    players[i].flare();
+                                 } else if (initializer == 'P') {
+                                    players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
+                                 } else if (initializer == 'W') {
+                                    players[i].setPositionIndex(Integer.parseInt(secondSplit[0]));
+                                    players[i].setWalking(Boolean.parseBoolean(secondSplit[1]));
+                                 } else if (initializer == 'L') {
+                                    players[i].setFlashlightOn(true);
+                                    players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
+                                 } else if (initializer == 'C') { // Chat coming in
+                                    String mode = secondSplit[0];
+                                    String message = secondSplit[1];
+                                    System.out.println("Message: " + message);
+                                    if (mode.equals("1")) { // To everyone
+                                       for (int j = 0; j < playerNum; j++) {
+                                          gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
+                                          gameOutputs[j].flush();
                                        }
-                                    } else if (initializer == 'S') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
-                                       }
-                                       //The x y information about the spell is stored as secondSplit[1] and [2]
-                                    } else if (initializer == 'A') {
-                                       players[i].autoAttack();
-                                    } else if (initializer == 'F') {
-                                       players[i].flare();
-                                    } else if (initializer == 'P') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
-                                       }
-                                    } else if (initializer == 'W') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setPositionIndex(Integer.parseInt(secondSplit[0]));
-                                          players[i].setWalking(Boolean.parseBoolean(secondSplit[1]));
-                                       }
-                                    } else if (initializer == 'L') {
-                                       if (!secondInput.isEmpty()) {
-                                          players[i].setFlashlightOn(true);
-                                          players[i].setIlluminated(true);
-                                          players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
-                                       }
-                                    } else if (initializer == 'C') { // Chat coming in
-                                       if (!secondInput.isEmpty()) {
-                                          String mode = secondSplit[0];
-                                          String message = secondSplit[1];
-                                          if (mode.equals("1")) { // To everyone
-                                             for (int j = 0; j < playerNum; j++) {
-                                                gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
-                                                gameOutputs[j].flush();
-                                             }
-                                          } else if (mode.equals("2")) { // To team
-
-                                          } else if (mode.equals("3")) { // DM
-
+                                    } else if (mode.equals("2")) { // To team
+                                       for (int j = 0; j < playerNum; j++) {
+                                          if (players[j].getTeam() == players[i].getTeam()) {
+                                             gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
                                           }
                                        }
+                                    } else if (mode.equals("3")) { // DM
                                     }
                                  }
                               }
