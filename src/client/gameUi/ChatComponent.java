@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.util.Base64;
 
 public class ChatComponent extends JPanel{
   private Client CLIENT;
@@ -39,11 +40,11 @@ public class ChatComponent extends JPanel{
     StyleConstants.setFontSize(regular, (int)(10 * SCALING));
     friendly.addAttributes(regular);
     StyleConstants.setBold(friendly, true);
-    StyleConstants.setForeground(friendly, Color.green);
+    StyleConstants.setForeground(friendly, Color.decode("#66bb6a"));
     enemy.addAttributes(regular);
     StyleConstants.setBold(enemy, true);
-    StyleConstants.setForeground(enemy, Color.red);
-    StyleConstants.setForeground(regular, Color.white);
+    StyleConstants.setForeground(enemy,Color.decode("#ff7043"));
+    StyleConstants.setForeground(regular, Color.decode("#f5f5f5"));
 
     // Styling panel
     this.setLayout(new BorderLayout());
@@ -55,7 +56,7 @@ public class ChatComponent extends JPanel{
     textPane.setBackground(new Color(0, 0, 0, 0));
     doc = textPane.getStyledDocument();
     try{
-      doc.insertString(doc.getLength(), "Game Chat\n", friendly);
+      doc.insertString(doc.getLength(), "Game Chat\n", regular);
     } catch (Exception e){
       e.printStackTrace();
     }
@@ -81,7 +82,9 @@ public class ChatComponent extends JPanel{
       public void actionPerformed(ActionEvent e){
         //TODO: add support for dm and teams
         if(!textField.getText().isEmpty()){
-          CLIENT.sendMessage(textField.getText(), 1);
+          System.out.println("Sending: " + textField.getText());
+          byte[] encodedBytes = Base64.getEncoder().encode(textField.getText().getBytes());
+          CLIENT.sendMessage(new String(encodedBytes), 1);
           textField.setText("");
           client.requestFocus(); // Change focus back to game
         }
@@ -97,13 +100,16 @@ public class ChatComponent extends JPanel{
   }
 
 
-  public void messageIn(String player, String message, int team){
+  public void messageIn(String userName, String message, boolean sameTeam){
     // Format and insert messages
+    byte[] decodedBytes = Base64.getDecoder().decode(message.getBytes());
+    message = new String(decodedBytes);
+
     try {
-      if (team == 0) { // Friendly
-        doc.insertString(doc.getLength(), player, friendly);
-      } else if (team == 1) {
-        doc.insertString(doc.getLength(), player, enemy);
+      if (sameTeam) { // Friendly
+        doc.insertString(doc.getLength(), userName + " ", friendly);
+      } else {
+        doc.insertString(doc.getLength(), userName + " ", enemy);
       }
       doc.insertString(doc.getLength(), message + "\n", regular);
     } catch (Exception e){

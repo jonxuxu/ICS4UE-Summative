@@ -56,8 +56,8 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       }
    }
 
-   public void messageIn(String player, String message, int team) {
-      chat.messageIn(player, message, team);
+   public void messageIn(String player, String message, boolean friendly) {
+      chat.messageIn(player, message, friendly);
    }
 
    public void repaintReal() {

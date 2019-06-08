@@ -1,9 +1,8 @@
 TODO:
 - clean up client code more
-- make chat send base64 once will splits by space only
-
+- player names, health, status
 - volume gain
-- background sound
+- background music
 - minimap
 
 
@@ -11,7 +10,9 @@ Work log:
 
 June 6:
 - Auto scroll pane
+- removed redundant server commands
 
 June 7:
+- encoding text in base 64
 
 June 8:
