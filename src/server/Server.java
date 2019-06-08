@@ -225,10 +225,10 @@ public class Server {
                         output.flush();
                      }
                   } else if (initializer == 'T') {
-                     myUser = new User(inputString.substring(0,inputString.indexOf(",")));
+                     myUser = new User(inputString.substring(0, inputString.indexOf(",")));
                      onlineUsers.add(myUser);
                      if (games.size() == 0) {
-                        myGame = new GameServer(inputString.substring(inputString.indexOf(",")+1), "0");//Set this game to the specific game for this gameserver
+                        myGame = new GameServer(inputString.substring(inputString.indexOf(",") + 1), "0");//Set this game to the specific game for this gameserver
                         games.add(myGame);
                         games.get(0).addGamePlayer(myUser, myConnection, this);
                      } else {
@@ -404,28 +404,28 @@ public class Server {
                                        if (!secondInput.isEmpty()) {
                                           players[i].setMouse(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
                                        }
-                                    } else if (initializer == 'W'){
+                                    } else if (initializer == 'W') {
                                        if (!secondInput.isEmpty()) {
                                           players[i].setPositionIndex(Integer.parseInt(thirdSplit[0]));
                                           players[i].setWalking(Boolean.parseBoolean(thirdSplit[1]));
                                        }
-                                    }else if (initializer == 'L'){
+                                    } else if (initializer == 'L') {
                                        if (!secondInput.isEmpty()) {
-                                          players[i].setFlashlightAngle(Double.parseDouble(thirdSplit[0]));
                                           players[i].setFlashlightOn(true);
+                                          players[i].calculateFlashlightPolygon(Double.parseDouble(thirdSplit[0]));
                                        }
                                     } else if (initializer == 'C') { // Chat coming in
                                        if (!secondInput.isEmpty()) {
                                           String mode = thirdSplit[0];
                                           String message = thirdSplit[1];
-                                          if(mode.equals("1")){ // To everyone
-                                             for(int j = 0; j < playerNum; j++){
+                                          if (mode.equals("1")) { // To everyone
+                                             for (int j = 0; j < playerNum; j++) {
                                                 gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
                                                 gameOutputs[j].flush();
                                              }
-                                          } else if(mode.equals("2")){ // To team
+                                          } else if (mode.equals("2")) { // To team
 
-                                          } else if(mode.equals("3")){ // DM
+                                          } else if (mode.equals("3")) { // DM
 
                                           }
                                        }
@@ -458,17 +458,17 @@ public class Server {
                            projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY());
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
-                          if (theseAOES.get(j).getID() != 4){
-                            aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius());
-                          } else {//Time Mage AOE is different
-                            aoeOutput.append("E" + theseAOES.get(j).getID());
-                            int[][] points = ((TimeMageQAOE)theseAOES.get(j)).getPoints();
-                            for (int m = 0; m < points.length; m++){
-                              for (int n = 0; n < points[m].length; n++){
-                                aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                           if (theseAOES.get(j).getID() != 4) {
+                              aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius());
+                           } else {//Time Mage AOE is different
+                              aoeOutput.append("E" + theseAOES.get(j).getID());
+                              int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
+                              for (int m = 0; m < points.length; m++) {
+                                 for (int n = 0; n < points[m].length; n++) {
+                                    aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                                 }
                               }
-                            }
-                          }
+                           }
                         }
                      }
                   }
@@ -481,7 +481,7 @@ public class Server {
                      }
                   }
                   //Output will be here. The first loop generates the full message, the second distributes it
-                  boolean otherPExist=false;
+                  boolean otherPExist = false;
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         outputString[i].append(mainPlayer[i] + " ");
@@ -517,13 +517,23 @@ public class Server {
                   //TODO:add spells
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        outputString[i].append("W"+i +","+players[i].getPositionIndex()+","+players[i].getWalking() +" ");
+                        outputString[i].append("W" + i + "," + players[i].getPositionIndex() + "," + players[i].getWalking() + " ");
                      }
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         if (players[i].getFlashlightOn()) {
-                           outputString[i].append("L" + i + "," + players[i].getFlashlightAngle() + " ");
+                           int[] tempX = players[i].getFlashlightPointX();
+                           int[] tempY = players[i].getFlashlightPointY();
+                           for (int j = 0; j < playerNum; j++) {
+                              if (players[j] != null) {
+                                 outputString[j].append("L" + i + "," + players[i].getFlashlightPointNum());
+                                 for (int k = 0; k < players[i].getFlashlightPointNum(); k++) {
+                                    outputString[j].append("," + tempX[k] + "," + tempY[k]);
+                                 }
+                              }
+                              outputString[j].append(" ");
+                           }
                         }
                      }
                   }
@@ -624,7 +634,7 @@ public class Server {
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
          if (!begin) {
             if (onlinePlayers.size() < 6) {
-               onlinePlayers.add(new Ghost(user.getUsername()));
+               onlinePlayers.add(new SafeMarksman(user.getUsername()));
                onlineGameSockets.add(playerSocket);
                handlers.add(handler);
                return (true);

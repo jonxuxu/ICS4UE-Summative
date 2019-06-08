@@ -1,5 +1,7 @@
 package server;
 
+
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.lang.reflect.Array;
@@ -19,7 +21,6 @@ public abstract class Player extends User implements CanIntersect {
    private int ID;
    private double[] xy = {300, 300};
    private int[] centerXy = new int[2];
-   private double scaling;//Temporary, normally it should be determined in the constructor
    private boolean spells[] = new boolean[3];
    private boolean artifact = false;
    private boolean damaged = false;
@@ -54,18 +55,48 @@ public abstract class Player extends User implements CanIntersect {
    private boolean illuminated = false;
    private boolean stunned = false;
    private boolean invisible = false;
+   private double damageReduction;
+
    //Movement
    private int positionIndex;
    private boolean walking;
+
    //Lighting
-   private double flashlightAngle;
    private boolean flashlightOn;
-
-   private double damageReduction;
-
+   private Polygon flashlightBeam = new Polygon();
+   private int FLASHLIGHT_RADIUS = 200;
+   private Polygon test = new Polygon();
+   private ArrayList<CustomPolygon> shapes = new ArrayList<CustomPolygon>();
+   private int xCo;
+   private int yCo;
+   private int cVal;
 
    Player(String username) {
       super(username);
+      ArrayList<Integer> xPoints = new ArrayList<Integer>();
+      ArrayList<Integer> yPoints = new ArrayList<Integer>();
+      xPoints.add(300);
+      xPoints.add(400);
+      xPoints.add(400);
+      xPoints.add(300);
+      yPoints.add(300);
+      yPoints.add(300);
+      yPoints.add(400);
+      yPoints.add(400);
+      shapes.add(new CustomPolygon(4, xPoints, yPoints));
+      ArrayList<Integer> x2Points = new ArrayList<Integer>();
+      ArrayList<Integer> y2Points = new ArrayList<Integer>();
+      x2Points.add(100);
+      x2Points.add(200);
+      x2Points.add(300);
+      x2Points.add(400);
+      x2Points.add(500);
+      y2Points.add(100);
+      y2Points.add(200);
+      y2Points.add(200);
+      y2Points.add(100);
+      y2Points.add(0);
+      shapes.add(new CustomPolygon(5, x2Points, y2Points));
    }
 
 
@@ -144,29 +175,105 @@ public abstract class Player extends User implements CanIntersect {
       }
    }
 
-   public void setFlashlightAngle(double flashlightAngle) {
-      this.flashlightAngle = flashlightAngle;
+   public void calculateFlashlightPolygon(double flashlightAngle) {
+      int[] xy = {(int) (this.xy[0]), (int) (this.xy[1])};
+      flashlightBeam.reset();
+      flashlightBeam.addPoint(xy[0],xy[1]);
+      int shapeIndex = -2;
+      int intersectionIndex = -2;
+      int[] savedPoint = new int[2];
+      int[] prevPoint = new int[2];
+      int newShapeIndex = -1;
+      int newIntersectionIndex = -1;
+      int points = 1;
+      boolean hit;
+      double tempFlashlightAngle = flashlightAngle;
+      tempFlashlightAngle -= 0.25;
+      for (double k = 0; k < 50; k++) {
+         hit = false;
+         tempFlashlightAngle += 0.01;
+         setPlayerVector(xy, xy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), xy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
+         int smallestDist = 100000000;
+         for (int i = 0; i < shapes.size(); i++) {
+            shapes.get(i).setPlayerScalar(xCo, yCo, cVal);
+            shapes.get(i).setPlayerVector(Math.cos(tempFlashlightAngle), Math.sin(tempFlashlightAngle));
+            shapes.get(i).setVectorMagnitude(Math.abs(tempFlashlightAngle - flashlightAngle));
+            if (shapes.get(i).intersect(xy)) {
+               if ((distance(shapes.get(i).getIntersect(), xy) < smallestDist)) {
+                  smallestDist = distance(shapes.get(i).getIntersect(), xy);
+                  newShapeIndex = i;
+                  newIntersectionIndex = shapes.get(i).getIntersectionIndex();
+                  savedPoint[0] = shapes.get(i).getIntersect()[0];
+                  savedPoint[1] = shapes.get(i).getIntersect()[1];
+                  hit = true;
+               }
+            }
+         }
+         if (!hit) {
+            newShapeIndex = -1;
+            newIntersectionIndex = -1;
+         }
+         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == 49)) {
+            points++;
+            shapeIndex = newShapeIndex;
+            intersectionIndex = newIntersectionIndex;
+            if (!((prevPoint[0] == 0) && (prevPoint[1] == 0))) {
+               flashlightBeam.addPoint((int) (prevPoint[0]), (int) (prevPoint[1]));
+            }
+            if (shapeIndex != -1) {
+               flashlightBeam.addPoint((int) (savedPoint[0]), (int) (savedPoint[1]));
+            } else {
+               flashlightBeam.addPoint((int) ((xy[0] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.cos(tempFlashlightAngle))), (int) ((xy[1] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.sin(tempFlashlightAngle))));
+            }
+         }
+         if (hit) {
+            prevPoint[0] = savedPoint[0];
+            prevPoint[1] = savedPoint[1];
+         } else {
+            prevPoint[0] = (int) ((xy[0] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.cos(tempFlashlightAngle)));
+            prevPoint[1] = (int) ((xy[1] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.sin(tempFlashlightAngle)));
+         }
+      }
+      if (points < 3) {
+         flashlightBeam.addPoint((int) ((xy[0] + FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle + 0.1))), (int) ((xy[1] + FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle + 0.1))));
+      }
    }
 
-   public double getFlashlightAngle() {
-      return (flashlightAngle);
-   }
-   public boolean getFlashlightOn(){
-      return(flashlightOn);
-   }
-   public void setFlashlightOn(boolean flashlightOn){
-      this.flashlightOn=flashlightOn;
+   public int distance(int[] firstXy, int[] secondXy) {
+      return (((firstXy[0] - secondXy[0]) * (firstXy[0] - secondXy[0])) + ((firstXy[1] - secondXy[1]) * (firstXy[1] - secondXy[1])));
    }
 
+   public void setPlayerVector(int[] initalXy, int finalX, int finalY) { //player is initial, final is mouse
+      xCo = initalXy[1] - finalY;
+      yCo = finalX - initalXy[0];
+      cVal = finalY * initalXy[0] - finalX * initalXy[1];
+   }
+
+   public boolean getFlashlightOn() {
+      return (flashlightOn);
+   }
+
+   public void setFlashlightOn(boolean flashlightOn) {
+      this.flashlightOn = flashlightOn;
+   }
+   public int  getFlashlightPointNum(){
+      return(flashlightBeam.npoints);
+   }
+   public int [] getFlashlightPointX(){
+      return(flashlightBeam.xpoints);
+   }
+   public int [] getFlashlightPointY(){
+      return(flashlightBeam.ypoints);
+   }
    public void autoAttack() {
-      if (!stunned && (autoAttackTimer<=0)) {
+      if (!stunned && (autoAttackTimer <= 0)) {
          projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
          autoAttackTimer = autoAttackCooldown;
       }
    }
 
    public void flare() {
-      if (!stunned && (flareTimer<=0)) {
+      if (!stunned && (flareTimer <= 0)) {
          projectiles.add(new FlareProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY));
          flareTimer = flareCooldown;
       }
@@ -222,27 +329,30 @@ public abstract class Player extends User implements CanIntersect {
    public int getPositionIndex() {
       return (positionIndex);
    }
+
    /*
    public int getAutoAttackTimer(){
      return autoAttackTimer;
    }*/
-   public void setAutoAttackCooldown(int cooldown){
-     autoAttackCooldown = cooldown;
+   public void setAutoAttackCooldown(int cooldown) {
+      autoAttackCooldown = cooldown;
    }
-   public void updateBasicTimers(){
-     if (autoAttackTimer > 0){
-       autoAttackTimer--;
-     }
-     if (flareTimer > 0){
-       flareTimer--;
-     }
+
+   public void updateBasicTimers() {
+      if (autoAttackTimer > 0) {
+         autoAttackTimer--;
+      }
+      if (flareTimer > 0) {
+         flareTimer--;
+      }
    }
+
    /*
    public int getFlareTimer(){
      return flareTimer;
    }*/
-   public void setFlareCooldown(int cooldown){
-     flareCooldown = cooldown;
+   public void setFlareCooldown(int cooldown) {
+      flareCooldown = cooldown;
    }
 
    public void updateStatuses() {
@@ -268,8 +378,6 @@ public abstract class Player extends User implements CanIntersect {
          }
       }
    }
-
-
 
 
    public void applyStatus(Status status) {

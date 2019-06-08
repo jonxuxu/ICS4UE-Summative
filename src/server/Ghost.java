@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Ghost extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
-  private int[] passiveTimers = new int[getEnemiesSize()];
+  private int[] passiveTimers;
   private static int PASSIVE_COOLDOWN = 50;
   private static int PASSIVE_RANGE = 300;
   private static int Q_BASE_DAMAGE = 100;
@@ -69,6 +69,9 @@ public class Ghost extends Player{
   }
   
   public void update(){
+    if (passiveTimers==null){
+      passiveTimers= new int[getEnemiesSize()];
+    }
     for (int i = 0; i < 3; i++){
       if (spellTimers[i] > 0){
         spellTimers[i]--;

@@ -30,15 +30,17 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       this.MAX_Y = MAX_Y;
       //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
       //Setting up the size
-      this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
+      this.setSize(new Dimension(MAX_X, MAX_Y));
       //Basic visuals
       this.setDoubleBuffered(true);
       this.setBackground(new Color(0, 0, 0));
       this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
       this.setVisible(true);
       gamePanel= CLIENT.new GamePanel();
-      gamePanel.setBounds(0, 0, MAX_X, MAX_Y);
-
+      System.out.println(MAX_X);
+      gamePanel.setBounds(0, 0, this.getWidth(),this.getHeight());
+      System.out.println(this.getWidth()+" "+MAX_X);
+      gamePanel.setDimensions(this.getWidth(),this.getHeight());
       chat = new ChatComponent(SCALING,  MAX_X/6, MAX_Y/4, CLIENT);
       chat.setBounds(0, MAX_Y/8*5, MAX_X/4, MAX_Y/4);
 
@@ -49,7 +51,7 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
    public void toggleFocus(int focus){
       if(focus == 1){ // Focus on chat
          chat.requestFocus();
-         System.out.println("Chatt");
+         System.out.println("Chat");
       } else if(focus == 2){ // Focus on game panel
          gamePanel.requestFocus();
          System.out.println("Game");

@@ -26,8 +26,8 @@ public class ChatComponent extends JPanel{
   Document doc;
 
 
-  public ChatComponent(double scaling, int width, int height, Client client){
-    SCALING = scaling;
+  public ChatComponent(double SCALING, int width, int height, Client client){
+    SCALING = SCALING;
     WIDTH = width;
     HEIGHT = height;
     this.CLIENT = client;
