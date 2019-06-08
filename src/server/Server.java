@@ -1,5 +1,6 @@
 package server;
 
+import java.awt.Polygon;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
  */
 
 public class Server {
-  private String playerClass = "SafeMarksman";
+   private String playerClass = "SafeMarksman";
    //REMEMBER: output = new PrintWriter(myConnection.getOutputStream()); is very important
 
    //All for the main server
@@ -323,14 +324,40 @@ public class Server {
          for (MenuHandler thisHandler : handlers) {
             thisHandler.kill();
          }
+         //TODO: ADD MAP LOADING HERE, set the polygons right after
+         Polygon[] sampleObstacles = new Polygon[2];
+         int[] xPoints = new int[4];
+         int[] yPoints = new int[4];
+         xPoints[0]=300;
+         xPoints[1]=400;
+         xPoints[2]=400;
+         xPoints[3]=300;
+         yPoints[0]=300;
+         yPoints[1]=300;
+         yPoints[2]=400;
+         yPoints[3]=400;
+         sampleObstacles[0] = (new Polygon(xPoints, yPoints, 4));
+         int[] x2Points = new int[5];
+         int[] y2Points = new int[5];
+         x2Points[0]=100;
+         x2Points[1]=200;
+         x2Points[2]=300;
+         x2Points[3]=400;
+         x2Points[4]=500;
+         y2Points[0]=100;
+         y2Points[1]=200;
+         y2Points[2]=200;
+         y2Points[3]=100;
+         y2Points[4]=0;
+         sampleObstacles[1] = (new Polygon(x2Points, y2Points, 5));
          try {
             players = new Player[onlinePlayers.size()];
-
             gameSockets = new Socket[players.length];
             gameOutputs = new PrintWriter[players.length];
             gameInputs = new BufferedReader[players.length];
             //gameObjectOutputs = new ObjectOutputStream[players.length];
             //gameObjectInputs = new ObjectInputStream[players.length];
+
 
             for (int i = 0; i < players.length; i++) {
                players[i] = onlinePlayers.get(i);
@@ -342,6 +369,8 @@ public class Server {
                gameOutputs[i].flush();
             }
             playerNum = players.length;
+            //Set up the players in each player
+            Player.setPlayerReference(players,playerNum);
             for (int i = 0; i < playerNum; i++) {
                players[i].setID(i);
             }//Set the gameplayer ID's
@@ -351,7 +380,12 @@ public class Server {
             }
             //Set the teams
             for (Player myPlayer : players) {
-               myPlayer.sendInfo(players);
+               myPlayer.sendInfo();
+            }
+            //TODO: Map stuff should be slightly before this
+            Player.setConstantHitboxes(players.length, sampleObstacles);
+            for (int i = 0; i < players.length; i++) {
+               players[i].setLightingHitbox(i);//TODO: Add the spawn xy here to initialize the hitbox properly. For now, it is just assuming that it starts at 300 by 300
             }
             while (!stopGame) {
                for (int i = 0; i < playerNum; i++) {
@@ -367,8 +401,8 @@ public class Server {
                for (int i = 0; i < playerNum; i++) {
                   outputString[i] = new StringBuilder();
                }
-
                // Input from clients
+
                for (int i = 0; i < playerNum; i++) {
                   if (players[i] != null) {
                      if (!allInput[i].isEmpty()) {
@@ -413,6 +447,7 @@ public class Server {
                                     } else if (initializer == 'L') {
                                        if (!secondInput.isEmpty()) {
                                           players[i].setFlashlightOn(true);
+                                          players[i].setIlluminated(true);
                                           players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
                                        }
                                     } else if (initializer == 'C') { // Chat coming in
@@ -438,7 +473,7 @@ public class Server {
                      }
                   }
                }
-
+               Player.updateHitbox();
                // Output to clients
                if (time.getFramePassed()) {
                   //Check to see if anything was added from disconnecting players. If this is true, then add a space
@@ -450,17 +485,16 @@ public class Server {
                      if (players[i] != null) {
                         mainPlayer[i] = new StringBuilder();
                         otherPlayers[i] = new StringBuilder();
-                        players[i].update();
                         mainPlayer[i].append("P" + i + "," + players[i].getMainOutput());
                         otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
                         for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY()+" ");
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
                            if (theseAOES.get(j).getID() != 4) {
-                              aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius()+" ");
+                              aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
                            } else {//Time Mage AOE is different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
@@ -489,7 +523,7 @@ public class Server {
                         for (int j = 0; j < playerNum; j++) {
                            if (i != j) {
                               if (players[j] != null) {
-                                 outputString[i].append(otherPlayers[j]+" ");
+                                 outputString[i].append(otherPlayers[j] + " ");
                               }
                            }
                         }
@@ -540,7 +574,12 @@ public class Server {
                         gameOutputs[i].flush();
                      }
                   }
-
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        //TODO: Ask Kamron why this is important and if I can move it here (interferes with light otherwise)
+                        players[i].update();
+                     }
+                  }
                   gameTick++;
                }
             }
@@ -631,20 +670,20 @@ public class Server {
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
          if (!begin) {
             if (onlinePlayers.size() < 6) {
-              //REE TEMPORARY DOESN'T SYNC WITH CLIENTS'S CHOICES
-              if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")){
-                onlinePlayers.add(new SafeMarksman(user.getUsername()));
-              } else if (playerClass.equals("TimeMage")){
-                onlinePlayers.add(new TimeMage(user.getUsername()));
-              } else if (playerClass.equals("Ghost")){
-                onlinePlayers.add(new Ghost(user.getUsername()));
-              } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")){
-                onlinePlayers.add(new MobileSupport(user.getUsername()));
-              } else if (playerClass.equals("Juggernaut")){
-                onlinePlayers.add(new Juggernaut(user.getUsername()));
-              } else {
-                onlinePlayers.add(new SafeMarksman(user.getUsername()));
-              }
+               //REE TEMPORARY DOESN'T SYNC WITH CLIENTS'S CHOICES
+               if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
+                  onlinePlayers.add(new SafeMarksman(user.getUsername()));
+               } else if (playerClass.equals("TimeMage")) {
+                  onlinePlayers.add(new TimeMage(user.getUsername()));
+               } else if (playerClass.equals("Ghost")) {
+                  onlinePlayers.add(new Ghost(user.getUsername()));
+               } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
+                  onlinePlayers.add(new MobileSupport(user.getUsername()));
+               } else if (playerClass.equals("Juggernaut")) {
+                  onlinePlayers.add(new Juggernaut(user.getUsername()));
+               } else {
+                  onlinePlayers.add(new SafeMarksman(user.getUsername()));
+               }
                onlineGameSockets.add(playerSocket);
                handlers.add(handler);
                return (true);
