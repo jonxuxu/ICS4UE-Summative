@@ -385,40 +385,40 @@ public class Server {
                            for (String firstInput : firstSplit) {
                               if (!firstInput.isEmpty()) {
                                  char initializer = firstInput.charAt(0);
-                                 String[] secondSplit = firstInput.split(initializer + "", -1);
+                                 firstInput = firstInput.substring(1);
+                                 String[] secondSplit = firstInput.split(",", -1);
                                  for (String secondInput : secondSplit) {
-                                    String[] thirdSplit = secondInput.split(",", -1);
                                     if (initializer == 'M') {
                                        if (!secondInput.isEmpty()) {
-                                          players[i].addXy(Double.parseDouble(thirdSplit[0]), Double.parseDouble(thirdSplit[1]));
+                                          players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
                                        }
                                     } else if (initializer == 'S') {
                                        if (!secondInput.isEmpty()) {
-                                          players[i].setSpell(players[i].castSpell(Integer.parseInt(thirdSplit[0])), Integer.parseInt(thirdSplit[0]));
+                                          players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
                                        }
-                                       //The x y information about the spell is stored as thirdSplit[1] and [2]
+                                       //The x y information about the spell is stored as secondSplit[1] and [2]
                                     } else if (initializer == 'A') {
                                        players[i].autoAttack();
                                     } else if (initializer == 'F') {
                                        players[i].flare();
                                     } else if (initializer == 'P') {
                                        if (!secondInput.isEmpty()) {
-                                          players[i].setMouse(Integer.parseInt(thirdSplit[0]), Integer.parseInt(thirdSplit[1]));
+                                          players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
                                        }
                                     } else if (initializer == 'W') {
                                        if (!secondInput.isEmpty()) {
-                                          players[i].setPositionIndex(Integer.parseInt(thirdSplit[0]));
-                                          players[i].setWalking(Boolean.parseBoolean(thirdSplit[1]));
+                                          players[i].setPositionIndex(Integer.parseInt(secondSplit[0]));
+                                          players[i].setWalking(Boolean.parseBoolean(secondSplit[1]));
                                        }
                                     } else if (initializer == 'L') {
                                        if (!secondInput.isEmpty()) {
                                           players[i].setFlashlightOn(true);
-                                          players[i].calculateFlashlightPolygon(Double.parseDouble(thirdSplit[0]));
+                                          players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
                                        }
                                     } else if (initializer == 'C') { // Chat coming in
                                        if (!secondInput.isEmpty()) {
-                                          String mode = thirdSplit[0];
-                                          String message = thirdSplit[1];
+                                          String mode = secondSplit[0];
+                                          String message = secondSplit[1];
                                           if (mode.equals("1")) { // To everyone
                                              for (int j = 0; j < playerNum; j++) {
                                                 gameOutputs[j].println("C" + players[i].getUsername() + "," + message);
@@ -456,11 +456,11 @@ public class Server {
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
                         for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY());
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY()+" ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
                            if (theseAOES.get(j).getID() != 4) {
-                              aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius());
+                              aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius()+" ");
                            } else {//Time Mage AOE is different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
@@ -469,6 +469,7 @@ public class Server {
                                     aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
                                  }
                               }
+                              aoeOutput.append(" ");
                            }
                         }
                      }
@@ -482,20 +483,15 @@ public class Server {
                      }
                   }
                   //Output will be here. The first loop generates the full message, the second distributes it
-                  boolean otherPExist = false;
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         outputString[i].append(mainPlayer[i] + " ");
                         for (int j = 0; j < playerNum; j++) {
                            if (i != j) {
                               if (players[j] != null) {
-                                 outputString[i].append(otherPlayers[j]);
-                                 otherPExist = true;
+                                 outputString[i].append(otherPlayers[j]+" ");
                               }
                            }
-                        }
-                        if (otherPExist) {
-                           outputString[i].append(" ");//Place a space at the end
                         }
                      }
                   }
@@ -503,7 +499,7 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         if (!projectileOutput.toString().isEmpty()) {
-                           outputString[i].append(projectileOutput + " ");
+                           outputString[i].append(projectileOutput);
                         }
                      }
                   }
@@ -511,7 +507,7 @@ public class Server {
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         if (!aoeOutput.toString().isEmpty()) {
-                           outputString[i].append(aoeOutput + " ");
+                           outputString[i].append(aoeOutput);
                         }
                      }
                   }

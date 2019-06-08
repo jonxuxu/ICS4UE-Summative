@@ -374,12 +374,8 @@ public class Client extends JFrame implements WindowListener {
             StringBuilder outputString = new StringBuilder();
             for (int i = 0; i < spellsPressed.length; i++) {
                if (spellsPressed[i]) {
-                  outputString.append("S" + i);
+                  outputString.append("S" + i+" ");
                }
-            }
-
-            if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
-               outputString.append(" "); //Add the separator
             }
             if (keyAngle != -10) {
                outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
@@ -411,9 +407,10 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             if (positionIndex != -10) {
-               outputString.append("W" + positionIndex + "," + walking);//TODO: make this event driven
+               outputString.append("W" + positionIndex + "," + walking+" ");//TODO: make this event driven
             }
             if (!outputString.toString().trim().isEmpty()) {
+               System.out.println(outputString.toString().trim());
                output.println(outputString.toString().trim());
                output.flush();
             }
@@ -581,27 +578,27 @@ public class Client extends JFrame implements WindowListener {
       String[] firstSplit = input.split(" ", -1);
       for (String firstInput : firstSplit) {
          char initializer = firstInput.charAt(0);
-         String[] secondSplit = firstInput.split(initializer + "", -1);
+         firstInput = firstInput.substring(1);
+         String[] secondSplit = firstInput.split(",", -1);
          for (String secondInput : secondSplit) {
             if (!secondInput.equals("")) {
-               String[] thirdSplit = secondInput.split(",", -1);
                if (initializer == 'P') {
-                  updatePlayer(thirdSplit);
+                  updatePlayer(secondSplit);
                } else if (initializer == 'O') {
-                  updateOthers(thirdSplit);
+                  updateOthers(secondSplit);
                } else if (initializer == 'D') {
-                  players[Integer.parseInt(thirdSplit[0])] = null;
+                  players[Integer.parseInt(secondSplit[0])] = null;
                } else if (initializer == 'R') {
-                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING)));
+                  projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
                } else if (initializer == 'E') {
-                  int id = Integer.parseInt(thirdSplit[0]);
+                  int id = Integer.parseInt(secondSplit[0]);
                   if (id != 4) {
-                     aoes.add(new AOE(id, (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
+                     aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
                   } else {
                      int[][] points = new int[2][4];
                      for (int m = 0; m < 2; m++) {
                         for (int n = 0; n < 4; n++) {
-                           points[m][n] = (int) (Integer.parseInt(thirdSplit[1 + m * 4 + n]) * SCALING);
+                           points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
                         }
                      }
                      aoes.add(new TimeMageAOE(id, points));
@@ -609,11 +606,11 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'S') {
                   //Set the spell of the appropriate player to the correct one using setSpell
                } else if (initializer == 'W') { //Walking
-                  players[Integer.parseInt(thirdSplit[0])].setMovementIndex(Integer.parseInt(thirdSplit[1]), Boolean.parseBoolean(thirdSplit[2]));
+                  players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
                } else if (initializer == 'L') {// Flash light
-                  players[Integer.parseInt(thirdSplit[0])].setFlashlightOn(true);//Resets the flashlight
-                  for (int i = 2; i < Integer.parseInt(thirdSplit[1]) * 2 + 2; i += 2) { //Parses all the points
-                     players[Integer.parseInt(thirdSplit[0])].setFlashlightPoint(Integer.parseInt(thirdSplit[i]), Integer.parseInt(thirdSplit[i + 1]));
+                  players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+                  for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+                     players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
                   }
                }
             }
