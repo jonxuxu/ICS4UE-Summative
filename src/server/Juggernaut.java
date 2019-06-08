@@ -8,23 +8,20 @@ package server;
  * @since 2019-05-19
  */
 import java.util.ArrayList;
-public class Ghost extends Player{
+public class Juggernaut extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
-  private int[] passiveTimers;
-  private static int PASSIVE_COOLDOWN = 50;
-  private static int PASSIVE_RANGE = 300;
+  private int[] passiveTimers = new int[getEnemiesSize()];
+  private static int PASSIVE_RANGE = 700;
   private static int Q_BASE_DAMAGE = 100;
   private static int Q_DAMAGE_PER_STACK = 10;
   private static int Q_SPEED = 5;
   private static int Q_RANGE = 200;
   private static int Q_DURATION = Q_RANGE/Q_SPEED;
-  private boolean inE = false;
+  private static int E_BASE_DAMAGE = 100;
   private static int SPACE_DURATION = 100;
   
-  private ArrayList<Player> qBlacklist = new ArrayList<Player>();
-  
-  Ghost(String username) {
+  Juggernaut(String username) {
     super(username);
     setMaxHealth(300);
     setHealth(300);
@@ -41,14 +38,12 @@ public class Ghost extends Player{
         spellTimers[spellIndex] = spellCooldowns[spellIndex];
         if (spellIndex==0) { //Q
           launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
-          addAOE(new GhostQAOE(getX(), getY(), Q_DURATION));
-          qBlacklist.clear();
+          addAOE(new JuggernautQAOE(getX(), getY(), Q_DURATION));
         }else if (spellIndex==1){//E
-          addStatus(new GhostE(getX(), getY(), getMouseX(), getMouseY()));
-          inE = true;
+          addAOE(new JuggernautEAOE(getX(), getY()));
         }else {//Space
-          addStatus(new Uncollidable(SPACE_DURATION));
-          addStatus(new Invisible(SPACE_DURATION));
+          addStatus(new Unstoppable(SPACE_DURATION));
+          addAOE(new JuggernautSpaceAOE(getX(), getY(), SPACE_DURATION));
         }
         return true;
       } else {
@@ -69,29 +64,18 @@ public class Ghost extends Player{
   }
   
   public void update(){
-    if (passiveTimers==null){
-      passiveTimers= new int[getEnemiesSize()];
-    }
     for (int i = 0; i < 3; i++){
       if (spellTimers[i] > 0){
         spellTimers[i]--;
       }
     }
-    if (inE){
-      spellTimers[1] = spellCooldowns[1];
-    }
-    for (int i = 0; i < passiveTimers.length; i++){
-      if (passiveTimers[i] > 0){
-        passiveTimers[i]--;
-      }
-    }
     updateBasicTimers();
     //Passive
     for (int i = 0; i <getEnemiesSize(); i++){
-      if (passiveTimers[i]<=0){
+      if (getEnemy(i).getIlluminated()){
         if (Math.sqrt(Math.pow(getEnemy(i).getX()-getX(),2) + Math.pow(getEnemy(i).getY()-getY(),2)) < PASSIVE_RANGE){
-          getEnemy(i).addStatus(new GhostPassive());
-          passiveTimers[i] = PASSIVE_COOLDOWN;
+          addStatus(new JuggernautMSBuff());
+          addStatus(new JuggernautDamageBuff());
         }
       }
     }
@@ -131,23 +115,34 @@ public class Ghost extends Player{
               getEnemy(j).addStatus(new Illuminated(500));
             }
           }
-        } else if  (getAOE(i) instanceof GhostQAOE){
-          ((GhostQAOE)getAOE(i)).setX(getX());
-          ((GhostQAOE)getAOE(i)).setY(getY());
+        } else if  (getAOE(i) instanceof JuggernautQAOE){
+          ((JuggernautQAOE)getAOE(i)).setX(getX());
+          ((JuggernautQAOE)getAOE(i)).setY(getY());
           for (int j = 0; j < getEnemiesSize(); j++){
-            for (int k = 0; k < qBlacklist.size(); k++){
-              if (getEnemy(j) != qBlacklist.get(k)){
-                if (getAOE(i).collides(getEnemy(j))){
-                  int numStacks = 0;
-                  for (int m = 0; m < getEnemy(j).getStatusesSize(); m++){
-                    if (getEnemy(j).getStatus(m) instanceof GhostPassive){
-                      numStacks++;
-                    }
-                  }
-                  getEnemy(j).damage(Q_BASE_DAMAGE + Q_DAMAGE_PER_STACK * numStacks);
-                  qBlacklist.add(getEnemy(j));
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).damage(Q_BASE_DAMAGE);
+              getEnemy(j).addStatus(new JuggernautQStun());
+              getAOE(i).removeNextTurn();
+              for (int k = getStatusesSize() - 1; k >= 0; k--){
+                if (getStatus(k) instanceof Launched){
+                  removeStatus(k);
                 }
               }
+            }
+          }
+        } else if (getAOE(i) instanceof JuggernautEAOE){
+          for (int j = 0; j < getEnemiesSize(); j++){
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).damage(E_BASE_DAMAGE);
+              getEnemy(j).addStatus(new JuggernautEStun());
+            }
+          }
+        } else if (getAOE(i) instanceof JuggernautSpaceAOE){
+          ((JuggernautSpaceAOE)getAOE(i)).setX(getX());
+          ((JuggernautSpaceAOE)getAOE(i)).setY(getY());
+          for (int j = 0; j < getEnemiesSize(); j++){
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).addStatus(new Illuminated(2));
             }
           }
         }
@@ -161,30 +156,6 @@ public class Ghost extends Player{
       Shield removed = null;
       if (getShield(i).getRemainingDuration() <= 0){
         removed = removeShield(i);
-      }
-    }
-  }
-  
-  @Override
-  public void damage(int damage) {
-    damage = (int)(damage*(1-getDamageReduction()));
-    if (getShieldsSize() == 0) {
-      setHealth(getHealth() - damage);
-    } else {
-      if (getShield(0).getStrength() - damage > 0) {
-        getShield(0).damage(damage);
-      } else {
-        setHealth(getHealth() - (damage - getShield(0).getStrength()));
-        removeShield(0);
-      }
-    }
-    if (inE){
-      inE = false;
-      for (int i = 0; i < getStatusesSize(); i++){
-        if (getStatus(i) instanceof GhostE){
-          setX(((GhostE)getStatus(i)).getX());
-          setY(((GhostE)getStatus(i)).getY());
-        }
       }
     }
   }

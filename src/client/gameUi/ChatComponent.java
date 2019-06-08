@@ -26,8 +26,8 @@ public class ChatComponent extends JPanel{
   Document doc;
 
 
-  public ChatComponent(double scaling, int width, int height, Client client){
-    SCALING = scaling;
+  public ChatComponent(double SCALING, int width, int height, Client client){
+    SCALING = SCALING;
     WIDTH = width;
     HEIGHT = height;
     this.CLIENT = client;
@@ -53,7 +53,7 @@ public class ChatComponent extends JPanel{
     textPane.setBackground(new Color(0, 0, 0, 0));
     doc = textPane.getStyledDocument();
     try{
-      doc.insertString(doc.getLength(), "HELLO", friendly);
+      doc.insertString(doc.getLength(), "Game Chat\n", friendly);
     } catch (Exception e){
       e.printStackTrace();
     }

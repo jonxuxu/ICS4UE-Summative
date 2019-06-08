@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class WaitingPanel extends MenuPanel { //State=6
    private Graphics2D g2;
-   private final double scaling = super.getScaling();
+   private final double SCALING = super.getScaling();
    private final int MAX_X = super.getWidth();
    private final int MAX_Y = super.getHeight();
    private final Client CLIENT = super.getClient();
@@ -18,10 +18,10 @@ public class WaitingPanel extends MenuPanel { //State=6
 
    private boolean buttonAdd = true;
    private boolean buttonRemove = true;
-   private CustomButton readyGameButton = new CustomButton("Begin game", scaling);
-   private CustomButton backButton = new CustomButton("Back", scaling);
-   private CustomButton teamOneButton = new CustomButton("Team one", scaling);
-   private CustomButton teamTwoButton = new CustomButton("Team two", scaling);
+   private CustomButton readyGameButton = new CustomButton("Begin game", SCALING);
+   private CustomButton backButton = new CustomButton("Back", SCALING);
+   private CustomButton teamOneButton = new CustomButton("Team one", SCALING);
+   private CustomButton teamTwoButton = new CustomButton("Team two", SCALING);
 
    //Class rectangles
    private Rectangle SAFE_MARKSMAN_RECT;
@@ -36,7 +36,7 @@ public class WaitingPanel extends MenuPanel { //State=6
 
    public WaitingPanel() {
       // Initializing buttons
-      readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 8 / 10, (int) (130 * scaling), (int) (19 * scaling));
+      readyGameButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 8 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       readyGameButton.addActionListener((ActionEvent e) -> {
          CLIENT.ready();
       });
@@ -44,24 +44,24 @@ public class WaitingPanel extends MenuPanel { //State=6
       teamOneButton.addActionListener((ActionEvent e) -> {
          CLIENT.setTeam(0);
       });
-      teamOneButton.setBounds(MAX_X / 2 - (int) ((65 + 200) * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
+      teamOneButton.setBounds(MAX_X / 2 - (int) ((65 + 200) * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(teamOneButton);
 
       teamTwoButton.addActionListener((ActionEvent e) -> {
          CLIENT.setTeam(1);
       });
-      teamTwoButton.setBounds(MAX_X / 2 - (int) ((65 - 200) * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
+      teamTwoButton.setBounds(MAX_X / 2 - (int) ((65 - 200) * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(teamTwoButton);
 
       backButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(2);
          CLIENT.leaveGame();
       });
-      backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 9 / 10, (int) (130 * scaling), (int) (19 * scaling));
+      backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 9 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);
 
       //Setting up the classes
-      SAFE_MARKSMAN_RECT = new Rectangle(MAX_X / 2 - (int) ((65 + 200) * scaling), MAX_Y * 3 / 10, (int) (70 * scaling), (int) (70 * scaling));
+      SAFE_MARKSMAN_RECT = new Rectangle(MAX_X / 2 - (int) ((65 + 200) * SCALING), MAX_Y * 3 / 10, (int) (70 * SCALING), (int) (70 * SCALING));
 
       //Basic visuals
       this.setDoubleBuffered(true);
@@ -112,19 +112,19 @@ public class WaitingPanel extends MenuPanel { //State=6
          players.append(onlineList.get(i).getUsername() + ", ");
          if (onlineList.get(i).getTeam() != -1) {
             if (onlineList.get(i).getTeam() == 0) {
-               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 + 200) * scaling), (int) (19 * scaling) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift1 + 1));
+               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 + 200) * SCALING), (int) (19 * SCALING) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift1 + 1));
                shift1++;
             } else if (onlineList.get(i).getTeam() == 1) {
-               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 - 200) * scaling), (int) (19 * scaling) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift2 + 1));
+               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 - 200) * SCALING), (int) (19 * SCALING) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift2 + 1));
                shift2++;
             }
          }
       }
       if (!onlineList.isEmpty()) {
-         g2.drawString(players.toString().substring(0, players.toString().lastIndexOf(",")), (int) (2 * scaling), (int) (10 * scaling));
+         g2.drawString(players.toString().substring(0, players.toString().lastIndexOf(",")), (int) (2 * SCALING), (int) (10 * SCALING));
       }
-      g2.drawString("Server name: "+CLIENT.getGameName(), (int) (2 * scaling), (int) (10 * scaling)+metrics.getHeight());
-      g2.drawString("Server password: "+CLIENT.getGamePassword(), (int) (2 * scaling), (int) (10 * scaling)+2*metrics.getHeight());
+      g2.drawString("Server name: "+CLIENT.getGameName(), (int) (2 * SCALING), (int) (10 * SCALING)+metrics.getHeight());
+      g2.drawString("Server password: "+CLIENT.getGamePassword(), (int) (2 * SCALING), (int) (10 * SCALING)+2*metrics.getHeight());
       if (CLIENT.getLoading()) {
          if (buttonRemove) {
             this.remove(readyGameButton);

@@ -40,6 +40,7 @@ public class PauseComponent extends GameComponent {
    private boolean visible;
 
    public PauseComponent() {
+      System.out.println("www"+MAX_X+" "+MAX_Y);
       BORDER_RECT = new Rectangle(MAX_X / 2 - scale(200), MAX_Y / 2 - scale(150), scale(400), scale(300));
       BORDER_RECT2 = new Rectangle(MAX_X / 2 - scale(198), MAX_Y / 2 - scale(148), scale(396), scale(296));
       BORDER_RECT3 = new Rectangle(MAX_X / 2 - scale(197), MAX_Y / 2 - scale(147), scale(394), scale(294));
