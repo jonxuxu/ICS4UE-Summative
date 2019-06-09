@@ -40,12 +40,11 @@ public class PauseComponent extends GameComponent {
    private boolean visible;
 
    public PauseComponent() {
-      System.out.println("www"+MAX_X+" "+MAX_Y);
-      BORDER_RECT = new Rectangle(MAX_X / 2 - scale(200), MAX_Y / 2 - scale(150), scale(400), scale(300));
-      BORDER_RECT2 = new Rectangle(MAX_X / 2 - scale(198), MAX_Y / 2 - scale(148), scale(396), scale(296));
-      BORDER_RECT3 = new Rectangle(MAX_X / 2 - scale(197), MAX_Y / 2 - scale(147), scale(394), scale(294));
-      BORDER_RECT4 = new Rectangle(MAX_X / 2 - scale(195), MAX_Y / 2 - scale(145), scale(390), scale(290));
-      INNER_RECT = new Rectangle(MAX_X / 2 - scale(194), MAX_Y / 2 - scale(144), scale(388), scale(288));
+      BORDER_RECT = new Rectangle(MAX_X / 2 - scale(206), MAX_Y / 2 - scale(156), scale(412), scale(312));
+      BORDER_RECT2 = new Rectangle(MAX_X / 2 - scale(204), MAX_Y / 2 - scale(154), scale(408), scale(308));
+      BORDER_RECT3 = new Rectangle(MAX_X / 2 - scale(203), MAX_Y / 2 - scale(153), scale(406), scale(306));
+      BORDER_RECT4 = new Rectangle(MAX_X / 2 - scale(201), MAX_Y / 2 - scale(151), scale(402), scale(302));
+      INNER_RECT = new Rectangle(MAX_X / 2 - scale(200), MAX_Y / 2 - scale(150), scale(400), scale(300));
       BORDER_FILL = new Area(BORDER_RECT);
       BORDER_FILL2 = new Area(BORDER_RECT2);
       BORDER_FILL3 = new Area(BORDER_RECT3);

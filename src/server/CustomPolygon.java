@@ -19,7 +19,7 @@ public class CustomPolygon {
    private int[] savedIntersection = new int[2];
    private double[] xyVector = new double[2];
    private int magnitude;
-   private int FLASHLIGHT_RADIUS =200;
+   private int FLASHLIGHT_RADIUS = 200;
 
    private int xCo;//x coefficient
    private int yCo;//y coefficient
@@ -28,20 +28,20 @@ public class CustomPolygon {
    private double tVal;
    private int intersectingVectorIndex;
 
-   CustomPolygon(int pointNum, ArrayList<Integer> xPoints, ArrayList<Integer> yPoints) {
+   CustomPolygon(int[] xPoints, int[] yPoints, int pointNum) {
       this.pointNum = pointNum;
       //POINTS SHOULD BE GIVEN IN ORDER. (either clockwise or counterclockwise is fine)
       points = new int[pointNum][2];
       vectors = new int[pointNum][2];
       for (int i = 0; i < pointNum; i++) {
-         points[i][0] = xPoints.get(i);
-         points[i][1] = yPoints.get(i);
+         points[i][0] = xPoints[i];
+         points[i][1] = yPoints[i];
          if (i < pointNum - 1) {
-            vectors[i][0] = xPoints.get(i + 1) - xPoints.get(i);
-            vectors[i][1] = yPoints.get(i + 1) - yPoints.get(i);
+            vectors[i][0] = xPoints[i + 1] - xPoints[i];
+            vectors[i][1] = yPoints[i + 1] - yPoints[i];
          } else {
-            vectors[i][0] = xPoints.get(0) - xPoints.get(i); //Cycles back to the first point
-            vectors[i][1] = yPoints.get(0) - yPoints.get(i);
+            vectors[i][0] = xPoints[0] - xPoints[i]; //Cycles back to the first point
+            vectors[i][1] = yPoints[0] - yPoints[i];
          }
       }
    }
@@ -51,10 +51,23 @@ public class CustomPolygon {
       this.yCo = yCo;
       this.cVal = cVal;
    }
-
    public void setPlayerVector(double xVector, double yVector) { //player is initial, final is mouse
       this.xyVector[0] = xVector;
       this.xyVector[1] = yVector;
+   }
+
+   public void setCenter(int[] xPoints, int []yPoints){
+      for (int i = 0; i < pointNum; i++) {
+         points[i][0] = xPoints[i];
+         points[i][1] = yPoints[i];
+         if (i < pointNum - 1) {
+            vectors[i][0] = xPoints[i + 1] - xPoints[i];
+            vectors[i][1] = yPoints[i + 1] - yPoints[i];
+         } else {
+            vectors[i][0] = xPoints[0] - xPoints[i]; //Cycles back to the first point
+            vectors[i][1] = yPoints[0] - yPoints[i];
+         }
+      }
    }
 
    public boolean intersect(int[] playerXy) {
@@ -92,8 +105,8 @@ public class CustomPolygon {
    }
 
    public void setVectorMagnitude(double angle) {
-      magnitude = (int)(FLASHLIGHT_RADIUS/Math.cos(angle));
-      magnitude = magnitude*magnitude;//Because it must be squared
+      magnitude = (int) (FLASHLIGHT_RADIUS / Math.cos(angle));
+      magnitude = magnitude * magnitude;//Because it must be squared
    }
 
    public int getIntersectionIndex() { //If these are both the same, then no point is added.

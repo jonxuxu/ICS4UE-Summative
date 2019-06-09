@@ -14,15 +14,18 @@ public class FogMap {
    private Area fogShape, viewedShape, activelyViewing, outputShape;
    private double SCALING;
    private static double fogRadius = 250;
+   private int MAP_WIDTH, MAP_HEIGHT;
 
-   public FogMap(int[] xy, double SCALING) {
+   public FogMap(int[] xy, double SCALING, int MAP_WIDTH, int MAP_HEIGHT) {
       //fog = new int[y][x];
       //currentlyExploring = new boolean[y][x];
       this.SCALING = SCALING;
 
       double x = xy[0] * SCALING;
       double y = xy[1] * SCALING;
-      fogShape = new Area(new Rectangle.Double(0, 0, 10000*SCALING, 10000*SCALING));
+      this.MAP_WIDTH=MAP_WIDTH;
+      this.MAP_HEIGHT=MAP_HEIGHT;
+      fogShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       activelyViewing = new Area(new Ellipse2D.Double(x, y, fogRadius*SCALING, fogRadius*SCALING));
    }
 
@@ -33,17 +36,17 @@ public class FogMap {
 
    public Area getFog() {
       fogShape.subtract(activelyViewing);
-      outputShape = new Area(new Rectangle.Double(0, 0, 10000*SCALING, 10000*SCALING));
+      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       outputShape.intersect(fogShape);
       return outputShape;
    }
 
    public Area getExplored(){
-      viewedShape = new Area(new Rectangle.Double(0, 0, 10000*SCALING, 10000*SCALING));
+      viewedShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       viewedShape.subtract(fogShape);
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
-      outputShape = new Area(new Rectangle.Double(0, 0, 10000*SCALING, 10000*SCALING));
+      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       outputShape.intersect(viewedShape);
       return outputShape;
    }

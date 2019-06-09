@@ -4,7 +4,6 @@ package server;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -50,9 +49,9 @@ public abstract class Player extends User implements CanIntersect {
    private int flareCooldown;
    private int flareTimer;
    private int teamNumber = 9;//Which means that it is invalid
-   private static int WIDTH = 16;
-   private static int HEIGHT = 50;
-   private Rectangle hitbox = new Rectangle(((int) (xy[0])-WIDTH/2), ((int) (xy[1])-HEIGHT/2), WIDTH, HEIGHT);
+   private static int WIDTH = 30;
+   private static int HEIGHT = 60;
+   private Rectangle hitbox = new Rectangle(((int) (xy[0]) - WIDTH / 2), ((int) (xy[1]) - HEIGHT / 2), WIDTH, HEIGHT);
    private boolean illuminated = false;
    private boolean stunned = false;
    private boolean invisible = false;
@@ -67,39 +66,61 @@ public abstract class Player extends User implements CanIntersect {
    private Polygon flashlightBeam = new Polygon();
    private int FLASHLIGHT_RADIUS = 200;
    private Polygon test = new Polygon();
-   private ArrayList<CustomPolygon> shapes = new ArrayList<CustomPolygon>();
+   private static CustomPolygon[] constantHitboxes;
+   private CustomPolygon lightingHitbox;
    private int xCo;
    private int yCo;
    private int cVal;
 
+   //Player references
+   private static Player []players;
+   private static int playerNum;
+
    Player(String username) {
       super(username);
-      ArrayList<Integer> xPoints = new ArrayList<Integer>();
-      ArrayList<Integer> yPoints = new ArrayList<Integer>();
-      xPoints.add(300);
-      xPoints.add(400);
-      xPoints.add(400);
-      xPoints.add(300);
-      yPoints.add(300);
-      yPoints.add(300);
-      yPoints.add(400);
-      yPoints.add(400);
-      shapes.add(new CustomPolygon(4, xPoints, yPoints));
-      ArrayList<Integer> x2Points = new ArrayList<Integer>();
-      ArrayList<Integer> y2Points = new ArrayList<Integer>();
-      x2Points.add(100);
-      x2Points.add(200);
-      x2Points.add(300);
-      x2Points.add(400);
-      x2Points.add(500);
-      y2Points.add(100);
-      y2Points.add(200);
-      y2Points.add(200);
-      y2Points.add(100);
-      y2Points.add(0);
-      shapes.add(new CustomPolygon(5, x2Points, y2Points));
    }
 
+
+   public static void updateHitbox() {
+      for (int i = 0; i < players.length; i++) {
+         if (players[i] != null) {
+            players[i].setCenter();
+         } else {
+            if (constantHitboxes[i] != null) {
+               constantHitboxes[i] = null;
+            }
+         }
+      }
+   }
+
+   public void setCenter() {
+      int[] xP = {(int) (xy[0]) - WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) - WIDTH / 2};
+      int[] yP = {(int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2};
+      lightingHitbox.setCenter(xP, yP);
+   }
+
+   public void setLightingHitbox(int i) {
+      int[] xP = {(int) (xy[0]) - WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) - WIDTH / 2};
+      int[] yP = {(int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2};
+      lightingHitbox = new CustomPolygon(xP, yP, 4);
+      constantHitboxes[i] = lightingHitbox;
+   }
+
+   public static void setConstantHitboxes(int playerNum, Polygon[] obstacles) {
+      constantHitboxes = new CustomPolygon[playerNum + obstacles.length];//For each shape, add another
+      for (int i = 0; i < obstacles.length; i++) {
+         int[] xP = new int[obstacles[i].npoints];
+         int[] yP = new int[obstacles[i].npoints];
+         for (int j = 0; j < obstacles[i].npoints; j++) {
+            xP[j] = obstacles[i].xpoints[j];
+            yP[j] = obstacles[i].ypoints[j];
+         }
+         constantHitboxes[i + playerNum] = (new CustomPolygon(xP, yP, obstacles[i].npoints));
+      }
+   }
+   public static CustomPolygon[] getConstantHitboxes(){
+      return(constantHitboxes);
+   }
 
    public void setMouse(int mouseX, int mouseY) {
       this.mouseX = mouseX;
@@ -134,15 +155,15 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
       outputString.append(health + "," + maxHealth + "," + attack + "," + (mobility + mobilityBoost) + "," + range + ",");//Stats
       outputString.append(artifact + "," + gold + ",");//General
-      outputString.append(spriteID + ",");//Sprite
       outputString.append(getSpellPercent(0) + "," + getSpellPercent(1) + "," + getSpellPercent(2) + ",");//Spells
+      outputString.append(damaged + ",");
+      outputString.append(illuminated+"," + 0);//Temporary "fix"
       /* STATUSES NOT WORKING!!! UNCOMMMENT WHEN SUPPORT FOR STATUSES IS ADDED
       outputString.append(damaged + "," + statuses.size());
       for (int i = 0; i < statuses.size(); i++) {
          outputString.append("," + statuses.get(i)); //Status exclusive
       }*/
 
-      outputString.append(damaged + "," + 0);//Temporary "fix"
 
       return outputString.toString();
    }
@@ -152,19 +173,20 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
       outputString.append(health + "," + maxHealth + ",");//stats
       outputString.append(artifact + ",");//General
-      outputString.append(spriteID + ",");//Sprite
+      outputString.append(damaged + ",");
+      outputString.append(illuminated+"," + 0);//Temporary "fix"
+
       /* STATUSES NOT WORKING!!! UNCOMMMENT WHEN SUPPORT FOR STATUSES IS ADDED
       outputString.append(damaged + "," + statuses.size());
       for (int i = 0; i < statuses.size(); i++) {
          outputString.append("," + statuses.get(i)); //Status exclusive
       }*/
 
-      outputString.append(damaged + "," + 0);//Temporary "fix"
       return outputString.toString();
    }
 
    //May 25
-   public void sendInfo(Player[] players) {
+   public void sendInfo() {
       for (Player player : players) {
          if (player.getTeam() == teamNumber) {
             System.out.println("Ally");
@@ -175,11 +197,15 @@ public abstract class Player extends User implements CanIntersect {
          }
       }
    }
+   public static void setPlayerReference(Player[] players1, int playerNum1){
+      players=players1;
+      playerNum=playerNum1;
+   }
 
    public void calculateFlashlightPolygon(double flashlightAngle) {
       int[] xy = {(int) (this.xy[0]), (int) (this.xy[1])};
       flashlightBeam.reset();
-      flashlightBeam.addPoint(xy[0],xy[1]);
+      flashlightBeam.addPoint(xy[0], xy[1]);
       int shapeIndex = -2;
       int intersectionIndex = -2;
       int[] savedPoint = new int[2];
@@ -189,40 +215,47 @@ public abstract class Player extends User implements CanIntersect {
       int points = 1;
       boolean hit;
       double tempFlashlightAngle = flashlightAngle;
-      tempFlashlightAngle -= 0.25;
-      for (double k = 0; k < 50; k++) {
+      int FLASHLIGHT_SPREAD = 30;
+      tempFlashlightAngle -= 0.01*FLASHLIGHT_SPREAD/2;
+      for (double k = 0; k < FLASHLIGHT_SPREAD; k++) {//If you want to change this, change the 29 below
          hit = false;
          tempFlashlightAngle += 0.01;
          setPlayerVector(xy, xy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), xy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
-         int smallestDist = 100000000;
-         for (int i = 0; i < shapes.size(); i++) {
-            shapes.get(i).setPlayerScalar(xCo, yCo, cVal);
-            shapes.get(i).setPlayerVector(Math.cos(tempFlashlightAngle), Math.sin(tempFlashlightAngle));
-            shapes.get(i).setVectorMagnitude(Math.abs(tempFlashlightAngle - flashlightAngle));
-            if (shapes.get(i).intersect(xy)) {
-               if ((distance(shapes.get(i).getIntersect(), xy) < smallestDist)) {
-                  smallestDist = distance(shapes.get(i).getIntersect(), xy);
-                  newShapeIndex = i;
-                  newIntersectionIndex = shapes.get(i).getIntersectionIndex();
-                  savedPoint[0] = shapes.get(i).getIntersect()[0];
-                  savedPoint[1] = shapes.get(i).getIntersect()[1];
-                  hit = true;
+         int smallestDist = FLASHLIGHT_RADIUS*FLASHLIGHT_RADIUS;
+         for (int i = 0; i < constantHitboxes.length; i++) {
+            if (!constantHitboxes[i].equals(lightingHitbox)) {
+               constantHitboxes[i].setPlayerScalar(xCo, yCo, cVal);
+               constantHitboxes[i].setPlayerVector(Math.cos(tempFlashlightAngle), Math.sin(tempFlashlightAngle));
+               constantHitboxes[i].setVectorMagnitude(Math.abs(tempFlashlightAngle - flashlightAngle));
+               if (constantHitboxes[i].intersect(xy)) {
+                  if ((distance(constantHitboxes[i].getIntersect(), xy) < smallestDist)) {
+                     smallestDist = distance(constantHitboxes[i].getIntersect(), xy);
+                     newShapeIndex = i;
+                     newIntersectionIndex = constantHitboxes[i].getIntersectionIndex();
+                     savedPoint[0] = constantHitboxes[i].getIntersect()[0];
+                     savedPoint[1] = constantHitboxes[i].getIntersect()[1];
+                     hit = true;
+                  }
                }
             }
          }
          if (!hit) {
             newShapeIndex = -1;
             newIntersectionIndex = -1;
+         }else{
+            if (newShapeIndex<playerNum){
+               players[newShapeIndex].setIlluminated(true);
+            }
          }
-         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == 49)) {
+         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == FLASHLIGHT_SPREAD-1)) {
             points++;
             shapeIndex = newShapeIndex;
             intersectionIndex = newIntersectionIndex;
             if (!((prevPoint[0] == 0) && (prevPoint[1] == 0))) {
-               flashlightBeam.addPoint((int) (prevPoint[0]), (int) (prevPoint[1]));
+               flashlightBeam.addPoint((prevPoint[0]), (prevPoint[1]));
             }
             if (shapeIndex != -1) {
-               flashlightBeam.addPoint((int) (savedPoint[0]), (int) (savedPoint[1]));
+               flashlightBeam.addPoint((savedPoint[0]), (savedPoint[1]));
             } else {
                flashlightBeam.addPoint((int) ((xy[0] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.cos(tempFlashlightAngle))), (int) ((xy[1] + FLASHLIGHT_RADIUS / Math.cos(flashlightAngle - tempFlashlightAngle) * Math.sin(tempFlashlightAngle))));
             }
@@ -257,15 +290,19 @@ public abstract class Player extends User implements CanIntersect {
    public void setFlashlightOn(boolean flashlightOn) {
       this.flashlightOn = flashlightOn;
    }
-   public int  getFlashlightPointNum(){
-      return(flashlightBeam.npoints);
+
+   public int getFlashlightPointNum() {
+      return (flashlightBeam.npoints);
    }
-   public int [] getFlashlightPointX(){
-      return(flashlightBeam.xpoints);
+
+   public int[] getFlashlightPointX() {
+      return (flashlightBeam.xpoints);
    }
-   public int [] getFlashlightPointY(){
-      return(flashlightBeam.ypoints);
+
+   public int[] getFlashlightPointY() {
+      return (flashlightBeam.ypoints);
    }
+
    public void autoAttack() {
       if (!stunned && (autoAttackTimer <= 0)) {
          projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
@@ -288,15 +325,15 @@ public abstract class Player extends User implements CanIntersect {
       statuses.add(new Launched(dx, dy, totalTime));
       statuses.add(new Stun(totalTime));
    }
-   
-   public void moveTo(int targetX, int targetY, int speed){
-     double range = Math.sqrt(Math.pow(targetX-xy[0],2) + Math.pow(targetY-xy[1],2));
-     double theta = Math.atan2(targetY - xy[1], targetX - xy[0]);
-     double dx = speed * Math.cos(theta);
-     double dy = speed * Math.sin(theta);
-     int totalTime = (int) Math.round(range * 1.0 / speed);
-     statuses.add(new Launched(dx, dy, totalTime));
-     statuses.add(new Stun(totalTime));
+
+   public void moveTo(int targetX, int targetY, int speed) {
+      double range = Math.sqrt(Math.pow(targetX - xy[0], 2) + Math.pow(targetY - xy[1], 2));
+      double theta = Math.atan2(targetY - xy[1], targetX - xy[0]);
+      double dx = speed * Math.cos(theta);
+      double dy = speed * Math.sin(theta);
+      int totalTime = (int) Math.round(range * 1.0 / speed);
+      statuses.add(new Launched(dx, dy, totalTime));
+      statuses.add(new Stun(totalTime));
    }
 
    public abstract void update();
@@ -372,6 +409,7 @@ public abstract class Player extends User implements CanIntersect {
       illuminated = false;
       stunned = false;
       invisible = false;
+      walking=false;
       damageReduction = 0;
       for (int i = statuses.size() - 1; i >= 0; i--) {
          statuses.get(i).advance();
@@ -432,7 +470,7 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Area getHitbox() {
-      hitbox.setLocation(((int) (xy[0]-WIDTH/2)), ((int) (xy[1]-HEIGHT/2)));
+      hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
       return new Area(hitbox);
    }
 

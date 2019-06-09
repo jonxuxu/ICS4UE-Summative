@@ -39,6 +39,7 @@ public abstract class Player extends User {
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
    private boolean translated;
+   private boolean illuminated;
 
 
    Player(String username) {
@@ -64,22 +65,27 @@ public abstract class Player extends User {
       this.xy[1] = y;
    }
 
-   public void draw(Graphics2D g2, int[] midXy, int []xyAdjust) {
-      drawFlashlight(g2,xyAdjust);
+   public void draw(Graphics2D g2, int[] midXy) {
       drawReal(g2, centerXy[0] + (int) (SCALING * (xy[0] - midXy[0])) - (int) (60 * SCALING) / 2, centerXy[1] + (int) (SCALING * (xy[1] - midXy[1])) - (int) (60 * SCALING) / 2, (int) (60 * SCALING), (int) (60 * SCALING), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
    }
 
-   public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
+  /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
       if (flashlightOn) {
-         g2.setColor(Color.WHITE);
+         g2.setColor(new Color (1f,1f,0.4f,0.1f));
          if (!translated) {
             flashlightBeam.translate(xyAdjust[0], xyAdjust[1]);
             translated = true;
          }
          g2.fillPolygon(flashlightBeam);
+      }
+   }*/
+   public void translateFlashlight(int[]xyAdjust){
+      if (!translated) {
+         flashlightBeam.translate(xyAdjust[0], xyAdjust[1]);
+         translated = true;
       }
    }
 
@@ -124,17 +130,16 @@ public abstract class Player extends User {
       translated = false;
    }
 
-   public void setFlashlightAngle(double flashlightAngle) {
-      this.flashlightAngle = flashlightAngle;
-      flashlightBeam.reset();
+   public boolean getFlashlightOn() {
+      return flashlightOn;
+   }
+
+   public Polygon getFlashlightBeam(){
+      return flashlightBeam;
    }
 
    public void setFlashlightPoint(int x, int y) {
       flashlightBeam.addPoint((int) (x * SCALING), (int) (y * SCALING));
-   }
-
-   public double getFlashlightAngle() {
-      return (flashlightAngle);
    }
 
    public void setSpellPercent(int spellPercent, int spellIndex) {
@@ -168,6 +173,14 @@ public abstract class Player extends User {
 
    public int getLevel() {
       return level;
+   }
+
+   public boolean getIlluminated() {
+      return illuminated;
+   }
+
+   public void setIlluminated(boolean illuminated) {
+      this.illuminated = illuminated;
    }
 
    public abstract void spellAnimation(Graphics2D g2, int x, int y, int width, int height, int spellIndex);
