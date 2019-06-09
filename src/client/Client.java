@@ -1,7 +1,6 @@
 package client;
 
 import client.gameUi.BottomComponent;
-import client.gameUi.ChatComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
 import client.gameUi.InventoryComponent;
@@ -45,7 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-  private String playerClass = "SafeMarksman";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+   private String playerClass = "SafeMarksman";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -65,7 +64,7 @@ public class Client extends JFrame implements WindowListener {
    private final int DESIRED_X = 950;
    private int[] xyAdjust = new int[2];
    private int MAX_Y, MAX_X;
-   private double SCALING, introScaling;
+   private double SCALING, INTRO_SCALING;
    private int[] mouseState = new int[3];
 
    // Assets
@@ -149,7 +148,7 @@ public class Client extends JFrame implements WindowListener {
       myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
 
       //Creating components
-      MenuPanel.setParameters(MAX_X, MAX_Y, SCALING, introScaling, this);
+      MenuPanel.setParameters(MAX_X, MAX_Y, SCALING, INTRO_SCALING, this);
       menuPanels[0] = new LoginPanel();
       menuPanels[1] = new IntroPanel();
       menuPanels[2] = new StartPanel();
@@ -316,27 +315,28 @@ public class Client extends JFrame implements WindowListener {
             host = true;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-              //TODO: Add class select here
-              if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")){
-                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("TimeMage")){
-                players[i] = new TimeMage(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("Ghost")){
-                players[i] = new Ghost(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")){
-                players[i] = new MobileSupport(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("Juggernaut")){
-                players[i] = new Juggernaut(onlineList.get(i).getUsername());
-              } else {
-                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              }
-              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                myPlayer = players[i];
-              }
+               if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               } else if (playerClass.equals("TimeMage")) {
+                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+               } else if (playerClass.equals("Ghost")) {
+                  players[i] = new Ghost(onlineList.get(i).getUsername());
+               } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+               } else if (playerClass.equals("Juggernaut")) {
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+               } else {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               }
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
+               }
+               players[i].setTeam(onlineList.get(i).getTeam());
             }
             testingBegin = false;
             nextPanel = 6;
          }
+         //TODO: Add class select here
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -373,7 +373,7 @@ public class Client extends JFrame implements WindowListener {
             StringBuilder outputString = new StringBuilder();
             for (int i = 0; i < spellsPressed.length; i++) {
                if (spellsPressed[i]) {
-                  outputString.append("S" + i+" ");
+                  outputString.append("S" + i + " ");
                }
             }
             if (keyAngle != -10) {
@@ -406,10 +406,9 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             if (positionIndex != -10) {
-               outputString.append("W" + positionIndex + "," + walking+" ");//TODO: make this event driven
+               outputString.append("W" + positionIndex + "," + walking + " ");//TODO: make this event driven
             }
             if (!outputString.toString().trim().isEmpty()) {
-               //System.out.println(outputString.toString().trim());
                output.println(outputString.toString().trim());
                output.flush();
             }
@@ -430,9 +429,6 @@ public class Client extends JFrame implements WindowListener {
                inputReady = true;
                if (!gameBegin) {
                   decipherMenuInput(input.readLine().trim());
-               } else {
-                  //   decipherGameInput(input.readLine().trim());
-                  //TODO: See if this is uncessary?
                }
             }
          }
@@ -542,7 +538,9 @@ public class Client extends JFrame implements WindowListener {
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
          for (int i = 0; i < onlineList.size(); i++) {
+            //TODO: Add class stuff here;
             players[i] = new Ghost(onlineList.get(i).getUsername());
+            players[i].setTeam(onlineList.get(i).getTeam());
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;
@@ -633,12 +631,12 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setRange(Integer.parseInt(data[7]));
       players[playerID].setArtifact(Boolean.parseBoolean(data[8]));
       players[playerID].setGold(Integer.parseInt(data[9]));
-      players[playerID].setSpriteID(Integer.parseInt(data[10]));
-      for (int j = 11; j < 14; j++) {
-         players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 11);
+      for (int j = 10; j < 13; j++) {
+         players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 10);
       }
-      players[playerID].setDamaged(Boolean.parseBoolean(data[14]));
-      for (int j = 15; j < 15 + Integer.parseInt(data[15]); j++) {
+      players[playerID].setDamaged(Boolean.parseBoolean(data[13]));
+      players[playerID].setIlluminated(Boolean.parseBoolean(data[14]));
+      for (int j = 16; j < 16 + Integer.parseInt(data[15]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
       //Turn off flashlight
@@ -651,9 +649,9 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setHealth(Integer.parseInt(data[3]));
       players[playerID].setMaxHealth(Integer.parseInt(data[4]));
       players[playerID].setArtifact(Boolean.parseBoolean(data[5]));
-      players[playerID].setSpriteID(Integer.parseInt(data[6]));
-      players[playerID].setDamaged(Boolean.parseBoolean(data[7]));
-      for (int j = 8; j < 8 + Integer.parseInt(data[8]); j++) {
+      players[playerID].setDamaged(Boolean.parseBoolean(data[6]));
+      players[playerID].setIlluminated(Boolean.parseBoolean(data[7]));
+      for (int j = 9; j < 9 + Integer.parseInt(data[8]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
       players[playerID].setFlashlightOn(false);
@@ -724,9 +722,9 @@ public class Client extends JFrame implements WindowListener {
       int BG_Y = 1198;
       int BG_X = 1800;
       if ((1.0 * MAX_Y / MAX_X) > (1.0 * BG_Y / BG_X)) { //Fit bg to height
-         introScaling = 1.0 * MAX_Y / BG_Y;
+         INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
       } else {
-         introScaling = 1.0 * MAX_X / BG_X;
+         INTRO_SCALING = 1.0 * MAX_X / BG_X;
       }
    }
 
@@ -844,8 +842,8 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
-         MAX_GAME_X=this.getWidth();
-         MAX_GAME_Y=this.getHeight();
+         MAX_GAME_X = this.getWidth();
+         MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[5];
          allComponents[0] = new PauseComponent();
@@ -863,7 +861,7 @@ public class Client extends JFrame implements WindowListener {
          super.paintComponent(g2);
          if ((currentPanel == 7) && (generateGraphics)) {
             midXy[0] = (MAX_GAME_X / 2);
-            midXy[1] =  (MAX_GAME_Y / 2);
+            midXy[1] = (MAX_GAME_Y / 2);
             for (Player currentPlayer : players) {
                currentPlayer.setScaling(SCALING);
                currentPlayer.setCenterXy(midXy);
@@ -876,9 +874,7 @@ public class Client extends JFrame implements WindowListener {
             } catch (IOException e) {
                System.out.println("Image not found");
             }
-            drawArea = new Rectangle(0, 0,  (MAX_GAME_X),  (MAX_GAME_Y));
-            //System.out.println(MAX_GAME_X + " " + this.getWidth());
-            //System.out.println(MAX_GAME_Y + " " + this.getHeight());
+            drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
          }
          if (drawArea != null) {
             g2.clip(drawArea);
@@ -887,11 +883,14 @@ public class Client extends JFrame implements WindowListener {
             g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
             g2.setColor(Color.black);
 
-           resetXyAdjust();
+            resetXyAdjust();
             //Game player
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
-                  currentPlayer.draw(g2, myPlayer.getXy(), xyAdjust);
+                  currentPlayer.drawFlashlight(g2, xyAdjust);
+                  if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
+                     currentPlayer.draw(g2, myPlayer.getXy());
+                  }
                }
             }
             //Creating shapes
@@ -900,10 +899,10 @@ public class Client extends JFrame implements WindowListener {
             int[] xP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (300 * SCALING), (int) (400 * SCALING), (int) (500 * SCALING)};
             int[] yP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (200 * SCALING), (int) (100 * SCALING), 0};
             Polygon test = new Polygon(xP, yP, 5);
-            test.translate(xyAdjust[0],xyAdjust[1]);
+            test.translate(xyAdjust[0], xyAdjust[1]);
             g2.setColor(Color.black);
             g2.fillPolygon(test);
-            g2.fillRect((int)(300*SCALING)+xyAdjust[0], (int)(300*SCALING)+xyAdjust[1], (int)(100*SCALING), (int)(100*SCALING));
+            g2.fillRect((int) (300 * SCALING) + xyAdjust[0], (int) (300 * SCALING) + xyAdjust[1], (int) (100 * SCALING), (int) (100 * SCALING));
             // Updating fog
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
@@ -954,7 +953,8 @@ public class Client extends JFrame implements WindowListener {
          this.MAX_GAME_X = MAX_GAME_X;
          this.MAX_GAME_Y = MAX_GAME_Y;
       }
-      public void resetXyAdjust(){
+
+      public void resetXyAdjust() {
          xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0] * SCALING);
          xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1] * SCALING);
       }
