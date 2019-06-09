@@ -906,8 +906,9 @@ public class Client extends JFrame implements WindowListener {
             // Updating fog
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
-                  // TODO: Separate by teams
-                  fog.scout(players[i].getXy());
+                  if(players[i].getTeam() == myTeam){
+                    fog.scout(players[i].getXy());
+                  }
                }
             }
             resetXyAdjust();
