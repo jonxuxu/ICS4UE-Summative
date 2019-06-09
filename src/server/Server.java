@@ -434,10 +434,11 @@ public class Server {
                                     players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
                                  } else if (initializer == 'W') {
                                     players[i].setPositionIndex(Integer.parseInt(secondSplit[0]));
-                                    players[i].setWalking(Boolean.parseBoolean(secondSplit[1]));
+                                    players[i].setWalking(true);
                                  } else if (initializer == 'L') {
                                     players[i].setFlashlightOn(true);
                                     players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
+                                    players[i].setIlluminated(true);
                                  } else if (initializer == 'C') { // Chat coming in
                                     String mode = secondSplit[0];
                                     String message = secondSplit[1];
@@ -534,7 +535,7 @@ public class Server {
                         }
                      }
                   }
-                  //TODO:add spells
+                  //TODO:add spells ID here
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         outputString[i].append("W" + i + "," + players[i].getPositionIndex() + "," + players[i].getWalking() + " ");

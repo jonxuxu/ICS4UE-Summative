@@ -106,6 +106,8 @@ public class Client extends JFrame implements WindowListener {
    private double mouseAngle;
    private int keyAngle;
    private boolean flashlightOn;
+   private int MAP_WIDTH=10000;
+   private int MAP_HEIGHT=10000;
    // Debugging
    private boolean testingBegin = false;
    //Graphics
@@ -171,7 +173,7 @@ public class Client extends JFrame implements WindowListener {
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
-      fog = new FogMap(xy, SCALING);
+      fog = new FogMap(xy, SCALING, MAP_WIDTH, MAP_HEIGHT);
       // TODO: Set player spawn xy later
 
       //Variable set up
@@ -406,7 +408,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             if (positionIndex != -10) {
-               outputString.append("W" + positionIndex + "," + walking + " ");//TODO: make this event driven
+               outputString.append("W" + positionIndex + " ");//TODO: make this event driven
             }
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
@@ -834,7 +836,7 @@ public class Client extends JFrame implements WindowListener {
       private GameComponent[] allComponents;
       private boolean menuCooldown = true;
       private int MAX_GAME_X, MAX_GAME_Y;
-
+      private Area darkness;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
@@ -875,27 +877,27 @@ public class Client extends JFrame implements WindowListener {
                System.out.println("Image not found");
             }
             drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
+            darkness= new Area(new Rectangle(0, 0,(MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
+            resetXyAdjust();
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
-            //Map
-            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
-            g2.setColor(Color.black);
 
-            resetXyAdjust();
+            //Map
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (MAP_WIDTH * SCALING), (int) (MAP_HEIGHT * SCALING), null);
+            g2.setColor(Color.black);
             //Game player
+            resetXyAdjust();
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
-                  currentPlayer.drawFlashlight(g2, xyAdjust);
-                  if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
-                     currentPlayer.draw(g2, myPlayer.getXy());
+                  currentPlayer.translateFlashlight(xyAdjust);
+                  if (currentPlayer.getFlashlightOn()){
+                     darkness.subtract(new Area(currentPlayer.getFlashlightBeam()));
                   }
                }
             }
             //Creating shapes
-
-
             int[] xP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (300 * SCALING), (int) (400 * SCALING), (int) (500 * SCALING)};
             int[] yP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (200 * SCALING), (int) (100 * SCALING), 0};
             Polygon test = new Polygon(xP, yP, 5);
@@ -903,14 +905,26 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(Color.black);
             g2.fillPolygon(test);
             g2.fillRect((int) (300 * SCALING) + xyAdjust[0], (int) (300 * SCALING) + xyAdjust[1], (int) (100 * SCALING), (int) (100 * SCALING));
+
+            g2.setColor(new Color(0, 0, 0, 128));
+            g2.fill(darkness);
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
+                     currentPlayer.draw(g2, myPlayer.getXy());
+                  }
+               }
+            }
+
             // Updating fog
+            resetXyAdjust();
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   // TODO: Separate by teams
                   fog.scout(players[i].getXy());
                }
             }
-            resetXyAdjust();
+
             //Creating shapes
             AffineTransform tx = new AffineTransform();
             tx.translate(xyAdjust[0], xyAdjust[1]);
@@ -947,6 +961,7 @@ public class Client extends JFrame implements WindowListener {
             //chatPanel.draw(g2);
          }
          g2.dispose();
+         darkness= new Area(new Rectangle(0, 0,(MAX_GAME_X), (MAX_GAME_Y)));
       }
 
       public void setDimensions(int MAX_GAME_X, int MAX_GAME_Y) {

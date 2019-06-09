@@ -216,12 +216,13 @@ public abstract class Player extends User implements CanIntersect {
       int points = 1;
       boolean hit;
       double tempFlashlightAngle = flashlightAngle;
-      tempFlashlightAngle -= 0.25;
-      for (double k = 0; k < 50; k++) {
+      int FLASHLIGHT_SPREAD = 30;
+      tempFlashlightAngle -= 0.01*FLASHLIGHT_SPREAD/2;
+      for (double k = 0; k < FLASHLIGHT_SPREAD; k++) {//If you want to change this, change the 29 below
          hit = false;
          tempFlashlightAngle += 0.01;
          setPlayerVector(xy, xy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), xy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
-         int smallestDist = 100000000;
+         int smallestDist = FLASHLIGHT_RADIUS*FLASHLIGHT_RADIUS;
          for (int i = 0; i < constantHitboxes.length; i++) {
             if (!constantHitboxes[i].equals(lightingHitbox)) {
                constantHitboxes[i].setPlayerScalar(xCo, yCo, cVal);
@@ -247,7 +248,7 @@ public abstract class Player extends User implements CanIntersect {
                players[newShapeIndex].setIlluminated(true);
             }
          }
-         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == 49)) {
+         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == FLASHLIGHT_SPREAD-1)) {
             points++;
             shapeIndex = newShapeIndex;
             intersectionIndex = newIntersectionIndex;
@@ -409,6 +410,7 @@ public abstract class Player extends User implements CanIntersect {
       illuminated = false;
       stunned = false;
       invisible = false;
+      walking=false;
       damageReduction = 0;
       for (int i = statuses.size() - 1; i >= 0; i--) {
          statuses.get(i).advance();

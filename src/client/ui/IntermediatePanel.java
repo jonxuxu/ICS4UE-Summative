@@ -33,7 +33,6 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       //Setting up the size
       this.setSize(new Dimension(MAX_X, MAX_Y));
       //Basic visuals
-      this.setDoubleBuffered(true);
       this.setBackground(new Color(0, 0, 0));
       this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
       this.setVisible(true);
@@ -47,6 +46,7 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
 
       this.add(gamePanel, new Integer(1));
       this.add(chat, new Integer(2));
+      this.setDoubleBuffered(true);
    }
 
    public void toggleFocus(int focus){
