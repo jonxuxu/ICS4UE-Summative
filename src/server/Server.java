@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 
 public class Server {
-  private String playerClass = "SafeMarksman";
+  private String playerClass = "Summoner";
    //REMEMBER: output = new PrintWriter(myConnection.getOutputStream()); is very important
 
    //All for the main server
@@ -627,6 +627,8 @@ public class Server {
                 onlinePlayers.add(new MobileSupport(user.getUsername()));
               } else if (playerClass.equals("Juggernaut")){
                 onlinePlayers.add(new Juggernaut(user.getUsername()));
+              } else if (playerClass.equals("Summoner")){
+                onlinePlayers.add(new Summoner(user.getUsername()));
               } else {
                 onlinePlayers.add(new SafeMarksman(user.getUsername()));
               }
