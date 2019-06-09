@@ -352,7 +352,7 @@ public class Client extends JFrame implements WindowListener {
       //System.out.println("type");
       if(currentPanel == 7){
          if(c == 9){ // Tab key switches focus to game chat panel
-            intermediatePanel.toggleFocus(1);
+            intermediatePanel.toggleMode();
          }
       }
    }

@@ -24,11 +24,13 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
    private int MAX_X, MAX_Y;
    private Client.GamePanel gamePanel;
    private ChatComponent chat;
+   private Client CLIENT;
 
    public IntermediatePanel(int MAX_X, int MAX_Y, double SCALING, Client CLIENT) {
       this.SCALING = SCALING;
       this.MAX_X = MAX_X;
       this.MAX_Y = MAX_Y;
+      this.CLIENT = CLIENT;
       //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
       //Setting up the size
       this.setSize(new Dimension(MAX_X, MAX_Y));
@@ -49,11 +51,16 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       this.add(chat, new Integer(2));
    }
 
-   public void toggleFocus(int focus){
-      if(focus == 1){ // Focus on chat
+   public void toggleMode(){
+      chat.requestFocus();
+      /*
+      chat.toggleMode();
+      if(chat.getMode() > 0){ // Focus on chat
          chat.requestFocus();
          //System.out.println("Chat");
-      }
+      } else {
+         CLIENT.requestFocus();
+      }*/
    }
 
    public void messageIn(String player, String message, boolean friendly) {

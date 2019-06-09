@@ -28,6 +28,8 @@ public class ChatComponent extends JPanel{
   private JScrollPane scrollPane;
   Document doc;
 
+  private int mode = 1; // Default is to everyone
+  private String[] modeString = {"To Team: ", "To Everyone: ", "To Player: "};
 
   public ChatComponent(double SCALING, int width, int height, Client client){
     SCALING = SCALING;
@@ -84,7 +86,7 @@ public class ChatComponent extends JPanel{
         if(!textField.getText().isEmpty()){
           System.out.println("Sending: " + textField.getText());
           byte[] encodedBytes = Base64.getEncoder().encode(textField.getText().getBytes());
-          CLIENT.sendMessage(new String(encodedBytes), 1);
+          CLIENT.sendMessage(new String(encodedBytes), mode);
           textField.setText("");
           client.requestFocus(); // Change focus back to game
         }
@@ -96,7 +98,24 @@ public class ChatComponent extends JPanel{
     this.setVisible(true);
   }
 
-  public void draw(Graphics g) {
+  public void toggleMode(){
+    System.out.println("toggle mode");
+    mode ++;
+    if(mode > 2){
+      mode = 0;
+    }
+    if(mode > 0){
+      try {
+        doc.insertString(doc.getLength(), modeString[mode - 1], regular);
+      } catch (Exception e){
+        e.printStackTrace();
+      }
+    }
+
+  }
+
+  public int getMode(){
+    return mode;
   }
 
 
