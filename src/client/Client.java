@@ -848,11 +848,6 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[5];
-         allComponents[0] = new PauseComponent();
-         allComponents[1] = new BottomComponent();
-         allComponents[2] = new MinimapComponent(fog, players);
-         allComponents[3] = new InventoryComponent();
-         allComponents[4] = new DebugComponent();
          this.setDoubleBuffered(true);
          this.setVisible(true);
       }
@@ -862,6 +857,11 @@ public class Client extends JFrame implements WindowListener {
          g2 = (Graphics2D) g;
          super.paintComponent(g2);
          if ((currentPanel == 7) && (generateGraphics)) {
+            allComponents[0] = new PauseComponent();
+            allComponents[1] = new BottomComponent(myPlayer);
+            allComponents[2] = new MinimapComponent(fog, players);
+            allComponents[3] = new InventoryComponent();
+            allComponents[4] = new DebugComponent();
             midXy[0] = (MAX_GAME_X / 2);
             midXy[1] = (MAX_GAME_Y / 2);
             for (Player currentPlayer : players) {
@@ -952,10 +952,11 @@ public class Client extends JFrame implements WindowListener {
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[4])).toggle();
                   System.out.println("Debug mode");
+               }else if ((lastKeyTyped == 99)||(lastKeyTyped == 67)){
+                  ((InventoryComponent) (allComponents[3])).toggle();
                }
                keyPressed = false;
             }
-            ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }

@@ -28,6 +28,7 @@ public abstract class GameComponent {
       // Setting fonts
       fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (12 * SCALING)));
       fonts.put("regular", new Font("Cambria Math", Font.PLAIN, (int) (5 * SCALING)));
+      fonts.put("stats", new Font("Cambria Math", Font.PLAIN, (int) (9 * SCALING)));
       fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (25 * SCALING)));
    }
 

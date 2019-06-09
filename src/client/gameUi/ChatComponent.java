@@ -38,7 +38,7 @@ public class ChatComponent extends JPanel{
     this.CLIENT = client;
 
     // Setting up styles
-    StyleConstants.setFontFamily(regular, "Arial");
+    StyleConstants.setFontFamily(regular, "Cambria Math");
     StyleConstants.setFontSize(regular, (int)(10 * SCALING));
     friendly.addAttributes(regular);
     StyleConstants.setBold(friendly, true);
@@ -77,7 +77,7 @@ public class ChatComponent extends JPanel{
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
     textField.setBackground(new Color(0,0,0,0));
-    textField.setFont(new Font("Arial", Font.PLAIN, (int) (10 * SCALING)));
+    textField.setFont(new Font("Cambria Math", Font.PLAIN, (int) (10 * SCALING)));
     textField.setForeground(Color.white);
     //this.setFocusTraversalKeysEnabled(false);
     textField.addActionListener(new ActionListener(){ // Do when enter key is pressed
