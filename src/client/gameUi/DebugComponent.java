@@ -5,7 +5,7 @@ import java.awt.*;
 public class DebugComponent extends GameComponent {
   private final int MAX_X = super.getMAX_X();
   private final int MAX_Y = super.getMAX_Y();
-  private final double scaling = super.getSCALING();
+  private final double SCALING = super.getSCALING();
   private final Font FONT = super.getFont("main");
   private boolean visible = false;
 
@@ -23,11 +23,11 @@ public class DebugComponent extends GameComponent {
       g2.fillRect(0,0,MAX_X, MAX_Y);
       g2.setColor(Color.white);
       g2.setFont(FONT);
-      g2.drawString("DEBUG MODE", 0, (int)(20*scaling));
-      g2.drawString("Fps: " + fps, 0, (int)(35*scaling));
-      g2.drawString("Mouse: " + mouse[0] + "x " + mouse[1] + "y " + mouseMessage[mouse[2]], 0, (int)(50*scaling));
-      g2.drawString("Keyboard: " + keyPress, 0, (int)(65*scaling));
-      g2.drawString("Memory: " + String.format("%.2f", usedMem) + "mb out of " + maxMem + "mb   " + String.format("%.2f", usedMem/maxMem*100) + "%", 0, (int)(80*scaling));
+      g2.drawString("DEBUG MODE", 0, (int)(20*SCALING));
+      g2.drawString("Fps: " + fps, 0, (int)(35*SCALING));
+      g2.drawString("Mouse: " + mouse[0] + "x " + mouse[1] + "y " + mouseMessage[mouse[2]], 0, (int)(50*SCALING));
+      g2.drawString("Keyboard: " + keyPress, 0, (int)(65*SCALING));
+      g2.drawString("Memory: " + String.format("%.2f", usedMem) + "mb out of " + maxMem + "mb   " + String.format("%.2f", usedMem/maxMem*100) + "%", 0, (int)(80*SCALING));
     }
   }
 

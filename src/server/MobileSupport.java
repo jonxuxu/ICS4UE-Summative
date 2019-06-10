@@ -9,14 +9,14 @@ package server;
  */
 import java.util.ArrayList;
 public class MobileSupport extends Player{
-  private int[] spellCooldowns = {100,100,100};
+  private int[] spellCooldowns = {50,100,100};
   private int PASSIVE_COOLDOWN = 100;
   private int[] spellTimers = {0,0,0};
   private int passiveTimer = 0;
   private int stacks = 0;
   private static int PASSIVE_RANGE = 500;
-  private static int Q_RANGE = 500;
-  private static int Q_SPEED = 100;
+  private static int Q_RANGE = 1000;
+  private static int Q_SPEED = 50;
   private static int Q_DURATION = Q_RANGE/Q_SPEED;
   private static int Q_STUN_DURATION = 100;
   private static int E_RANGE = 500;
@@ -35,6 +35,8 @@ public class MobileSupport extends Player{
     setAttack(100);
     setMobility(30);
     setRange(300);
+    setAutoAttackCooldown(5);
+    setFlareCooldown(100);
   }
   
   public boolean castSpell(int spellIndex){
@@ -44,15 +46,15 @@ public class MobileSupport extends Player{
         if (spellIndex==0) { //Q
           boolean qCast = false;
           for (int i = 0; (i < getAlliesSize() && (!qCast)); i++){
-            if (getAlly(i).contains(getMouseX(), getMouseY()) && (Math.sqrt(Math.pow(getAlly(i).getX()-getX(),2) + Math.pow(getAlly(i).getY()-getY(),2)) < Q_RANGE)){
+            if (getAlly(i).contains(getMouseX(), getMouseY()) && (Math.sqrt(Math.pow(getAlly(i).getX()-getX(),2) + Math.pow(getAlly(i).getY()-getY(),2)) < Q_RANGE) && (getAlly(i)!=this)){
               spellTimers[spellIndex] = spellCooldowns[spellIndex];
               cast = true;
               stacks++;
-              launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+              moveTo(getMouseX(), getMouseY(), Q_SPEED);
               for (int j = 0; j < getAlliesSize(); j++){
                 for (int k = 0; k < getStatusesSize(); k++){
                   if (getAlly(j).getStatus(k) instanceof MobileSupportEStatus){
-                    launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+                    moveTo(getMouseX(), getMouseY(), Q_SPEED);
                   }
                 }
               }
@@ -68,11 +70,11 @@ public class MobileSupport extends Player{
                 spellTimers[spellIndex] = spellCooldowns[spellIndex];
                 cast = true;
                 stacks++;
-                launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);//Could be AOE x and y
+                moveTo(getAOE(i).getX(), getAOE(i).getY(), Q_SPEED);//Could be AOE x and y
                 for (int j = 0; j < getAlliesSize(); j++){
                   for (int k = 0; k < getStatusesSize(); k++){
                     if (getAlly(j).getStatus(k) instanceof MobileSupportEStatus){
-                      launch(getMouseX(), getMouseY(), Q_SPEED, Q_RANGE);
+                      moveTo(getAOE(i).getX(), getAOE(i).getY(), Q_SPEED);//Could be AOE x and y
                     }
                   }
                 }
@@ -129,14 +131,14 @@ public class MobileSupport extends Player{
     if (passiveTimer > 0){
       passiveTimer--;
     }
-    
+    updateBasicTimers();
     //Update Passive
-    if (passiveTimer == 0){
+    if (passiveTimer <= 0){
       passiveTimer = PASSIVE_COOLDOWN;
       double angle = Math.random() * 2 * Math.PI;
       double radius = PASSIVE_RANGE * Math.sqrt(Math.random());
-      double passiveX = radius * Math.cos(angle);
-      double passiveY = radius * Math.sin(angle);
+      double passiveX = radius * Math.cos(angle) + getX();
+      double passiveY = radius * Math.sin(angle) + getY();
       addAOE(new MobileSupportPassiveAOE((int)passiveX, (int)passiveY));
     }
     

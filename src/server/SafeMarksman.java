@@ -14,7 +14,7 @@ public class SafeMarksman extends Player{
 
   private static int SPACE_AOE_DURATION = 50;
   private static int SPACE_AOE_RADIUS = 100;
-  private static int MS_BUFF_STRENGTH = 3;
+  private static int MS_BUFF_STRENGTH = 5;
   private static int MS_BUFF_DURATION = 100;
   private static int STUN_DURATION = 100;
 
@@ -24,8 +24,10 @@ public class SafeMarksman extends Player{
     setHealth(300);
     setAttack(100);
     //setMaxMobility(10);
-    setMobility(20);
+    setMobility(10);
     setRange(300);
+    setAutoAttackCooldown(5);
+    setFlareCooldown(100);
   }
   
   public boolean castSpell(int spellIndex){
@@ -67,6 +69,7 @@ public class SafeMarksman extends Player{
         spellTimers[i]--;
       }
     }
+    updateBasicTimers();
     //Update Projectiles
     for (int i = getProjectilesSize()-1; i >= 0; i--){
       getProjectile(i).advance();

@@ -1,7 +1,6 @@
 package client;
 
 import client.gameUi.BottomComponent;
-import client.gameUi.ChatComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
 import client.gameUi.InventoryComponent;
@@ -12,8 +11,7 @@ import client.sound.*;
 import client.ui.*;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -46,6 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
+  private String playerClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -58,14 +57,14 @@ public class Client extends JFrame implements WindowListener {
    private int connectionState = 0; //-1 means unable to connect, 0 means trying to connect, 1 means connected
    private String serverName;
    private String serverPassword;
+   private boolean receivedOnce;//Determines if a message was received
 
    // Screen stuff
    private final int DESIRED_Y = 500;
    private final int DESIRED_X = 950;
-   private int MAX_Y, MAX_X;
-   private double SCALING, introScaling;
    private int[] xyAdjust = new int[2];
-   private int[] centerXy = new int[2];
+   private int MAX_Y, MAX_X;
+   private double SCALING, INTRO_SCALING;
    private int[] mouseState = new int[3];
 
    // Assets
@@ -75,7 +74,8 @@ public class Client extends JFrame implements WindowListener {
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
    private CustomKeyListener myKeyListener = new CustomKeyListener(this);
-   private GeneralPanel[] allPanels = new GeneralPanel[8];
+   private MenuPanel[] menuPanels = new MenuPanel[7];
+   private IntermediatePanel intermediatePanel;
    private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
    private CardLayout cardLayout = new CardLayout(5, 5);
    private JPanel mainContainer = new JPanel(cardLayout);
@@ -106,8 +106,12 @@ public class Client extends JFrame implements WindowListener {
    private double mouseAngle;
    private int keyAngle;
    private boolean flashlightOn;
+   private int MAP_WIDTH = 10000;
+   private int MAP_HEIGHT = 10000;
    // Debugging
    private boolean testingBegin = false;
+   //Graphics
+
 
    public Client() {
       super("Dark");
@@ -141,34 +145,35 @@ public class Client extends JFrame implements WindowListener {
       //Control set up (the mouse listeners are attached to the game panel)
       initializeScaling();
       this.addKeyListener(myKeyListener);
-      int[] tempXy = {(int) (DESIRED_X * SCALING / 2), (int) (DESIRED_Y * SCALING / 2)};
+      this.setFocusTraversalKeysEnabled(false);
+      int[] tempXy = {(int) (MAX_X / 2), (int) (MAX_Y / 2)};
       myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
 
       //Creating components
-      GeneralPanel.setParameters(MAX_X, MAX_Y, SCALING, introScaling, this);
-      allPanels[0] = new LoginPanel();
-      allPanels[1] = new IntroPanel();
-      allPanels[2] = new StartPanel();
-      allPanels[3] = new CreatePanel();
-      allPanels[4] = new JoinPanel();
-      allPanels[5] = new InstructionPanel();
-      allPanels[6] = new WaitingPanel();
-      allPanels[7] = new IntermediatePanel();
+      MenuPanel.setParameters(MAX_X, MAX_Y, SCALING, INTRO_SCALING, this);
+      menuPanels[0] = new LoginPanel();
+      menuPanels[1] = new IntroPanel();
+      menuPanels[2] = new StartPanel();
+      menuPanels[3] = new CreatePanel();
+      menuPanels[4] = new JoinPanel();
+      menuPanels[5] = new InstructionPanel();
+      menuPanels[6] = new WaitingPanel();
+      intermediatePanel = new IntermediatePanel(MAX_X, MAX_Y, SCALING, this);
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
-      for (int i = 0; i < allPanels.length; i++) {
-         mainContainer.add(allPanels[i], PANEL_NAMES[i]);
+      for (int i = 0; i < menuPanels.length; i++) {
+         mainContainer.add(menuPanels[i], PANEL_NAMES[i]);
       }
+      mainContainer.add(intermediatePanel, PANEL_NAMES[7]);
       this.add(mainContainer);
       cardLayout.show(mainContainer, PANEL_NAMES[0]);
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
-      ((IntermediatePanel) (allPanels[7])).initializeSize(DESIRED_X, DESIRED_Y);
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
-      fog = new FogMap(xy, SCALING);
+      fog = new FogMap(xy, SCALING, MAP_WIDTH, MAP_HEIGHT);
       // TODO: Set player spawn xy later
 
       //Variable set up
@@ -198,7 +203,13 @@ public class Client extends JFrame implements WindowListener {
 
       while (true) {  //Main game loop
          if (time.getFramePassed()) {
-            repaintPanels();
+            if (gameBegin) {
+               if (receivedOnce) {
+                  repaintPanels();
+               }
+            } else {
+               repaintPanels();
+            }
             frames++;
          }
          if (connectionState < 1) {
@@ -249,7 +260,7 @@ public class Client extends JFrame implements WindowListener {
                   waitForInput();
                }
                if (errors[0] != 0) {
-                  allPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[0]]);
+                  menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[0]]);
                   soundEffect.playSound("error");
                }
             }
@@ -275,7 +286,7 @@ public class Client extends JFrame implements WindowListener {
                if ((errors[2] != 0)) {
                   totalErrorOutput += ("Password Error: " + errorMessages[errors[2]]);
                }
-               allPanels[currentPanel].setErrorUpdate(totalErrorOutput);
+               menuPanels[currentPanel].setErrorUpdate(totalErrorOutput);
             }
          }
          if (notifyReady) {
@@ -284,7 +295,7 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
             waitForInput();
             if (errors[3] != 0) {
-               allPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+               menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
                System.out.println(errorMessages[errors[3]]);
                soundEffect.playSound("error");
             }
@@ -297,24 +308,40 @@ public class Client extends JFrame implements WindowListener {
          if (testingBegin) {
             username = Math.random() + "";
             myUser = new User(username);
-            serverName=Integer.toString((int)(Math.random()*10000));
-            serverPassword="0";
+            serverName = Integer.toString((int) (Math.random() * 10000));
+            serverPassword = "0";
             System.out.println(serverName);
-            output.println("T" + username+","+serverName);//test
+            output.println("T" + username + "," + serverName);//test
             output.flush();
             waitForInput();
             host = true;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               //TODO: Add class select here
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
+              //TODO: Add class select here
+              if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")){
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("TimeMage")){
+                players[i] = new TimeMage(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("Ghost")){
+                players[i] = new Ghost(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")){
+                players[i] = new MobileSupport(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("Juggernaut")){
+                players[i] = new Juggernaut(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("Summoner")){
+                players[i] = new Summoner(onlineList.get(i).getUsername());
+              } else {
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              }
+              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                myPlayer = players[i];
+              }
+              players[i].setTeam(onlineList.get(i).getTeam());
             }
             testingBegin = false;
             nextPanel = 6;
          }
+         //TODO: Add class select here
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -327,6 +354,12 @@ public class Client extends JFrame implements WindowListener {
    public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
+      //System.out.println("type");
+      if (currentPanel == 7) {
+         if (c == 9) { // Tab key switches focus to game chat panel
+            intermediatePanel.toggleMode();
+         }
+      }
    }
 
    public void gameLogic() {
@@ -345,12 +378,8 @@ public class Client extends JFrame implements WindowListener {
             StringBuilder outputString = new StringBuilder();
             for (int i = 0; i < spellsPressed.length; i++) {
                if (spellsPressed[i]) {
-                  outputString.append("S" + i);
+                  outputString.append("S" + i + " ");
                }
-            }
-
-            if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
-               outputString.append(" "); //Add the separator
             }
             if (keyAngle != -10) {
                outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
@@ -382,12 +411,14 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             if (positionIndex != -10) {
-               outputString.append("W" + positionIndex + "," + walking);//TODO: make this event driven
+               outputString.append("W" + positionIndex + " ");//TODO: make this event driven
             }
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
                output.flush();
             }
+
+            //Update positions:
          }
       } catch (
               IOException e) {
@@ -403,8 +434,6 @@ public class Client extends JFrame implements WindowListener {
                inputReady = true;
                if (!gameBegin) {
                   decipherMenuInput(input.readLine().trim());
-               } else {
-                  decipherGameInput(input.readLine().trim());
                }
             }
          }
@@ -453,7 +482,6 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      System.out.println("d:" + input);
       char initializer = input.charAt(0);
       input = input.substring(1);
       if (isParsable(initializer)) {
@@ -463,7 +491,7 @@ public class Client extends JFrame implements WindowListener {
                //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
-                  ((IntroPanel) (allPanels[1])).go();
+                  ((IntroPanel) (menuPanels[1])).go();
                   try {
                      Thread.sleep(3000);
                   } catch (Exception E) {
@@ -515,7 +543,9 @@ public class Client extends JFrame implements WindowListener {
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
          for (int i = 0; i < onlineList.size(); i++) {
-            players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            //TODO: Add class stuff here;
+            players[i] = new Ghost(onlineList.get(i).getUsername());
+            players[i].setTeam(onlineList.get(i).getTeam());
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;
@@ -542,33 +572,55 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherGameInput(String input) {
+      if (!receivedOnce) {
+         receivedOnce = true;
+      }
       projectiles.clear();
       aoes.clear();
       String[] firstSplit = input.split(" ", -1);
       for (String firstInput : firstSplit) {
          char initializer = firstInput.charAt(0);
-         String[] secondSplit = firstInput.split(initializer + "", -1);
-         for (String secondInput : secondSplit) {
-            if (!secondInput.equals("")) {
-               String[] thirdSplit = secondInput.split(",", -1);
-               if (initializer == 'P') {
-                  updatePlayer(thirdSplit);
-               } else if (initializer == 'O') {
-                  updateOthers(thirdSplit);
-               } else if (initializer == 'D') {
-                  players[Integer.parseInt(thirdSplit[0])] = null;
-               } else if (initializer == 'R') {
-                  projectiles.add(new Projectile(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING)));
-               } else if (initializer == 'E') {
-                  aoes.add(new AOE(Integer.parseInt(thirdSplit[0]), (int) (Integer.parseInt(thirdSplit[1]) * SCALING), (int) (Integer.parseInt(thirdSplit[2]) * SCALING), (int) (Integer.parseInt(thirdSplit[3]) * SCALING)));
-               } else if (initializer == 'S') {
-                  //Set the spell of the appropriate player to the correct one using setSpell
-               } else if (initializer == 'W') { //Walking
-                  players[Integer.parseInt(thirdSplit[0])].setMovementIndex(Integer.parseInt(thirdSplit[1]), Boolean.parseBoolean(thirdSplit[2]));
-               } else if (initializer == 'L') {// Flash light
-                  players[Integer.parseInt(thirdSplit[0])].setFlashlightAngle(Double.parseDouble(thirdSplit[1]));
-                  players[Integer.parseInt(thirdSplit[0])].setFlashlightOn(true);
+         firstInput = firstInput.substring(1);
+         String[] secondSplit = firstInput.split(",", -1);
+         if (secondSplit.length > 0) {
+            if (initializer == 'P') {
+               updatePlayer(secondSplit);
+            } else if (initializer == 'O') {
+               updateOthers(secondSplit);
+            } else if (initializer == 'D') {
+               players[Integer.parseInt(secondSplit[0])] = null;
+            } else if (initializer == 'R') {
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
+            } else if (initializer == 'E') {
+               int id = Integer.parseInt(secondSplit[0]);
+               if (id != 4) {
+                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+               } else {
+                  int[][] points = new int[2][4];
+                  for (int m = 0; m < 2; m++) {
+                     for (int n = 0; n < 4; n++) {
+                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                     }
+                  }
+                  aoes.add(new TimeMageAOE(id, points));
                }
+            } else if (initializer == 'S') {
+               //Set the spell of the appropriate player to the correct one using setSpell
+            } else if (initializer == 'W') { //Walking
+               players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
+            } else if (initializer == 'L') {// Flash light
+               players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+               for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+                  players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
+               }
+            } else if (initializer == 'C') { //Message in
+               boolean isFriendly = false;
+               for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
+                  if (player.getUsername().equals(secondSplit[0])) {
+                     isFriendly = true;
+                  }
+               }
+               intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
             }
          }
       }
@@ -584,12 +636,12 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setRange(Integer.parseInt(data[7]));
       players[playerID].setArtifact(Boolean.parseBoolean(data[8]));
       players[playerID].setGold(Integer.parseInt(data[9]));
-      players[playerID].setSpriteID(Integer.parseInt(data[10]));
-      for (int j = 11; j < 14; j++) {
-         players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 11);
+      for (int j = 10; j < 13; j++) {
+         players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 10);
       }
-      players[playerID].setDamaged(Boolean.parseBoolean(data[14]));
-      for (int j = 15; j < 15 + Integer.parseInt(data[15]); j++) {
+      players[playerID].setDamaged(Boolean.parseBoolean(data[13]));
+      players[playerID].setIlluminated(Boolean.parseBoolean(data[14]));
+      for (int j = 16; j < 16 + Integer.parseInt(data[15]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
       //Turn off flashlight
@@ -598,30 +650,30 @@ public class Client extends JFrame implements WindowListener {
 
    public void updateOthers(String[] data) {
       int playerID = Integer.parseInt(data[0]);
+      players[playerID].setFlashlightOn(false);
       players[playerID].setXy(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
       players[playerID].setHealth(Integer.parseInt(data[3]));
       players[playerID].setMaxHealth(Integer.parseInt(data[4]));
       players[playerID].setArtifact(Boolean.parseBoolean(data[5]));
-      players[playerID].setSpriteID(Integer.parseInt(data[6]));
-      players[playerID].setDamaged(Boolean.parseBoolean(data[7]));
-      for (int j = 8; j < 8 + Integer.parseInt(data[8]); j++) {
+      players[playerID].setDamaged(Boolean.parseBoolean(data[6]));
+      players[playerID].setIlluminated(Boolean.parseBoolean(data[7]));
+      for (int j = 9; j < 9 + Integer.parseInt(data[8]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
-      players[playerID].setFlashlightOn(false);
    }
 
    public void repaintPanels() {
       if (currentPanel != nextPanel) {
          System.out.println("C" + currentPanel);
          System.out.println("V" + nextPanel);
-         allPanels[currentPanel].setErrorUpdate("");
+         menuPanels[currentPanel].setErrorUpdate("");
          currentPanel = nextPanel;
          cardLayout.show(mainContainer, PANEL_NAMES[currentPanel]);
       }
       if (currentPanel != 7) {
-         allPanels[currentPanel].repaint();
+         menuPanels[currentPanel].repaint();
       } else {
-         ((IntermediatePanel) (allPanels[currentPanel])).repaintReal();
+         intermediatePanel.repaintReal();
       }
    }
 
@@ -675,9 +727,9 @@ public class Client extends JFrame implements WindowListener {
       int BG_Y = 1198;
       int BG_X = 1800;
       if ((1.0 * MAX_Y / MAX_X) > (1.0 * BG_Y / BG_X)) { //Fit bg to height
-         introScaling = 1.0 * MAX_Y / BG_Y;
+         INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
       } else {
-         introScaling = 1.0 * MAX_X / BG_X;
+         INTRO_SCALING = 1.0 * MAX_X / BG_X;
       }
    }
 
@@ -703,8 +755,8 @@ public class Client extends JFrame implements WindowListener {
       if (!testGame) {
          this.attemptedGameName = attemptedGameName;
          this.attemptedGamePassword = attemptedGamePassword;
-         serverName=this.attemptedGameName;
-         serverPassword=this.attemptedGamePassword;
+         serverName = this.attemptedGameName;
+         serverPassword = this.attemptedGamePassword;
          testGame = true;
       }
    }
@@ -730,6 +782,12 @@ public class Client extends JFrame implements WindowListener {
    public void setClassID(int classID) {
       this.classID = classID;
       classChosen = true;
+   }
+
+   // Chat methods
+   public void sendMessage(String message, int mode) {
+      output.println("C" + mode + "," + message);
+      output.flush();
    }
 
    //Info to panels
@@ -770,56 +828,45 @@ public class Client extends JFrame implements WindowListener {
     * @since 2019-05-31
     */
 
-   public class GamePanel extends GeneralPanel {//State=7
+   public class GamePanel extends MenuPanel {//State=7
       private Graphics2D g2;
       private boolean generateGraphics = true;
-      int[] midXy = new int[2];
+      private int[] midXy = new int[2];
       private Rectangle drawArea;
       private final Font MAIN_FONT = super.getFont("main");
       private BufferedImage sheet;
-      private int[][] currentXy;
       //Game components
-      private GameComponent[] allComponents = new GameComponent[5];
-      private ChatComponent chatPanel;
+      private GameComponent[] allComponents;
+      private boolean menuCooldown = true;
+      private int MAX_GAME_X, MAX_GAME_Y;
+      private Area darkness;
 
       public GamePanel() {
          this.setBackground(new Color(0, 0, 0));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
-         GameComponent.initializeSize(SCALING, DESIRED_X, DESIRED_Y);
-         allComponents[0] = new PauseComponent();
-         allComponents[1] = new BottomComponent();
-         allComponents[2] = new MinimapComponent(fog, players);
-         allComponents[3] = new InventoryComponent();
-         allComponents[4] = new DebugComponent();
+         MAX_GAME_X = this.getWidth();
+         MAX_GAME_Y = this.getHeight();
+         GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
+         allComponents = new GameComponent[5];
          this.setDoubleBuffered(true);
-
-         // Chat panel
-         chatPanel = new ChatComponent(SCALING, DESIRED_X, DESIRED_Y);
-         this.add(chatPanel);
+         this.setVisible(true);
       }
 
       @Override
       public void paintComponent(Graphics g) {
-         if (players.length != 0) {
-            currentXy = new int[players.length][2];
-            for (int i = 0; i < players.length; i++) {
-               if (players[i] != null) {
-                  currentXy[i][0] = players[i].getXy()[0];
-                  currentXy[i][1] = players[i].getXy()[1];
-               }
-            }
-            xyAdjust[0] = (int) (centerXy[0] - currentXy[myPlayerID][0] * SCALING);
-            xyAdjust[1] = (int) (centerXy[1] - currentXy[myPlayerID][1] * SCALING);
-         }
          g2 = (Graphics2D) g;
          super.paintComponent(g2);
          if ((currentPanel == 7) && (generateGraphics)) {
-            midXy[0] = (int) (DESIRED_X * SCALING / 2);
-            midXy[1] = (int) (DESIRED_Y * SCALING / 2);
+            allComponents[0] = new PauseComponent();
+            allComponents[1] = new BottomComponent(myPlayer);
+            allComponents[2] = new MinimapComponent(fog, players);
+            allComponents[3] = new InventoryComponent();
+            allComponents[4] = new DebugComponent();
+            midXy[0] = (MAX_GAME_X / 2);
+            midXy[1] = (MAX_GAME_Y / 2);
             for (Player currentPlayer : players) {
                currentPlayer.setScaling(SCALING);
                currentPlayer.setCenterXy(midXy);
@@ -827,40 +874,63 @@ public class Client extends JFrame implements WindowListener {
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
             //Game set up
-            centerXy[0] = (int) (DESIRED_X * SCALING / 2);
-            centerXy[1] = (int) (DESIRED_Y * SCALING / 2);
             try {
-              sheet = ImageIO.read(new File(".\\res\\Map.png"));
+               sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
             }
-            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * SCALING), (int) (DESIRED_Y * SCALING));
+            drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
+            darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
+            resetXyAdjust();
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
-            // Updating fog
-            for (int i = 0; i < players.length; i++) {
-               if (players[i] != null) {
-                  // TODO: Separate by teams
-                  fog.scout(currentXy[i]);
-               }
-            }
 
             //Map
-            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (10000 * SCALING), (int) (10000 * SCALING), null);
-            
-            //Flash light
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (MAP_WIDTH * SCALING), (int) (MAP_HEIGHT * SCALING), null);
+            g2.setColor(Color.black);
+            //Game player
+            resetXyAdjust();
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
-                  currentPlayer.drawFlashlight(g2, myPlayer.getXy());
+                  currentPlayer.translateFlashlight(xyAdjust);
+                  if (currentPlayer.getFlashlightOn()) {
+                     darkness.subtract(new Area(currentPlayer.getFlashlightBeam()));
+                  }
+               }
+            }
+            for (int i = 0; i < aoes.size(); i++) {
+               if (aoes.get(i).getID() == 0) {
+                  darkness.subtract(aoes.get(i).getArea());
+               }
+            }
+            //Creating shapes
+            int[] xP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (300 * SCALING), (int) (400 * SCALING), (int) (500 * SCALING)};
+            int[] yP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (200 * SCALING), (int) (100 * SCALING), 0};
+            Polygon test = new Polygon(xP, yP, 5);
+            test.translate(xyAdjust[0], xyAdjust[1]);
+            g2.setColor(Color.black);
+            g2.fillPolygon(test);
+            g2.fillRect((int) (300 * SCALING) + xyAdjust[0], (int) (300 * SCALING) + xyAdjust[1], (int) (100 * SCALING), (int) (100 * SCALING));
+
+            g2.setColor(new Color(0, 0, 0, 128));
+            g2.fill(darkness);
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
+                     currentPlayer.draw(g2, myPlayer.getXy());
+                  }
                }
             }
 
-            //Game player
-            for (Player currentPlayer : players) {
-               if (currentPlayer != null) {
-                  currentPlayer.draw(g2, myPlayer.getXy());
+            // Updating fog
+            resetXyAdjust();
+            for (int i = 0; i < players.length; i++) {
+               if (players[i] != null) {
+                  if (players[i].getTeam() == myTeam) {
+                     fog.scout(players[i].getXy());
+                  }
                }
             }
 
@@ -869,13 +939,11 @@ public class Client extends JFrame implements WindowListener {
             tx.translate(xyAdjust[0], xyAdjust[1]);
             Area darkFog = fog.getFog().createTransformedArea(tx);
             Area lightFog = fog.getExplored().createTransformedArea(tx);
-
             //Draws fog
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
-
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
@@ -884,7 +952,6 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
             }
-
             //draw all components
             ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
             if (keyPressed) {
@@ -892,17 +959,29 @@ public class Client extends JFrame implements WindowListener {
                   ((PauseComponent) (allComponents[0])).toggle();
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[4])).toggle();
-                  System.out.println("F1");
+                  System.out.println("Debug mode");
+               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) {
+                  ((InventoryComponent) (allComponents[3])).toggle();
                }
                keyPressed = false;
             }
-            ((BottomComponent) (allComponents[1])).setBothHealth(myPlayer.getHealth(), myPlayer.getMaxHealth());
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
             //chatPanel.draw(g2);
          }
          g2.dispose();
+         darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
+      }
+
+      public void setDimensions(int MAX_GAME_X, int MAX_GAME_Y) {
+         this.MAX_GAME_X = MAX_GAME_X;
+         this.MAX_GAME_Y = MAX_GAME_Y;
+      }
+
+      public void resetXyAdjust() {
+         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0] * SCALING);
+         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1] * SCALING);
       }
    }
 }

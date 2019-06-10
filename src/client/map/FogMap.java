@@ -12,38 +12,41 @@ import java.io.IOException;
 
 public class FogMap {
    private Area fogShape, viewedShape, activelyViewing, outputShape;
-   private double scaling;
+   private double SCALING;
    private static double fogRadius = 250;
+   private int MAP_WIDTH, MAP_HEIGHT;
 
-   public FogMap(int[] xy, double scaling) {
+   public FogMap(int[] xy, double SCALING, int MAP_WIDTH, int MAP_HEIGHT) {
       //fog = new int[y][x];
       //currentlyExploring = new boolean[y][x];
-      this.scaling = scaling;
+      this.SCALING = SCALING;
 
-      double x = xy[0] * scaling;
-      double y = xy[1] * scaling;
-      fogShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
-      activelyViewing = new Area(new Ellipse2D.Double(x, y, fogRadius*scaling, fogRadius*scaling));
+      double x = xy[0] * SCALING;
+      double y = xy[1] * SCALING;
+      this.MAP_WIDTH=MAP_WIDTH;
+      this.MAP_HEIGHT=MAP_HEIGHT;
+      fogShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      activelyViewing = new Area(new Ellipse2D.Double(x, y, fogRadius*SCALING, fogRadius*SCALING));
    }
 
    public void scout(int[] xy) {
-      Area circle = new Area(new Ellipse2D.Double((xy[0]-fogRadius)*scaling, (xy[1]-fogRadius) *scaling, 2*fogRadius*scaling, 2*fogRadius*scaling));
+      Area circle = new Area(new Ellipse2D.Double((xy[0]-fogRadius)*SCALING, (xy[1]-fogRadius) *SCALING, 2*fogRadius*SCALING, 2*fogRadius*SCALING));
       activelyViewing.add(circle);
    }
 
    public Area getFog() {
       fogShape.subtract(activelyViewing);
-      outputShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       outputShape.intersect(fogShape);
       return outputShape;
    }
 
    public Area getExplored(){
-      viewedShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      viewedShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       viewedShape.subtract(fogShape);
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
-      outputShape = new Area(new Rectangle.Double(0, 0, 10000*scaling, 10000*scaling));
+      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       outputShape.intersect(viewedShape);
       return outputShape;
    }

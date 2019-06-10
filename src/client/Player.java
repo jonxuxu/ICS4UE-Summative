@@ -20,7 +20,7 @@ public abstract class Player extends User {
    private int ID;
    private int[] xy = {300, 300};
    private int[] centerXy = new int[2];
-   private double scaling;
+   private double SCALING;
    private int desiredSpell = -1;
    private int[] spellPercent = {100, 100, 100};
    private ArrayList<Status> allStatus = new ArrayList<Status>();
@@ -38,9 +38,13 @@ public abstract class Player extends User {
    private boolean flashlightOn;
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
+   private boolean translated;
+   private boolean illuminated;
+
 
    Player(String username) {
       super(username);
+
    }
 
    public void setID(int ID) {
@@ -62,41 +66,45 @@ public abstract class Player extends User {
    }
 
    public void draw(Graphics2D g2, int[] midXy) {
-      drawReal(g2, centerXy[0] + (int) (scaling * (xy[0] - midXy[0])) - (int) (60 * scaling) / 2, centerXy[1] + (int) (scaling * (xy[1] - midXy[1])) - (int) (60 * scaling) / 2, (int) (60 * scaling), (int) (60 * scaling), desiredSpell);
+      drawReal(g2, centerXy[0] + (int) (SCALING * (xy[0] - midXy[0])) - (int) (60 * SCALING) / 2, centerXy[1] + (int) (SCALING * (xy[1] - midXy[1])) - (int) (60 * SCALING) / 2, (int) (60 * SCALING), (int) (60 * SCALING), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
    }
 
-   public void drawFlashlight(Graphics2D g2, int[] midXy) {
-      flashlightBeam.reset();
+  /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
       if (flashlightOn) {
-         int playerLocationX = centerXy[0] + (int) (scaling * (xy[0] - midXy[0]));
-         int playerLocationY = centerXy[1] + (int) (scaling * (xy[1] - midXy[1]));
-         flashlightBeam.addPoint(playerLocationX, playerLocationY);
-         flashlightBeam.addPoint(playerLocationX + (int) (scaling * 100 * Math.cos(flashlightAngle - 0.1)), playerLocationY + (int) (scaling * 100 * Math.sin(flashlightAngle - 0.1)));
-         flashlightBeam.addPoint(playerLocationX + (int) (scaling * 100 * Math.cos(flashlightAngle + 0.1)), playerLocationY + (int) (scaling * 100 * Math.sin(flashlightAngle + 0.1)));
-         g2.setColor(Color.WHITE);
+         g2.setColor(new Color (1f,1f,0.4f,0.1f));
+         if (!translated) {
+            flashlightBeam.translate(xyAdjust[0], xyAdjust[1]);
+            translated = true;
+         }
          g2.fillPolygon(flashlightBeam);
+      }
+   }*/
+   public void translateFlashlight(int[]xyAdjust){
+      if (!translated) {
+         flashlightBeam.translate(xyAdjust[0], xyAdjust[1]);
+         translated = true;
       }
    }
 
    public double[] getDisp(int angleOfMovement) {
       double[] displacements = new double[2];
       if (angleOfMovement == 0) {
-         displacements[0] = mobility / scaling;
+         displacements[0] = mobility / SCALING;
          displacements[1] = 0;
       } else if (Math.abs(angleOfMovement) == 1) {
-         displacements[0] = ROOT2O2 * mobility / scaling;
-         displacements[1] = ROOT2O2 * mobility / scaling;
+         displacements[0] = ROOT2O2 * mobility / SCALING;
+         displacements[1] = ROOT2O2 * mobility / SCALING;
       } else if (Math.abs(angleOfMovement) == 2) {
          displacements[0] = 0;
-         displacements[1] = mobility / scaling;
+         displacements[1] = mobility / SCALING;
       } else if (Math.abs(angleOfMovement) == 3) {
-         displacements[0] = -ROOT2O2 * mobility / scaling;
-         displacements[1] = ROOT2O2 * mobility / scaling;
+         displacements[0] = -ROOT2O2 * mobility / SCALING;
+         displacements[1] = ROOT2O2 * mobility / SCALING;
       } else {
-         displacements[0] = -mobility / scaling;
+         displacements[0] = -mobility / SCALING;
          displacements[1] = 0;
       }
       if (angleOfMovement < 0) {
@@ -105,8 +113,8 @@ public abstract class Player extends User {
       return (displacements);
    }
 
-   public void setScaling(double scaling) {
-      this.scaling = scaling;
+   public void setScaling(double SCALING) {
+      this.SCALING = SCALING;
    }
 
    public void setSpell(int spellIndex) {
@@ -117,15 +125,21 @@ public abstract class Player extends User {
 
 
    public void setFlashlightOn(boolean flashlightOn) {
+      flashlightBeam.reset();
       this.flashlightOn = flashlightOn;
+      translated = false;
    }
 
-   public void setFlashlightAngle(double flashlightAngle) {
-      this.flashlightAngle = flashlightAngle;
+   public boolean getFlashlightOn() {
+      return flashlightOn;
    }
 
-   public double getFlashlightAngle() {
-      return (flashlightAngle);
+   public Polygon getFlashlightBeam(){
+      return flashlightBeam;
+   }
+
+   public void setFlashlightPoint(int x, int y) {
+      flashlightBeam.addPoint((int) (x * SCALING), (int) (y * SCALING));
    }
 
    public void setSpellPercent(int spellPercent, int spellIndex) {
@@ -159,6 +173,14 @@ public abstract class Player extends User {
 
    public int getLevel() {
       return level;
+   }
+
+   public boolean getIlluminated() {
+      return illuminated;
+   }
+
+   public void setIlluminated(boolean illuminated) {
+      this.illuminated = illuminated;
    }
 
    public abstract void spellAnimation(Graphics2D g2, int x, int y, int width, int height, int spellIndex);

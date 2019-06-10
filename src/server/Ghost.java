@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Ghost extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
-  private int[] passiveTimers = new int[getEnemiesSize()];
+  private int[] passiveTimers;
   private static int PASSIVE_COOLDOWN = 50;
   private static int PASSIVE_RANGE = 300;
   private static int Q_BASE_DAMAGE = 100;
@@ -31,6 +31,8 @@ public class Ghost extends Player{
     setAttack(300);
     setMobility(10);
     setRange(10);//REE Change to -1 when add support for melee attacks
+    setAutoAttackCooldown(10);
+    setFlareCooldown(100);
   }
   
   public boolean castSpell(int spellIndex){
@@ -67,6 +69,9 @@ public class Ghost extends Player{
   }
   
   public void update(){
+    if (passiveTimers==null){
+      passiveTimers= new int[getEnemiesSize()];
+    }
     for (int i = 0; i < 3; i++){
       if (spellTimers[i] > 0){
         spellTimers[i]--;
@@ -80,6 +85,7 @@ public class Ghost extends Player{
         passiveTimers[i]--;
       }
     }
+    updateBasicTimers();
     //Passive
     for (int i = 0; i <getEnemiesSize(); i++){
       if (passiveTimers[i]<=0){

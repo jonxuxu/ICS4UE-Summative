@@ -4,12 +4,13 @@ import java.awt.geom.Area;
 class TimeMageQAOE extends AOE{
   
   private int spawnX, spawnY, targetX, targetY;
-  private static int DURATION;
-  private static int WIDTH;
-  private static int HEIGHT;
+  private static int DURATION = 100;
+  private static int WIDTH = 100;
+  private static int HEIGHT = 500;
+  private static int ID = 4;
   private Polygon hitbox;
   TimeMageQAOE(int spawnX, int spawnY, int targetX, int targetY){
-    super(spawnX,spawnY,DURATION,1);//These things don't matter except for duration
+    super(spawnX,spawnY,DURATION,0,ID);//These things don't matter except for duration
     this.spawnX = spawnX;
     this.spawnY = spawnY;
     this.targetX = targetX;

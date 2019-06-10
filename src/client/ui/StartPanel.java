@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
  * @since 2019-05-31
  */
 
-public class StartPanel extends GeneralPanel {//State=2
+public class StartPanel extends MenuPanel {//State=2
    private Graphics2D g2;
    private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
@@ -89,7 +89,7 @@ public class StartPanel extends GeneralPanel {//State=2
          }
       }
       if (Math.random() < 0.2) {
-         GeneralPanel.getParticles().add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) * SCALING), MAX_Y));
+         MenuPanel.getParticles().add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) * SCALING), MAX_Y));
       }
       drawAllParticles(g2);
    }

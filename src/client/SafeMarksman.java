@@ -16,10 +16,6 @@ import java.io.IOException;
  */
 
 public class SafeMarksman extends Player {
-   private int maxHealth = 100;
-   private int attack = 10;
-   private int mobility = 10;
-   private int range = 10;
    private int positionIndex;
    private int movementIndex;
    private boolean moving;
