@@ -69,7 +69,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock(16);
+   private Clock time = new Clock(30);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;

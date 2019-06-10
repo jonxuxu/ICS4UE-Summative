@@ -21,7 +21,7 @@ import java.awt.geom.Rectangle2D;
  */
 
 public class MinimapComponent extends GameComponent {
-   private static FogMap fog;
+   private FogMap fog;
    private Player[] players;
    private static int myPlayerId;
    private int[] xyAdjust = new int[2];
@@ -39,12 +39,14 @@ public class MinimapComponent extends GameComponent {
    private Area BORDER_FILL2;
    private Area BORDER_FILL3;
    private Area BORDER_FILL4;
+   private Area outputShape;
 
    public MinimapComponent(FogMap fog, Player[] players, int myPlayerId){
       // Setting up refs
       this.fog = fog;
       this.players = players;
       this.myPlayerId = myPlayerId;
+
       // Border
       BORDER_RECT = new Rectangle(scale(830), scale(379), scale(120), scale(120));
       BORDER_RECT2 = new Rectangle(scale(832), scale(381), scale(116), scale(116));
@@ -73,23 +75,24 @@ public class MinimapComponent extends GameComponent {
       g2.fill(BORDER_FILL3);
       g2.setColor(new Color(50, 46, 41));
       g2.fill(BORDER_FILL4);
-      g2.setColor(new Color(33, 35, 37));
-      g2.fill(INNER_RECT);
+      outputShape = new Area(INNER_RECT);
+      g2.setColor(Color.white);
+      g2.fill(outputShape);
 
       // Draws map
 
       // Draws fog
-      xyAdjust[0] =  scale(-players[myPlayerId].getXy()[0]);
-      xyAdjust[1] =  scale(-players[myPlayerId].getXy()[1]);
+      xyAdjust[0] =  (int)(scale(890) -scale(players[myPlayerId].getXy()[0])*0.05);
+      xyAdjust[1] =  (int)(scale(440) - scale(players[myPlayerId].getXy()[1])*0.05);
       AffineTransform tx = new AffineTransform();
       tx.translate(xyAdjust[0], xyAdjust[1]);
-      tx.scale(0.5,0.5);
+      tx.scale(0.05,0.05);
       Area darkFog = fog.getFog(1).createTransformedArea(tx);
       Area lightFog = fog.getExplored(1).createTransformedArea(tx);
       g2.setColor(Color.black); //Unexplored
-      //g2.fill(darkFog);
-      g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-      //g2.fill(lightFog);
+      g2.fill(darkFog);
+      g2.setColor(Color.red); //Previously explored
+      g2.fill(lightFog);
 
 
       // Draws player

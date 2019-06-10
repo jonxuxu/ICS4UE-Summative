@@ -37,7 +37,7 @@ public class FogMap {
    public Area getFog(int scope) {
       fogShape.subtract(activelyViewing);
       if(scope == 1){ //Minimap scope
-         outputShape = new Area(new Rectangle.Double(0, 0, 2*MAP_WIDTH*SCALING, 2*MAP_WIDTH*SCALING));
+         outputShape = new Area(new Rectangle.Double(836*SCALING, 385*SCALING, 108*SCALING, 108*SCALING));
       } else { // Visible only in window
          outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       }
@@ -51,7 +51,7 @@ public class FogMap {
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
       if(scope == 1){ // Minimap scope
-         outputShape = new Area(new Rectangle.Double(0, 0, 2*MAP_WIDTH*SCALING, 2*MAP_WIDTH*SCALING));
+         outputShape = new Area(new Rectangle.Double(836*SCALING, 385*SCALING, 108*SCALING, 108*SCALING));
       } else { // Only within window
          outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       }
