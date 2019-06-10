@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * SafeMarksman.java
- * This is
+ * Ghost.java
+ * This is the character class for Ghost
  *
- * @author Will Jeong
+ * @author Will Jeong + company
  * @version 1.0
  * @since 2019-05-19
  */
@@ -69,7 +69,7 @@ public class Ghost extends Player {
       if (movementIndex == 10) {
          movementIndex = 0;
       }
-      g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex / 5], x, y, width, height, null);
+      g2.drawImage(ALL_ANIMATIONS[0][movementIndex / 5][positionIndex], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {

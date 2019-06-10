@@ -8,9 +8,9 @@ import java.io.IOException;
 
 /**
  * SafeMarksman.java
- * This is
+ * This is the character class for SafeMarksman
  *
- * @author Will Jeong
+ * @author Will Jeong + company
  * @version 1.0
  * @since 2019-05-19
  */
