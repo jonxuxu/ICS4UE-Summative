@@ -579,7 +579,6 @@ public class Client extends JFrame implements WindowListener {
                players[i].setTeam(onlineList.get(i).getTeam());
             } catch (Exception e) {
                teams[0].add(players[i]);
-               teams[onlineList.get(i).getTeam()].add(players[i]);
                players[i].setTeam(0);
                System.out.println("Testing mode error");
             }
