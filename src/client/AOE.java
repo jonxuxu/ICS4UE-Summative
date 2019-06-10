@@ -2,6 +2,8 @@ package client;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 
 /**
  * AOE.java
@@ -17,6 +19,7 @@ public class AOE {
    private int x;
    private int y;
    private int radius;
+   private Area area;
    private static int[] xyAdjust;
 
    AOE(int ID, int x, int y, int radius) {
@@ -27,8 +30,10 @@ public class AOE {
    }
 
    public void draw(Graphics2D g2) {
-      g2.setColor(Color.WHITE);
-      g2.fillOval(x+xyAdjust[0] - radius, y+xyAdjust[1] - radius, radius * 2, radius * 2);
+      if (ID!=0) {
+         g2.setColor(Color.WHITE);
+         g2.fillOval(x + xyAdjust[0] - radius, y + xyAdjust[1] - radius, radius * 2, radius * 2);
+      }
    }
 
    public static void setXyAdjust(int[] xyAdjust1) {
@@ -36,5 +41,13 @@ public class AOE {
    }
    public int[] getXyAdjust(){
      return xyAdjust;
+   }
+   public int getID(){
+      return ID;
+   }
+   public Area getArea(){
+      //if (ID==0) {
+         return (new Area(new Ellipse2D.Double(x + xyAdjust[0] - radius, y + xyAdjust[1] - radius, radius * 2, radius * 2)));
+      //}
    }
 }

@@ -568,6 +568,7 @@ public class Server {
                      if (players[i] != null) {
                         //TODO: Ask Kamron why this is important and if I can move it here (interferes with light otherwise)
                         players[i].update();
+                        players[i].setFlashlightOn(false);
                      }
                   }
                   gameTick++;

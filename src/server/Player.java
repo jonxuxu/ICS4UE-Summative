@@ -74,7 +74,7 @@ public abstract class Player extends User implements CanIntersect {
    private int cVal;
 
    //Player references
-   private static Player []players;
+   private static Player[] players;
    private static int playerNum;
 
    Player(String username) {
@@ -119,8 +119,9 @@ public abstract class Player extends User implements CanIntersect {
          constantHitboxes[i + playerNum] = (new CustomPolygon(xP, yP, obstacles[i].npoints));
       }
    }
-   public static CustomPolygon[] getConstantHitboxes(){
-      return(constantHitboxes);
+
+   public static CustomPolygon[] getConstantHitboxes() {
+      return (constantHitboxes);
    }
 
    public void setMouse(int mouseX, int mouseY) {
@@ -158,7 +159,7 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append(artifact + "," + gold + ",");//General
       outputString.append(getSpellPercent(0) + "," + getSpellPercent(1) + "," + getSpellPercent(2) + ",");//Spells
       outputString.append(damaged + ",");
-      outputString.append(illuminated+"," + 0);//Temporary "fix"
+      outputString.append(illuminated + "," + 0);//Temporary "fix"
       /* STATUSES NOT WORKING!!! UNCOMMMENT WHEN SUPPORT FOR STATUSES IS ADDED
       outputString.append(damaged + "," + statuses.size());
       for (int i = 0; i < statuses.size(); i++) {
@@ -175,7 +176,8 @@ public abstract class Player extends User implements CanIntersect {
       outputString.append(health + "," + maxHealth + ",");//stats
       outputString.append(artifact + ",");//General
       outputString.append(damaged + ",");
-      outputString.append(illuminated+"," + 0);//Temporary "fix"
+      outputString.append(illuminated + "," + 0);//Temporary "fix"
+
 
       /* STATUSES NOT WORKING!!! UNCOMMMENT WHEN SUPPORT FOR STATUSES IS ADDED
       outputString.append(damaged + "," + statuses.size());
@@ -198,9 +200,10 @@ public abstract class Player extends User implements CanIntersect {
          }
       }
    }
-   public static void setPlayerReference(Player[] players1, int playerNum1){
-      players=players1;
-      playerNum=playerNum1;
+
+   public static void setPlayerReference(Player[] players1, int playerNum1) {
+      players = players1;
+      playerNum = playerNum1;
    }
 
    public void calculateFlashlightPolygon(double flashlightAngle) {
@@ -217,12 +220,12 @@ public abstract class Player extends User implements CanIntersect {
       boolean hit;
       double tempFlashlightAngle = flashlightAngle;
       int FLASHLIGHT_SPREAD = 30;
-      tempFlashlightAngle -= 0.01*FLASHLIGHT_SPREAD/2;
+      tempFlashlightAngle -= 0.01 * FLASHLIGHT_SPREAD / 2;
       for (double k = 0; k < FLASHLIGHT_SPREAD; k++) {//If you want to change this, change the 29 below
          hit = false;
          tempFlashlightAngle += 0.01;
          setPlayerVector(xy, xy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), xy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
-         int smallestDist = FLASHLIGHT_RADIUS*FLASHLIGHT_RADIUS;
+         int smallestDist = FLASHLIGHT_RADIUS * FLASHLIGHT_RADIUS;
          for (int i = 0; i < constantHitboxes.length; i++) {
             if (!constantHitboxes[i].equals(lightingHitbox)) {
                constantHitboxes[i].setPlayerScalar(xCo, yCo, cVal);
@@ -243,12 +246,12 @@ public abstract class Player extends User implements CanIntersect {
          if (!hit) {
             newShapeIndex = -1;
             newIntersectionIndex = -1;
-         }else{
-            if (newShapeIndex<playerNum){
-               players[newShapeIndex].setIlluminated(true);
+         } else {
+            if (newShapeIndex < playerNum) {
+               players[newShapeIndex].addStatus(new Illuminated(2)); //TODO: Fix with Kamron
             }
          }
-         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == FLASHLIGHT_SPREAD-1)) {
+         if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == FLASHLIGHT_SPREAD - 1)) {
             points++;
             shapeIndex = newShapeIndex;
             intersectionIndex = newIntersectionIndex;
@@ -317,7 +320,6 @@ public abstract class Player extends User implements CanIntersect {
          flareTimer = flareCooldown;
       }
    }
-
    public void launch(int targetX, int targetY, int speed, int range) {
       double theta = Math.atan2(targetY - xy[1], targetX - xy[0]);
       double dx = speed * Math.cos(theta);
@@ -405,12 +407,13 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void updateStatuses() {
+      //TODO: account for duplicate illumination
       mobilityBoost = 0;
       buffBlacklist.clear();
       illuminated = false;
       stunned = false;
       invisible = false;
-      walking=false;
+      walking = false;
       damageReduction = 0;
       for (int i = statuses.size() - 1; i >= 0; i--) {
          statuses.get(i).advance();
@@ -433,7 +436,7 @@ public abstract class Player extends User implements CanIntersect {
    public void applyStatus(Status status) {
       boolean blacklisted = false;
       if ((status instanceof Illuminated) && (!invisible)) {
-         illuminated = true;
+         illuminated = true;//TODO: Ask kamron how this works
       } else if (status instanceof MSBuff) {
          for (int i = 0; i < buffBlacklist.size(); i++) {
             if (status.getClass().equals(buffBlacklist.get(i))) {
@@ -444,14 +447,6 @@ public abstract class Player extends User implements CanIntersect {
             mobilityBoost += ((MSBuff) (status)).getStrength();
             buffBlacklist.add(status.getClass());
          }
-      } else if (status instanceof Stun) {
-         stunned = true;
-      } else if (status instanceof Launched) {
-         xy[0] += ((Launched) (status)).getDX();
-         xy[1] += ((Launched) (status)).getDY();
-      } else if (status instanceof Invisible) {
-         invisible = true;
-         illuminated = false;
       } else if (status instanceof Stun) {
          stunned = true;
       } else if (status instanceof Launched) {
