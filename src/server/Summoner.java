@@ -23,8 +23,8 @@ public class Summoner extends Player{
   private boolean secondE = false;
   private SummonerPet chosenPet;
   
-  Summoner(String username) {
-    super(username);
+  Summoner(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(200);
     setHealth(200);
     setAttack(200);

@@ -44,7 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-  private String playerClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+  private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -92,9 +92,9 @@ public class Client extends JFrame implements WindowListener {
    private String username, attemptedGameName, attemptedGamePassword;
    private boolean host, notifyReady, sendName, testGame, loading, logout, leaveGame, teamChosen, classChosen, gameBegin; // False by default
    private int[] errors = new int[4];
-   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team"};
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team", "Not all players have selected a class"};
    private int myTeam;
-   private int classID;
+   private String className;
    private int myPlayerID;
    private int frames, fps;
 
@@ -295,14 +295,20 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
             waitForInput();
             if (errors[3] != 0) {
+               System.out.println("dwd");
                menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println(errorMessages[errors[3]]);
+               System.out.println("Error:"+errorMessages[errors[3]]);
                soundEffect.playSound("error");
             }
          }
          if (teamChosen) {
             teamChosen = false;
             output.println("E" + myTeam);//E for now, when testing is removed it will be T
+            output.flush();
+         }
+         if (classChosen) {
+            classChosen = true;
+            output.println("Z" + className);//Refers to class chosen
             output.flush();
          }
          if (testingBegin) {
@@ -318,17 +324,17 @@ public class Client extends JFrame implements WindowListener {
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
               //TODO: Add class select here
-              if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")){
+              if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")){
                 players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("TimeMage")){
+              } else if (thisClass.equals("TimeMage")){
                 players[i] = new TimeMage(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("Ghost")){
+              } else if (thisClass.equals("Ghost")){
                 players[i] = new Ghost(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")){
+              } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")){
                 players[i] = new MobileSupport(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("Juggernaut")){
+              } else if (thisClass.equals("Juggernaut")){
                 players[i] = new Juggernaut(onlineList.get(i).getUsername());
-              } else if (playerClass.equals("Summoner")){
+              } else if (thisClass.equals("Summoner")){
                 players[i] = new Summoner(onlineList.get(i).getUsername());
               } else {
                 players[i] = new SafeMarksman(onlineList.get(i).getUsername());
@@ -508,7 +514,7 @@ public class Client extends JFrame implements WindowListener {
             if (initializer == '0') {
                loading = true;
             } else {
-               errors[3] = Integer.parseInt(initializer + "");
+               errors[3] = Integer.parseInt(initializer+input);
             }
          }
       } else if (initializer == 'A') {
@@ -542,10 +548,27 @@ public class Client extends JFrame implements WindowListener {
          }
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
+         input=input.trim();
+         String []classes = input.split(" ",-1);
          for (int i = 0; i < onlineList.size(); i++) {
+            thisClass = classes[i];
+            System.out.println(thisClass);
             //TODO: Add class stuff here;
-            players[i] = new Ghost(onlineList.get(i).getUsername());
-            players[i].setTeam(onlineList.get(i).getTeam());
+            if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("TimeMage")) {
+               players[i] = new TimeMage(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Ghost")) {
+               players[i] = new Ghost(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+               players[i] = new MobileSupport(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Juggernaut")) {
+               players[i] = new Juggernaut(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Summoner")) {
+               players[i] = new Summoner(onlineList.get(i).getUsername());
+            }else {//TESTING MODE ONLY
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            }
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;
@@ -553,7 +576,11 @@ public class Client extends JFrame implements WindowListener {
             try {
                teams[0].add(players[i]);
                teams[onlineList.get(i).getTeam()].add(players[i]);
+               players[i].setTeam(onlineList.get(i).getTeam());
             } catch (Exception e) {
+               teams[0].add(players[i]);
+               teams[onlineList.get(i).getTeam()].add(players[i]);
+               players[i].setTeam(0);
                System.out.println("Testing mode error");
             }
          }
@@ -779,8 +806,8 @@ public class Client extends JFrame implements WindowListener {
       this.nextPanel = nextPanel;
    }
 
-   public void setClassID(int classID) {
-      this.classID = classID;
+   public void setClassName(String className) {
+      this.className = className;
       classChosen = true;
    }
 

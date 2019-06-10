@@ -21,8 +21,8 @@ public class Juggernaut extends Player{
   private static int E_BASE_DAMAGE = 100;
   private static int SPACE_DURATION = 100;
   
-  Juggernaut(String username) {
-    super(username);
+  Juggernaut(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(300);
     setHealth(300);
     setAttack(300);

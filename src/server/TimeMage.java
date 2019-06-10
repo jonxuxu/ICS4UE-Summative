@@ -17,8 +17,8 @@ public class TimeMage extends Player{
   
   private ArrayList<Player> qBlacklist = new ArrayList<Player>();
   
-  TimeMage(String username) {
-    super(username);
+  TimeMage(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(200);
     setHealth(200);
     setAttack(300);

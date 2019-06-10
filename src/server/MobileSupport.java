@@ -28,8 +28,8 @@ public class MobileSupport extends Player{
   
   private ArrayList<Player> qBlacklist = new ArrayList<Player>();
   
-  MobileSupport(String username) {
-    super(username);
+  MobileSupport(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(100);
     setHealth(100);
     setAttack(100);

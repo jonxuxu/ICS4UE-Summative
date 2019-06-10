@@ -24,8 +24,8 @@ public class Ghost extends Player{
   
   private ArrayList<Player> qBlacklist = new ArrayList<Player>();
   
-  Ghost(String username) {
-    super(username);
+  Ghost(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(300);
     setHealth(300);
     setAttack(300);

@@ -23,8 +23,14 @@ public class WaitingPanel extends MenuPanel { //State=6
    private CustomButton teamOneButton = new CustomButton("Team one", SCALING);
    private CustomButton teamTwoButton = new CustomButton("Team two", SCALING);
 
-   //Class rectangles
-   private Rectangle SAFE_MARKSMAN_RECT;
+   //Class pedestals
+   private CustomButton SAFE_MARKSMAN_PEDESTAL= new CustomButton("Archer", SCALING);
+   private CustomButton GHOST_PEDESTAL= new CustomButton("Ghost", SCALING);
+   private CustomButton SUMMONER_PEDESTAL= new CustomButton("Summoner", SCALING);
+   private CustomButton JUGGERNAUT_PEDESTAL= new CustomButton("Juggernaut", SCALING);
+   private CustomButton TIME_MAGE_PEDESTAL= new CustomButton("Time Mage", SCALING);
+   private CustomButton MOBILE_SUPPORT_PEDESTAL= new CustomButton("Mobile Support", SCALING);
+
 
    //Mouse
    private int[] mouseState = CLIENT.getMouseState();
@@ -60,8 +66,43 @@ public class WaitingPanel extends MenuPanel { //State=6
       backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 9 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
       this.add(backButton);
 
+      //TODO: Make into buttons
       //Setting up the classes
-      SAFE_MARKSMAN_RECT = new Rectangle(MAX_X / 2 - (int) ((65 + 200) * SCALING), MAX_Y * 3 / 10, (int) (70 * SCALING), (int) (70 * SCALING));
+      SAFE_MARKSMAN_PEDESTAL.addActionListener((ActionEvent e) -> {
+         CLIENT.setClassName("Archer");
+      });
+      SAFE_MARKSMAN_PEDESTAL.setBounds(MAX_X / 2 - (int) (290 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      this.add(SAFE_MARKSMAN_PEDESTAL);
+
+      GHOST_PEDESTAL.addActionListener((ActionEvent e) -> {
+         CLIENT.setClassName("Ghost");
+      });
+      GHOST_PEDESTAL.setBounds(MAX_X / 2 - (int) (170 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      this.add(GHOST_PEDESTAL);
+
+      TIME_MAGE_PEDESTAL.addActionListener((ActionEvent e) -> {
+         CLIENT.setClassName("TimeMage");
+      });
+      TIME_MAGE_PEDESTAL.setBounds(MAX_X / 2 - (int) (50 * SCALING), MAX_Y * 3 /5, (int) (100 * SCALING), (int) (15 * SCALING));
+      this.add(TIME_MAGE_PEDESTAL);
+
+      JUGGERNAUT_PEDESTAL.addActionListener((ActionEvent e) -> {
+         CLIENT.setClassName("Juggernaut");
+      });
+      JUGGERNAUT_PEDESTAL.setBounds(MAX_X / 2 + (int) (70 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      this.add(JUGGERNAUT_PEDESTAL);
+
+      SUMMONER_PEDESTAL.addActionListener((ActionEvent e) -> {
+         CLIENT.setClassName("Summoner");
+      });
+      SUMMONER_PEDESTAL.setBounds(MAX_X / 2 + (int) (190 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      this.add(SUMMONER_PEDESTAL);
+
+      MOBILE_SUPPORT_PEDESTAL.addActionListener((ActionEvent e) -> {
+         CLIENT.setClassName("MobileSupport");
+      });
+      MOBILE_SUPPORT_PEDESTAL.setBounds(MAX_X / 2 + (int) (310 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      this.add(MOBILE_SUPPORT_PEDESTAL);
 
       //Basic visuals
       this.setDoubleBuffered(true);
@@ -91,18 +132,9 @@ public class WaitingPanel extends MenuPanel { //State=6
          buttonAdd = false;
       }
 
-      //Check if a class was selected
 
-      if (mouseState[2]==1){
-         if (!justPressed) {
-            justPressed = true;
-            if (SAFE_MARKSMAN_RECT.contains(mouseState[0], mouseState[1])){
-               CLIENT.setClassID(0);//From now on, 0 will represent safe marksman
-            }
-         }
-      }else{
-         justPressed=false;
-      }
+      //Display classes:
+
 
       //Display all players
       StringBuilder players = new StringBuilder("Players: ");

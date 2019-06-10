@@ -56,6 +56,7 @@ public abstract class Player extends User implements CanIntersect {
    private boolean stunned = false;
    private boolean invisible = false;
    private double damageReduction;
+   private String selectedClass;
 
    //Movement
    private int positionIndex;
@@ -76,10 +77,22 @@ public abstract class Player extends User implements CanIntersect {
    private static Player[] players;
    private static int playerNum;
 
-   Player(String username) {
+   Player(String username){
       super(username);
    }
 
+   Player(String username,int teamNumber) {
+      super(username);
+      this.teamNumber = teamNumber;
+   }
+
+
+   public void setSelectedClass (String selectedClass){
+      this.selectedClass=selectedClass;
+   }
+   public String getSelectedClass (){
+      return(selectedClass);
+   }
 
    public static void updateHitbox() {
       for (int i = 0; i < players.length; i++) {

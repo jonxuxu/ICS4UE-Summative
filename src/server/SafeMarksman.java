@@ -18,8 +18,8 @@ public class SafeMarksman extends Player{
   private static int MS_BUFF_DURATION = 100;
   private static int STUN_DURATION = 100;
 
-  SafeMarksman(String username) {
-    super(username);
+  SafeMarksman(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(300);
     setHealth(300);
     setAttack(100);
