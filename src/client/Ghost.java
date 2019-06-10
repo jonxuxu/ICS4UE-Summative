@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * SafeMarksman.java
- * This is
+ * Ghost.java
+ * This is the character class for Ghost
  *
- * @author Will Jeong
+ * @author Will Jeong + company
  * @version 1.0
  * @since 2019-05-19
  */
