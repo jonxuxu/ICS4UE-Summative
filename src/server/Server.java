@@ -21,7 +21,7 @@ import java.util.ArrayList;
  */
 
 public class Server {
-   private String playerClass = "SafeMarksman";
+  private String playerClass = "Summoner";
    //REMEMBER: output = new PrintWriter(myConnection.getOutputStream()); is very important
 
    //All for the main server
@@ -661,20 +661,22 @@ public class Server {
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
          if (!begin) {
             if (onlinePlayers.size() < 6) {
-               //REE TEMPORARY DOESN'T SYNC WITH CLIENTS'S CHOICES
-               if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
-                  onlinePlayers.add(new SafeMarksman(user.getUsername()));
-               } else if (playerClass.equals("TimeMage")) {
-                  onlinePlayers.add(new TimeMage(user.getUsername()));
-               } else if (playerClass.equals("Ghost")) {
-                  onlinePlayers.add(new Ghost(user.getUsername()));
-               } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
-                  onlinePlayers.add(new MobileSupport(user.getUsername()));
-               } else if (playerClass.equals("Juggernaut")) {
-                  onlinePlayers.add(new Juggernaut(user.getUsername()));
-               } else {
-                  onlinePlayers.add(new SafeMarksman(user.getUsername()));
-               }
+              //REE TEMPORARY DOESN'T SYNC WITH CLIENTS'S CHOICES
+              if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")){
+                onlinePlayers.add(new SafeMarksman(user.getUsername()));
+              } else if (playerClass.equals("TimeMage")){
+                onlinePlayers.add(new TimeMage(user.getUsername()));
+              } else if (playerClass.equals("Ghost")){
+                onlinePlayers.add(new Ghost(user.getUsername()));
+              } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")){
+                onlinePlayers.add(new MobileSupport(user.getUsername()));
+              } else if (playerClass.equals("Juggernaut")){
+                onlinePlayers.add(new Juggernaut(user.getUsername()));
+              } else if (playerClass.equals("Summoner")){
+                onlinePlayers.add(new Summoner(user.getUsername()));
+              } else {
+                onlinePlayers.add(new SafeMarksman(user.getUsername()));
+              }
                onlineGameSockets.add(playerSocket);
                handlers.add(handler);
                return (true);

@@ -44,7 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-   private String playerClass = "SafeMarksman";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+  private String playerClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -317,23 +317,26 @@ public class Client extends JFrame implements WindowListener {
             host = true;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("TimeMage")) {
-                  players[i] = new TimeMage(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("Ghost")) {
-                  players[i] = new Ghost(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
-                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("Juggernaut")) {
-                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
-               } else {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               }
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
-               players[i].setTeam(onlineList.get(i).getTeam());
+              //TODO: Add class select here
+              if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")){
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("TimeMage")){
+                players[i] = new TimeMage(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("Ghost")){
+                players[i] = new Ghost(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")){
+                players[i] = new MobileSupport(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("Juggernaut")){
+                players[i] = new Juggernaut(onlineList.get(i).getUsername());
+              } else if (playerClass.equals("Summoner")){
+                players[i] = new Summoner(onlineList.get(i).getUsername());
+              } else {
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              }
+              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                myPlayer = players[i];
+              }
+              players[i].setTeam(onlineList.get(i).getTeam());
             }
             testingBegin = false;
             nextPanel = 6;

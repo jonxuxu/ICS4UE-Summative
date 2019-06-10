@@ -19,7 +19,6 @@ public abstract class Player extends User implements CanIntersect {
    //Constants
    private int ID;
    private double[] xy = {300, 300};
-   private int[] centerXy = new int[2];
    private boolean spells[] = new boolean[3];
    private boolean artifact = false;
    private boolean damaged = false;
