@@ -41,6 +41,13 @@ class AOE implements HasID{
     hitbox = new Ellipse2D.Double(x-radius, y-radius, radius * 2, radius * 2);
     this.y = y;
   }
+  /*
+  public void incrementX(int dx){
+    x+=dx;
+  }
+  public void incrementY(int dy){
+    y+=dy;
+  }*/
   
   public void advance() {
     lifetime++;

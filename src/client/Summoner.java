@@ -15,7 +15,7 @@ import java.io.IOException;
  * @since 2019-05-19
  */
 
-public class SafeMarksman extends Player {
+public class Summoner extends Player {
    private int positionIndex;
    private int movementIndex;
    private boolean moving;
@@ -23,13 +23,13 @@ public class SafeMarksman extends Player {
    private int[] ANIMATION_LENGTH = {80, 80, 80};
    private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[4][][];
 
-   SafeMarksman(String username) {
+   Summoner(String username) {
       super(username);
       try {
-         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\characters\\C_archer.png"));
-         ALL_ANIMATIONS[0] = new BufferedImage[3][4];
-         for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 3; j++) {
+         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\SafeMarksman.png"));
+         ALL_ANIMATIONS[0] = new BufferedImage[4][3];
+         for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 4; j++) {
                ALL_ANIMATIONS[0][j][i] = movementSheet.getSubimage(j * 32, i * 32, 32, 32);
                //i refers to row number, j refers to column number
             }
@@ -69,7 +69,7 @@ public class SafeMarksman extends Player {
       if (movementIndex == 10) {
          movementIndex = 0;
       }
-      g2.drawImage(ALL_ANIMATIONS[0][movementIndex / 5][positionIndex], x, y, width, height, null);
+      g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex / 5], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {

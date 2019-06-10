@@ -21,7 +21,6 @@ import java.util.ArrayList;
  */
 
 public class Server {
-   private String playerClass = "SafeMarksman";
    //REMEMBER: output = new PrintWriter(myConnection.getOutputStream()); is very important
 
    //All for the main server
@@ -133,8 +132,8 @@ public class Server {
                      }
                   } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
                      System.out.println(inputString);
-                     /*
-                     if (myGame.getGameSize() <= 1) {
+
+                   /*  if (myGame.getGameSize() <= 1) {
                         output.println(7);
                         output.flush();
                      } else if ((myGame.emptyTeam(0)) || (myGame.emptyTeam(1))) {
@@ -143,12 +142,14 @@ public class Server {
                      } else if (myGame.noTeam()) {
                         output.println(9);
                         output.flush();
-                     } else {
-                        myGame.run();
-                     }
-                     */
-                     //Error verification is ignored
+                     } else if (myGame.noClass()) {
+                        output.println(10);
+                        output.flush();
+                     } else {*/
                      myGame.run();
+                     //   }
+
+                     //Error verification is ignored
                      //Each game is a thread that is run. There is only communication between the game and the players
                   } else if (initializer == 'B') {
                      if (myGame != null) {
@@ -238,6 +239,8 @@ public class Server {
                         games.get(0).addGamePlayer(myUser, myConnection, this);
                      }
                      adjustPlayerList(true);
+                  } else if (initializer == 'Z') { //Choosing class
+                     myGame.setSelectedClass(myUser, inputString);
                   }
                }
             }
@@ -360,12 +363,39 @@ public class Server {
 
 
             for (int i = 0; i < players.length; i++) {
-               players[i] = onlinePlayers.get(i);
+               String playerClass = onlinePlayers.get(i).getSelectedClass();
+               System.out.println(playerClass);
+               if (playerClass != null) { //TESTING ONLY
+                  if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
+                     players[i] = new SafeMarksman(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+                  } else if (playerClass.equals("TimeMage")) {
+                     players[i] = new TimeMage(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+                  } else if (playerClass.equals("Ghost")) {
+                     players[i] = new Ghost(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+                  } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
+                     players[i] = new MobileSupport(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+                  } else if (playerClass.equals("Juggernaut")) {
+                     players[i] = new Juggernaut(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+                  } else if (playerClass.equals("Summoner")) {
+                     players[i] = new Summoner(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+                  }
+                  players[i].setSelectedClass(playerClass);
+               } else {
+                  System.out.println("Class has not been chosen");
+                  players[i] = new SafeMarksman(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
+               }
                gameSockets[i] = onlineGameSockets.get(i);
                gameOutputs[i] = new PrintWriter(onlineGameSockets.get(i).getOutputStream());
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
-               gameOutputs[i].println("B"); //B for begin
+            }
+            StringBuilder beginLine = new StringBuilder("B");
+            for (int k = 0; k < players.length; k++) {
+               beginLine.append(" " + players[k].getSelectedClass());
+            }
+            System.out.println(beginLine.toString());
+            for (int i = 0; i < players.length; i++) {
+               gameOutputs[i].println(beginLine.toString().trim()); //B for begin
                gameOutputs[i].flush();
             }
             playerNum = players.length;
@@ -568,6 +598,7 @@ public class Server {
                      if (players[i] != null) {
                         //TODO: Ask Kamron why this is important and if I can move it here (interferes with light otherwise)
                         players[i].update();
+                        players[i].setFlashlightOn(false);
                      }
                   }
                   gameTick++;
@@ -589,6 +620,14 @@ public class Server {
             return true;
          } else {
             return false;
+         }
+      }
+
+      private void setSelectedClass(User myUser, String selectedClass) {
+         for (Player myPlayer : onlinePlayers) {
+            if (myPlayer.getUsername().equals(myUser.getUsername())) {
+               myPlayer.setSelectedClass(selectedClass);
+            }
          }
       }
 
@@ -641,6 +680,15 @@ public class Server {
          return (false);
       }
 
+      private boolean noClass() {
+         for (Player myPlayer : onlinePlayers) {
+            if (myPlayer.getSelectedClass() == null) {
+               return (true);
+            }
+         }
+         return (false);
+      }
+
       private boolean sameName(String comparedName) {
          if (comparedName.equals(serverName)) {
             return (true);
@@ -660,20 +708,7 @@ public class Server {
       private boolean addGamePlayer(User user, Socket playerSocket, MenuHandler handler) {
          if (!begin) {
             if (onlinePlayers.size() < 6) {
-               //REE TEMPORARY DOESN'T SYNC WITH CLIENTS'S CHOICES
-               if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
-                  onlinePlayers.add(new SafeMarksman(user.getUsername()));
-               } else if (playerClass.equals("TimeMage")) {
-                  onlinePlayers.add(new TimeMage(user.getUsername()));
-               } else if (playerClass.equals("Ghost")) {
-                  onlinePlayers.add(new Ghost(user.getUsername()));
-               } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
-                  onlinePlayers.add(new MobileSupport(user.getUsername()));
-               } else if (playerClass.equals("Juggernaut")) {
-                  onlinePlayers.add(new Juggernaut(user.getUsername()));
-               } else {
-                  onlinePlayers.add(new SafeMarksman(user.getUsername()));
-               }
+               onlinePlayers.add(new SafeMarksman(user.getUsername(), 9));//The team will not be set
                onlineGameSockets.add(playerSocket);
                handlers.add(handler);
                return (true);

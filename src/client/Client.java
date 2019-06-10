@@ -44,7 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-   private String playerClass = "SafeMarksman";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+  private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -92,9 +92,9 @@ public class Client extends JFrame implements WindowListener {
    private String username, attemptedGameName, attemptedGamePassword;
    private boolean host, notifyReady, sendName, testGame, loading, logout, leaveGame, teamChosen, classChosen, gameBegin; // False by default
    private int[] errors = new int[4];
-   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team"};
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team", "Not all players have selected a class"};
    private int myTeam;
-   private int classID;
+   private String className;
    private int myPlayerID;
    private int frames, fps;
 
@@ -106,8 +106,8 @@ public class Client extends JFrame implements WindowListener {
    private double mouseAngle;
    private int keyAngle;
    private boolean flashlightOn;
-   private int MAP_WIDTH=10000;
-   private int MAP_HEIGHT=10000;
+   private int MAP_WIDTH = 10000;
+   private int MAP_HEIGHT = 10000;
    // Debugging
    private boolean testingBegin = false;
    //Graphics
@@ -295,14 +295,20 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
             waitForInput();
             if (errors[3] != 0) {
+               System.out.println("dwd");
                menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println(errorMessages[errors[3]]);
+               System.out.println("Error:"+errorMessages[errors[3]]);
                soundEffect.playSound("error");
             }
          }
          if (teamChosen) {
             teamChosen = false;
             output.println("E" + myTeam);//E for now, when testing is removed it will be T
+            output.flush();
+         }
+         if (classChosen) {
+            classChosen = true;
+            output.println("Z" + className);//Refers to class chosen
             output.flush();
          }
          if (testingBegin) {
@@ -317,23 +323,26 @@ public class Client extends JFrame implements WindowListener {
             host = true;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-               if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("TimeMage")) {
-                  players[i] = new TimeMage(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("Ghost")) {
-                  players[i] = new Ghost(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("MobileSupport") || playerClass.equals("Support")) {
-                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
-               } else if (playerClass.equals("Juggernaut")) {
-                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
-               } else {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               }
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
-               players[i].setTeam(onlineList.get(i).getTeam());
+              //TODO: Add class select here
+              if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")){
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("TimeMage")){
+                players[i] = new TimeMage(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("Ghost")){
+                players[i] = new Ghost(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")){
+                players[i] = new MobileSupport(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("Juggernaut")){
+                players[i] = new Juggernaut(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("Summoner")){
+                players[i] = new Summoner(onlineList.get(i).getUsername());
+              } else {
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              }
+              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                myPlayer = players[i];
+              }
+              players[i].setTeam(onlineList.get(i).getTeam());
             }
             testingBegin = false;
             nextPanel = 6;
@@ -352,8 +361,8 @@ public class Client extends JFrame implements WindowListener {
       keyPressed = true;
       lastKeyTyped = c;
       //System.out.println("type");
-      if(currentPanel == 7){
-         if(c == 9){ // Tab key switches focus to game chat panel
+      if (currentPanel == 7) {
+         if (c == 9) { // Tab key switches focus to game chat panel
             intermediatePanel.toggleMode();
          }
       }
@@ -505,7 +514,7 @@ public class Client extends JFrame implements WindowListener {
             if (initializer == '0') {
                loading = true;
             } else {
-               errors[3] = Integer.parseInt(initializer + "");
+               errors[3] = Integer.parseInt(initializer+input);
             }
          }
       } else if (initializer == 'A') {
@@ -539,10 +548,27 @@ public class Client extends JFrame implements WindowListener {
          }
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
+         input=input.trim();
+         String []classes = input.split(" ",-1);
          for (int i = 0; i < onlineList.size(); i++) {
+            thisClass = classes[i];
+            System.out.println(thisClass);
             //TODO: Add class stuff here;
-            players[i] = new Ghost(onlineList.get(i).getUsername());
-            players[i].setTeam(onlineList.get(i).getTeam());
+            if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("TimeMage")) {
+               players[i] = new TimeMage(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Ghost")) {
+               players[i] = new Ghost(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+               players[i] = new MobileSupport(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Juggernaut")) {
+               players[i] = new Juggernaut(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Summoner")) {
+               players[i] = new Summoner(onlineList.get(i).getUsername());
+            }else {//TESTING MODE ONLY
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            }
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                myPlayer = players[i];
                myPlayerID = i;
@@ -550,7 +576,10 @@ public class Client extends JFrame implements WindowListener {
             try {
                teams[0].add(players[i]);
                teams[onlineList.get(i).getTeam()].add(players[i]);
+               players[i].setTeam(onlineList.get(i).getTeam());
             } catch (Exception e) {
+               teams[0].add(players[i]);
+               players[i].setTeam(0);
                System.out.println("Testing mode error");
             }
          }
@@ -579,46 +608,46 @@ public class Client extends JFrame implements WindowListener {
          char initializer = firstInput.charAt(0);
          firstInput = firstInput.substring(1);
          String[] secondSplit = firstInput.split(",", -1);
-         if(secondSplit.length > 0){
-           if (initializer == 'P') {
-             updatePlayer(secondSplit);
-           } else if (initializer == 'O') {
-             updateOthers(secondSplit);
-           } else if (initializer == 'D') {
-             players[Integer.parseInt(secondSplit[0])] = null;
-           } else if (initializer == 'R') {
-             projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
-           } else if (initializer == 'E') {
-             int id = Integer.parseInt(secondSplit[0]);
-             if (id != 4) {
-               aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
-             } else {
-               int[][] points = new int[2][4];
-               for (int m = 0; m < 2; m++) {
-                 for (int n = 0; n < 4; n++) {
-                   points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
-                 }
+         if (secondSplit.length > 0) {
+            if (initializer == 'P') {
+               updatePlayer(secondSplit);
+            } else if (initializer == 'O') {
+               updateOthers(secondSplit);
+            } else if (initializer == 'D') {
+               players[Integer.parseInt(secondSplit[0])] = null;
+            } else if (initializer == 'R') {
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
+            } else if (initializer == 'E') {
+               int id = Integer.parseInt(secondSplit[0]);
+               if (id != 4) {
+                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+               } else {
+                  int[][] points = new int[2][4];
+                  for (int m = 0; m < 2; m++) {
+                     for (int n = 0; n < 4; n++) {
+                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                     }
+                  }
+                  aoes.add(new TimeMageAOE(id, points));
                }
-               aoes.add(new TimeMageAOE(id, points));
-             }
-           } else if (initializer == 'S') {
-             //Set the spell of the appropriate player to the correct one using setSpell
-           } else if (initializer == 'W') { //Walking
-             players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
-           } else if (initializer == 'L') {// Flash light
-             players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
-             for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
-               players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
-             }
-           } else if (initializer == 'C') { //Message in
-             boolean isFriendly = false;
-             for(Player player: teams[myTeam]){ // Checks to see if username belongs to a player in 1st team
-               if(player.getUsername().equals(secondSplit[0])){
-                 isFriendly = true;
+            } else if (initializer == 'S') {
+               //Set the spell of the appropriate player to the correct one using setSpell
+            } else if (initializer == 'W') { //Walking
+               players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
+            } else if (initializer == 'L') {// Flash light
+               players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+               for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+                  players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
                }
-             }
-             intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
-           }
+            } else if (initializer == 'C') { //Message in
+               boolean isFriendly = false;
+               for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
+                  if (player.getUsername().equals(secondSplit[0])) {
+                     isFriendly = true;
+                  }
+               }
+               intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
+            }
          }
       }
    }
@@ -647,6 +676,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void updateOthers(String[] data) {
       int playerID = Integer.parseInt(data[0]);
+      players[playerID].setFlashlightOn(false);
       players[playerID].setXy(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
       players[playerID].setHealth(Integer.parseInt(data[3]));
       players[playerID].setMaxHealth(Integer.parseInt(data[4]));
@@ -656,7 +686,6 @@ public class Client extends JFrame implements WindowListener {
       for (int j = 9; j < 9 + Integer.parseInt(data[8]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
       }
-      players[playerID].setFlashlightOn(false);
    }
 
    public void repaintPanels() {
@@ -776,8 +805,8 @@ public class Client extends JFrame implements WindowListener {
       this.nextPanel = nextPanel;
    }
 
-   public void setClassID(int classID) {
-      this.classID = classID;
+   public void setClassName(String className) {
+      this.className = className;
       classChosen = true;
    }
 
@@ -877,7 +906,7 @@ public class Client extends JFrame implements WindowListener {
                System.out.println("Image not found");
             }
             drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
-            darkness= new Area(new Rectangle(0, 0,(MAX_GAME_X), (MAX_GAME_Y)));
+            darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
             resetXyAdjust();
@@ -892,9 +921,14 @@ public class Client extends JFrame implements WindowListener {
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   currentPlayer.translateFlashlight(xyAdjust);
-                  if (currentPlayer.getFlashlightOn()){
+                  if (currentPlayer.getFlashlightOn()) {
                      darkness.subtract(new Area(currentPlayer.getFlashlightBeam()));
                   }
+               }
+            }
+            for (int i = 0; i < aoes.size(); i++) {
+               if (aoes.get(i).getID() == 0) {
+                  darkness.subtract(aoes.get(i).getArea());
                }
             }
             //Creating shapes
@@ -920,8 +954,8 @@ public class Client extends JFrame implements WindowListener {
             resetXyAdjust();
             for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
-                  if(players[i].getTeam() == myTeam){
-                    fog.scout(players[i].getXy());
+                  if (players[i].getTeam() == myTeam) {
+                     fog.scout(players[i].getXy());
                   }
                }
             }
@@ -952,7 +986,7 @@ public class Client extends JFrame implements WindowListener {
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[4])).toggle();
                   System.out.println("Debug mode");
-               }else if ((lastKeyTyped == 99)||(lastKeyTyped == 67)){
+               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) {
                   ((InventoryComponent) (allComponents[3])).toggle();
                }
                keyPressed = false;
@@ -963,7 +997,7 @@ public class Client extends JFrame implements WindowListener {
             //chatPanel.draw(g2);
          }
          g2.dispose();
-         darkness= new Area(new Rectangle(0, 0,(MAX_GAME_X), (MAX_GAME_Y)));
+         darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
       }
 
       public void setDimensions(int MAX_GAME_X, int MAX_GAME_Y) {

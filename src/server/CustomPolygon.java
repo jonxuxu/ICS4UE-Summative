@@ -51,12 +51,13 @@ public class CustomPolygon {
       this.yCo = yCo;
       this.cVal = cVal;
    }
+
    public void setPlayerVector(double xVector, double yVector) { //player is initial, final is mouse
       this.xyVector[0] = xVector;
       this.xyVector[1] = yVector;
    }
 
-   public void setCenter(int[] xPoints, int []yPoints){
+   public void setCenter(int[] xPoints, int[] yPoints) {
       for (int i = 0; i < pointNum; i++) {
          points[i][0] = xPoints[i];
          points[i][1] = yPoints[i];
@@ -98,6 +99,19 @@ public class CustomPolygon {
       } else {
          return (false);
       }
+   }
+
+   public boolean getFlareIntersect(int flareX, int flareY, int flareRadius) {
+      for (int i = 0; i < 4; i++) {
+         int xSquared = (points[i][0] - flareX);
+         xSquared = xSquared * xSquared;
+         int ySquared = (points[i][1] - flareY);
+         ySquared = ySquared * ySquared;
+         if (xSquared + ySquared < flareRadius * flareRadius) {
+            return (true);
+         }
+      }
+      return(false);
    }
 
    public int[] getIntersect() {
