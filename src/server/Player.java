@@ -328,7 +328,8 @@ public abstract class Player extends User implements CanIntersect {
          projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
          autoAttackTimer = autoAttackCooldown;
        } else {
-         addAOE(new AutoAOE(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
+         addAOE(new AutoAOE(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, range));
+         autoAttackTimer = autoAttackCooldown;
        }
      }
    }

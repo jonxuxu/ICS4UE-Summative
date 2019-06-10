@@ -30,9 +30,10 @@ public class Ghost extends Player{
     setHealth(300);
     setAttack(300);
     setMobility(10);
-    setRange(10);//REE Change to -1 when add support for melee attacks
+    setRange(50);//REE Change to -1 when add support for melee attacks
     setAutoAttackCooldown(10);
     setFlareCooldown(100);
+    setMelee(true);
   }
   
   public boolean castSpell(int spellIndex){
