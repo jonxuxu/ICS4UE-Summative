@@ -1,7 +1,7 @@
 
 public class Tester {
 	public static void main(String[] args) {
-	    MapGenTester gen = new MapGenTester();        
+	    MainMapGenModule gen = new MainMapGenModule();        
 	    
 	    System.out.println("executed");
 	  }
