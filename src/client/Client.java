@@ -1,18 +1,22 @@
 package client;
 
+import client.gameUi.BottomComponent;
+import client.gameUi.DebugComponent;
+import client.gameUi.GameComponent;
+import client.gameUi.InventoryComponent;
+import client.gameUi.MinimapComponent;
+import client.gameUi.PauseComponent;
+import client.map.*;
+import client.sound.*;
+import client.ui.*;
+
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,7 +25,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Random;
 
 /*
 Here is how the messages work.
@@ -41,64 +44,79 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
+  private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+   //Finds memory usage before program starts
+   Runtime runtime = Runtime.getRuntime();
+   double maxMem = runtime.maxMemory();
+   double usedMem;
+
+   // Networking
    private Socket socket;
    private BufferedReader input;
    private PrintWriter output;
-   private String username;
-   private boolean connected = false;
-   private JPanel[] allPanels = new JPanel[8];
+   private int connectionState = 0; //-1 means unable to connect, 0 means trying to connect, 1 means connected
+   private String serverName;
+   private String serverPassword;
+   private boolean receivedOnce;//Determines if a message was received
+
+   // Screen stuff
+   private final int DESIRED_Y = 500;
+   private final int DESIRED_X = 950;
+   private int[] xyAdjust = new int[2];
+   private int MAX_Y, MAX_X;
+   private double SCALING, INTRO_SCALING;
+   private int[] mouseState = new int[3];
+
+   // Assets
+   private soundEffectManager soundEffect = new soundEffectManager();
+   private Clock time = new Clock(16);
+
+   // Ui stuff
+   private CustomMouseAdapter myMouseAdapter;
+   private CustomKeyListener myKeyListener = new CustomKeyListener(this);
+   private MenuPanel[] menuPanels = new MenuPanel[7];
+   private IntermediatePanel intermediatePanel;
    private final String[] PANEL_NAMES = {"LOGIN_PANEL", "INTRO_PANEL", "MAIN_PANEL", "CREATE_PANEL", "JOIN_PANEL", "INSTRUCTION_PANEL", "WAITING_PANEL", "INTERMEDIATE_PANEL"};
-   private CustomMouseAdapter myMouseAdapter = new CustomMouseAdapter();
-   private CustomKeyListener myKeyListener = new CustomKeyListener();
-   private boolean sendName = false;
-   private boolean testGame = false;
-   private Font MAIN_FONT;
-   private Font HEADER_FONT;
-   //State legend:
-   private int state = 0;//should be 0
-   private int newState = 0;//should be 0
    private CardLayout cardLayout = new CardLayout(5, 5);
    private JPanel mainContainer = new JPanel(cardLayout);
-   private String gameName;
-   private String gamePassword;
-   private String attemptedGameName;
-   private String attemptedGamePassword;
-   private boolean host = false;
-   private boolean notifyReady = false;
+   private int currentPanel, nextPanel; // 0 by default
+   private boolean keyPressed = false;
+   private char lastKeyTyped;
+
+
+   // Game states
    private ArrayList<User> onlineList = new ArrayList<User>();
    private Player[] players;
    private User myUser;
    private Player myPlayer;
-   private boolean gameBegin;
-   private String outputString;//This is what is outputted to the game
-   private boolean loading = false;
-   private int DESIRED_Y = 500;
-   private int DESIRED_X = 950;
-   private int MAX_Y;
-   private int MAX_X;
-   private double scaling;
-   private Sector[][] sectors;
-   private ArrayList<Integer> disconnectedPlayerID = new ArrayList<Integer>();
-   private int[] errors = new int[3];
-   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun"};
-   private BufferedImage sheet;
-   private boolean logout = false;
-   private boolean leaveGame = false;
-   private BufferedImage TITLE_SCREEN;
-   private BufferedImage TITLE;
-   private boolean unableToConnect = false;
+   private String username, attemptedGameName, attemptedGamePassword;
+   private boolean host, notifyReady, sendName, testGame, loading, logout, leaveGame, teamChosen, classChosen, gameBegin; // False by default
+   private int[] errors = new int[4];
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team", "Not all players have selected a class"};
+   private int myTeam;
+   private String className;
+   private int myPlayerID;
+   private int frames, fps;
+
+   // Game itself
    private FogMap fog;
+   private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+   private ArrayList<AOE> aoes = new ArrayList<AOE>();
+   private ArrayList<Player>[] teams = new ArrayList[2];
+   private double mouseAngle;
+   private int keyAngle;
+   private boolean flashlightOn;
+   private int MAP_WIDTH = 10000;
+   private int MAP_HEIGHT = 10000;
+   // Debugging
    private boolean testingBegin = false;
-   private double introScaling;
-   private ArrayList<AshParticle> particles = new ArrayList<>();
+   //Graphics
+
 
    public Client() {
       super("Dark");
 
-      //Control set up (the mouse listeners are attached to the game panel)
-      this.addKeyListener(myKeyListener);
-
-      //Font+image set up
+      //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Regular.ttf")));
@@ -106,49 +124,63 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
-         TITLE_SCREEN = ImageIO.read(new File(".\\res\\TitleScreenDark.png"));
-         TITLE = ImageIO.read(new File(".\\res\\Title.png"));
       } catch (IOException | FontFormatException e) {
          System.out.println("Font not available");
+         e.printStackTrace();
       }
 
-
-      //Basic set up
+      // Display set up
       MAX_X = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getWidth());
       MAX_Y = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getHeight());
       this.setSize(MAX_X, MAX_Y);
       this.setVisible(true);
       Dimension actualSize = this.getContentPane().getSize();
+      MAX_X = actualSize.width;
+      MAX_Y = actualSize.height;
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
       this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-      //Creating components
-      allPanels[7] = new IntermediatePanel();
-      ((IntermediatePanel) (allPanels[7])).initializeScaling();//must be called before the rest of the fonts
 
-      allPanels[0] = new LoginPanel();
-      allPanels[1] = new IntroPanel();
-      allPanels[2] = new MenuPanel();
-      allPanels[3] = new CreatePanel();
-      allPanels[4] = new JoinPanel();
-      allPanels[5] = new InstructionPanel();
-      allPanels[6] = new WaitingPanel();
+      //Control set up (the mouse listeners are attached to the game panel)
+      initializeScaling();
+      this.addKeyListener(myKeyListener);
+      this.setFocusTraversalKeysEnabled(false);
+      int[] tempXy = {(int) (MAX_X / 2), (int) (MAX_Y / 2)};
+      myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
+
+      //Creating components
+      MenuPanel.setParameters(MAX_X, MAX_Y, SCALING, INTRO_SCALING, this);
+      menuPanels[0] = new LoginPanel();
+      menuPanels[1] = new IntroPanel();
+      menuPanels[2] = new StartPanel();
+      menuPanels[3] = new CreatePanel();
+      menuPanels[4] = new JoinPanel();
+      menuPanels[5] = new InstructionPanel();
+      menuPanels[6] = new WaitingPanel();
+      intermediatePanel = new IntermediatePanel(MAX_X, MAX_Y, SCALING, this);
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
-      for (int i = 0; i < allPanels.length; i++) {
-         mainContainer.add(allPanels[i], PANEL_NAMES[i]);
+      for (int i = 0; i < menuPanels.length; i++) {
+         mainContainer.add(menuPanels[i], PANEL_NAMES[i]);
       }
+      mainContainer.add(intermediatePanel, PANEL_NAMES[7]);
       this.add(mainContainer);
-      //cardLayout.show(mainContainer, PANEL_NAMES[0]);
       cardLayout.show(mainContainer, PANEL_NAMES[0]);
       this.setVisible(true);//Must be called again so that it appears visible
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
-      ((IntermediatePanel) (allPanels[7])).initializeSize();
 
       // Setting up fog (should be moved soon TM)
-      fog = new FogMap(1000, 1000);
+      int[] xy = {300, 300};
+      fog = new FogMap(xy, SCALING, MAP_WIDTH, MAP_HEIGHT);
+      // TODO: Set player spawn xy later
+
+      //Variable set up
+      teams[0] = new ArrayList<Player>();
+      teams[1] = new ArrayList<Player>();
+      Projectile.setXyAdjust(xyAdjust);
+      AOE.setXyAdjust(xyAdjust);
    }
 
    public static void main(String[] args) {
@@ -156,171 +188,272 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void go() {
-      boolean inputReady = false;
-      while (!connected) {
-         //Idle
-         repaintPanels();
-         connect();
-      }
-      try {
-         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-         output = new PrintWriter(socket.getOutputStream());
-         //Start with entering the name. This must be separated from the rest
-         //Username successfully entered in
-         int fogTicks = 0;
-         Clock time = new Clock ();
-         while (connected) {
-            //Otherwise, continue to send messages. The lines below are for when something is going to be sent
-            if (!gameBegin) {
-               if (time.getFramePassed()) {
-                  //Recieves input if possible
-                  if (input.ready()) {
-                     decipherInput(input.readLine());
-                  }
+      // Sets up frame rate timer
+      new java.util.Timer().scheduleAtFixedRate(
+              new java.util.TimerTask() {
+                 @Override
+                 public void run() {
+                    fps = frames;
+                    frames = 0;
+                 }
+              },
+              1000,
+              1000
+      );
 
-                  //Deal with output when going back through the menu
-                  if (logout) {
-                     output.println("B");//for back
-                     output.flush();
-                     username = null;
-                     logout = false;
-                  }
-                  if (leaveGame) {
-                     output.println("B");//for back
-                     output.flush();
-                     onlineList.clear();
-                     leaveGame = false;
-                  }
-                  if (sendName) {
-                     sendName = false;
-                     if (username != null) {
-                        if (verifyString(username, 0)) {
-                           output.println("U" + username);
-                           output.flush();
-                           waitForInput();
-                        }
-                        if (errors[0] == 0) {
-                           System.out.println("Valid username");
-                        } else {
-                           System.out.println("Error: " + errorMessages[errors[0]]);
-                        }
-                     }
-                  }
-                  if (testGame) {
-                     testGame = false;
-                     if ((verifyString(attemptedGameName, 1)) && (verifyString(attemptedGamePassword, 2))) {
-                        if (state == 3) {
-                           output.println("C" + attemptedGameName + " " + attemptedGamePassword);
-                        } else {
-                           output.println("J" + attemptedGameName + " " + attemptedGamePassword);
-                        }
-                        output.flush();
-                        waitForInput();
-                     }
-                     System.out.println(errors[2] + " " + attemptedGameName + " " + attemptedGamePassword);
-                     if ((errors[1] == 0) && (errors[2] == 0)) {
-                        System.out.println("Valid game");
-                     } else {
-                        System.out.println("Error: " + errorMessages[errors[1]]);
-                        System.out.println("Error: " + errorMessages[errors[2]]);
-                     }
-                  }
-                  if (notifyReady) {
-                     notifyReady = false;
-                     output.println("R");
-                     output.flush();
-                     waitForInput();
-                  }
-                  if (testingBegin) {
-                     username = Math.random() + "";
-                     myUser = new User(username);
-                     output.println("T" + username);//test
-                     output.flush();
-                     waitForInput();
-                     host = true;
-                     newState = 6;
-                     gameName = "";
-                     gamePassword = "";
-                     players = new Player[onlineList.size()];
-                     for (int i = 0; i < onlineList.size(); i++) {
-                        players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-                        if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                           myPlayer = players[i];
-                        }
-                     }
-                     testingBegin = false;
-                  }
+      while (true) {  //Main game loop
+         if (time.getFramePassed()) {
+            if (gameBegin) {
+               if (receivedOnce) {
                   repaintPanels();
                }
             } else {
-               // TODO: Initialize map ONCE after game begin
+               repaintPanels();
+            }
+            frames++;
+         }
+         if (connectionState < 1) {
+            connect();
+         } else {
+            try {
+               input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+               output = new PrintWriter(socket.getOutputStream());
+            } catch (IOException e) {
+               e.printStackTrace();
+            }
+            if (!gameBegin) {
+               menuLogic();
+            } else {
+               //Finds memory usage after code execution
+               usedMem = runtime.totalMemory() - runtime.freeMemory();
+               gameLogic();
+            }
+         }
+      }
+   }
 
-
-               if (input.ready()) {
-                  decipherInput(input.readLine());//read input
-                  //This is where everything is output. Output the key controls
-                  //Always begin with clearing the outputString
-                  //The output string contains all the information required for the server.
-                  //I'm unsure if I should process some here, or just send all the raw data
-                  //If the raw data was to be sent, the following should be sent: MAX_X/MAX_Y (only once),
-                  //the x and y of the mouse, the relevant keyboard presses maybe? (not all)
-                  outputString = "";
-                  int angleOfMovement = myKeyListener.getAngle();
-                  int[] xyPos = new int[2]; //Scaled to the map
-
-                  xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0]; //Make it for hover
-                  xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
-
-                  // Updating fog
-                  if (fogTicks > 30) { //50 frames or 0.5 seconds @ 100fps
-                     fog.age();
-                     for (int i = 0; i < players.length; i++) {
-                        // TODO: Separate by teams
-                        // TODO: Account for players that quit?
-                        fog.scout(players[i].getXy()[1] / 10, players[i].getXy()[0] / 10);
-                     }
-                     fogTicks = 0;
-                  }
-                  fogTicks++;
-
-
-                  //Check to see if it can only reach within the boundaries of the JFrame. Make sure that this is true, otherwise you
-                  //must add the mouse adapter to the JPanel.
-
-                  boolean[] spellsPressed = myKeyListener.getSpell();
-                  boolean[] leftRight = myMouseAdapter.getLeftRight();
-                  StringBuilder outputString = new StringBuilder();
-                  for (int i = 0; i < spellsPressed.length; i++) {
-                     if (spellsPressed[i]) {
-                        outputString.append("S" + i + "," + xyPos[0] + "," + xyPos[1]);
-                     }
-                  }
-                  if ((spellsPressed[0]) || (spellsPressed[1]) || (spellsPressed[2])) {
-                     outputString.append(" "); //Add the seperator
-                  }
-                  if (angleOfMovement != -10) {
-                     outputString.append("M" + myPlayer.getDisp(angleOfMovement)[0] + "," + myPlayer.getDisp(angleOfMovement)[1] + " ");
-                  }
-                  if (myMouseAdapter.getPressed()) {
-                     if (myMouseAdapter.getLeftRight()[0]) {
-                        outputString.append("A" + xyPos[0] + "," + xyPos[1] + " ");
-                     }
-                     if (myMouseAdapter.getLeftRight()[1]) {
-                        outputString.append("F" + xyPos[0] + "," + xyPos[1] + " ");
-                     }
-                  }
-                  // outputString = angleOfMovement + " " + xyDisp[0] + " " + xyDisp[1] + " " + spellsPressed[0] + " " + spellsPressed[1] + " " + spellsPressed[2] + " " + leftRight[0] + " " + leftRight[1];//If it is -1, then the server will recognize to stop
-                  if (!outputString.toString().trim().isEmpty()) {
-                     output.println(outputString.toString().trim());
-                     output.flush();
-                  }
-                  repaintPanels();
+   public void menuLogic() {
+      try {
+         if (input.ready()) {
+            decipherMenuInput(input.readLine());
+         }
+         //Deal with output when going back through the menu
+         if (logout) {
+            output.println("B");//for back
+            output.flush();
+            username = null;
+            logout = false;
+         }
+         if (leaveGame) {
+            output.println("B");//for back
+            output.flush();
+            onlineList.clear();
+            myUser.setTeam(9);
+            leaveGame = false;
+         }
+         if (sendName) {
+            sendName = false;
+            if (username != null) {
+               if (verifyString(username, 0)) {
+                  output.println("U" + username);
+                  output.flush();
+                  waitForInput();
+               }
+               if (errors[0] != 0) {
+                  menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[0]]);
+                  soundEffect.playSound("error");
                }
             }
          }
-         //If a message is sent, wait until a response is received before doing anything
+         if (testGame) {
+            testGame = false;
+            boolean checkName = (verifyString(attemptedGameName, 1));
+            boolean checkPass = (verifyString(attemptedGamePassword, 2));
+            if ((checkName) && (checkPass)) {
+               if (currentPanel == 3) {
+                  output.println("C" + attemptedGameName + " " + attemptedGamePassword);
+               } else {
+                  output.println("J" + attemptedGameName + " " + attemptedGamePassword);
+               }
+               output.flush();
+               waitForInput();
+            } else {
+               soundEffect.playSound("error");
+               String totalErrorOutput = "";
+               if ((errors[1] != 0)) {
+                  totalErrorOutput += ("Name Error: " + errorMessages[errors[1]] + "_");
+               }
+               if ((errors[2] != 0)) {
+                  totalErrorOutput += ("Password Error: " + errorMessages[errors[2]]);
+               }
+               menuPanels[currentPanel].setErrorUpdate(totalErrorOutput);
+            }
+         }
+         if (notifyReady) {
+            notifyReady = false;
+            output.println("R");
+            output.flush();
+            waitForInput();
+            if (errors[3] != 0) {
+               System.out.println("dwd");
+               menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+               System.out.println("Error:"+errorMessages[errors[3]]);
+               soundEffect.playSound("error");
+            }
+         }
+         if (teamChosen) {
+            teamChosen = false;
+            output.println("E" + myTeam);//E for now, when testing is removed it will be T
+            output.flush();
+         }
+         if (classChosen) {
+            classChosen = true;
+            output.println("Z" + className);//Refers to class chosen
+            output.flush();
+         }
+         if (testingBegin) {
+            username = Math.random() + "";
+            myUser = new User(username);
+            serverName = Integer.toString((int) (Math.random() * 10000));
+            serverPassword = "0";
+            System.out.println(serverName);
+            output.println("T" + username + "," + serverName);//test
+            output.flush();
+            waitForInput();
+            host = true;
+            players = new Player[onlineList.size()];
+            for (int i = 0; i < onlineList.size(); i++) {
+              //TODO: Add class select here
+              if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")){
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("TimeMage")){
+                players[i] = new TimeMage(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("Ghost")){
+                players[i] = new Ghost(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")){
+                players[i] = new MobileSupport(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("Juggernaut")){
+                players[i] = new Juggernaut(onlineList.get(i).getUsername());
+              } else if (thisClass.equals("Summoner")){
+                players[i] = new Summoner(onlineList.get(i).getUsername());
+              } else {
+                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+              }
+              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                myPlayer = players[i];
+              }
+              players[i].setTeam(onlineList.get(i).getTeam());
+            }
+            testingBegin = false;
+            nextPanel = 6;
+         }
+         //TODO: Add class select here
       } catch (IOException e) {
-         System.out.println("Unable to read/write");
+         e.printStackTrace();
+      }
+   }
+
+   public void updateMouse(int[] state) {
+      this.mouseState = state;
+   }
+
+   public void typeKey(char c) {
+      keyPressed = true;
+      lastKeyTyped = c;
+      //System.out.println("type");
+      if (currentPanel == 7) {
+         if (c == 9) { // Tab key switches focus to game chat panel
+            intermediatePanel.toggleMode();
+         }
+      }
+   }
+
+   public void gameLogic() {
+      // TODO: Initialize map ONCE after game begin
+      try {
+         if (input.ready()) {
+            decipherGameInput(input.readLine());
+            // TODO: Update/improve when kameron is done
+            int[] xyPos = new int[2]; //Scaled to the map
+            xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
+            xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
+            mouseAngle = myMouseAdapter.getAngle();
+            keyAngle = myKeyListener.getAngle();
+            boolean[] spellsPressed = myKeyListener.getSpell();
+            boolean[] leftRight = myMouseAdapter.getLeftRight();
+            StringBuilder outputString = new StringBuilder();
+            for (int i = 0; i < spellsPressed.length; i++) {
+               if (spellsPressed[i]) {
+                  outputString.append("S" + i + " ");
+               }
+            }
+            if (keyAngle != -10) {
+               outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
+            }
+            if (mouseState[2] == 1) { // If mouse pressed
+               if (leftRight[0]) {
+                  outputString.append("A" + " ");
+               }
+               if (leftRight[1]) {
+                  soundEffect.playSound("cow");
+                  outputString.append("F" + " ");
+               }
+            }
+            if (myKeyListener.getFlashlightOn()) {
+               outputString.append("L" + mouseAngle + " ");
+            }
+            outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
+            boolean walking = false;
+            int positionIndex = -10;
+            //Refreshes the players animation
+            if (keyAngle != -10) {
+               positionIndex = (int) Math.abs(2 - Math.ceil(keyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
+               //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
+               //Adding one more gives 3,2,1,0, which refer to left, up,right,down
+               walking = true;
+            } else {
+               if (mouseState[2] == 1) {
+                  positionIndex = (int) Math.abs(2 - Math.ceil((int) (4 * (mouseAngle / Math.PI)) / 2.0));
+               }
+            }
+            if (positionIndex != -10) {
+               outputString.append("W" + positionIndex + " ");//TODO: make this event driven
+            }
+            if (!outputString.toString().trim().isEmpty()) {
+               output.println(outputString.toString().trim());
+               output.flush();
+            }
+
+            //Update positions:
+         }
+      } catch (
+              IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+   public void waitForInput() {
+      boolean inputReady = false;
+      try {
+         while (!inputReady) {
+            if (input.ready()) {
+               inputReady = true;
+               if (!gameBegin) {
+                  decipherMenuInput(input.readLine().trim());
+               }
+            }
+         }
+      } catch (IOException e) {
+         System.out.println("Lost connection");
+      }
+   }
+
+   public boolean isParsable(char input) {
+      try {
+         int test = Integer.parseInt(input + "");
+         return (true);
+      } catch (NumberFormatException e) {
+         return (false);
       }
    }
 
@@ -354,178 +487,219 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   public void waitForInput() {
-      boolean inputReady = false;
-      try {
-         while (!inputReady) {
-            if (input.ready()) {
-               inputReady = true;
-               decipherInput(input.readLine());
-            }
-         }
-      } catch (IOException e) {
-         System.out.println("Lost connection");
-      }
-   }
-
-   public boolean isParsable(char input) {
-      try {
-         int test = Integer.parseInt(input + "");
-         return (true);
-      } catch (NumberFormatException e) {
-         return (false);
-      }
-   }
-
-   public void decipherInput(String input) {
-      //Hopefully, every message should have something
-      //For the menu, numbers represent error/success, A represents add all (if you join),
-      //N represents add one new player, and B represents begin the game
-      //Remove the initializer
-      input = input.trim();//in case something is wrong
-      if (!gameBegin) {
-         char initializer = input.charAt(0);
-         input = input.substring(1);
-         if (isParsable(initializer)) {
-            if (state == 0) {
-               errors[0] = Integer.parseInt(initializer + "");
-               if (initializer == '0') {
-
-                  //Start the opening here
+   public void decipherMenuInput(String input) {
+      char initializer = input.charAt(0);
+      input = input.substring(1);
+      if (isParsable(initializer)) {
+         if (currentPanel == 0) {
+            errors[0] = Integer.parseInt(initializer + "");
+            if (initializer == '0') {
+               //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
-                  ((IntroPanel) (allPanels[1])).go();
+                  ((IntroPanel) (menuPanels[1])).go();
                   try {
                      Thread.sleep(3000);
                   } catch (Exception E) {
                   }
 */
-                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
-
-                  newState = 2;
-               } else {
-                  username = null;
-               }
-            } else if ((state == 3) || (state == 4)) {
-               if (initializer == '0') {
-                  newState = 6;//Sends to a waiting room
-                  gameName = attemptedGameName;
-                  gamePassword = attemptedGamePassword;
-                  myUser = new User(username);//Sets the player
-                  if (state == 3) {
-                     host = true;
-                     onlineList.add(myUser);
-                  }
-               }
-               errors[1] = Integer.parseInt(initializer + "");
-               /*
-               else if (initializer == '1') {
-                  if (state == 2) {
-                     System.out.println("Game name in use");
-                  } else {
-                     System.out.println("Wrong username/password"); //Make this one print out state==5
-                  }
-               } else if (initializer == '2') {
-                  System.out.println("Game is full");//Make this one print out state==6
-               }
-               */
-            } else if (state == 6) {
-               if (initializer == '0') {
-                  System.out.println("Starting Game");
-                  loading = true;
-               } else {
-                  System.out.println("Unable to Start Game");
-               }
+               cardLayout.show(mainContainer, PANEL_NAMES[2]);
+               nextPanel = 2;
+            } else {
+               username = null;
             }
-         } else if (initializer == 'A') {
-            String[] allPlayers = input.split(" ", -1);
-            for (String aPlayer : allPlayers) {
-               if ((testingBegin) && (myUser.getUsername().equals(aPlayer))) {
-                  onlineList.add(myUser);
-               } else {
-                  onlineList.add(new User(aPlayer));
-               }
+         } else if ((currentPanel == 3) || (currentPanel == 4)) {
+            errors[1] = Integer.parseInt(initializer + "");
+         } else if (currentPanel == 6) {
+            if (initializer == '0') {
+               loading = true;
+            } else {
+               errors[3] = Integer.parseInt(initializer+input);
             }
-         } else if (initializer == 'N') {
-            onlineList.add(new User(input));
-         } else if (initializer == 'X') {
-            for (int i = 0; i < onlineList.size(); i++) {
-               if (onlineList.get(i).getUsername().equals(input)) {
-                  onlineList.remove(i);
-               }
-            }
-         } else if (initializer == 'B') {
-            players = new Player[onlineList.size()];
-            for (int i = 0; i < onlineList.size(); i++) {
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
-            }
-            newState = 7;//Sends to the game screen
-            gameBegin = true;
-         } else if (initializer == 'P') { //Then leave the game
-            onlineList.clear();
-            newState = 2;
          }
-      } else {
-         String[] firstSplit = input.split(" ", -1);
-         for (String firstInput : firstSplit) {
-            char initializer = firstInput.charAt(0);
-            String[] secondSplit = firstInput.split(initializer + "", -1);
-            for (String secondInput : secondSplit) {
-               if (!secondInput.equals("")) {
-                  String[] thirdSplit = secondInput.split(",", -1);
-                  if (initializer == 'P') {
-                     //REPLACE THIS WITH A SET PLAYER METHOD.
-                     int playerID = Integer.parseInt(thirdSplit[0]);
-                     players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
-                     players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
-                     players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
-                     players[playerID].setAttack(Integer.parseInt(thirdSplit[5]));
-                     players[playerID].setMobility(Integer.parseInt(thirdSplit[6]));
-                     players[playerID].setRange(Integer.parseInt(thirdSplit[7]));
-                     players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[8]));
-                     players[playerID].setGold(Integer.parseInt(thirdSplit[9]));
-                     players[playerID].setSpriteID(Integer.parseInt(thirdSplit[10]));
-                     for (int j = 11; j < 14; j++) {
-                        players[playerID].setSpellPercent(Integer.parseInt(thirdSplit[j]), j - 11);
-                     }
-                     players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[14]));
-                     for (int j = 15; j < 15 + Integer.parseInt(thirdSplit[15]); j++) {
-                        players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
-                     }
-                  } else if (initializer == 'O') {
-                     //REPLACE THIS WITH A SET OTHERS METHOD.
-                     int playerID = Integer.parseInt(thirdSplit[0]);
-                     players[playerID].setXy(Integer.parseInt(thirdSplit[1]), Integer.parseInt(thirdSplit[2]));
-                     players[playerID].setHealth(Integer.parseInt(thirdSplit[3]));
-                     players[playerID].setMaxHealth(Integer.parseInt(thirdSplit[4]));
-                     players[playerID].setArtifact(Boolean.parseBoolean(thirdSplit[5]));
-                     players[playerID].setSpriteID(Integer.parseInt(thirdSplit[6]));
-                     players[playerID].setDamaged(Boolean.parseBoolean(thirdSplit[7]));
-                     for (int j = 8; j < 8 + Integer.parseInt(thirdSplit[8]); j++) {
-                        players[playerID].addStatus(Integer.parseInt(thirdSplit[j]));
-                     }
-
-                  } else if (initializer == 'D') {
-                     players[Integer.parseInt(thirdSplit[0])] = null;
-                  }
+      } else if (initializer == 'A') {
+         String[] allPlayers = input.split(" ", -1);
+         myUser = new User(username);
+         for (String aPlayer : allPlayers) {
+            if ((testingBegin) && (myUser.getUsername().equals(aPlayer.substring(1)))) {
+               if (aPlayer.charAt(0) != '9') {
+                  myUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
                }
+               onlineList.add(myUser);
+            } else {
+               User tempUser = new User(aPlayer.substring(1));
+               if (aPlayer.charAt(0) != '9') {
+                  tempUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+               }
+               onlineList.add(tempUser);
+            }
+         }
+         nextPanel = 6;
+         if (currentPanel == 3) {
+            host = true;
+         }
+      } else if (initializer == 'N') {
+         onlineList.add(new User(input));
+      } else if (initializer == 'X') {
+         for (int i = 0; i < onlineList.size(); i++) {
+            if (onlineList.get(i).getUsername().equals(input)) {
+               onlineList.remove(i);
+            }
+         }
+      } else if (initializer == 'B') {
+         players = new Player[onlineList.size()];
+         input=input.trim();
+         String []classes = input.split(" ",-1);
+         for (int i = 0; i < onlineList.size(); i++) {
+            thisClass = classes[i];
+            System.out.println(thisClass);
+            //TODO: Add class stuff here;
+            if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("TimeMage")) {
+               players[i] = new TimeMage(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Ghost")) {
+               players[i] = new Ghost(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+               players[i] = new MobileSupport(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Juggernaut")) {
+               players[i] = new Juggernaut(onlineList.get(i).getUsername());
+            } else if (thisClass.equals("Summoner")) {
+               players[i] = new Summoner(onlineList.get(i).getUsername());
+            }else {//TESTING MODE ONLY
+               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            }
+            if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+               myPlayer = players[i];
+               myPlayerID = i;
+            }
+            try {
+               teams[0].add(players[i]);
+               teams[onlineList.get(i).getTeam()].add(players[i]);
+               players[i].setTeam(onlineList.get(i).getTeam());
+            } catch (Exception e) {
+               teams[0].add(players[i]);
+               players[i].setTeam(0);
+               System.out.println("Testing mode error");
+            }
+         }
+         nextPanel = 7;//Sends to the game screen
+         gameBegin = true;
+      } else if (initializer == 'P') { //Then leave the game
+         onlineList.clear();
+         nextPanel = 2;
+      } else if (initializer == 'E') { //This is similar to when E was sent, it is for switching teams
+         for (int i = 0; i < onlineList.size(); i++) {
+            if (onlineList.get(i).getUsername().equals(input.substring(1))) {
+               onlineList.get(i).setTeam(Integer.parseInt(input.charAt(0) + ""));
             }
          }
       }
    }
 
-   public void repaintPanels() {
-      if (state != newState) {
-         state = newState;
-         cardLayout.show(mainContainer, PANEL_NAMES[state]);
+   public void decipherGameInput(String input) {
+      if (!receivedOnce) {
+         receivedOnce = true;
       }
-      if (state != 7) {
-         allPanels[state].repaint();
+      projectiles.clear();
+      aoes.clear();
+      String[] firstSplit = input.split(" ", -1);
+      for (String firstInput : firstSplit) {
+         char initializer = firstInput.charAt(0);
+         firstInput = firstInput.substring(1);
+         String[] secondSplit = firstInput.split(",", -1);
+         if (secondSplit.length > 0) {
+            if (initializer == 'P') {
+               updatePlayer(secondSplit);
+            } else if (initializer == 'O') {
+               updateOthers(secondSplit);
+            } else if (initializer == 'D') {
+               players[Integer.parseInt(secondSplit[0])] = null;
+            } else if (initializer == 'R') {
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
+            } else if (initializer == 'E') {
+               int id = Integer.parseInt(secondSplit[0]);
+               if (id != 4) {
+                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+               } else {
+                  int[][] points = new int[2][4];
+                  for (int m = 0; m < 2; m++) {
+                     for (int n = 0; n < 4; n++) {
+                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                     }
+                  }
+                  aoes.add(new TimeMageAOE(id, points));
+               }
+            } else if (initializer == 'S') {
+               //Set the spell of the appropriate player to the correct one using setSpell
+            } else if (initializer == 'W') { //Walking
+               players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
+            } else if (initializer == 'L') {// Flash light
+               players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+               for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+                  players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
+               }
+            } else if (initializer == 'C') { //Message in
+               boolean isFriendly = false;
+               for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
+                  if (player.getUsername().equals(secondSplit[0])) {
+                     isFriendly = true;
+                  }
+               }
+               intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
+            }
+         }
+      }
+   }
+
+   public void updatePlayer(String[] data) {
+      int playerID = Integer.parseInt(data[0]);
+      players[playerID].setXy(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+      players[playerID].setHealth(Integer.parseInt(data[3]));
+      players[playerID].setMaxHealth(Integer.parseInt(data[4]));
+      players[playerID].setAttack(Integer.parseInt(data[5]));
+      players[playerID].setMobility(Integer.parseInt(data[6]));
+      players[playerID].setRange(Integer.parseInt(data[7]));
+      players[playerID].setArtifact(Boolean.parseBoolean(data[8]));
+      players[playerID].setGold(Integer.parseInt(data[9]));
+      for (int j = 10; j < 13; j++) {
+         players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 10);
+      }
+      players[playerID].setDamaged(Boolean.parseBoolean(data[13]));
+      players[playerID].setIlluminated(Boolean.parseBoolean(data[14]));
+      for (int j = 16; j < 16 + Integer.parseInt(data[15]); j++) {
+         players[playerID].addStatus(Integer.parseInt(data[j]));
+      }
+      //Turn off flashlight
+      players[playerID].setFlashlightOn(false);
+   }
+
+   public void updateOthers(String[] data) {
+      int playerID = Integer.parseInt(data[0]);
+      players[playerID].setFlashlightOn(false);
+      players[playerID].setXy(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
+      players[playerID].setHealth(Integer.parseInt(data[3]));
+      players[playerID].setMaxHealth(Integer.parseInt(data[4]));
+      players[playerID].setArtifact(Boolean.parseBoolean(data[5]));
+      players[playerID].setDamaged(Boolean.parseBoolean(data[6]));
+      players[playerID].setIlluminated(Boolean.parseBoolean(data[7]));
+      for (int j = 9; j < 9 + Integer.parseInt(data[8]); j++) {
+         players[playerID].addStatus(Integer.parseInt(data[j]));
+      }
+   }
+
+   public void repaintPanels() {
+      if (currentPanel != nextPanel) {
+         System.out.println("C" + currentPanel);
+         System.out.println("V" + nextPanel);
+         menuPanels[currentPanel].setErrorUpdate("");
+         currentPanel = nextPanel;
+         cardLayout.show(mainContainer, PANEL_NAMES[currentPanel]);
+      }
+      if (currentPanel != 7) {
+         menuPanels[currentPanel].repaint();
       } else {
-         ((IntermediatePanel) (allPanels[state])).repaintReal();
+         intermediatePanel.repaintReal();
       }
    }
 
@@ -533,12 +707,10 @@ public class Client extends JFrame implements WindowListener {
       try {
          socket = new Socket("localhost", 5001);
          System.out.println("Successfully connected");
-         connected = true;
-         unableToConnect = false;
+         connectionState = 1;
       } catch (Exception e) {
          System.out.println("Unable to connect");
-         unableToConnect = true;
-         connected = false;
+         connectionState = -1;
       }
    }
 
@@ -572,643 +744,270 @@ public class Client extends JFrame implements WindowListener {
    public void windowClosed(WindowEvent e) {
    }
 
-   private class LoginPanel extends JPanel { //State=0
-      private Graphics2D g2;
-      private CustomTextField nameField = new CustomTextField(3);
-      private CustomButton testButton = new CustomButton("Test");
-
-      public LoginPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic username field
-         //sendName = true;
-         nameField.addActionListener((ActionEvent e) -> {
-            if (!sendName) {
-               if (!(nameField.getText().contains(" "))) {
-                  username = nameField.getText();
-                  sendName = true;
-               } else {
-                  System.out.println("Error: Spaces exist");
-               }
-            }
-         });
-         nameField.setFont(MAIN_FONT);
-         nameField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
-         this.add(nameField);
-
-
-         testButton.addActionListener((ActionEvent e) -> {
-            testingBegin = true;
-         });
-
-         testButton.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 2 / 5, (int) (75 * scaling), (int) (15 * scaling));
-         this.add(testButton);
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
+   public void initializeScaling() {
+      if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //
+         SCALING = 1.0 * MAX_X / DESIRED_X;
+      } else {
+         SCALING = 1.0 * MAX_Y / DESIRED_Y;
       }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-
-         //Begin drawing
-         g2.setColor(Color.WHITE);
-         g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * scaling));
-         if ((!connected) && (!unableToConnect)) {
-            g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y / 4.0));
-         } else if ((connected) && (!unableToConnect)) {
-            g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y / 4.0));
-         } else if (unableToConnect) {
-            g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y / 4.0));
-         }
+      int BG_Y = 1198;
+      int BG_X = 1800;
+      if ((1.0 * MAX_Y / MAX_X) > (1.0 * BG_Y / BG_X)) { //Fit bg to height
+         INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
+      } else {
+         INTRO_SCALING = 1.0 * MAX_X / BG_X;
       }
    }
 
-   private class MenuPanel extends JPanel {//State=2
-      private Graphics2D g2;
-      private CustomButton createButton = new CustomButton("Create Game");
-      private CustomButton joinButton = new CustomButton("Join Game");
-      private CustomButton instructionButton = new CustomButton("Instructions");
-      private CustomButton backButton = new CustomButton("Back");
-      private double introAlpha = 1;
+   //Booleans to clients
+   public void leaveGame() {
+      leaveGame = true;
+   }
 
-      public MenuPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic create and join server buttons
-         createButton.addActionListener((ActionEvent e) -> {
-            newState = 3;
-         });
-         createButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-         this.add(createButton);
+   public void logout() {
+      logout = true;
+   }
 
-         joinButton.addActionListener((ActionEvent e) -> {
-            newState = 4;
-         });
-         joinButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-         this.add(joinButton);
-         instructionButton.addActionListener((ActionEvent e) -> {
-            newState = 5;//I added this later so I didn't want to move everything around
-         });
-         instructionButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
+   public void testingBegin() {
+      testingBegin = true;
+   }
 
-         this.add(instructionButton);
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 0;
-            logout = true;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
+   public void ready() {
+      notifyReady = true;
+   }
 
-         //Setting up intro scaling
-         if ((1.0 * MAX_Y / MAX_X) > (1.0 * 1198 / 1800)) { //Make sure that these are doubles
-            //Y is excess
-            introScaling = 1.0 * MAX_Y / 1198;
-         } else {
-            //X is excess
-            introScaling = 1.0 * MAX_X / 1800;
-         }
-
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
-         //Title
-         g2.drawImage(TITLE, (int) ((MAX_X - (MAX_Y / 4.0 * 1316 / 625)) / 2.0), (int) (MAX_Y / 10.0), (int) (MAX_Y / 4.0 * 1316 / 625), (int) (MAX_Y / 4.0), null);
-         if (introAlpha != 0) {
-            introAlpha -= 0.03;
-            g2.setColor(new Color(0f, 0f, 0f, (float) (introAlpha)));
-            createButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            createButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            joinButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            joinButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            instructionButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            instructionButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            backButton.setForeground(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)));
-            backButton.setBorder(BorderFactory.createLineBorder(new Color((float) (1 - introAlpha), (float) (1 - introAlpha), (float) (1 - introAlpha)), (int) (1.5 * scaling)));
-            g2.fillRect(0, 0, MAX_X, MAX_Y);
-            if (introAlpha < 0.03) {
-               introAlpha = 0;
-            }
-         }
-         //Adds particles
-         if(Math.random() < 0.2){
-            particles.add(new AshParticle(Math.random()*MAX_X + MAX_X/20, 0, (int)((Math.random()*3+3)*scaling), MAX_Y));
-         }
-         //Draws particles
-         for (int i = 0; i < particles.size(); i++) {
-            try {
-               if (particles.get(i).update()) {
-                  particles.remove(i);
-               } else {
-                  particles.get(i).render(g2);
-               }
-            } catch (Exception e) {
-               e.printStackTrace();
-            }
-         }
+   //Tested input to clients
+   public void testGame(String attemptedGameName, String attemptedGamePassword) {
+      if (!testGame) {
+         this.attemptedGameName = attemptedGameName;
+         this.attemptedGamePassword = attemptedGamePassword;
+         serverName = this.attemptedGameName;
+         serverPassword = this.attemptedGamePassword;
+         testGame = true;
       }
    }
 
-   private class CreatePanel extends JPanel { //State =3
-      private Graphics2D g2;
-      private CustomTextField gameNameField = new CustomTextField(3);
-      private CustomTextField gamePasswordField = new CustomTextField(3);
-      private CustomButton backButton = new CustomButton("Back");
-      private CustomButton confirmButton = new CustomButton("Confirm Game");
-
-      public CreatePanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic create and join server buttons
-         gameNameField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         gameNameField.setFont(MAIN_FONT);
-         gameNameField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
-         this.add(gameNameField);
-         gamePasswordField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         gamePasswordField.setFont(MAIN_FONT);
-         gamePasswordField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 3 / 10, (int) (75 * scaling), (int) (15 * scaling));
-         this.add(gamePasswordField);
-         confirmButton.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameField.getText();
-               attemptedGamePassword = gamePasswordField.getText();
-               testGame = true;
-            }
-         });
-         confirmButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 2 / 5, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(confirmButton);
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
-         g2.setColor(Color.WHITE);
-         g2.setFont(HEADER_FONT);
-         g2.drawString("Create Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Create Server")) / 2.0), MAX_Y / 5);
-         //Server name
-         g2.setFont(MAIN_FONT);
-         g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y / 5 - g2.getFontMetrics().getHeight()));
-         //Server password
-         g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
-         //Confirm button
-         //Draws particles
+   public void testName(String username) {
+      if (!sendName) {
+         this.username = username;
+         sendName = true;
       }
    }
 
-   private class JoinPanel extends JPanel { //State =4
-      private Graphics2D g2;
-      private CustomTextField gameNameTestField = new CustomTextField(3);
-      private CustomTextField gamePasswordTestField = new CustomTextField(3);
-      private CustomButton backButton = new CustomButton("Back");
-
-      public JoinPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic create and join server buttons
-         gameNameTestField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameTestField.getText();
-               attemptedGamePassword = gamePasswordTestField.getText();
-               testGame = true;
-            }
-         });
-         gameNameTestField.setFont(MAIN_FONT);
-         gameNameTestField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y / 5, (int) (75 * scaling), (int) (15 * scaling));
-         this.add(gameNameTestField);
-         gamePasswordTestField.addActionListener((ActionEvent e) -> {
-            if (!testGame) {
-               attemptedGameName = gameNameTestField.getText();
-               attemptedGamePassword = gamePasswordTestField.getText();
-               testGame = true;
-            }
-         });
-         gamePasswordTestField.setFont(MAIN_FONT);
-         gamePasswordTestField.setBounds(MAX_X / 2 - (int) (37 * scaling), MAX_Y * 3 / 10, (int) (75 * scaling), (int) (15 * scaling));
-         this.add(gamePasswordTestField);
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(20, 20, 20));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
-         g2.setColor(Color.WHITE);
-         g2.drawString("Join Game", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Game")) / 2.0), MAX_Y / 5);
-      }
+   //Sets the teams
+   public void setTeam(int myTeam) {
+      this.myTeam = myTeam;
+      teamChosen = true;
    }
 
-   private class InstructionPanel extends JPanel { //State=5
-      private Graphics2D g2;
-      private CustomButton backButton = new CustomButton("Back");
 
-
-      public InstructionPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Setting up buttons
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-            leaveGame = true;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (15 * scaling));
-         this.add(backButton);
-
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(150, 150, 150));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         super.paintComponent(g);
-         //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
-      }
+   public void setNextPanel(int nextPanel) {
+      this.nextPanel = nextPanel;
    }
 
-   private class WaitingPanel extends JPanel { //State=6
-      private Graphics2D g2;
-      private boolean buttonAdd = true;
-      private boolean buttonRemove = true;
-      private CustomButton readyGameButton = new CustomButton("Begin game");
-      private CustomButton backButton = new CustomButton("Back");
-
-
-      public WaitingPanel() {
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Setting up buttons
-         readyGameButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 4 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         readyGameButton.addActionListener((ActionEvent e) -> {
-            notifyReady = true;
-         });
-
-         backButton.addActionListener((ActionEvent e) -> {
-            newState = 2;
-            leaveGame = true;
-         });
-         backButton.setBounds(MAX_X / 2 - (int) (65 * scaling), MAX_Y * 7 / 10, (int) (130 * scaling), (int) (19 * scaling));
-         this.add(backButton);
-
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(70, 70, 70));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-         this.setFocusable(true);
-      }
-
-      @Override
-      public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         g2.setFont(MAIN_FONT);
-         FontMetrics metrics = g2.getFontMetrics();
-         super.paintComponent(g);
-         //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-         //if host==true, then display the ready button
-         //Background
-         g2.drawImage(TITLE_SCREEN, MAX_X - (int) (1800 * introScaling), MAX_Y - (int) (1198 * introScaling), (int) (1800 * introScaling), (int) (1198 * introScaling), null);
-         g2.setColor(Color.white);
-         if ((host) && (buttonAdd)) {
-            this.add(readyGameButton);
-            buttonAdd = false;
-         }
-         StringBuilder players = new StringBuilder("Players: ");
-         for (int i = 0; i < onlineList.size(); i++) {
-            players.append(onlineList.get(i).getUsername() + ", ");
-         }
-         g2.drawString(players.toString(), (int) (2 * scaling), (int) (10 * scaling));
-         if (loading) {
-            if (buttonRemove) {
-               this.remove(readyGameButton);
-               buttonRemove = false;
-            }
-
-            g2.drawString("LOADING", (int) ((MAX_X - metrics.stringWidth("LOADING")) / 2.0), MAX_Y / 2);
-         }
-      }
+   public void setClassName(String className) {
+      this.className = className;
+      classChosen = true;
    }
 
-   private class IntermediatePanel extends JPanel { //State=7 (intermediate)=
-      private GamePanel gamePanel;
-      private boolean begin = true;
-
-      public IntermediatePanel() {
-         //Scaling is a factor which reduces the MAX_X/MAX_Y so that it eventually fits
-         //Setting up the size
-         this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(0, 0, 0));
-         this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
-      }
-
-      //set a method called initialize
-      public void repaintReal() {
-         gamePanel.repaint();
-      }
-
-      public void initializeScaling() {
-         if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //Make sure that these are doubles
-            //Y is excess
-            scaling = 1.0 * MAX_X / DESIRED_X;
-         } else {
-            //X is excess
-            scaling = 1.0 * MAX_Y / DESIRED_Y;
-         }
-         MAIN_FONT = new Font("Cambria Math", Font.PLAIN, (int) (10 * scaling));
-         HEADER_FONT = new Font("Akura Popo", Font.PLAIN, (int) (20 * scaling));
-      }
-
-      public void initializeSize() {
-         int[] tempXy = {(int) (DESIRED_X * scaling / 2), (int) (DESIRED_Y * scaling / 2)};
-         myMouseAdapter.setCenterXy(tempXy);
-         myMouseAdapter.setScaling(scaling);
-         gamePanel = new GamePanel();
-         gamePanel.setBounds((int) ((this.getWidth() - (DESIRED_X * scaling)) / 2), (int) ((this.getHeight() - (DESIRED_Y * scaling)) / 2), (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
-         this.add(gamePanel);
-      }
+   // Chat methods
+   public void sendMessage(String message, int mode) {
+      output.println("C" + mode + "," + message);
+      output.flush();
    }
 
-   private class GamePanel extends JPanel {//State=7
+   //Info to panels
+   public int getConnectionState() {
+      return (connectionState);
+   }
+
+   public boolean getHost() {
+      return (host);
+   }
+
+   public boolean getLoading() {
+      return (loading);
+   }
+
+   public ArrayList<User> getOnlineList() {
+      return (onlineList);
+   }
+
+   public int[] getMouseState() {
+      return (mouseState);
+   }
+
+   public String getGameName() {
+      return (serverName);
+   }
+
+   public String getGamePassword() {
+      return (serverPassword);
+   }
+
+   /**
+    * GamePanel.java
+    * This is
+    *
+    * @author Will Jeong
+    * @version 1.0
+    * @since 2019-05-31
+    */
+
+   public class GamePanel extends MenuPanel {//State=7
       private Graphics2D g2;
       private boolean generateGraphics = true;
-      int[] midXy = new int[2];
-      private Shape rect;
-      private Shape largeCircle;
-      private Area areaRect;
-      private Area largeRing;
-      private Polygon BOTTOM_BAR = new Polygon();
+      private int[] midXy = new int[2];
       private Rectangle drawArea;
-      private int[] centerXy = new int[2];
-      private BufferedImage fogMap;
-
+      private final Font MAIN_FONT = super.getFont("main");
+      private BufferedImage sheet;
+      //Game components
+      private GameComponent[] allComponents;
+      private boolean menuCooldown = true;
+      private int MAX_GAME_X, MAX_GAME_Y;
+      private Area darkness;
 
       public GamePanel() {
-         //Basic visuals
-         this.setDoubleBuffered(true);
-         this.setBackground(new Color(40, 40, 40));
+         this.setBackground(new Color(0, 0, 0));
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
-         this.setVisible(true);
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
+         MAX_GAME_X = this.getWidth();
+         MAX_GAME_Y = this.getHeight();
+         GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
+         allComponents = new GameComponent[5];
+         this.setDoubleBuffered(true);
+         this.setVisible(true);
       }
 
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         if ((state == 7) && (generateGraphics)) {
-            midXy[0] = (int) (DESIRED_X * scaling / 2);
-            midXy[1] = (int) (DESIRED_Y * scaling / 2);
+         super.paintComponent(g2);
+         if ((currentPanel == 7) && (generateGraphics)) {
+            allComponents[0] = new PauseComponent();
+            allComponents[1] = new BottomComponent(myPlayer);
+            allComponents[2] = new MinimapComponent(fog, players);
+            allComponents[3] = new InventoryComponent();
+            allComponents[4] = new DebugComponent();
+            midXy[0] = (MAX_GAME_X / 2);
+            midXy[1] = (MAX_GAME_Y / 2);
             for (Player currentPlayer : players) {
-               currentPlayer.setScaling(scaling);
+               currentPlayer.setScaling(SCALING);
                currentPlayer.setCenterXy(midXy);
             }
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
-            largeCircle = new Ellipse2D.Double(400 * scaling, 175 * scaling, 150 * scaling, 150 * scaling);
-
-            rect = new Rectangle2D.Double(0, 0, 950 * scaling, 500 * scaling);
-            areaRect = new Area(rect);
-            largeRing = new Area(largeCircle);
-            areaRect.subtract(largeRing);
-            BOTTOM_BAR.addPoint((int) (272 * scaling), (int) (500 * scaling));
-            BOTTOM_BAR.addPoint((int) (265 * scaling), (int) (440 * scaling));
-            BOTTOM_BAR.addPoint((int) (270 * scaling), (int) (435 * scaling));
-            BOTTOM_BAR.addPoint((int) (680 * scaling), (int) (435 * scaling));
-            BOTTOM_BAR.addPoint((int) (685 * scaling), (int) (440 * scaling));
-            BOTTOM_BAR.addPoint((int) (678 * scaling), (int) (500 * scaling));
             //Game set up
-            centerXy[0] = (int) (DESIRED_X * scaling / 2);
-            centerXy[1] = (int) (DESIRED_Y * scaling / 2);
             try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
-               /*
-               sectors = new Sector[1000][1000];
-               for (int i = 0; i < 1000; i++) {
-                  for (int j = 0; j < 1000; j++) {
-                     sectors[j][i] = new Sector();
-                    // sectors[j][i].setImage(sheet.getSubimage(j * 10, i * 10, 10, 10));
-                     sectors[j][i].setSectorCoords(j, i);
-                     sectors[j][i].setScaling(scaling);
-                     sectors[j][i].setCenterXy(centerXy);
-                  }
-               }
-*/
             } catch (IOException e) {
                System.out.println("Image not found");
             }
-            drawArea = new Rectangle(0, 0, (int) (DESIRED_X * scaling), (int) (DESIRED_Y * scaling));
+            drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
+            darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
-         super.paintComponent(g2);
          if (drawArea != null) {
+            resetXyAdjust();
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            //this.requestFocusInWindow(); Removed, this interferes with the textboxes. See if this is truly necessary
-            //Sectors
-            int startX = (int) ((myPlayer.getXy()[0] - 475.0) / 10.0);
-            int finalX = (int) (Math.ceil((myPlayer.getXy()[0] + 475.0) / 10.0)) + 1;
-            int startY = (int) ((myPlayer.getXy()[1] - 250.0) / 10.0);
-            int finalY = (int) (Math.ceil((myPlayer.getXy()[1] + 250.0) / 10.0)) + 1;
-
-            //long time = System.nanoTime();
-            /*
-            for (int i = startY; i < finalY; i++) {
-               for (int j = startX; j < finalX; j++) {
-                  if ((i >= 0) && (j >= 0) && (i < 1000) && (j < 1000)) {
-                     sectors[j][i].setFog(fog.getSingleFog(j, i));
-                     sectors[j][i].drawSector(g2, myPlayer.getXy());
-                  }
-               }
-            }
-            */
-            g2.drawImage(sheet, (int) (centerXy[0] - myPlayer.getXy()[0] * scaling), (int) (centerXy[1] - myPlayer.getXy()[1] * scaling), (int) (10000 * scaling), (int) (10000 * scaling), null);
+            //Map
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (MAP_WIDTH * SCALING), (int) (MAP_HEIGHT * SCALING), null);
+            g2.setColor(Color.black);
             //Game player
+            resetXyAdjust();
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
-                  currentPlayer.draw(g2, myPlayer.getXy());
-               }
-            }
-            // System.out.println(System.nanoTime() - time);
-
-
-            g2.setColor(new Color(165, 156, 148));
-            //Minimap
-            g2.drawRect((int) (830 * scaling), (int) (379 * scaling), (int) (120 * scaling), (int) (120 * scaling));
-            //Bottom bar
-            g2.drawPolygon(BOTTOM_BAR);
-
-
-            //Stat bars
-            g2.setColor(new Color(190, 40, 40));
-            g2.fillRect(0, (int) (486 * scaling), (int) (121 * scaling * myPlayer.getHealth() / myPlayer.getMaxHealth()), (int) (5 * scaling));
-
-            g2.setColor(new Color(165, 156, 148));
-            g2.drawRect(0, (int) (486 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-            g2.drawRect(0, (int) (495 * scaling), (int) (121 * scaling), (int) (5 * scaling));
-            //Bottom bar contents
-
-            //Spells
-            g2.fillRect((int) (565 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-            g2.fillRect((int) (604 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-            g2.fillRect((int) (643 * scaling), (int) (442 * scaling), (int) (30 * scaling), (int) (50 * scaling));
-
-
-            // Draws fog
-         /*
-            for (int i = -MAX_X / 2; i < MAX_X / 2; i += 10 * scaling) { // In units of screen pixels
-               for (int j = -MAX_Y / 2; j < MAX_Y / 2; j += 10 * scaling) {
-                  int mapX = (myPlayer.getXy()[0] + (int) (i / scaling)) / 10; // In units of fog map
-                  int mapY = (myPlayer.getXy()[1] + (int) (j / scaling)) / 10;
-                  if (mapX >= 0 && mapX < 1000 && mapY >= 0 && mapY < 1000) { // If within bounds of fog
-                     int fogValue = fog.getFog()[mapY][mapX];
-                     if (fogValue == 0) { // Unexplored
-                        g2.setColor(Color.black);
-                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
-                     } else if (fogValue == 1) { // Explored but not actively viewed
-                        g2.setColor(new Color(0, 0, 0, 128));
-                        g2.fillRect(i + MAX_X / 2, j + MAX_Y / 2, (int) (10 * scaling), (int) (10 * scaling));
-                     }
+                  currentPlayer.translateFlashlight(xyAdjust);
+                  if (currentPlayer.getFlashlightOn()) {
+                     darkness.subtract(new Area(currentPlayer.getFlashlightBeam()));
                   }
                }
             }
-         */
+            for (int i = 0; i < aoes.size(); i++) {
+               if (aoes.get(i).getID() == 0) {
+                  darkness.subtract(aoes.get(i).getArea());
+               }
+            }
+            //Creating shapes
+            int[] xP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (300 * SCALING), (int) (400 * SCALING), (int) (500 * SCALING)};
+            int[] yP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (200 * SCALING), (int) (100 * SCALING), 0};
+            Polygon test = new Polygon(xP, yP, 5);
+            test.translate(xyAdjust[0], xyAdjust[1]);
+            g2.setColor(Color.black);
+            g2.fillPolygon(test);
+            g2.fillRect((int) (300 * SCALING) + xyAdjust[0], (int) (300 * SCALING) + xyAdjust[1], (int) (100 * SCALING), (int) (100 * SCALING));
+
+            g2.setColor(new Color(0, 0, 0, 128));
+            g2.fill(darkness);
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
+                     currentPlayer.draw(g2, myPlayer.getXy());
+                  }
+               }
+            }
+
+            // Updating fog
+            resetXyAdjust();
+            for (int i = 0; i < players.length; i++) {
+               if (players[i] != null) {
+                  if (players[i].getTeam() == myTeam) {
+                     fog.scout(players[i].getXy());
+                  }
+               }
+            }
+
+            //Creating shapes
+            AffineTransform tx = new AffineTransform();
+            tx.translate(xyAdjust[0], xyAdjust[1]);
+            Area darkFog = fog.getFog().createTransformedArea(tx);
+            Area lightFog = fog.getExplored().createTransformedArea(tx);
+            //Draws fog
+            g2.setColor(Color.black); //Unexplored
+            g2.fill(darkFog);
+            g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
+            g2.fill(lightFog);
+
+            // Draws projectiles and AOEs
+            for (int i = 0; i < projectiles.size(); i++) {
+               projectiles.get(i).draw(g2);
+            }
+            for (int i = 0; i < aoes.size(); i++) {
+               aoes.get(i).draw(g2);
+            }
+            //draw all components
+            ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
+            if (keyPressed) {
+               if (lastKeyTyped == 27) { // Esc key
+                  ((PauseComponent) (allComponents[0])).toggle();
+               } else if (lastKeyTyped == 8) { // Back key
+                  ((DebugComponent) (allComponents[4])).toggle();
+                  System.out.println("Debug mode");
+               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) {
+                  ((InventoryComponent) (allComponents[3])).toggle();
+               }
+               keyPressed = false;
+            }
+            for (GameComponent gameComponent : allComponents) {
+               gameComponent.draw(g2);
+            }
+            //chatPanel.draw(g2);
          }
          g2.dispose();
+         darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
       }
 
-   }
-
-   private class CustomButton extends JButton {
-      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
-      private Color backgroundColor = new Color(0f, 0f, 0f, 0f);
-      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
-
-      CustomButton(String description) {
-         super(description);
-         super.setContentAreaFilled(false);
-         this.setFont(BUTTON_FONT);
-         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-         this.setFocusPainted(false);
+      public void setDimensions(int MAX_GAME_X, int MAX_GAME_Y) {
+         this.MAX_GAME_X = MAX_GAME_X;
+         this.MAX_GAME_Y = MAX_GAME_Y;
       }
 
-      CustomButton(String description, Color foregroundColor, Color backgroundColor) {
-         super(description);
-         super.setContentAreaFilled(false);
-         this.setFont(MAIN_FONT);
-         this.foregroundColor = foregroundColor;
-         this.backgroundColor = backgroundColor;
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-         this.setFocusPainted(false);
-      }
-
-      @Override
-      protected void paintComponent(Graphics g) {
-         if (getModel().isPressed()) {
-            g.setColor(backgroundColor.brighter().brighter());
-         } else if (getModel().isRollover()) {
-            g.setColor(backgroundColor.brighter());
-         } else {
-            g.setColor(getBackground());
-         }
-         g.fillRect(0, 0, getWidth(), getHeight());
-         super.paintComponent(g);
-      }
-   }
-
-   private class CustomTextField extends JTextField {
-      private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
-      private Color backgroundColor = new Color(0f, 0f, 0f, 0f);
-      private Font BUTTON_FONT = new Font("Cambria Math", Font.PLAIN, (int) (12 * scaling));
-
-      CustomTextField(int row) {
-         super(row);
-         this.setFont(BUTTON_FONT);
-         this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * scaling)));
-         this.setForeground(foregroundColor);
-         this.setBackground(backgroundColor);
-      }
-
-      @Override
-      protected void paintComponent(Graphics g) {
-         g.setColor(getBackground());
-         g.fillRect(0, 0, getWidth(), getHeight());
-         super.paintComponent(g);
+      public void resetXyAdjust() {
+         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0] * SCALING);
+         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1] * SCALING);
       }
    }
 }

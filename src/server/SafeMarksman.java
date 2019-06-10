@@ -9,69 +9,84 @@ package server;
  */
 
 public class SafeMarksman extends Player{
-  private int[] spellCooldowns = {1000,1000,1000};
-  private int[] lastSpellTicks = {-10000,-10000,-10000};//So that they can be used immediately
-  private int spellTick;
+  private int[] spellCooldowns = {100,100,100};
+  private int[] spellTimers = {0,0,0};
 
-  private static int SPACE_AOE_DURATION = 500;
-  private static int SPACE_AOE_RADIUS = 300;
-  private static int MS_BUFF_STRENGTH = 3;
+  private static int SPACE_AOE_DURATION = 50;
+  private static int SPACE_AOE_RADIUS = 100;
+  private static int MS_BUFF_STRENGTH = 5;
   private static int MS_BUFF_DURATION = 100;
   private static int STUN_DURATION = 100;
-  
-  SafeMarksman(String username) {
-    super(username);
+
+  SafeMarksman(String username, int teamNumber) {
+    super(username,teamNumber);
     setMaxHealth(300);
     setHealth(300);
     setAttack(100);
+    //setMaxMobility(10);
     setMobility(10);
     setRange(300);
+    setAutoAttackCooldown(5);
+    setFlareCooldown(100);
   }
-
- public boolean castSpell(int spellIndex){
-   if (!getStunned()) {
-     if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
-       lastSpellTicks[spellIndex] = spellTick;
-       if (spellIndex==0) { //Q
-         addProjectile(new SafeMarksmanQProjectile(getX(), getY(), getMouseX(), getMouseY()));
-       }else if (spellIndex==1){//E
-         addShield(new SafeMarksmanEShield());
-       }else {//Space
-         addAOE(new SafeMarksmanSpaceAOE1(getX(), getY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
-         addAOE(new SafeMarksmanSpaceAOE2(getMouseX(), getMouseY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
-       }
-       return true;
-     } else {
-       return false;
-     }
-   }else{
+  
+  public boolean castSpell(int spellIndex){
+    if (!getStunned()) {
+      if (spellTimers[spellIndex]<=0) {
+        spellTimers[spellIndex] = spellCooldowns[spellIndex];
+        if (spellIndex==0) { //Q
+          addProjectile(new SafeMarksmanQProjectile(getX(), getY(), getMouseX(), getMouseY()));
+        }else if (spellIndex==1){//E
+          addShield(new SafeMarksmanEShield());
+        }else {//Space
+          addAOE(new SafeMarksmanSpaceAOE1(getX(), getY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
+          //System.out.println("First AOE made at " + getX() + "," + getY());
+          addAOE(new SafeMarksmanSpaceAOE2(getMouseX(), getMouseY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
+          //System.out.println("Second AOE made at " + getMouseX() + "," + getMouseY());
+        }
+        return true;
+      } else {
+        return false;
+      }
+    }else{
       return false;
-   }
- }
+    }
+  }
+  
   public int getSpellPercent(int spellIndex) {
+    return (spellCooldowns[spellIndex] - spellTimers[spellIndex])/spellCooldowns[spellIndex]*100;
+    /*
     if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
       return (100);
     } else {
       return ((int) ((100.0 * (spellTick - lastSpellTicks[spellIndex]) / spellCooldowns[spellIndex])));
-    }
+    }*/
   }
 
   public void update(){
-    spellTick++;
+    for (int i = 0; i < 3; i++){
+      if (spellTimers[i] > 0){
+        spellTimers[i]--;
+      }
+    }
+    updateBasicTimers();
     //Update Projectiles
     for (int i = getProjectilesSize()-1; i >= 0; i--){
       getProjectile(i).advance();
-      Projectile removed = null;//REE NEED TO MAKE AN ARRAY LIST OR ELSE PROBLEMS AND NEED OT HAVE MORE THAN JUST PROJECTILE
+      Projectile removed = null;
       if (getProjectile(i).getRemainingDuration() <= 0){
         removed = removeProjectile(i);
+        if (removed instanceof FlareProjectile){
+          addAOE(new FlareAOE(removed.getX(), removed.getY()));
+        }
       } else {
         //Insert Collision with Terrain
         if (getProjectile(i) instanceof AutoProjectile){
           for (int j = 0; j < getEnemiesSize(); j++){
             if(getProjectile(i).collides(getEnemy(j))){
               getEnemy(j).damage(getAttack());
-              addStatus(new MSBuff(MS_BUFF_STRENGTH, MS_BUFF_DURATION));
-              getEnemy(j).addStatus(new MSBuff(-1*MS_BUFF_STRENGTH, MS_BUFF_DURATION));
+              addStatus(new SafeMarksmanMSBuff());
+              getEnemy(j).addStatus(new SafeMarksmanMSDebuff());
               removed = removeProjectile(i);
             }
           }
@@ -84,9 +99,6 @@ public class SafeMarksman extends Player{
           }
         }
       }
-      if (removed instanceof FlareProjectile){
-        addAOE(new FlareAOE(removed.getX(), removed.getY()));
-      }
     }
     
     //Update AOEs
@@ -95,6 +107,27 @@ public class SafeMarksman extends Player{
       AOE removed = null;
       if (getAOE(i).getRemainingDuration() <= 0){
         removed = removeAOE(i);
+        if (removed instanceof SafeMarksmanSpaceAOE2){
+          //System.out.println("AOE Removed");
+          for (int j = 0; j < getAlliesSize(); j++){
+            for (int k = 0; k < getAlly(j).getStatusesSize(); k++){
+              if (getAlly(j).getStatus(k) instanceof SafeMarksmanInTPCircle){
+                //System.out.println("TP from " + getAlly(j).getX() + "," + getAlly(j).getY() + " to " + removed.getX() + "," + removed.getY());
+                getAlly(j).setX(removed.getX());
+                getAlly(j).setY(removed.getY());
+              }
+            }
+          }
+          /*
+          //NEW STUFF
+          for (int k = 0; k < getStatusesSize(); k++){
+            if (getStatus(k) instanceof SafeMarksmanInTPCircle){
+              //System.out.println("TP from " + getX() + "," + getY() + " to " + removed.getX() + "," + removed.getY());
+              setX(removed.getX());
+              setY(removed.getY());
+            }
+          }*/ //Ally of self
+        }
       } else {
         if (getAOE(i) instanceof FlareAOE){
           for (int j = 0; j < getEnemiesSize(); j++){
@@ -112,34 +145,31 @@ public class SafeMarksman extends Player{
           //Might want to change to illuminate everything illuminatable
           for (int j = 0; j < getEnemiesSize(); j++){
             if (getAOE(i).collides(getEnemy(j))){
-              getEnemy(j).addStatus(new Illuminated(500));
+              getEnemy(j).addStatus(new Illuminated(2));
             }
           }
           for (int j = 0; j < getAlliesSize(); j++){
             if (getAOE(i).collides(getAlly(j))){
-              getAlly(j).addStatus(new Illuminated(500));//REE
+              getAlly(j).addStatus(new Illuminated(2));//REE
               getAlly(j).addStatus(new SafeMarksmanInTPCircle());
+              //System.out.println("Ally Afflicted");
             }
           }
+          /*
+          if (getAOE(i).collides(this)){
+            addStatus(new Illuminated(2));//REE
+            addStatus(new SafeMarksmanInTPCircle());
+            //System.out.println("Self Afflicted");
+          }*///Self ally
         } else if (getAOE(i) instanceof SafeMarksmanSpaceAOE2){
           for (int j = 0; j < getEnemiesSize(); j++){
             if (getAOE(i).collides(getEnemy(j))){
-              getEnemy(j).addStatus(new Illuminated(500));
+              getEnemy(j).addStatus(new Illuminated(2));
             }
           }
           for (int j = 0; j < getAlliesSize(); j++){
             if (getAOE(i).collides(getAlly(j))){
-              getAlly(j).addStatus(new Illuminated(500));//REE
-            }
-          }
-        }
-      }
-      if (removed instanceof SafeMarksmanSpaceAOE2){
-        for (int j = 0; j < getAlliesSize(); j++){
-          for (int k = 0; k < getAlly(j).getStatusesSize(); k++){
-            if (getAlly(j).getStatus(k) instanceof SafeMarksmanInTPCircle){
-              getAlly(j).setX(removed.getX());
-              getAlly(j).setY(removed.getY());
+              getAlly(j).addStatus(new Illuminated(2));//REE
             }
           }
         }
@@ -157,13 +187,15 @@ public class SafeMarksman extends Player{
       if (removed!=null){
         if (removed instanceof SafeMarksmanEShield){
           addAOE(new SafeMarksmanEAOE(getX(),getY()));
+          //REE ADD PUSH AWAY. ALSO ADD FOR THE OTHER SHIELD BREAK LINE
         }
       }
     }
   }
-  
+
   @Override
   public void damage(int damage){
+    damage = (int)(damage*(1-getDamageReduction()));
     if (getShieldsSize() == 0){
       setHealth(getHealth() - damage);
     } else {

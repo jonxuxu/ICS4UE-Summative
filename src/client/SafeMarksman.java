@@ -16,36 +16,39 @@ import java.io.IOException;
  */
 
 public class SafeMarksman extends Player {
-   private int maxHealth = 100;
-   private int attack = 10;
-   private int mobility = 10;
-   private int range = 10;
+   private int positionIndex;
+   private int movementIndex;
+   private boolean moving;
    private int[] animationIndex = {80, 80, 80};
    private int[] ANIMATION_LENGTH = {80, 80, 80};
-   private BufferedImage[][] ALL_ANIMATIONS = new BufferedImage[4][];
+   private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[4][][];
+
    SafeMarksman(String username) {
       super(username);
       try {
-         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\LightningRoomba.png"));
-         ALL_ANIMATIONS[0] = new BufferedImage[12];
+         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\characters\\C_archer.png"));
+         ALL_ANIMATIONS[0] = new BufferedImage[3][4];
          for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
-               ALL_ANIMATIONS[0][(i * 3) + j] = movementSheet.getSubimage(j * 15, i * 15, 15, 15);
+               ALL_ANIMATIONS[0][j][i] = movementSheet.getSubimage(j * 32, i * 32, 32, 32);
+               //i refers to row number, j refers to column number
             }
          }
-         BufferedImage animationSheet = ImageIO.read(new File(".\\res\\LightningRoomba.png"));
+         /*
+         BufferedImage animationSheet = ImageIO.read(new File(".\\res\\C.png"));
          ALL_ANIMATIONS[1] = new BufferedImage[4];
          for (int i = 0; i < 4; i++) {
             ALL_ANIMATIONS[1][i] = animationSheet.getSubimage(0, i * 15, 15, 15);
          }
+         */
       } catch (IOException e) {
          System.out.println("Unable to find image");
       }
    }
 
    public void spellAnimation(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {
-      if (animationIndex[spellIndex] < 80) {
-         g2.drawImage(ALL_ANIMATIONS[spellIndex + 1][animationIndex[spellIndex] % 4], x, y, width, height, null);
+      if (animationIndex[spellIndex] < ANIMATION_LENGTH[spellIndex]) {
+         g2.drawImage(ALL_ANIMATIONS[spellIndex + 1][animationIndex[spellIndex] % 4][0], x, y, width, height, null);
          animationIndex[spellIndex]++;
       }
    }
@@ -54,8 +57,19 @@ public class SafeMarksman extends Player {
       animationIndex[spellIndex] = 0;
    }
 
+   public void setMovementIndex(int positionIndex, boolean moving) {
+      this.moving = moving;
+      this.positionIndex = positionIndex;
+   }
+
    public void move(Graphics2D g2, int x, int y, int width, int height) {
-      g2.drawImage(ALL_ANIMATIONS[0][2], x, y, width, height, null);
+      if (moving) {
+         movementIndex++;
+      }
+      if (movementIndex == 10) {
+         movementIndex = 0;
+      }
+      g2.drawImage(ALL_ANIMATIONS[0][movementIndex / 5][positionIndex], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {
