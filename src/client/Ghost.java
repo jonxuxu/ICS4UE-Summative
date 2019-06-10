@@ -26,10 +26,10 @@ public class Ghost extends Player {
    Ghost(String username) {
       super(username);
       try {
-         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\SafeMarksman.png"));
-         ALL_ANIMATIONS[0] = new BufferedImage[4][3];
-         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 4; j++) {
+         BufferedImage movementSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/ghost/C_ghost.png"));
+         ALL_ANIMATIONS[0] = new BufferedImage[3][4];
+         for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
                ALL_ANIMATIONS[0][j][i] = movementSheet.getSubimage(j * 32, i * 32, 32, 32);
                //i refers to row number, j refers to column number
             }
