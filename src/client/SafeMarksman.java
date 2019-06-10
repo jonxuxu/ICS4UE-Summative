@@ -26,7 +26,7 @@ public class SafeMarksman extends Player {
    SafeMarksman(String username) {
       super(username);
       try {
-         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\characters\\C_archer.png"));
+         BufferedImage movementSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/C_archer.png"));
          ALL_ANIMATIONS[0] = new BufferedImage[3][4];
          for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
