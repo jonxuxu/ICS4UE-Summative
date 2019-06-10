@@ -859,7 +859,7 @@ public class Client extends JFrame implements WindowListener {
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new PauseComponent();
             allComponents[1] = new BottomComponent(myPlayer);
-            allComponents[2] = new MinimapComponent(fog, players);
+            allComponents[2] = new MinimapComponent(fog, players, myPlayerID);
             allComponents[3] = new InventoryComponent();
             allComponents[4] = new DebugComponent();
             midXy[0] = (MAX_GAME_X / 2);
@@ -929,8 +929,8 @@ public class Client extends JFrame implements WindowListener {
             //Creating shapes
             AffineTransform tx = new AffineTransform();
             tx.translate(xyAdjust[0], xyAdjust[1]);
-            Area darkFog = fog.getFog().createTransformedArea(tx);
-            Area lightFog = fog.getExplored().createTransformedArea(tx);
+            Area darkFog = fog.getFog(2).createTransformedArea(tx);
+            Area lightFog = fog.getExplored(2).createTransformedArea(tx);
             //Draws fog
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);

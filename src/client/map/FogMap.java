@@ -34,19 +34,27 @@ public class FogMap {
       activelyViewing.add(circle);
    }
 
-   public Area getFog() {
+   public Area getFog(int scope) {
       fogShape.subtract(activelyViewing);
-      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      if(scope == 1){ //Minimap scope
+         outputShape = new Area(new Rectangle.Double(0, 0, 2*MAP_WIDTH*SCALING, 2*MAP_WIDTH*SCALING));
+      } else { // Visible only in window
+         outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      }
       outputShape.intersect(fogShape);
       return outputShape;
    }
 
-   public Area getExplored(){
+   public Area getExplored(int scope){
       viewedShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       viewedShape.subtract(fogShape);
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
-      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      if(scope == 1){ // Minimap scope
+         outputShape = new Area(new Rectangle.Double(0, 0, 2*MAP_WIDTH*SCALING, 2*MAP_WIDTH*SCALING));
+      } else { // Only within window
+         outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      }
       outputShape.intersect(viewedShape);
       return outputShape;
    }

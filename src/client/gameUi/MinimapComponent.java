@@ -1,11 +1,13 @@
 package client.gameUi;
 
+import client.Client;
 import client.Player;
 import client.map.FogMap;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
@@ -19,8 +21,10 @@ import java.awt.geom.Rectangle2D;
  */
 
 public class MinimapComponent extends GameComponent {
-   private FogMap fog;
+   private static FogMap fog;
    private Player[] players;
+   private static int myPlayerId;
+   private int[] xyAdjust = new int[2];
 
    private final int MAX_X = super.getMAX_X();
    private final int MAX_Y = super.getMAX_Y();
@@ -36,11 +40,11 @@ public class MinimapComponent extends GameComponent {
    private Area BORDER_FILL3;
    private Area BORDER_FILL4;
 
-   public MinimapComponent(FogMap fog, Player[] players) {
+   public MinimapComponent(FogMap fog, Player[] players, int myPlayerId){
       // Setting up refs
       this.fog = fog;
       this.players = players;
-
+      this.myPlayerId = myPlayerId;
       // Border
       BORDER_RECT = new Rectangle(scale(830), scale(379), scale(120), scale(120));
       BORDER_RECT2 = new Rectangle(scale(832), scale(381), scale(116), scale(116));
@@ -60,12 +64,6 @@ public class MinimapComponent extends GameComponent {
 
 
    public void draw(Graphics2D g2) {
-      // Fills inside
-
-
-      // Draws player
-      g2.setColor(Color.green);
-
       // Draws border
       g2.setColor(new Color(72, 60, 32));
       g2.fill(BORDER_FILL);
@@ -77,6 +75,28 @@ public class MinimapComponent extends GameComponent {
       g2.fill(BORDER_FILL4);
       g2.setColor(new Color(33, 35, 37));
       g2.fill(INNER_RECT);
+
+      // Draws map
+
+      // Draws fog
+      xyAdjust[0] =  scale(-players[myPlayerId].getXy()[0]);
+      xyAdjust[1] =  scale(-players[myPlayerId].getXy()[1]);
+      AffineTransform tx = new AffineTransform();
+      tx.translate(xyAdjust[0], xyAdjust[1]);
+      tx.scale(0.5,0.5);
+      Area darkFog = fog.getFog(1).createTransformedArea(tx);
+      Area lightFog = fog.getExplored(1).createTransformedArea(tx);
+      g2.setColor(Color.black); //Unexplored
+      //g2.fill(darkFog);
+      g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
+      //g2.fill(lightFog);
+
+
+      // Draws player
+      g2.setColor(Color.green);
+      g2.fillRect(scale(888), scale(438), scale(4), scale(4));
+
+      // Draws other players and mobs
    }
 
    public void update(){
