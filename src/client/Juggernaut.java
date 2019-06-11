@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * SafeMarksman.java
- * This is
+ * Juggernaut.java
+ * This is the character class for Juggernaut
  *
- * @author Will Jeong
+ * @author Will Jeong + company
  * @version 1.0
  * @since 2019-05-19
  */
@@ -26,10 +26,10 @@ public class Juggernaut extends Player {
    Juggernaut(String username) {
       super(username);
       try {
-         BufferedImage movementSheet = ImageIO.read(new File(".\\res\\SafeMarksman.png"));
-         ALL_ANIMATIONS[0] = new BufferedImage[4][3];
-         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 4; j++) {
+         BufferedImage movementSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/juggernaut/C_juggernaut.png"));
+         ALL_ANIMATIONS[0] = new BufferedImage[3][4];
+         for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
                ALL_ANIMATIONS[0][j][i] = movementSheet.getSubimage(j * 32, i * 32, 32, 32);
                //i refers to row number, j refers to column number
             }
@@ -77,7 +77,7 @@ public class Juggernaut extends Player {
       if (movementIndex == 10) {
          movementIndex = 0;
       }
-      g2.drawImage(ALL_ANIMATIONS[0][positionIndex][movementIndex / 5], x, y, width, height, null);
+      g2.drawImage(ALL_ANIMATIONS[0][movementIndex / 5][positionIndex], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {

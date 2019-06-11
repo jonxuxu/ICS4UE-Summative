@@ -19,6 +19,8 @@ public abstract class Player extends User implements CanIntersect {
    //Constants
    private int ID;
    private double[] xy = {300, 300};
+   private int spawnX = 300;
+   private int spawnY = 300;
    private boolean spells[] = new boolean[3];
    private boolean artifact = false;
    private boolean damaged = false;
@@ -33,7 +35,10 @@ public abstract class Player extends User implements CanIntersect {
    private int spriteID;
    private int mouseX;
    private int mouseY;
+<<<<<<< HEAD
    private double mouseAngle;
+=======
+>>>>>>> parent of aed9b30... Revert "Merge branch 'master' of https://github.com/JonathanXu1/ICS4UE-Summative"
    private boolean melee;
 
    //May 25//
@@ -326,10 +331,15 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void autoAttack() {
-      if (!stunned && (autoAttackTimer <= 0)) {
+     if (!stunned && (autoAttackTimer <= 0)) {
+       if (!melee){
          projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
          autoAttackTimer = autoAttackCooldown;
-      }
+       } else {
+         addAOE(new AutoAOE(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, range));
+         autoAttackTimer = autoAttackCooldown;
+       }
+     }
    }
 
    public void flare() {
@@ -370,6 +380,9 @@ public abstract class Player extends User implements CanIntersect {
             health -= damage - shields.get(0).getStrength();
             shields.remove(0);
          }
+      }
+      if (health <= 0){
+        addStatus(new Dead());
       }
    }
 
@@ -443,6 +456,9 @@ public abstract class Player extends User implements CanIntersect {
             } else if (removed instanceof TimeMageE) {
                setX(((TimeMageE) removed).getX());
                setY(((TimeMageE) removed).getY());
+            } else if (removed instanceof Dead){
+              setX(spawnX);
+              setY(spawnY);
             }
          } else {
             applyStatus(statuses.get(i));
@@ -662,5 +678,9 @@ public abstract class Player extends User implements CanIntersect {
 
    public double getDamageReduction() {
       return damageReduction;
+   }
+   
+   public void setMelee(boolean melee){
+     this.melee = melee;
    }
 }

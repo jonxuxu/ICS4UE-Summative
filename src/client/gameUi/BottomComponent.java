@@ -52,7 +52,6 @@ public class BottomComponent extends GameComponent {
 
 
    public void draw(Graphics2D g2) {
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setColor(new Color(152, 162, 169));
       //Bottom panel
       g2.setColor(new Color(72, 60, 32));

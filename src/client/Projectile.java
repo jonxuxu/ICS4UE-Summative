@@ -1,7 +1,11 @@
 package client;
 
+import client.particle.AshParticle;
+import client.particle.FireParticle;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 //tmp
 import javax.imageio.ImageIO;
@@ -19,9 +23,9 @@ import java.io.File;
 
 public class Projectile {
    private int ID;
-   private int x;
-   private int y;
+   private int x, y;
    private static int[] xyAdjust;
+   private ArrayList<FireParticle> particles = new ArrayList<FireParticle>();
 
    Projectile(int ID, int x, int y) {
       this.ID = ID;
@@ -41,6 +45,7 @@ public class Projectile {
                particles.remove(i);
             } else {
                particles.get(i).render(g2);
+<<<<<<< HEAD
                BufferedImage arrow1 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow1.png"));
                AffineTransform at = AffineTransform.getTranslateInstance(x+xyAdjust[0], y+xyAdjust[1]);
 
@@ -53,6 +58,8 @@ public class Projectile {
 
                at.rotate(radians-Math.PI/2);
                g2.drawImage(arrow1, at, null);
+=======
+>>>>>>> parent of aed9b30... Revert "Merge branch 'master' of https://github.com/JonathanXu1/ICS4UE-Summative"
             }
          } catch (Exception e) {
             e.printStackTrace();
