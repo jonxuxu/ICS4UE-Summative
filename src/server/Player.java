@@ -148,6 +148,9 @@ public abstract class Player extends User implements CanIntersect {
    public void setMouseAngle(double mouseAngle) {
       this.mouseAngle = mouseAngle;
    }
+   public double getMouseAngle(){
+      return this.mouseAngle;
+   }
 
    public void setID(int ID) {
       this.ID = ID;

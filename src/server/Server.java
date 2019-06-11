@@ -527,7 +527,7 @@ public class Server {
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
                         for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " "); //, theseProjectiles.get(j).getAngle() + " ");
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
                            if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {

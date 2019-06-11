@@ -419,7 +419,7 @@ public class Client extends JFrame implements WindowListener {
                outputString.append("L" + mouseAngle + " ");
             }
             outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
-            outputString.append ("R" + mouseAngle + " ");
+            outputString.append("R" + mouseAngle + " ");
             boolean walking = false;
             int positionIndex = -10;
             //Refreshes the players animation
