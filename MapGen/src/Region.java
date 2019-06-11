@@ -34,9 +34,9 @@ public class Region extends Polygon {
 		
 		for (int idx = 0; idx < numVertices; idx++) {
 			tempAngle = 2*Math.PI*idx/numVertices;
-			this.xpoints[idx] = (int) (radius*Math.cos(tempAngle));
-			this.ypoints[idx] = (int) (radius*Math.sin(tempAngle));
-		}
+			this.xpoints[idx] = (int) (radius*Math.cos(tempAngle)) + centerX;
+			this.ypoints[idx] = (int) (radius*Math.sin(tempAngle)) + centerY;
+		}			
 	}
 	
 	public void mimicEllipse(int centerX, int centerY, int radius, double ellipticalAdjust, int numVertices) {
