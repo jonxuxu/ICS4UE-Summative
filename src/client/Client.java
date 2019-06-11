@@ -117,8 +117,18 @@ public class Client extends JFrame implements WindowListener {
 
 
    public Client() {
-      super("Dark");
+      super("Artifact of the Shadowmage");
+      GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
+     // this.setUndecorated(true);
+      this.setResizable(false);
+      this.setFocusable(false);
+      screenDevice.setFullScreenWindow(this);
 
+      DisplayMode dm = new DisplayMode(1280,720, 32, 60);
+      screenDevice.setDisplayMode(dm);
+      setSize(new Dimension(dm.getWidth(), dm.getHeight()));
+      validate();
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -922,7 +932,7 @@ public class Client extends JFrame implements WindowListener {
             } catch (IOException e) {
                System.out.println("Image not found");
             }*/
-            drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
+            drawArea = new Rectangle(0, 0, (int)(MAX_GAME_X), (int)(MAX_GAME_Y));
             darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
