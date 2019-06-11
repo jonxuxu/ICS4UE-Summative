@@ -25,7 +25,7 @@ public class FogMap {
       double y = xy[1] * SCALING;
       this.MAP_WIDTH=MAP_WIDTH;
       this.MAP_HEIGHT=MAP_HEIGHT;
-      fogShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      fogShape = new Area(new Rectangle.Double(-MAP_WIDTH*SCALING, -MAP_HEIGHT*SCALING, 3*MAP_WIDTH*SCALING, 3*MAP_HEIGHT*SCALING)); // Goes over bounds to account for edges
       activelyViewing = new Area(new Ellipse2D.Double(x, y, fogRadius*SCALING, fogRadius*SCALING));
    }
 
@@ -51,13 +51,6 @@ public class FogMap {
       viewedShape.subtract(fogShape);
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
-      if(scope == 1){ // Minimap scope
-         return viewedShape;
-      } else { // Only within window
-         outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
-         outputShape.intersect(viewedShape);
-         return outputShape;
-      }
-
+      return viewedShape;
    }
 }

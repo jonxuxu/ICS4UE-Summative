@@ -25,6 +25,7 @@ public class MinimapComponent extends GameComponent {
    private Player[] players;
    private static int myPlayerId;
    private int[] xyAdjust = new int[2];
+   private AffineTransform tx;
 
    private final int MAX_X = super.getMAX_X();
    private final int MAX_Y = super.getMAX_Y();
@@ -40,6 +41,8 @@ public class MinimapComponent extends GameComponent {
    private Area BORDER_FILL3;
    private Area BORDER_FILL4;
    private Area outputShape;
+   private Area darkFog, lightFog;
+   private Area playerShape, allyShape, enemyShape;
 
    public MinimapComponent(FogMap fog, Player[] players, int myPlayerId){
       // Setting up refs
@@ -84,22 +87,44 @@ public class MinimapComponent extends GameComponent {
       // Draws fog
       xyAdjust[0] =  (int)(scale(890) -scale(players[myPlayerId].getXy()[0])*0.05);
       xyAdjust[1] =  (int)(scale(440) - scale(players[myPlayerId].getXy()[1])*0.05);
-      AffineTransform tx = new AffineTransform();
+      tx = new AffineTransform();
       tx.translate(xyAdjust[0], xyAdjust[1]);
       tx.scale(0.05,0.05);
-      Area darkFog = fog.getFog(1).createTransformedArea(tx);
-      Area lightFog = fog.getExplored(1).createTransformedArea(tx);
+      darkFog = fog.getFog(1).createTransformedArea(tx);
+      lightFog = fog.getExplored(1).createTransformedArea(tx);
       g2.setColor(Color.black); //Unexplored
-      g2.fill(darkFog);
-      g2.setColor(Color.red); //Previously explored
-      g2.fill(lightFog);
+      outputShape = new Area(INNER_RECT);
+      outputShape.intersect(darkFog);
+      g2.fill(outputShape);
+      g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
+      outputShape = new Area(INNER_RECT);
+      outputShape.intersect(lightFog);
+      g2.fill(outputShape);
 
-
-      // Draws player
+      // Draws players and mobs
+      allyShape = new Area();
+      enemyShape = new Area();
+      for(Player player:players){
+         tx = new AffineTransform();
+         xyAdjust[0] = -(int)(scale(players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
+         xyAdjust[1] = -(int)(scale(players[myPlayerId].getXy()[1] - player.getXy()[1])*0.05);
+         tx.translate(xyAdjust[0], xyAdjust[1]);
+         playerShape = new Area(new Rectangle(scale(888), scale(438), scale(4), scale(4))).createTransformedArea(tx);
+         if(player.getTeam() == players[myPlayerId].getTeam()){ // On same team
+            allyShape.add(playerShape);
+         } else {
+            enemyShape.add(playerShape);
+         }
+      }
+      outputShape = new Area(INNER_RECT);
+      outputShape.intersect(allyShape);
       g2.setColor(Color.green);
-      g2.fillRect(scale(888), scale(438), scale(4), scale(4));
+      g2.fill(outputShape);
+      outputShape = new Area(INNER_RECT);
+      outputShape.intersect(enemyShape);
+      g2.setColor(Color.red);
+      g2.fill(outputShape);
 
-      // Draws other players and mobs
    }
 
    public void update(){
