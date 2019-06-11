@@ -35,6 +35,7 @@ public abstract class Player extends User implements CanIntersect {
    private int spriteID;
    private int mouseX;
    private int mouseY;
+   private double mouseAngle;
    private boolean melee;
 
    //May 25//
@@ -142,6 +143,13 @@ public abstract class Player extends User implements CanIntersect {
    public void setMouse(int mouseX, int mouseY) {
       this.mouseX = mouseX;
       this.mouseY = mouseY;
+   }
+
+   public void setMouseAngle(double mouseAngle) {
+      this.mouseAngle = mouseAngle;
+   }
+   public double getMouseAngle(){
+      return this.mouseAngle;
    }
 
    public void setID(int ID) {
@@ -346,7 +354,7 @@ public abstract class Player extends User implements CanIntersect {
       double dy = speed * Math.sin(theta);
       int totalTime = (int) Math.round(range * 1.0 / speed);
       statuses.add(new Launched(dx, dy, totalTime));
-      statuses.add(new Stun(totalTime));
+      statuses.add(new Stun(totalTime, -1));
    }
 
    public void moveTo(int targetX, int targetY, int speed) {
@@ -356,7 +364,7 @@ public abstract class Player extends User implements CanIntersect {
       double dy = speed * Math.sin(theta);
       int totalTime = (int) Math.round(range * 1.0 / speed);
       statuses.add(new Launched(dx, dy, totalTime));
-      statuses.add(new Stun(totalTime));
+      statuses.add(new Stun(totalTime, -1));
    }
 
    public abstract void update();
@@ -451,6 +459,7 @@ public abstract class Player extends User implements CanIntersect {
             } else if (removed instanceof Dead){
               setX(spawnX);
               setY(spawnY);
+              setHealth(maxHealth);
             }
          } else {
             applyStatus(statuses.get(i));

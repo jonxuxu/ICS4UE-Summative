@@ -117,8 +117,8 @@ public class Client extends JFrame implements WindowListener {
 
 
    public Client() {
-      super("Dark");
-
+      super("Artifact of the Shadowmage");
+      // this.setUndecorated(true);
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -236,8 +236,12 @@ public class Client extends JFrame implements WindowListener {
 
    public void menuLogic() {
       try {
-         if (input.ready()) {
-            decipherMenuInput(input.readLine());
+         if (!waitingForImage) {
+            if (input.ready()) {
+               decipherMenuInput(input.readLine());
+            }
+         } else {
+            waitForInput();
          }
          //Deal with output when going back through the menu
          if (logout) {
@@ -294,11 +298,8 @@ public class Client extends JFrame implements WindowListener {
          if (notifyReady) {
             notifyReady = false;
             output.println("R");
-            waitingForImage = true;
             output.flush();
-            while (!recievedImageFully) {
-               waitForInput();
-            }
+
             waitForInput();
             recievedImageFully = false;
             if (errors[3] != 0) {
@@ -409,6 +410,7 @@ public class Client extends JFrame implements WindowListener {
                outputString.append("L" + mouseAngle + " ");
             }
             outputString.append("P" + xyPos[0] + "," + xyPos[1] + " ");
+            outputString.append("R" + mouseAngle + " ");
             boolean walking = false;
             int positionIndex = -10;
             //Refreshes the players animation
@@ -449,8 +451,9 @@ public class Client extends JFrame implements WindowListener {
                      decipherMenuInput(input.readLine().trim());
                   } else {
                      sheet = ImageIO.read(socket.getInputStream());
-                     // ImageIO.write(image, "png", new File("Test"));
                      waitingForImage = false;
+                     nextPanel = 7;//Sends to the game screen
+                     gameBegin = true;
                   }
                }
             }
@@ -563,12 +566,12 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          } else if (initializer == 'B') {
+            waitingForImage = true;
             players = new Player[onlineList.size()];
             input = input.trim();
             String[] classes = input.split(" ", -1);
             for (int i = 0; i < onlineList.size(); i++) {
                thisClass = classes[i];
-               System.out.println(thisClass);
                //TODO: Add class stuff here;
                if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
                   players[i] = new SafeMarksman(onlineList.get(i).getUsername());
@@ -599,8 +602,6 @@ public class Client extends JFrame implements WindowListener {
                   System.out.println("Testing mode error");
                }
             }
-            nextPanel = 7;//Sends to the game screen
-            gameBegin = true;
          } else if (initializer == 'P') { //Then leave the game
             onlineList.clear();
             nextPanel = 2;
@@ -635,19 +636,23 @@ public class Client extends JFrame implements WindowListener {
             } else if (initializer == 'D') {
                players[Integer.parseInt(secondSplit[0])] = null;
             } else if (initializer == 'R') {
-               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), SCALING));
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
             } else if (initializer == 'E') {
                int id = Integer.parseInt(secondSplit[0]);
-               if (id != 4) {
-                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+               if ((id != 4) && (id != 14)) {
+                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
                } else {
                   int[][] points = new int[2][4];
                   for (int m = 0; m < 2; m++) {
                      for (int n = 0; n < 4; n++) {
-                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
                      }
                   }
-                  aoes.add(new TimeMageAOE(id, points));
+                  if (id == 4) {
+                     aoes.add(new TimeMageAOE(id, points));
+                  } else {
+                     aoes.add(new AutoAOE(id, points));
+                  }
                }
             } else if (initializer == 'S') {
                //Set the spell of the appropriate player to the correct one using setSpell
@@ -885,7 +890,7 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseMotionListener(myMouseAdapter);
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
-         GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
+         GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[4];
          pauseComponent = new PauseComponent(SCALING,  (int)(SCALING*412), (int)(SCALING*312));
          pauseComponent.setBounds(MAX_GAME_X / 2 - (int)(SCALING*206), MAX_GAME_Y / 2 - (int)(SCALING*156), (int)(SCALING*412), (int)(SCALING*312));
@@ -923,7 +928,7 @@ public class Client extends JFrame implements WindowListener {
          if (drawArea != null) {
             resetXyAdjust();
             g2.clip(drawArea);
-            // g2.scale(SCALING, SCALING);
+            g2.scale(SCALING, SCALING);
             g2.setFont(MAIN_FONT);
 
             //Map
@@ -1016,8 +1021,8 @@ public class Client extends JFrame implements WindowListener {
       }
 
       public void resetXyAdjust() {
-         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0] * SCALING);
-         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1] * SCALING);
+         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
+         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
       }
    }
 }

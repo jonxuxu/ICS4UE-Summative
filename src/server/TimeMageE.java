@@ -2,8 +2,9 @@ package server;
 class TimeMageE extends Status{
   private int x,y;
   private static int DURATION = 100;
+  private static int ID = -1;
   TimeMageE(int x, int y){
-    super(DURATION);
+    super(DURATION,ID);
     this.x = x;
     this.y = y;
   }

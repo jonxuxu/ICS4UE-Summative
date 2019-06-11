@@ -56,7 +56,7 @@ public class TimeMage extends Player{
           }
         }else {//Space
           addStatus(new Uncollidable(SPACE_DURATION));
-          addStatus(new Stun(SPACE_DURATION));
+          addStatus(new Stun(SPACE_DURATION, 12));
           addStatus(new Invisible(SPACE_DURATION));
         }
         return true;

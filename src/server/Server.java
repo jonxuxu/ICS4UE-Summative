@@ -392,18 +392,7 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
-            System.out.println("ww");
             MainMapGenModule builder=  new MainMapGenModule();
-            System.out.println("de");
-            for (int i=0;i<onlineGameSockets.size();i++){
-               builder.sendMap(onlineGameSockets.get(i));
-            }
-            for (int i = 0; i < players.length; i++) {
-               gameOutputs[i].println(""); //B for begin
-               gameOutputs[i].flush();
-            }
-            System.out.println("done");
-
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -413,6 +402,14 @@ public class Server {
                gameOutputs[i].println(beginLine.toString().trim()); //B for begin
                gameOutputs[i].flush();
             }
+            for (int i=0;i<onlineGameSockets.size();i++){
+               builder.sendMap(onlineGameSockets.get(i));
+            }
+            for (int i = 0; i < players.length; i++) {
+               gameOutputs[i].println(""); //B for begin
+               gameOutputs[i].flush();
+            }
+            System.out.println("done");
             playerNum = players.length;
             //Set up the players in each player
             Player.setPlayerReference(players, playerNum);
@@ -475,6 +472,8 @@ public class Server {
                                     players[i].autoAttack();
                                  } else if (initializer == 'F') {
                                     players[i].flare();
+                                 } else if (initializer == 'R') {
+                                    players[i].setMouseAngle(Double.parseDouble(secondSplit[0]));
                                  } else if (initializer == 'P') {
                                     players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
                                  } else if (initializer == 'W') {
@@ -528,11 +527,20 @@ public class Server {
                            projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
-                           if (theseAOES.get(j).getID() != 4) {
+                           if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
                               aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
-                           } else {//Time Mage AOE is different
+                           } else if (theseAOES.get(j).getID() == 4){//Time Mage AOE is different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
+                              for (int m = 0; m < points.length; m++) {
+                                 for (int n = 0; n < points[m].length; n++) {
+                                    aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                                 }
+                              }
+                              aoeOutput.append(" ");
+                           } else if (theseAOES.get(j).getID() == 14){//AutAOE is also different
+                              aoeOutput.append("E" + theseAOES.get(j).getID());
+                              int[][] points = ((AutoAOE) theseAOES.get(j)).getPoints();
                               for (int m = 0; m < points.length; m++) {
                                  for (int n = 0; n < points[m].length; n++) {
                                     aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
@@ -611,7 +619,6 @@ public class Server {
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        //TODO: Ask Kamron why this is important and if I can move it here (interferes with light otherwise)
                         players[i].update();
                         players[i].setFlashlightOn(false);
                      }
