@@ -30,7 +30,7 @@ import java.util.Map;
  */
 
 public abstract class MenuPanel extends JPanel {
-   private static double SCALING, INTRO_SCALING;
+   private static double  INTRO_SCALING;
    private static int MAX_X, MAX_Y;
    private static BufferedImage TITLE_SCREEN;
    private static BufferedImage TITLE;
@@ -47,10 +47,9 @@ public abstract class MenuPanel extends JPanel {
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
    }
 
-   public static void setParameters(int MAX_X1, int MAX_Y1, double SCALING1, double INTRO_SCALING1, Client CLIENT1) {
+   public static void setParameters(int MAX_X1, int MAX_Y1, double INTRO_SCALING1, Client CLIENT1) {
       MAX_X = MAX_X1;
       MAX_Y = MAX_Y1;
-      SCALING = SCALING1;
       INTRO_SCALING = INTRO_SCALING1;
       CLIENT = CLIENT1;
       try {
@@ -79,8 +78,8 @@ public abstract class MenuPanel extends JPanel {
       graphicsT.dispose();
 
       // Setting fonts
-      fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (12 * SCALING)));
-      fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (25 * SCALING)));
+      fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (24 )));
+      fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (50 )));
 
    }
 
@@ -95,10 +94,6 @@ public abstract class MenuPanel extends JPanel {
             g2.drawString(errorMessages[i], x - g2.getFontMetrics().stringWidth(errorMessages[i]) / 2, y + g2.getFontMetrics().getHeight() * i);
          }
       }
-   }
-
-   public double getScaling() {
-      return (SCALING);
    }
 
    public double getIntroScaling() {

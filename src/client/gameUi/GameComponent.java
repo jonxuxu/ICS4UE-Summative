@@ -14,7 +14,6 @@ import java.util.Map;
  */
 
 public abstract class GameComponent {
-   private static double SCALING = 1;
    private static int MAX_X, MAX_Y;
    private static Map<String, Font> fonts = new HashMap<String, Font>();
 
@@ -25,15 +24,12 @@ public abstract class GameComponent {
       MAX_X = MAX_X1;
       MAX_Y = MAX_Y1;
       // Setting fonts
-      fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (12 * SCALING)));
-      fonts.put("regular", new Font("Cambria Math", Font.PLAIN, (int) (5 * SCALING)));
-      fonts.put("stats", new Font("Cambria Math", Font.PLAIN, (int) (9 * SCALING)));
-      fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (25 * SCALING)));
+      fonts.put("main", new Font("Cambria Math", Font.PLAIN, (int) (24 )));
+      fonts.put("regular", new Font("Cambria Math", Font.PLAIN, (int) (10 )));
+      fonts.put("stats", new Font("Cambria Math", Font.PLAIN, (int) (18 )));
+      fonts.put("header", new Font("Akura Popo", Font.PLAIN, (int) (50 )));
    }
 
-   public double getSCALING() {
-      return SCALING;
-   }
 
    public int getMAX_X() {
       return MAX_X;
@@ -43,9 +39,6 @@ public abstract class GameComponent {
       return MAX_Y;
    }
 
-   public int scale(int unscaled) {
-      return ((int) (unscaled * SCALING));
-   }
 
    public Font getFont(String fontName) {
       return fonts.get(fontName);

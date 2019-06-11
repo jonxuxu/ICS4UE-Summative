@@ -9,11 +9,11 @@ public class CustomButton extends JButton {
   private Color rolloverColor = new Color(1f, 1f, 1f, 0.1f);
   private Color pressedColor = new Color(1f, 1f, 1f, 0.2f);
 
-  public CustomButton(String text, double SCALING) {
+  public CustomButton(String text) {
     super(text);
     super.setContentAreaFilled(false);
-    this.setFont(new Font("Cambria Math",Font.PLAIN, (int) (12*SCALING)));
-    this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (1.5 * SCALING)));
+    this.setFont(new Font("Cambria Math",Font.PLAIN, (int) (24)));
+    this.setBorder(BorderFactory.createLineBorder(Color.white, (int) (4 )));
     this.setForeground(foregroundColor);
     this.setBackground(backgroundColor);
     this.setFocusPainted(false);

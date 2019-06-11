@@ -19,7 +19,7 @@ public class CustomPolygon {
    private int[] savedIntersection = new int[2];
    private double[] xyVector = new double[2];
    private int magnitude;
-   private int FLASHLIGHT_RADIUS = 200;
+   private int FLASHLIGHT_RADIUS = 600;
 
    private int xCo;//x coefficient
    private int yCo;//y coefficient

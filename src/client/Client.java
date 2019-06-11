@@ -60,11 +60,11 @@ public class Client extends JFrame implements WindowListener {
    private boolean receivedOnce;//Determines if a message was received
 
    // Screen stuff
-   private final int DESIRED_Y = 500;
-   private final int DESIRED_X = 950;
+   private final int DESIRED_X = 1920;
+   private final int DESIRED_Y = 1080;
    private int[] xyAdjust = new int[2];
    private int MAX_Y, MAX_X;
-   private double SCALING, INTRO_SCALING;
+   private double INTRO_SCALING;
    private int[] mouseState = new int[3];
 
    // Assets
@@ -100,6 +100,8 @@ public class Client extends JFrame implements WindowListener {
 
    // Game itself
    private FogMap fog;
+   private Area darkFog;
+   private Area lightFog;
    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
    private ArrayList<AOE> aoes = new ArrayList<AOE>();
    private ArrayList<Player>[] teams = new ArrayList[2];
@@ -110,15 +112,22 @@ public class Client extends JFrame implements WindowListener {
    private int MAP_HEIGHT = 20000;
    private boolean waitingForImage;
    private BufferedImage sheet;
+   private boolean drawn=true;
    // Debugging
    private boolean testingBegin = false;
-   private boolean recievedImageFully = false;
    //Graphics
 
 
    public Client() {
       super("Artifact of the Shadowmage");
-      // this.setUndecorated(true);
+
+      GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
+      screenDevice.setFullScreenWindow(this);
+
+      DisplayMode dm = new DisplayMode(DESIRED_X, DESIRED_Y, 32, 60);
+      screenDevice.setDisplayMode(dm);
+      validate();
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -150,10 +159,10 @@ public class Client extends JFrame implements WindowListener {
       this.addKeyListener(myKeyListener);
       this.setFocusTraversalKeysEnabled(false);
       int[] tempXy = {(int) (MAX_X / 2), (int) (MAX_Y / 2)};
-      myMouseAdapter = new CustomMouseAdapter(this, SCALING, tempXy);
+      myMouseAdapter = new CustomMouseAdapter(this, tempXy);
 
       //Creating components
-      MenuPanel.setParameters(MAX_X, MAX_Y, SCALING, INTRO_SCALING, this);
+      MenuPanel.setParameters(MAX_X, MAX_Y, INTRO_SCALING, this);
       menuPanels[0] = new LoginPanel();
       menuPanels[1] = new IntroPanel();
       menuPanels[2] = new StartPanel();
@@ -161,7 +170,7 @@ public class Client extends JFrame implements WindowListener {
       menuPanels[4] = new JoinPanel();
       menuPanels[5] = new InstructionPanel();
       menuPanels[6] = new WaitingPanel();
-      intermediatePanel = new IntermediatePanel(MAX_X, MAX_Y, SCALING, this);
+      intermediatePanel = new IntermediatePanel(MAX_X, MAX_Y, this);
       //Adding to mainContainer cards
       mainContainer.setBackground(new Color(0, 0, 0));
       for (int i = 0; i < menuPanels.length; i++) {
@@ -176,7 +185,7 @@ public class Client extends JFrame implements WindowListener {
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
-      fog = new FogMap(xy, SCALING, MAP_WIDTH, MAP_HEIGHT);
+      fog = new FogMap(xy, MAP_WIDTH, MAP_HEIGHT);
       // TODO: Set player spawn xy later
 
       //Variable set up
@@ -301,7 +310,6 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
 
             waitForInput();
-            recievedImageFully = false;
             if (errors[3] != 0) {
                menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
                System.out.println("Error:" + errorMessages[errors[3]]);
@@ -380,6 +388,20 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (input.ready()) {
             decipherGameInput(input.readLine());
+            if (drawn) {
+               for (int i = 0; i < players.length; i++) {
+                  if (players[i] != null) {
+                     if (players[i].getTeam() == myTeam) {
+                        fog.scout(players[i].getXy());
+                     }
+                  }
+               }
+               AffineTransform tx = new AffineTransform();
+               tx.translate(xyAdjust[0], xyAdjust[1]);
+               darkFog = fog.getFog(2).createTransformedArea(tx);
+               lightFog = fog.getExplored(2).createTransformedArea(tx);
+               drawn=false;
+            }
             // TODO: Update/improve when kameron is done
             int[] xyPos = new int[2]; //Scaled to the map
             xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
@@ -612,8 +634,6 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          }
-      } else {
-         recievedImageFully = true;
       }
    }
 
@@ -738,6 +758,16 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+   public void initializeScaling() {
+      int BG_Y = 1198;
+      int BG_X = 1800;
+      if ((1.0 * MAX_Y / MAX_X) > (1.0 * BG_Y / BG_X)) { //Fit bg to height
+         INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
+      } else {
+         INTRO_SCALING = 1.0 * MAX_X / BG_X;
+      }
+   }
+
    public void windowClosing(WindowEvent e) {
       dispose();
       try {
@@ -768,20 +798,6 @@ public class Client extends JFrame implements WindowListener {
    public void windowClosed(WindowEvent e) {
    }
 
-   public void initializeScaling() {
-      if ((1.0 * MAX_Y / MAX_X) > (1.0 * DESIRED_Y / DESIRED_X)) { //
-         SCALING = 1.0 * MAX_X / DESIRED_X;
-      } else {
-         SCALING = 1.0 * MAX_Y / DESIRED_Y;
-      }
-      int BG_Y = 1198;
-      int BG_X = 1800;
-      if ((1.0 * MAX_Y / MAX_X) > (1.0 * BG_Y / BG_X)) { //Fit bg to height
-         INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
-      } else {
-         INTRO_SCALING = 1.0 * MAX_X / BG_X;
-      }
-   }
 
    //Booleans to clients
    public void leaveGame() {
@@ -891,7 +907,7 @@ public class Client extends JFrame implements WindowListener {
       private Area darkness;
 
       public GamePanel() {
-         this.setBackground(new Color(0, 0, 0));
+         this.setBackground(Color.black);
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
@@ -907,6 +923,7 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
+         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
          super.paintComponent(g);
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new PauseComponent();
@@ -921,19 +938,12 @@ public class Client extends JFrame implements WindowListener {
             }
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
-            //Game set up
-           /* try {
-               sheet = ImageIO.read(new File(".\\res\\Map.png"));
-            } catch (IOException e) {
-               System.out.println("Image not found");
-            }*/
-            drawArea = new Rectangle(0, 0, (int) (MAX_GAME_X), (int) (MAX_GAME_Y));
+            drawArea = new Rectangle(0, 0, DESIRED_X, DESIRED_Y);
             darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
             resetXyAdjust();
             g2.clip(drawArea);
-            g2.scale(SCALING, SCALING);
             g2.setFont(MAIN_FONT);
 
             //Map
@@ -950,11 +960,19 @@ public class Client extends JFrame implements WindowListener {
                   }
                }
             }
+
             for (int i = 0; i < aoes.size(); i++) {
                if (aoes.get(i).getID() == 0) {
                   darkness.subtract(aoes.get(i).getArea());
                }
             }
+            int[] xP = {(int) (100), (int) (200), (int) (300), (int) (400), (int) (500)};
+            int[] yP = {(int) (100), (int) (200), (int) (200), (int) (100), 0};
+            Polygon test = new Polygon(xP, yP, 5);
+            test.translate(xyAdjust[0], xyAdjust[1]);
+            g2.setColor(Color.black);
+            g2.fillPolygon(test);
+            g2.fillRect((int) (300) + xyAdjust[0], (int) (300) + xyAdjust[1], (int) (100), (int) (100));
 
             g2.setColor(new Color(0, 0, 0, 200));
             g2.fill(darkness);
@@ -968,25 +986,14 @@ public class Client extends JFrame implements WindowListener {
 
             // Updating fog
             resetXyAdjust();
-
-            for (int i = 0; i < players.length; i++) {
-               if (players[i] != null) {
-                  if (players[i].getTeam() == myTeam) {
-                     fog.scout(players[i].getXy());
-                  }
-               }
-            }
-
             //Creating shapes
-            AffineTransform tx = new AffineTransform();
-            tx.translate(xyAdjust[0], xyAdjust[1]);
-            Area darkFog = fog.getFog(2).createTransformedArea(tx);
-            Area lightFog = fog.getExplored(2).createTransformedArea(tx);
+
             //Draws fog
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
+            drawn=true;
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
