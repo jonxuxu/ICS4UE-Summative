@@ -28,23 +28,7 @@ public class MapGen {
       this.ellipticalAdjust = eAdjust;
     }
     
-    public MapData finalGenerate() {
-    	this.selfInitialize();
-    	
-    	MapData returnMap = new MapData();
-    	returnMap.obstacles = this.obstacles;
-    	returnMap.rLayer = this.regionLayer;
-    	
-    	return returnMap;
-    }
-    
     public void selfInitialize() {
-    	this.nodes = new ArrayList<RoadNode>(0);
-        this.obstacles = new ArrayList<Obstacle>(0);
-        this.testingState = false;
-        
-        //this.ellipticalAdjust = eAdjust;
-    	
     	int loopRadiusSize = 10;
     	int nodeGenRange = 3750;
     	double nodeGenStDev = 0.5;
