@@ -170,21 +170,17 @@ public class MapGen {
     			tempY = (int) (Math.sin(angle)*radius);
     			
     			exit = true;
-    			if (regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("map") || 
-    					regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) {    			
-	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
-	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
-	    				tempDeltaY = tempY - obstacles.get(idx).location.y;
-	    				
-	    				if ((Math.pow(tempDeltaX,2) + 
-	    						Math.pow(tempDeltaY,2)) <= 2500) {
-	    							System.out.println((Math.pow(tempDeltaX,2) + 
-	    		    						Math.pow(tempDeltaY,2)));
-	    							exit = false;
-	    				}
-	    			}
-    			} else {
-    				exit = false;
+    			    			
+    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
+    				tempDeltaX = tempX - obstacles.get(idx).location.x;
+    				tempDeltaY = tempY - obstacles.get(idx).location.y;
+    				
+    				if ((Math.pow(tempDeltaX,2) + 
+    						Math.pow(tempDeltaY,2)) <= 2500) {
+    							System.out.println((Math.pow(tempDeltaX,2) + 
+    		    						Math.pow(tempDeltaY,2)));
+    							exit = false;
+    				}
     			}
     			
     			
@@ -221,8 +217,7 @@ public class MapGen {
     			
     			exit = true;
     			    
-    			if (regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("map") || 
-    					regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) {
+    			if (regionLayer.checkCoordinate(tempX, tempY) == ("map")) {
 	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
 	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
 	    				tempDeltaY = tempY - obstacles.get(idx).location.y;    				
@@ -251,33 +246,6 @@ public class MapGen {
     		
     		this.obstacles.add(temp);
     	}
-    }
-    
-    public void insertArtifactClearing() {
-    	int teamOneDistance = 0;  
-    	int teamTwoDistance = 0;
-    	int teamOneIdx = 0; 
-    	int teamTwoIdx = 0;
-    	
-    	for (int idx = 0; idx < this.nodes.size(); idx++) {
-    		if (nodes.get(idx).location.x > teamTwoDistance) {
-    			teamTwoDistance = nodes.get(idx).location.x;
-    			teamTwoIdx = idx;
-    		}
-    		if (nodes.get(idx).location.x < teamOneDistance) {
-    			teamOneDistance = nodes.get(idx).location.x;
-    			teamOneIdx = idx;
-    		}
-    	}
-    	
-    	Region t1Clearing = new Region("team_one_clearing",9);
-    	Region t2Clearing = new Region("team_two_clearing",9);
-    	
-    	t1Clearing.mimicCircle(nodes.get(teamOneIdx).location.x,nodes.get(teamOneIdx).location.y,750,12);
-    	t2Clearing.mimicCircle(nodes.get(teamTwoIdx).location.x,nodes.get(teamTwoIdx).location.y,750,12);
-    	
-    	regionLayer.regions.add(t1Clearing);
-    	regionLayer.regions.add(t2Clearing);
     }
     
     public void tetherAllNodes() {
