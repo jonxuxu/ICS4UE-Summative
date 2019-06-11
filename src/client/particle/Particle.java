@@ -27,7 +27,10 @@ public abstract class Particle {
     this.y += dy;
 
     life --;
-    return life <= 0;
+    if(life <= 0){
+      return true;
+    }
+    return false;
   }
 
   public void render(Graphics2D g) {
@@ -53,5 +56,4 @@ public abstract class Particle {
   public void kill(){
     this.life = 0;
   }
-
 }

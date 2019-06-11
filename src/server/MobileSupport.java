@@ -37,7 +37,6 @@ public class MobileSupport extends Player{
     setRange(300);
     setAutoAttackCooldown(5);
     setFlareCooldown(100);
-    setMelee(false);
   }
   
   public boolean castSpell(int spellIndex){

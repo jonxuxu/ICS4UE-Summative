@@ -25,7 +25,7 @@ public class FogMap {
       double y = xy[1] * SCALING;
       this.MAP_WIDTH=MAP_WIDTH;
       this.MAP_HEIGHT=MAP_HEIGHT;
-      fogShape = new Area(new Rectangle.Double(-MAP_WIDTH*SCALING, -MAP_HEIGHT*SCALING, 3*MAP_WIDTH*SCALING, 3*MAP_HEIGHT*SCALING)); // Goes over bounds to account for edges
+      fogShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       activelyViewing = new Area(new Ellipse2D.Double(x, y, fogRadius*SCALING, fogRadius*SCALING));
    }
 
@@ -34,23 +34,20 @@ public class FogMap {
       activelyViewing.add(circle);
    }
 
-   public Area getFog(int scope) {
+   public Area getFog() {
       fogShape.subtract(activelyViewing);
-      if(scope == 1){ //Minimap scope
-         return fogShape;
-      } else { // Visible only in window
-         outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
-         outputShape.intersect(fogShape);
-         return outputShape;
-      }
-
+      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      outputShape.intersect(fogShape);
+      return outputShape;
    }
 
-   public Area getExplored(int scope){
+   public Area getExplored(){
       viewedShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
       viewedShape.subtract(fogShape);
       viewedShape.subtract(activelyViewing);
       activelyViewing.reset();
-      return viewedShape;
+      outputShape = new Area(new Rectangle.Double(0, 0, MAP_WIDTH*SCALING, MAP_HEIGHT*SCALING));
+      outputShape.intersect(viewedShape);
+      return outputShape;
    }
 }

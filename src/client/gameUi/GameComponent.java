@@ -14,14 +14,15 @@ import java.util.Map;
  */
 
 public abstract class GameComponent {
-   private static double SCALING = 1;
+   private static double SCALING;
    private static int MAX_X, MAX_Y;
    private static Map<String, Font> fonts = new HashMap<String, Font>();
 
 
    public abstract void draw(Graphics2D g2);
 
-   public static void initializeSize(int MAX_X1, int MAX_Y1) {
+   public static void initializeSize(double SCALING1, int MAX_X1, int MAX_Y1) {
+      SCALING = SCALING1;
       MAX_X = MAX_X1;
       MAX_Y = MAX_Y1;
       // Setting fonts
@@ -42,9 +43,8 @@ public abstract class GameComponent {
    public int getMAX_Y() {
       return MAX_Y;
    }
-
-   public int scale(int unscaled) {
-      return ((int) (unscaled * SCALING));
+   public int scale(int unscaled){
+      return((int)(unscaled*SCALING));
    }
 
    public Font getFont(String fontName) {

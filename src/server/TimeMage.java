@@ -23,10 +23,9 @@ public class TimeMage extends Player{
     setHealth(200);
     setAttack(300);
     setMobility(30);
-    setRange(50);//REE Change to -1 when add support for melee attacks
+    setRange(10);//REE Change to -1 when add support for melee attacks
     setAutoAttackCooldown(10);
     setFlareCooldown(100);
-    setMelee(true);
   }
   
   public boolean castSpell(int spellIndex){

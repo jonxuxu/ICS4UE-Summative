@@ -3,9 +3,16 @@ TODO:
 - player names, health, status
 - volume gain
 - background music
+- minimap
 
 
 Work log:
 
-June 10:
-- finish adding particles to projectiles
+June 6:
+- Auto scroll pane
+- removed redundant server commands
+
+June 7:
+- encoding text in base 64
+
+June 8:

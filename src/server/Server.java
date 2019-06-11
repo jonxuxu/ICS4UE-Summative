@@ -1,10 +1,7 @@
 package server;
 
-import javax.imageio.ImageIO;
 import java.awt.Polygon;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -392,18 +389,6 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
-            System.out.println("ww");
-            MainMapGenModule builder=  new MainMapGenModule();
-            System.out.println("de");
-            for (int i=0;i<onlineGameSockets.size();i++){
-               builder.sendMap(onlineGameSockets.get(i));
-            }
-            for (int i = 0; i < players.length; i++) {
-               gameOutputs[i].println(""); //B for begin
-               gameOutputs[i].flush();
-            }
-            System.out.println("done");
-
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -611,6 +596,7 @@ public class Server {
                   }
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
+                        //TODO: Ask Kamron why this is important and if I can move it here (interferes with light otherwise)
                         players[i].update();
                         players[i].setFlashlightOn(false);
                      }
