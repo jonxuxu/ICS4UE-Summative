@@ -902,9 +902,7 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         long time = System.nanoTime();
          super.paintComponent(g);
-         System.out.println(System.nanoTime() - time);
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new PauseComponent();
             allComponents[1] = new BottomComponent(myPlayer);
@@ -953,16 +951,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
 
-            //Creating shapes
-            int[] xP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (300 * SCALING), (int) (400 * SCALING), (int) (500 * SCALING)};
-            int[] yP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (200 * SCALING), (int) (100 * SCALING), 0};
-            Polygon test = new Polygon(xP, yP, 5);
-            test.translate(xyAdjust[0], xyAdjust[1]);
-            g.setColor(Color.black);
-            g.fillPolygon(test);
-            g.fillRect((int) (300 * SCALING) + xyAdjust[0], (int) (300 * SCALING) + xyAdjust[1], (int) (100 * SCALING), (int) (100 * SCALING));
-
-            g2.setColor(new Color(0, 0, 0, 128));
+                  g2.setColor(new Color(0, 0, 0, 200));
             g2.fill(darkness);
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {

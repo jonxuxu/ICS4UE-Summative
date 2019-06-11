@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -48,16 +49,9 @@ class MainMapGenModule {
          gen.purgeRedundanices();
          gen.generateCrevices(2);
       }
-      //Image map = new BufferedImage(100,100,BufferedImage.TRANSLUCENT);
       display = new Disp();
       //this.add(display);
       //  display.repaint();
-      try {
-         String str = "";
-         socket = new Socket("localHost", 5001);
-      } catch (IOException e) {
-         System.out.println("w");
-      }
       display.paintImage();
       System.out.println("done");
    }
@@ -88,6 +82,7 @@ class MainMapGenModule {
          //this.setCenter(g);
          g.translate(3000, 2000);
          Graphics2D g2 = (Graphics2D) (g);
+         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
          g2.scale(0.2, 0.2);
 
          if (!gen.testingState) {
@@ -105,10 +100,10 @@ class MainMapGenModule {
 
          if (gen.regionLayer != null) {
             for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
-               if (gen.regionLayer.regions.get(idx).regionType.equals( "crevice")) {
+               if (gen.regionLayer.regions.get(idx).regionType.equals("crevice")) {
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
-                  g.setColor(new Color (0,50,0));
+                  g.setColor(new Color(0, 50, 0));
                } else {
                   g.setColor(new Color(0, 100, 0));
                }
@@ -138,10 +133,10 @@ class MainMapGenModule {
          }
 
          for (int i = 0; i < gen.obstacles.size(); i++) {
-            if (gen.obstacles.get(i).type .equals( "TREE")) {
-               g.setColor(new Color (0,75,0));
-            } else if (gen.obstacles.get(i).type .equals("ROCK")) {
-               g.setColor(Color.BLACK);
+            if (gen.obstacles.get(i).type.equals("TREE")) {
+               g.setColor(new Color(0, 75, 0));
+            } else if (gen.obstacles.get(i).type.equals("ROCK")) {
+               g.setColor(Color.GRAY);
             }
             if (gen.obstacles.get(i).radius != 0) {
                g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y,
@@ -150,16 +145,16 @@ class MainMapGenModule {
                g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
             }
          }
-         }
       }
+   }
 
-      public void sendMap(Socket socket){
-         try {
-            ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
+   public void sendMap(Socket socket) {
+      try {
+         ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
+      } catch (IOException e) {
+         e.printStackTrace();
       }
+   }
 //Make it extend from JPanel
   /*    public void paintComponent(Graphics g) {
          super.paintComponent(g);
