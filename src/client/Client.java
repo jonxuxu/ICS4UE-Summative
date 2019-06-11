@@ -892,18 +892,18 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[4];
-         pauseComponent = new PauseComponent(SCALING,  (int)(SCALING*412), (int)(SCALING*312));
+         pauseComponent = new PauseComponent(SCALING);
+         this.add(pauseComponent);
          pauseComponent.setBounds(MAX_GAME_X / 2 - (int)(SCALING*206), MAX_GAME_Y / 2 - (int)(SCALING*156), (int)(SCALING*412), (int)(SCALING*312));
 
-         this.add(pauseComponent);
-         this.setDoubleBuffered(true);
+         //this.setDoubleBuffered(true);
          this.setVisible(true);
       }
 
       @Override
       public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
          super.paintComponent(g);
+         g2 = (Graphics2D) g;
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new BottomComponent(myPlayer);
             allComponents[1] = new MinimapComponent(fog, players, myPlayerID);
@@ -964,7 +964,7 @@ public class Client extends JFrame implements WindowListener {
             // Updating fog
             resetXyAdjust();
 
-        /*    for (int i = 0; i < players.length; i++) {
+            for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   if (players[i].getTeam() == myTeam) {
                      fog.scout(players[i].getXy());
@@ -981,7 +981,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);*/
+            g2.fill(lightFog);
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
@@ -997,7 +997,10 @@ public class Client extends JFrame implements WindowListener {
                if (lastKeyTyped == 27) { // Esc key
                   pause = !pause;
                   pauseComponent.setVisible(pause);
-                  System.out.println("Pause");
+                  if(pause){
+                     pauseComponent.requestFocus();
+                     System.out.println("Pause");
+                  }
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
                   System.out.println("Debug mode");
@@ -1010,7 +1013,7 @@ public class Client extends JFrame implements WindowListener {
                gameComponent.draw(g2);
             }
          }
-         //g2.dispose();
+         g2.scale(1/SCALING, 1/SCALING);
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          frames++;
       }
