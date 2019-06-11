@@ -448,20 +448,9 @@ public class Client extends JFrame implements WindowListener {
                   if (!waitingForImage) {
                      decipherMenuInput(input.readLine().trim());
                   } else {
-                     BufferedImage sheet = ImageIO.read(socket.getInputStream());
-                     //ImageIO.write(temp, "png", new File("Map"));
-                 /*    GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                     GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
-                     GraphicsConfiguration graphicsConfiguration = graphicsDevice.getDefaultConfiguration();
-                     LOADED_TITLE_SCREEN = graphicsConfiguration.createCompatibleImage((int) (BG_X * INTRO_SCALING), (int) (BG_Y * INTRO_SCALING), Transparency.TRANSLUCENT);
-                     Graphics2D graphicsTS = LOADED_TITLE_SCREEN.createGraphics();
-                     graphicsTS.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                     graphicsTS.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                     graphicsTS.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                     graphicsTS.drawImage(TITLE_SCREEN, 0, 0, (int) (BG_X * INTRO_SCALING), (int) (BG_Y * INTRO_SCALING), null);
-                     graphicsTS.dispose();*/
+                     sheet = ImageIO.read(socket.getInputStream());
+                     // ImageIO.write(image, "png", new File("Test"));
                      waitingForImage = false;
-
                   }
                }
             }
