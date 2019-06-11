@@ -118,17 +118,7 @@ public class Client extends JFrame implements WindowListener {
 
    public Client() {
       super("Artifact of the Shadowmage");
-      GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-      GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
      // this.setUndecorated(true);
-      this.setResizable(false);
-      this.setFocusable(false);
-      screenDevice.setFullScreenWindow(this);
-
-      DisplayMode dm = new DisplayMode(1280,720, 32, 60);
-      screenDevice.setDisplayMode(dm);
-      setSize(new Dimension(dm.getWidth(), dm.getHeight()));
-      validate();
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -979,7 +969,7 @@ public class Client extends JFrame implements WindowListener {
             // Updating fog
             resetXyAdjust();
 
-        /*    for (int i = 0; i < players.length; i++) {
+            for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   if (players[i].getTeam() == myTeam) {
                      fog.scout(players[i].getXy());
@@ -996,7 +986,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);*/
+            g2.fill(lightFog);
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {

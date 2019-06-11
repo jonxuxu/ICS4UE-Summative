@@ -1,4 +1,4 @@
-import javax.swing.JPanel;
+/*import javax.swing.JPanel;
 
 
 import javax.swing.JFrame;
@@ -145,4 +145,4 @@ class MainMapGenModule extends JFrame{
 		
 	}              
   }      
-}
+}*/

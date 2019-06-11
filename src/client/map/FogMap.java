@@ -12,14 +12,13 @@ import java.io.IOException;
 
 public class FogMap {
    private Area fogShape, viewedShape, activelyViewing, outputShape;
-   private double SCALING;
+   private double SCALING=1;
    private static double fogRadius = 250;
    private int MAP_WIDTH, MAP_HEIGHT;
 
    public FogMap(int[] xy, double SCALING, int MAP_WIDTH, int MAP_HEIGHT) {
       //fog = new int[y][x];
       //currentlyExploring = new boolean[y][x];
-      this.SCALING = SCALING;
 
       double x = xy[0] * SCALING;
       double y = xy[1] * SCALING;
