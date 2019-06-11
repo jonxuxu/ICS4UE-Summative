@@ -188,5 +188,8 @@ public class Ghost extends Player{
         }
       }
     }
+    if (getHealth() <= 0){
+      addStatus(new Dead());
+    }
   }
 }

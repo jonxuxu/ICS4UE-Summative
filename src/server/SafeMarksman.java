@@ -210,5 +210,8 @@ public class SafeMarksman extends Player{
         }
       }
     }
+    if (getHealth() <= 0){
+      addStatus(new Dead());
+    }
   }
 }

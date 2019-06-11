@@ -459,6 +459,7 @@ public abstract class Player extends User implements CanIntersect {
             } else if (removed instanceof Dead){
               setX(spawnX);
               setY(spawnY);
+              setHealth(maxHealth);
             }
          } else {
             applyStatus(statuses.get(i));
