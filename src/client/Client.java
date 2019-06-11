@@ -44,7 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-  private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+   private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -69,7 +69,7 @@ public class Client extends JFrame implements WindowListener {
 
    // Assets
    private soundEffectManager soundEffect = new soundEffectManager();
-   private Clock time = new Clock(16);
+   private Clock time = new Clock(30);
 
    // Ui stuff
    private CustomMouseAdapter myMouseAdapter;
@@ -106,16 +106,29 @@ public class Client extends JFrame implements WindowListener {
    private double mouseAngle;
    private int keyAngle;
    private boolean flashlightOn;
-   private int MAP_WIDTH = 10000;
-   private int MAP_HEIGHT = 10000;
+   private int MAP_WIDTH = 30000;
+   private int MAP_HEIGHT = 20000;
+   private boolean waitingForImage;
+   private BufferedImage sheet;
    // Debugging
    private boolean testingBegin = false;
+   private boolean recievedImageFully = false;
    //Graphics
 
 
    public Client() {
-      super("Dark");
+      super("Artifact of the Shadowmage");
+      GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
+     // this.setUndecorated(true);
+      this.setResizable(false);
+      this.setFocusable(false);
+      screenDevice.setFullScreenWindow(this);
 
+      DisplayMode dm = new DisplayMode(1280,720, 32, 60);
+      screenDevice.setDisplayMode(dm);
+      setSize(new Dimension(dm.getWidth(), dm.getHeight()));
+      validate();
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -203,14 +216,13 @@ public class Client extends JFrame implements WindowListener {
 
       while (true) {  //Main game loop
          if (time.getFramePassed()) {
-            if (gameBegin) {
+            if (!gameBegin) {
+               repaintPanels();
+            } else {
                if (receivedOnce) {
                   repaintPanels();
                }
-            } else {
-               repaintPanels();
             }
-            frames++;
          }
          if (connectionState < 1) {
             connect();
@@ -292,12 +304,16 @@ public class Client extends JFrame implements WindowListener {
          if (notifyReady) {
             notifyReady = false;
             output.println("R");
+            waitingForImage = true;
             output.flush();
+            while (!recievedImageFully) {
+               waitForInput();
+            }
             waitForInput();
+            recievedImageFully = false;
             if (errors[3] != 0) {
-               System.out.println("dwd");
                menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println("Error:"+errorMessages[errors[3]]);
+               System.out.println("Error:" + errorMessages[errors[3]]);
                soundEffect.playSound("error");
             }
          }
@@ -323,26 +339,26 @@ public class Client extends JFrame implements WindowListener {
             host = true;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-              //TODO: Add class select here
-              if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")){
-                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("TimeMage")){
-                players[i] = new TimeMage(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("Ghost")){
-                players[i] = new Ghost(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")){
-                players[i] = new MobileSupport(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("Juggernaut")){
-                players[i] = new Juggernaut(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("Summoner")){
-                players[i] = new Summoner(onlineList.get(i).getUsername());
-              } else {
-                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              }
-              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                myPlayer = players[i];
-              }
-              players[i].setTeam(onlineList.get(i).getTeam());
+               //TODO: Add class select here
+               if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("TimeMage")) {
+                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Ghost")) {
+                  players[i] = new Ghost(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Juggernaut")) {
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Summoner")) {
+                  players[i] = new Summoner(onlineList.get(i).getUsername());
+               } else {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               }
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
+               }
+               players[i].setTeam(onlineList.get(i).getTeam());
             }
             testingBegin = false;
             nextPanel = 6;
@@ -439,13 +455,21 @@ public class Client extends JFrame implements WindowListener {
             if (input.ready()) {
                inputReady = true;
                if (!gameBegin) {
-                  decipherMenuInput(input.readLine().trim());
+                  if (!waitingForImage) {
+                     decipherMenuInput(input.readLine().trim());
+                  } else {
+                     sheet = ImageIO.read(socket.getInputStream());
+                     // ImageIO.write(image, "png", new File("Test"));
+                     waitingForImage = false;
+                  }
                }
             }
          }
-      } catch (IOException e) {
+      } catch (
+              IOException e) {
          System.out.println("Lost connection");
       }
+
    }
 
    public boolean isParsable(char input) {
@@ -488,13 +512,15 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      char initializer = input.charAt(0);
-      input = input.substring(1);
-      if (isParsable(initializer)) {
-         if (currentPanel == 0) {
-            errors[0] = Integer.parseInt(initializer + "");
-            if (initializer == '0') {
-               //Start the opening here
+      System.out.println(input);
+      if (!input.contains("END")) {
+         char initializer = input.charAt(0);
+         input = input.substring(1);
+         if (isParsable(initializer)) {
+            if (currentPanel == 0) {
+               errors[0] = Integer.parseInt(initializer + "");
+               if (initializer == '0') {
+                  //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
                   ((IntroPanel) (menuPanels[1])).go();
@@ -503,97 +529,100 @@ public class Client extends JFrame implements WindowListener {
                   } catch (Exception E) {
                   }
 */
-               cardLayout.show(mainContainer, PANEL_NAMES[2]);
-               nextPanel = 2;
-            } else {
-               username = null;
-            }
-         } else if ((currentPanel == 3) || (currentPanel == 4)) {
-            errors[1] = Integer.parseInt(initializer + "");
-         } else if (currentPanel == 6) {
-            if (initializer == '0') {
-               loading = true;
-            } else {
-               errors[3] = Integer.parseInt(initializer+input);
-            }
-         }
-      } else if (initializer == 'A') {
-         String[] allPlayers = input.split(" ", -1);
-         myUser = new User(username);
-         for (String aPlayer : allPlayers) {
-            if ((testingBegin) && (myUser.getUsername().equals(aPlayer.substring(1)))) {
-               if (aPlayer.charAt(0) != '9') {
-                  myUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
+                  nextPanel = 2;
+               } else {
+                  username = null;
                }
-               onlineList.add(myUser);
-            } else {
-               User tempUser = new User(aPlayer.substring(1));
-               if (aPlayer.charAt(0) != '9') {
-                  tempUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+            } else if ((currentPanel == 3) || (currentPanel == 4)) {
+               errors[1] = Integer.parseInt(initializer + "");
+            } else if (currentPanel == 6) {
+               if (initializer == '0') {
+                  loading = true;
+               } else {
+                  errors[3] = Integer.parseInt(initializer + input);
                }
-               onlineList.add(tempUser);
+            }
+         } else if (initializer == 'A') {
+            String[] allPlayers = input.split(" ", -1);
+            myUser = new User(username);
+            for (String aPlayer : allPlayers) {
+               if ((testingBegin) && (myUser.getUsername().equals(aPlayer.substring(1)))) {
+                  if (aPlayer.charAt(0) != '9') {
+                     myUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+                  }
+                  onlineList.add(myUser);
+               } else {
+                  User tempUser = new User(aPlayer.substring(1));
+                  if (aPlayer.charAt(0) != '9') {
+                     tempUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+                  }
+                  onlineList.add(tempUser);
+               }
+            }
+            nextPanel = 6;
+            if (currentPanel == 3) {
+               host = true;
+            }
+         } else if (initializer == 'N') {
+            onlineList.add(new User(input));
+         } else if (initializer == 'X') {
+            for (int i = 0; i < onlineList.size(); i++) {
+               if (onlineList.get(i).getUsername().equals(input)) {
+                  onlineList.remove(i);
+               }
+            }
+         } else if (initializer == 'B') {
+            players = new Player[onlineList.size()];
+            input = input.trim();
+            String[] classes = input.split(" ", -1);
+            for (int i = 0; i < onlineList.size(); i++) {
+               thisClass = classes[i];
+               System.out.println(thisClass);
+               //TODO: Add class stuff here;
+               if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("TimeMage")) {
+                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Ghost")) {
+                  players[i] = new Ghost(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Juggernaut")) {
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Summoner")) {
+                  players[i] = new Summoner(onlineList.get(i).getUsername());
+               } else {//TESTING MODE ONLY
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               }
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
+                  myPlayerID = i;
+               }
+               try {
+                  teams[0].add(players[i]);
+                  teams[onlineList.get(i).getTeam()].add(players[i]);
+                  players[i].setTeam(onlineList.get(i).getTeam());
+               } catch (Exception e) {
+                  teams[0].add(players[i]);
+                  players[i].setTeam(0);
+                  System.out.println("Testing mode error");
+               }
+            }
+            nextPanel = 7;//Sends to the game screen
+            gameBegin = true;
+         } else if (initializer == 'P') { //Then leave the game
+            onlineList.clear();
+            nextPanel = 2;
+         } else if (initializer == 'E') { //This is similar to when E was sent, it is for switching teams
+            for (int i = 0; i < onlineList.size(); i++) {
+               if (onlineList.get(i).getUsername().equals(input.substring(1))) {
+                  onlineList.get(i).setTeam(Integer.parseInt(input.charAt(0) + ""));
+               }
             }
          }
-         nextPanel = 6;
-         if (currentPanel == 3) {
-            host = true;
-         }
-      } else if (initializer == 'N') {
-         onlineList.add(new User(input));
-      } else if (initializer == 'X') {
-         for (int i = 0; i < onlineList.size(); i++) {
-            if (onlineList.get(i).getUsername().equals(input)) {
-               onlineList.remove(i);
-            }
-         }
-      } else if (initializer == 'B') {
-         players = new Player[onlineList.size()];
-         input=input.trim();
-         String []classes = input.split(" ",-1);
-         for (int i = 0; i < onlineList.size(); i++) {
-            thisClass = classes[i];
-            System.out.println(thisClass);
-            //TODO: Add class stuff here;
-            if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("TimeMage")) {
-               players[i] = new TimeMage(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("Ghost")) {
-               players[i] = new Ghost(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
-               players[i] = new MobileSupport(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("Juggernaut")) {
-               players[i] = new Juggernaut(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("Summoner")) {
-               players[i] = new Summoner(onlineList.get(i).getUsername());
-            }else {//TESTING MODE ONLY
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-            }
-            if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-               myPlayer = players[i];
-               myPlayerID = i;
-            }
-            try {
-               teams[0].add(players[i]);
-               teams[onlineList.get(i).getTeam()].add(players[i]);
-               players[i].setTeam(onlineList.get(i).getTeam());
-            } catch (Exception e) {
-               teams[0].add(players[i]);
-               players[i].setTeam(0);
-               System.out.println("Testing mode error");
-            }
-         }
-         nextPanel = 7;//Sends to the game screen
-         gameBegin = true;
-      } else if (initializer == 'P') { //Then leave the game
-         onlineList.clear();
-         nextPanel = 2;
-      } else if (initializer == 'E') { //This is similar to when E was sent, it is for switching teams
-         for (int i = 0; i < onlineList.size(); i++) {
-            if (onlineList.get(i).getUsername().equals(input.substring(1))) {
-               onlineList.get(i).setTeam(Integer.parseInt(input.charAt(0) + ""));
-            }
-         }
+      } else {
+         recievedImageFully = true;
       }
    }
 
@@ -616,16 +645,16 @@ public class Client extends JFrame implements WindowListener {
             } else if (initializer == 'D') {
                players[Integer.parseInt(secondSplit[0])] = null;
             } else if (initializer == 'R') {
-               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
             } else if (initializer == 'E') {
                int id = Integer.parseInt(secondSplit[0]);
                if (id != 4) {
-                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
                } else {
                   int[][] points = new int[2][4];
                   for (int m = 0; m < 2; m++) {
                      for (int n = 0; n < 4; n++) {
-                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
                      }
                   }
                   aoes.add(new TimeMageAOE(id, points));
@@ -705,7 +734,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void connect() {
       try {
-         socket = new Socket("localhost", 5001);
+         socket = new Socket("localhost", 5001);//localhost
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -860,7 +889,6 @@ public class Client extends JFrame implements WindowListener {
       private int[] midXy = new int[2];
       private Rectangle drawArea;
       private final Font MAIN_FONT = super.getFont("main");
-      private BufferedImage sheet;
       //Game components
       private GameComponent[] allComponents;
       private boolean menuCooldown = true;
@@ -875,7 +903,7 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseMotionListener(myMouseAdapter);
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
-         GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
+         GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[5];
          this.setDoubleBuffered(true);
          this.setVisible(true);
@@ -884,40 +912,41 @@ public class Client extends JFrame implements WindowListener {
       @Override
       public void paintComponent(Graphics g) {
          g2 = (Graphics2D) g;
-         super.paintComponent(g2);
+         super.paintComponent(g);
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new PauseComponent();
             allComponents[1] = new BottomComponent(myPlayer);
-            allComponents[2] = new MinimapComponent(fog, players);
+            allComponents[2] = new MinimapComponent(fog, players, myPlayerID);
             allComponents[3] = new InventoryComponent();
             allComponents[4] = new DebugComponent();
-            midXy[0] = (MAX_GAME_X / 2);
-            midXy[1] = (MAX_GAME_Y / 2);
+            midXy[0] = (DESIRED_X / 2);
+            midXy[1] = (DESIRED_Y / 2);
             for (Player currentPlayer : players) {
-               currentPlayer.setScaling(SCALING);
                currentPlayer.setCenterXy(midXy);
             }
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
             //Game set up
-            try {
+           /* try {
                sheet = ImageIO.read(new File(".\\res\\Map.png"));
             } catch (IOException e) {
                System.out.println("Image not found");
-            }
-            drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
+            }*/
+            drawArea = new Rectangle(0, 0, (int)(MAX_GAME_X), (int)(MAX_GAME_Y));
             darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
             resetXyAdjust();
             g2.clip(drawArea);
+            g2.scale(SCALING, SCALING);
             g2.setFont(MAIN_FONT);
 
             //Map
-            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (MAP_WIDTH * SCALING), (int) (MAP_HEIGHT * SCALING), null);
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], MAP_WIDTH, MAP_HEIGHT, null);
             g2.setColor(Color.black);
             //Game player
             resetXyAdjust();
+
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   currentPlayer.translateFlashlight(xyAdjust);
@@ -931,16 +960,8 @@ public class Client extends JFrame implements WindowListener {
                   darkness.subtract(aoes.get(i).getArea());
                }
             }
-            //Creating shapes
-            int[] xP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (300 * SCALING), (int) (400 * SCALING), (int) (500 * SCALING)};
-            int[] yP = {(int) (100 * SCALING), (int) (200 * SCALING), (int) (200 * SCALING), (int) (100 * SCALING), 0};
-            Polygon test = new Polygon(xP, yP, 5);
-            test.translate(xyAdjust[0], xyAdjust[1]);
-            g2.setColor(Color.black);
-            g2.fillPolygon(test);
-            g2.fillRect((int) (300 * SCALING) + xyAdjust[0], (int) (300 * SCALING) + xyAdjust[1], (int) (100 * SCALING), (int) (100 * SCALING));
 
-            g2.setColor(new Color(0, 0, 0, 128));
+            g2.setColor(new Color(0, 0, 0, 200));
             g2.fill(darkness);
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
@@ -952,7 +973,8 @@ public class Client extends JFrame implements WindowListener {
 
             // Updating fog
             resetXyAdjust();
-            for (int i = 0; i < players.length; i++) {
+
+        /*    for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   if (players[i].getTeam() == myTeam) {
                      fog.scout(players[i].getXy());
@@ -963,13 +985,13 @@ public class Client extends JFrame implements WindowListener {
             //Creating shapes
             AffineTransform tx = new AffineTransform();
             tx.translate(xyAdjust[0], xyAdjust[1]);
-            Area darkFog = fog.getFog().createTransformedArea(tx);
-            Area lightFog = fog.getExplored().createTransformedArea(tx);
+            Area darkFog = fog.getFog(2).createTransformedArea(tx);
+            Area lightFog = fog.getExplored(2).createTransformedArea(tx);
             //Draws fog
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);
+            g2.fill(lightFog);*/
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
@@ -979,6 +1001,7 @@ public class Client extends JFrame implements WindowListener {
                aoes.get(i).draw(g2);
             }
             //draw all components
+
             ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
             if (keyPressed) {
                if (lastKeyTyped == 27) { // Esc key
@@ -996,8 +1019,9 @@ public class Client extends JFrame implements WindowListener {
             }
             //chatPanel.draw(g2);
          }
-         g2.dispose();
+         //g2.dispose();
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
+         frames++;
       }
 
       public void setDimensions(int MAX_GAME_X, int MAX_GAME_Y) {
@@ -1006,8 +1030,8 @@ public class Client extends JFrame implements WindowListener {
       }
 
       public void resetXyAdjust() {
-         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0] * SCALING);
-         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1] * SCALING);
+         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
+         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
       }
    }
 }

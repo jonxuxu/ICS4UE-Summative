@@ -1,3 +1,5 @@
+package server;
+
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -15,7 +17,7 @@ public class MapGen {
 	
     public ArrayList<RoadNode> nodes; 
     public ArrayList<Obstacle> obstacles;
-    public RegionLayer regionLayer; 
+    public RegionLayer regionLayer;
     public boolean testingState;
     
     
@@ -24,7 +26,6 @@ public class MapGen {
       this.nodes = new ArrayList<RoadNode>(0);
       this.obstacles = new ArrayList<Obstacle>(0);
       this.testingState = false;
-      
       this.ellipticalAdjust = eAdjust;
     }
         
@@ -49,7 +50,7 @@ public class MapGen {
     	Region map = new Region("map", 0); 
     			
     	map.mimicEllipse(0, 0, 7500, 1.75, 100);
-    	swamp.mimicEllipse(0, 0, 3000, 1.75, 20);        	
+    	swamp.mimicEllipse(0, 0, 3000, 1.75, 20);
     	
     	
     	this.regionLayer.regions.add(MAP_REGION_IDX, map);

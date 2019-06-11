@@ -11,6 +11,7 @@ package server;
 public class Status {
   int duration;
   int lifetime;
+  int ID;
   Status(int duration){
     this.duration = duration;
   }
@@ -19,5 +20,8 @@ public class Status {
   }
   public int getRemainingDuration(){
     return duration-lifetime;
+  }
+  public void setID(int ID){
+    this.ID=ID;
   }
 }
