@@ -18,23 +18,23 @@ import java.util.ArrayList;
 
 public class Projectile {
    private int ID;
-   private int x;
-   private int y;
+   private int x, y;
+   private double SCALING;
    private static int[] xyAdjust;
    private ArrayList<FireParticle> particles = new ArrayList<FireParticle>();
 
-   Projectile(int ID, int x, int y) {
+   Projectile(int ID, int x, int y, double SCALING) {
       this.ID = ID;
       this.x = x;
       this.y = y;
+      this.SCALING= SCALING;
    }
 
    public void draw(Graphics2D g2) {
       g2.setColor(Color.WHITE);
       g2.fillRect(x+xyAdjust[0], y+xyAdjust[1], 10, 10);
-      if(Math.random() < 0.1){
-         particles.add(new FireParticle(x+xyAdjust[0], y+xyAdjust[1], (int) (Math.random() * 5 + 5)));
-      }
+      particles.add(new FireParticle(x+xyAdjust[0], y+xyAdjust[1], (int) ((Math.random() * 5 + 5)*SCALING), SCALING));
+
       //Draws particles
       for (int i = 0; i < particles.size(); i++) {
          try {

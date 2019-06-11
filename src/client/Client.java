@@ -616,7 +616,7 @@ public class Client extends JFrame implements WindowListener {
             } else if (initializer == 'D') {
                players[Integer.parseInt(secondSplit[0])] = null;
             } else if (initializer == 'R') {
-               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING)));
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), SCALING));
             } else if (initializer == 'E') {
                int id = Integer.parseInt(secondSplit[0]);
                if (id != 4) {
