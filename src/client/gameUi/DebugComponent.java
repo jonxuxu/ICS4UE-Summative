@@ -23,10 +23,10 @@ public class DebugComponent extends GameComponent {
          g2.setColor(Color.white);
          g2.setFont(FONT);
          g2.drawString("DEBUG MODE", 0, (int) (20 ));
-         g2.drawString("Fps: " + fps, 0, (int) (35 ));
-         g2.drawString("Mouse: " + mouse[0] + "x " + mouse[1] + "y " + mouseMessage[mouse[2]], 0, (int) (50 ));
-         g2.drawString("Keyboard: " + keyPress, 0, (int) (65 ));
-         g2.drawString("Memory: " + String.format("%.2f", usedMem) + "mb out of " + maxMem + "mb   " + String.format("%.2f", usedMem / maxMem * 100) + "%", 0, (int) (80 ));
+         g2.drawString("Fps: " + fps, 0, (int) (40 ));
+         g2.drawString("Mouse: " + mouse[0] + "x " + mouse[1] + "y " + mouseMessage[mouse[2]], 0, (int) (60 ));
+         g2.drawString("Keyboard: " + keyPress, 0, (int) (80 ));
+         g2.drawString("Memory: " + String.format("%.2f", usedMem) + "mb out of " + maxMem + "mb   " + String.format("%.2f", usedMem / maxMem * 100) + "%", 0, (int) (100 ));
       }
    }
 

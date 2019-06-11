@@ -885,15 +885,6 @@ public class Client extends JFrame implements WindowListener {
       return (serverPassword);
    }
 
-   /**
-    * GamePanel.java
-    * This is
-    *
-    * @author Will Jeong
-    * @version 1.0
-    * @since 2019-05-31
-    */
-
    public class GamePanel extends MenuPanel {//State=7
       private Graphics2D g2;
       private boolean generateGraphics = true;
@@ -902,9 +893,10 @@ public class Client extends JFrame implements WindowListener {
       private final Font MAIN_FONT = super.getFont("main");
       //Game components
       private GameComponent[] allComponents;
-      private boolean menuCooldown = true;
+      private PauseComponent pauseComponent;
       private int MAX_GAME_X, MAX_GAME_Y;
       private Area darkness;
+      private boolean pause = false;
 
       public GamePanel() {
          this.setBackground(Color.black);
@@ -915,7 +907,11 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
-         allComponents = new GameComponent[5];
+         allComponents = new GameComponent[4];
+         pauseComponent = new PauseComponent( (int)(412), (int)(312));
+         pauseComponent.setBounds(MAX_GAME_X / 2 - (int)(206), MAX_GAME_Y / 2 - (int)(156), (int)(412), (int)(312));
+
+         this.add(pauseComponent);
          this.setDoubleBuffered(true);
          this.setVisible(true);
       }
@@ -926,11 +922,10 @@ public class Client extends JFrame implements WindowListener {
          g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
          super.paintComponent(g);
          if ((currentPanel == 7) && (generateGraphics)) {
-            allComponents[0] = new PauseComponent();
-            allComponents[1] = new BottomComponent(myPlayer);
-            allComponents[2] = new MinimapComponent(fog, players, myPlayerID);
-            allComponents[3] = new InventoryComponent();
-            allComponents[4] = new DebugComponent();
+            allComponents[0] = new BottomComponent(myPlayer);
+            allComponents[1] = new MinimapComponent(fog, players, myPlayerID);
+            allComponents[2] = new InventoryComponent();
+            allComponents[3] = new DebugComponent();
             midXy[0] = (DESIRED_X / 2);
             midXy[1] = (DESIRED_Y / 2);
             for (Player currentPlayer : players) {
@@ -986,6 +981,9 @@ public class Client extends JFrame implements WindowListener {
 
             // Updating fog
             resetXyAdjust();
+
+
+
             //Creating shapes
 
             //Draws fog
@@ -994,7 +992,6 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
             drawn=true;
-
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
                projectiles.get(i).draw(g2);
@@ -1004,22 +1001,23 @@ public class Client extends JFrame implements WindowListener {
             }
             //draw all components
 
-            ((DebugComponent) (allComponents[4])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
+            ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
             if (keyPressed) {
                if (lastKeyTyped == 27) { // Esc key
-                  ((PauseComponent) (allComponents[0])).toggle();
+                  pause = !pause;
+                  pauseComponent.setVisible(pause);
+                  System.out.println("Pause");
                } else if (lastKeyTyped == 8) { // Back key
-                  ((DebugComponent) (allComponents[4])).toggle();
+                  ((DebugComponent) (allComponents[3])).toggle();
                   System.out.println("Debug mode");
-               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) {
-                  ((InventoryComponent) (allComponents[3])).toggle();
+               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) { //C or c
+                  ((InventoryComponent) (allComponents[2])).toggle();
                }
                keyPressed = false;
             }
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
-            //chatPanel.draw(g2);
          }
          //g2.dispose();
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
