@@ -354,7 +354,7 @@ public abstract class Player extends User implements CanIntersect {
       double dy = speed * Math.sin(theta);
       int totalTime = (int) Math.round(range * 1.0 / speed);
       statuses.add(new Launched(dx, dy, totalTime));
-      statuses.add(new Stun(totalTime));
+      statuses.add(new Stun(totalTime, -1));
    }
 
    public void moveTo(int targetX, int targetY, int speed) {
@@ -364,7 +364,7 @@ public abstract class Player extends User implements CanIntersect {
       double dy = speed * Math.sin(theta);
       int totalTime = (int) Math.round(range * 1.0 / speed);
       statuses.add(new Launched(dx, dy, totalTime));
-      statuses.add(new Stun(totalTime));
+      statuses.add(new Stun(totalTime, -1));
    }
 
    public abstract void update();

@@ -11,9 +11,10 @@ package server;
 public class Status {
   int duration;
   int lifetime;
-  int ID;
-  Status(int duration){
+  int id;
+  Status(int duration, int id){
     this.duration = duration;
+    this.id = id;
   }
   public void advance(){
     lifetime++;
@@ -21,7 +22,10 @@ public class Status {
   public int getRemainingDuration(){
     return duration-lifetime;
   }
-  public void setID(int ID){
-    this.ID=ID;
+  public void setID(int id){
+    this.id=id;
+  }
+  public int getID(){
+    return id;
   }
 }

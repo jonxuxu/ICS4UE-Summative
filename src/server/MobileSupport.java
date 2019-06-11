@@ -193,7 +193,7 @@ public class MobileSupport extends Player{
             for (int k = 0; k < qBlacklist.size(); k++){
               if (getEnemy(j) != qBlacklist.get(k)){
                 if (getAOE(i).collides(getEnemy(j))){
-                  getEnemy(j).addStatus(new Stun(Q_STUN_DURATION));
+                  getEnemy(j).addStatus(new Stun(Q_STUN_DURATION, 12));
                   qBlacklist.add(getEnemy(j));
                 }
               }
