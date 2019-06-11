@@ -76,9 +76,6 @@ public class Server {
          try {
             while (!stop) {
                if (input.ready()) {
-             /*     BufferedImage image = ImageIO.read(myConnection.getInputStream());
-                  System.out.println(image.getWidth());
-                  ImageIO.write(image, "png", new File("Test"));*/
                   String inputString = input.readLine();//Reads as fast as it can. Or you could alternatively slow it down here by making a getFramePassed at this instance
                   char initializer = inputString.charAt(0);
                   inputString = inputString.substring(1);//Remove the initializer
@@ -395,10 +392,18 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
-            MainMapGenModule builder = new MainMapGenModule();
-            for (int i = 0; i < onlineGameSockets.size(); i++) {
+            System.out.println("ww");
+            MainMapGenModule builder=  new MainMapGenModule();
+            System.out.println("de");
+            for (int i=0;i<onlineGameSockets.size();i++){
                builder.sendMap(onlineGameSockets.get(i));
             }
+            for (int i = 0; i < players.length; i++) {
+               gameOutputs[i].println(""); //B for begin
+               gameOutputs[i].flush();
+            }
+            System.out.println("done");
+
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());

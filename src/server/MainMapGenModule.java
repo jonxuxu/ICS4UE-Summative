@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
-class MainMapGenModule extends JFrame {
+class MainMapGenModule {
    private Disp display;
    private MapGen gen;
 
@@ -28,8 +28,6 @@ class MainMapGenModule extends JFrame {
    private Socket socket;
 
    MainMapGenModule() {
-
-      this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 
       String config = "";
 
@@ -54,7 +52,6 @@ class MainMapGenModule extends JFrame {
       display = new Disp();
       //this.add(display);
       //  display.repaint();
-      this.setVisible(true);
       try {
          String str = "";
          socket = new Socket("localHost", 5001);
@@ -86,7 +83,7 @@ class MainMapGenModule extends JFrame {
 
       public void paintImage() {
          //6000 by 4000
-         mapImage = new BufferedImage(6000, 4000, BufferedImage.TRANSLUCENT);
+         mapImage = new BufferedImage(6000, 4000, BufferedImage.TYPE_INT_RGB);
          Graphics g = mapImage.createGraphics();
          //this.setCenter(g);
          g.translate(3000, 2000);
@@ -158,7 +155,7 @@ class MainMapGenModule extends JFrame {
 
       public void sendMap(Socket socket){
          try {
-            ImageIO.write(mapImage, "JPEG", socket.getOutputStream());//also try png
+            ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
          } catch (IOException e) {
             e.printStackTrace();
          }
