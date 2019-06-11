@@ -117,8 +117,18 @@ public class Client extends JFrame implements WindowListener {
 
 
    public Client() {
-      super("Dark");
+      super("Artifact of the Shadowmage");
+      GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
+     // this.setUndecorated(true);
+      this.setResizable(false);
+      this.setFocusable(false);
+      screenDevice.setFullScreenWindow(this);
 
+      DisplayMode dm = new DisplayMode(1280,720, 32, 60);
+      screenDevice.setDisplayMode(dm);
+      setSize(new Dimension(dm.getWidth(), dm.getHeight()));
+      validate();
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -635,16 +645,16 @@ public class Client extends JFrame implements WindowListener {
             } else if (initializer == 'D') {
                players[Integer.parseInt(secondSplit[0])] = null;
             } else if (initializer == 'R') {
-               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), SCALING));
+               projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
             } else if (initializer == 'E') {
                int id = Integer.parseInt(secondSplit[0]);
                if ((id != 4) && (id != 14)) {
-                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1]) * SCALING), (int) (Integer.parseInt(secondSplit[2]) * SCALING), (int) (Integer.parseInt(secondSplit[3]) * SCALING)));
+                  aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
                } else {
                   int[][] points = new int[2][4];
                   for (int m = 0; m < 2; m++) {
                      for (int n = 0; n < 4; n++) {
-                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]) * SCALING);
+                        points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
                      }
                   }
                   if (id == 4){
@@ -897,7 +907,7 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseMotionListener(myMouseAdapter);
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
-         GameComponent.initializeSize(SCALING, MAX_GAME_X, MAX_GAME_Y);
+         GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[5];
          this.setDoubleBuffered(true);
          this.setVisible(true);
@@ -913,10 +923,9 @@ public class Client extends JFrame implements WindowListener {
             allComponents[2] = new MinimapComponent(fog, players, myPlayerID);
             allComponents[3] = new InventoryComponent();
             allComponents[4] = new DebugComponent();
-            midXy[0] = (MAX_GAME_X / 2);
-            midXy[1] = (MAX_GAME_Y / 2);
+            midXy[0] = (DESIRED_X / 2);
+            midXy[1] = (DESIRED_Y / 2);
             for (Player currentPlayer : players) {
-               currentPlayer.setScaling(SCALING);
                currentPlayer.setCenterXy(midXy);
             }
             g2.setFont(MAIN_FONT);
@@ -927,16 +936,17 @@ public class Client extends JFrame implements WindowListener {
             } catch (IOException e) {
                System.out.println("Image not found");
             }*/
-            drawArea = new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y));
+            drawArea = new Rectangle(0, 0, (int)(MAX_GAME_X), (int)(MAX_GAME_Y));
             darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
             resetXyAdjust();
             g2.clip(drawArea);
+            g2.scale(SCALING, SCALING);
             g2.setFont(MAIN_FONT);
 
             //Map
-            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], (int) (MAP_WIDTH * SCALING), (int) (MAP_HEIGHT * SCALING), null);
+            g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], MAP_WIDTH, MAP_HEIGHT, null);
             g2.setColor(Color.black);
             //Game player
             resetXyAdjust();
@@ -955,7 +965,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
 
-                  g2.setColor(new Color(0, 0, 0, 200));
+            g2.setColor(new Color(0, 0, 0, 200));
             g2.fill(darkness);
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
@@ -968,7 +978,7 @@ public class Client extends JFrame implements WindowListener {
             // Updating fog
             resetXyAdjust();
 
-            for (int i = 0; i < players.length; i++) {
+        /*    for (int i = 0; i < players.length; i++) {
                if (players[i] != null) {
                   if (players[i].getTeam() == myTeam) {
                      fog.scout(players[i].getXy());
@@ -985,7 +995,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);
+            g2.fill(lightFog);*/
 
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
@@ -1024,8 +1034,8 @@ public class Client extends JFrame implements WindowListener {
       }
 
       public void resetXyAdjust() {
-         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0] * SCALING);
-         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1] * SCALING);
+         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
+         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
       }
    }
 }
