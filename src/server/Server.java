@@ -392,18 +392,7 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
-            System.out.println("ww");
             MainMapGenModule builder=  new MainMapGenModule();
-            System.out.println("de");
-            for (int i=0;i<onlineGameSockets.size();i++){
-               builder.sendMap(onlineGameSockets.get(i));
-            }
-            for (int i = 0; i < players.length; i++) {
-               gameOutputs[i].println(""); //B for begin
-               gameOutputs[i].flush();
-            }
-            System.out.println("done");
-
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -413,6 +402,14 @@ public class Server {
                gameOutputs[i].println(beginLine.toString().trim()); //B for begin
                gameOutputs[i].flush();
             }
+            for (int i=0;i<onlineGameSockets.size();i++){
+               builder.sendMap(onlineGameSockets.get(i));
+            }
+            for (int i = 0; i < players.length; i++) {
+               gameOutputs[i].println(""); //B for begin
+               gameOutputs[i].flush();
+            }
+            System.out.println("done");
             playerNum = players.length;
             //Set up the players in each player
             Player.setPlayerReference(players, playerNum);
