@@ -528,11 +528,20 @@ public class Server {
                            projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
-                           if (theseAOES.get(j).getID() != 4) {
+                           if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
                               aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
-                           } else {//Time Mage AOE is different
+                           } else if (theseAOES.get(j).getID() == 4){//Time Mage AOE is different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
+                              for (int m = 0; m < points.length; m++) {
+                                 for (int n = 0; n < points[m].length; n++) {
+                                    aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                                 }
+                              }
+                              aoeOutput.append(" ");
+                           } else if (theseAOES.get(j).getID() == 14){//AutAOE is also different
+                              aoeOutput.append("E" + theseAOES.get(j).getID());
+                              int[][] points = ((AutoAOE) theseAOES.get(j)).getPoints();
                               for (int m = 0; m < points.length; m++) {
                                  for (int n = 0; n < points[m].length; n++) {
                                     aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
