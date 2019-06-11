@@ -22,6 +22,7 @@ public class SafeMarksman extends Player {
    private int[] animationIndex = {80, 80, 80};
    private int[] ANIMATION_LENGTH = {80, 80, 80};
    private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[4][][];
+   private BufferedImage[] SPELL_SPRITES = new BufferedImage[3];
 
    SafeMarksman(String username) {
       super(username);
@@ -34,6 +35,13 @@ public class SafeMarksman extends Player {
                //i refers to row number, j refers to column number
             }
          }
+         //animations [1] and up are for spell sprites
+         //BufferedImage arrow1 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow1.png"));
+         //ALL_ANIMATIONS[1][0][0] = arrow1;
+         //BufferedImage arrow2 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow2.png"));
+         //ALL_ANIMATIONS[2][0][0] = arrow2;
+         //BufferedImage shield = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/shield_blue.png"));
+         //ALL_ANIMATIONS[3][0][0] = shield;
          /*
          BufferedImage animationSheet = ImageIO.read(new File(".\\res\\C.png"));
          ALL_ANIMATIONS[1] = new BufferedImage[4];

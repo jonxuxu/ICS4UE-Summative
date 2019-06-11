@@ -24,7 +24,7 @@ public class TimeMage extends Player {
    private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[4][][];
 
    TimeMage(String username) {
-     super(username);
+      super(username);
       try {
          BufferedImage movementSheet = ImageIO.read(new File(".\\res\\SafeMarksman.png"));
          ALL_ANIMATIONS[0] = new BufferedImage[4][3];

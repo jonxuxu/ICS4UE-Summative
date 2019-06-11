@@ -33,6 +33,8 @@ public abstract class Player extends User implements CanIntersect {
    private int spriteID;
    private int mouseX;
    private int mouseY;
+   private double mouseAngle;
+   private boolean melee;
 
    //May 25//
    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
@@ -139,6 +141,10 @@ public abstract class Player extends User implements CanIntersect {
    public void setMouse(int mouseX, int mouseY) {
       this.mouseX = mouseX;
       this.mouseY = mouseY;
+   }
+
+   public void setMouseAngle(double mouseAngle) {
+      this.mouseAngle = mouseAngle;
    }
 
    public void setID(int ID) {

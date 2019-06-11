@@ -460,6 +460,8 @@ public class Server {
                                     players[i].autoAttack();
                                  } else if (initializer == 'F') {
                                     players[i].flare();
+                                 } else if (initializer == 'R') {
+                                    players[i].setMouseAngle(Double.parseDouble(secondSplit[0]));
                                  } else if (initializer == 'P') {
                                     players[i].setMouse(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]));
                                  } else if (initializer == 'W') {
@@ -510,14 +512,23 @@ public class Server {
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
                         for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " "); //, theseProjectiles.get(j).getAngle() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
-                           if (theseAOES.get(j).getID() != 4) {
+                           if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
                               aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
-                           } else {//Time Mage AOE is different
+                           } else if (theseAOES.get(j).getID() == 4){//Time Mage AOE is different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
+                              for (int m = 0; m < points.length; m++) {
+                                 for (int n = 0; n < points[m].length; n++) {
+                                    aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                                 }
+                              }
+                              aoeOutput.append(" ");
+                           } else if (theseAOES.get(j).getID() == 14){//AutAOE is also different
+                              aoeOutput.append("E" + theseAOES.get(j).getID());
+                              int[][] points = ((AutoAOE) theseAOES.get(j)).getPoints();
                               for (int m = 0; m < points.length; m++) {
                                  for (int n = 0; n < points[m].length; n++) {
                                     aoeOutput.append("," + points[m][n]);//xpoints, then ypoints

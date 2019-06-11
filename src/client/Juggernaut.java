@@ -34,6 +34,14 @@ public class Juggernaut extends Player {
                //i refers to row number, j refers to column number
             }
          }
+         BufferedImage dashSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/juggernaut/juggernaut_dash.png"));
+         ALL_ANIMATIONS[1] = new BufferedImage[3][2];
+         for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 3; j++) {
+               ALL_ANIMATIONS[1][j][i] = movementSheet.getSubimage(j * 32, i * 32, 32, 32);
+               //i refers to row number, j refers to column number
+            }//dash order is left, middle, right, *next row* back
+         }
          /*
          BufferedImage animationSheet = ImageIO.read(new File(".\\res\\C.png"));
          ALL_ANIMATIONS[1] = new BufferedImage[4];
