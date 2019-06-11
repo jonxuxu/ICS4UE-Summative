@@ -44,7 +44,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  */
 
 public class Client extends JFrame implements WindowListener {
-  private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
+   private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
    Runtime runtime = Runtime.getRuntime();
    double maxMem = runtime.maxMemory();
@@ -108,6 +108,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean flashlightOn;
    private int MAP_WIDTH = 10000;
    private int MAP_HEIGHT = 10000;
+   private boolean waitingForImage;
    // Debugging
    private boolean testingBegin = false;
    //Graphics
@@ -235,7 +236,21 @@ public class Client extends JFrame implements WindowListener {
    public void menuLogic() {
       try {
          if (input.ready()) {
-            decipherMenuInput(input.readLine());
+            if (!waitingForImage) {
+               decipherMenuInput(input.readLine());
+            } else {
+               BufferedImage image2 = ImageIO.read(socket.getInputStream());
+               System.out.println(image2);
+               ImageIO.write(image2,"JPEG",new File("Test"));
+
+              /* System.out.println(input.readLine());
+
+               System.out.println("w");
+               BufferedImage image = ImageIO.read(socket.getInputStream());
+               System.out.println(image.getWidth());
+             //  ImageIO.write(image, "PNG", new File("Test"));*/
+               waitingForImage = false;
+            }
          }
          //Deal with output when going back through the menu
          if (logout) {
@@ -292,12 +307,12 @@ public class Client extends JFrame implements WindowListener {
          if (notifyReady) {
             notifyReady = false;
             output.println("R");
+            waitingForImage = true;
             output.flush();
             waitForInput();
             if (errors[3] != 0) {
-               System.out.println("dwd");
                menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println("Error:"+errorMessages[errors[3]]);
+               System.out.println("Error:" + errorMessages[errors[3]]);
                soundEffect.playSound("error");
             }
          }
@@ -323,26 +338,26 @@ public class Client extends JFrame implements WindowListener {
             host = true;
             players = new Player[onlineList.size()];
             for (int i = 0; i < onlineList.size(); i++) {
-              //TODO: Add class select here
-              if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")){
-                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("TimeMage")){
-                players[i] = new TimeMage(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("Ghost")){
-                players[i] = new Ghost(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")){
-                players[i] = new MobileSupport(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("Juggernaut")){
-                players[i] = new Juggernaut(onlineList.get(i).getUsername());
-              } else if (thisClass.equals("Summoner")){
-                players[i] = new Summoner(onlineList.get(i).getUsername());
-              } else {
-                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-              }
-              if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                myPlayer = players[i];
-              }
-              players[i].setTeam(onlineList.get(i).getTeam());
+               //TODO: Add class select here
+               if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("TimeMage")) {
+                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Ghost")) {
+                  players[i] = new Ghost(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Juggernaut")) {
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Summoner")) {
+                  players[i] = new Summoner(onlineList.get(i).getUsername());
+               } else {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               }
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
+               }
+               players[i].setTeam(onlineList.get(i).getTeam());
             }
             testingBegin = false;
             nextPanel = 6;
@@ -514,7 +529,7 @@ public class Client extends JFrame implements WindowListener {
             if (initializer == '0') {
                loading = true;
             } else {
-               errors[3] = Integer.parseInt(initializer+input);
+               errors[3] = Integer.parseInt(initializer + input);
             }
          }
       } else if (initializer == 'A') {
@@ -548,8 +563,8 @@ public class Client extends JFrame implements WindowListener {
          }
       } else if (initializer == 'B') {
          players = new Player[onlineList.size()];
-         input=input.trim();
-         String []classes = input.split(" ",-1);
+         input = input.trim();
+         String[] classes = input.split(" ", -1);
          for (int i = 0; i < onlineList.size(); i++) {
             thisClass = classes[i];
             System.out.println(thisClass);
@@ -566,7 +581,7 @@ public class Client extends JFrame implements WindowListener {
                players[i] = new Juggernaut(onlineList.get(i).getUsername());
             } else if (thisClass.equals("Summoner")) {
                players[i] = new Summoner(onlineList.get(i).getUsername());
-            }else {//TESTING MODE ONLY
+            } else {//TESTING MODE ONLY
                players[i] = new SafeMarksman(onlineList.get(i).getUsername());
             }
             if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {

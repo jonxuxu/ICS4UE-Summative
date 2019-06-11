@@ -1,7 +1,10 @@
 package server;
 
+import javax.imageio.ImageIO;
 import java.awt.Polygon;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -73,6 +76,9 @@ public class Server {
          try {
             while (!stop) {
                if (input.ready()) {
+             /*     BufferedImage image = ImageIO.read(myConnection.getInputStream());
+                  System.out.println(image.getWidth());
+                  ImageIO.write(image, "png", new File("Test"));*/
                   String inputString = input.readLine();//Reads as fast as it can. Or you could alternatively slow it down here by making a getFramePassed at this instance
                   char initializer = inputString.charAt(0);
                   inputString = inputString.substring(1);//Remove the initializer
@@ -388,6 +394,10 @@ public class Server {
                gameOutputs[i] = new PrintWriter(onlineGameSockets.get(i).getOutputStream());
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
+            }
+            MainMapGenModule builder = new MainMapGenModule();
+            for (int i = 0; i < onlineGameSockets.size(); i++) {
+               builder.sendMap(onlineGameSockets.get(i));
             }
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
