@@ -5,7 +5,13 @@ import client.particle.FireParticle;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+
+//tmp
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Projectile.java
@@ -27,7 +33,7 @@ public class Projectile {
       this.ID = ID;
       this.x = x;
       this.y = y;
-      this.SCALING= SCALING;
+      this.SCALING = SCALING;
    }
 
    public void draw(Graphics2D g2) {
@@ -42,6 +48,18 @@ public class Projectile {
                particles.remove(i);
             } else {
                particles.get(i).render(g2);
+               BufferedImage arrow1 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow1.png"));
+               AffineTransform at = AffineTransform.getTranslateInstance(x+xyAdjust[0], y+xyAdjust[1]);
+
+               //double xChange = (mouseX - x);
+               //double yChange = (mouseY - y);
+
+               //double radians = Math.atan2(yChange,xChange);
+               double radians = Math.atan2(xyAdjust[1],xyAdjust[0]);
+
+
+               at.rotate(radians-Math.PI/2);
+               g2.drawImage(arrow1, at, null);
             }
          } catch (Exception e) {
             e.printStackTrace();
