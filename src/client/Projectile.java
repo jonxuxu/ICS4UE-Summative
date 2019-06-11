@@ -25,21 +25,19 @@ import java.io.File;
 public class Projectile {
    private int ID;
    private int x, y;
-   private double SCALING;
    private static int[] xyAdjust;
    private ArrayList<FireParticle> particles = new ArrayList<FireParticle>();
 
-   Projectile(int ID, int x, int y, double SCALING) {
+   Projectile(int ID, int x, int y) {
       this.ID = ID;
       this.x = x;
       this.y = y;
-      this.SCALING = SCALING;
    }
 
    public void draw(Graphics2D g2) {
       g2.setColor(Color.WHITE);
       g2.fillRect(x+xyAdjust[0], y+xyAdjust[1], 10, 10);
-      particles.add(new FireParticle(x+xyAdjust[0], y+xyAdjust[1], (int) ((Math.random() * 5 + 5)*SCALING), SCALING));
+      particles.add(new FireParticle(x+xyAdjust[0], y+xyAdjust[1], (int) ((Math.random() * 5 + 5))));
 
       //Draws particles
       for (int i = 0; i < particles.size(); i++) {

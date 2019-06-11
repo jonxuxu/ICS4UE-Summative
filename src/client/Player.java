@@ -20,7 +20,7 @@ public abstract class Player extends User {
    private int ID;
    private int[] xy = {300, 300};
    private int[] centerXy = new int[2];
-   private double SCALING;
+
    private int desiredSpell = -1;
    private int[] spellPercent = {100, 100, 100};
    private ArrayList<Status> allStatus = new ArrayList<Status>();
@@ -66,7 +66,7 @@ public abstract class Player extends User {
    }
 
    public void draw(Graphics2D g2, int[] midXy) {
-      drawReal(g2, centerXy[0] + (int) (SCALING * (xy[0] - midXy[0])) - (int) (60 * SCALING) / 2, centerXy[1] + (int) (SCALING * (xy[1] - midXy[1])) - (int) (60 * SCALING) / 2, (int) (60 * SCALING), (int) (60 * SCALING), desiredSpell);
+      drawReal(g2, centerXy[0] + (int) ((xy[0] - midXy[0])) - (int) (60 / 2), centerXy[1] + (int) ((xy[1] - midXy[1])) - (int) (60) / 2, (int) (60), (int) (60), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
@@ -92,29 +92,25 @@ public abstract class Player extends User {
    public double[] getDisp(int angleOfMovement) {
       double[] displacements = new double[2];
       if (angleOfMovement == 0) {
-         displacements[0] = mobility / SCALING;
+         displacements[0] = mobility;
          displacements[1] = 0;
       } else if (Math.abs(angleOfMovement) == 1) {
-         displacements[0] = ROOT2O2 * mobility / SCALING;
-         displacements[1] = ROOT2O2 * mobility / SCALING;
+         displacements[0] = ROOT2O2 * mobility;
+         displacements[1] = ROOT2O2 * mobility;
       } else if (Math.abs(angleOfMovement) == 2) {
          displacements[0] = 0;
-         displacements[1] = mobility / SCALING;
+         displacements[1] = mobility;
       } else if (Math.abs(angleOfMovement) == 3) {
-         displacements[0] = -ROOT2O2 * mobility / SCALING;
-         displacements[1] = ROOT2O2 * mobility / SCALING;
+         displacements[0] = -ROOT2O2 * mobility ;
+         displacements[1] = ROOT2O2 * mobility;
       } else {
-         displacements[0] = -mobility / SCALING;
+         displacements[0] = -mobility ;
          displacements[1] = 0;
       }
       if (angleOfMovement < 0) {
          displacements[1] = -displacements[1];
       }
       return (displacements);
-   }
-
-   public void setScaling(double SCALING) {
-      this.SCALING = SCALING;
    }
 
    public void setSpell(int spellIndex) {
@@ -139,7 +135,7 @@ public abstract class Player extends User {
    }
 
    public void setFlashlightPoint(int x, int y) {
-      flashlightBeam.addPoint((int) (x * SCALING), (int) (y * SCALING));
+      flashlightBeam.addPoint((int) (x), (int) (y ));
    }
 
    public void setSpellPercent(int spellPercent, int spellIndex) {
