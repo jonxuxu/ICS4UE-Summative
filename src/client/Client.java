@@ -647,7 +647,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherGameInput(String input) {
-      System.out.println("G" + input);
+      //System.out.println("G" + input);
       if ((!input.contains("END")) && (!input.contains("FINAL"))) {
          if (!receivedOnce) {
             receivedOnce = true;
