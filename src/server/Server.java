@@ -407,7 +407,7 @@ public class Server {
                gameOutputs[i].flush();
             }
             for (int i = 0; i < players.length; i++) {
-               gameOutputs[i].println("FINAL");
+               gameOutputs[i].println("FINAL");//B for begin
                gameOutputs[i].flush();
             }
             System.out.println("done");

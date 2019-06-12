@@ -635,7 +635,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherGameInput(String input) {
-      if ((!input.contains("END"))&&(!input.contains("FINAL"))) {
+      if ((!input.contains("END")) && (!input.contains("FINAL"))) {
          if (!receivedOnce) {
             receivedOnce = true;
          }
@@ -936,10 +936,11 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseMotionListener(myMouseAdapter);
          GameComponent.initializeSize(MAX_X, MAX_Y);
          allComponents = new GameComponent[4];
-         pauseComponent = new PauseComponent((int) (412), (int) (312));
-         pauseComponent.setBounds(MAX_X / 2 - (int) (206), MAX_Y / 2 - (int) (156), (int) (412), (int) (312));
+         pauseComponent = new PauseComponent(800, 500);
+         pauseComponent.setBounds(MAX_X / 2 - 400, MAX_Y / 2 - 250, 800, 500);
          this.add(pauseComponent);
-         //this.setDoubleBuffered(true);
+
+         this.setDoubleBuffered(true);
          this.setVisible(true);
       }
 
@@ -1000,7 +1001,7 @@ public class Client extends JFrame implements WindowListener {
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
-                     currentPlayer.draw(g2, myPlayer.getXy());
+                     currentPlayer.draw(g2, myPlayer);
                   }
                }
             }
