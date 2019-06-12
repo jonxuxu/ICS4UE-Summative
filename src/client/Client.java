@@ -938,7 +938,7 @@ public class Client extends JFrame implements WindowListener {
          allComponents = new GameComponent[4];
          pauseComponent = new PauseComponent((int) (412), (int) (312));
          pauseComponent.setBounds(MAX_X / 2 - (int) (206), MAX_Y / 2 - (int) (156), (int) (412), (int) (312));
-
+         this.add(pauseComponent);
          //this.setDoubleBuffered(true);
          this.setVisible(true);
       }
