@@ -315,7 +315,7 @@ public class MapGen {
 			double tempAngle;
 
 			for (int idx2 = 0; idx2 < numVertices; idx2++) {
-				tempAngle = 2*Math.PI*idx/numVertices;
+				tempAngle = 2*Math.PI*idx2/numVertices;
 				creation.xpoints[idx2] = (int) (radius*Math.cos(tempAngle)) + obstacles.get(idx).location.x;
 				creation.ypoints[idx2] = (int) (radius*Math.sin(tempAngle)) +  obstacles.get(idx).location.y;
 			}

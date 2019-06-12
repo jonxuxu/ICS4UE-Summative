@@ -8,14 +8,16 @@ import javax.swing.JFrame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
-class MainMapGenModule extends JFrame{
+class MainMapGenModule extends JFrame {
    private Disp display;
    private MapGen gen;
 
@@ -149,13 +151,22 @@ class MainMapGenModule extends JFrame{
                g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
             }
          }
-        /* try {
+         g2.setColor(Color.white);
+         for (int i = 0; i < gen.obstacles.size(); i++) {
+            g2.fill(gen.obstacles.get(i).boundingBox);
+         }
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
+
+   public ArrayList<Obstacle> getObstacle() {
+      return (gen.obstacles);
+   }
+
 
    public void sendMap(Socket socket) {
       System.out.println("reee");

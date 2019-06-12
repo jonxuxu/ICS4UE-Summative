@@ -395,6 +395,7 @@ public class Server {
             System.out.println("{{{-------------------{{{{{{{{{");
             MainMapGenModule builder=  new MainMapGenModule();
             System.out.println("{{{{{{{{{{{{{{{{{{{{{{{{{{");
+
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -414,6 +415,7 @@ public class Server {
                gameOutputs[i].println("FINAL");//B for begin
                gameOutputs[i].flush();
             }
+
             System.out.println("done");
             playerNum = players.length;
             //Set up the players in each player
@@ -430,7 +432,7 @@ public class Server {
                myPlayer.sendInfo();
             }
             //TODO: Map stuff should be slightly before this
-            Player.setConstantHitboxes(players.length, sampleObstacles);
+            Player.setConstantHitboxes(players.length,  builder.getObstacle());
             for (int i = 0; i < players.length; i++) {
                players[i].setLightingHitbox(i);//TODO: Add the spawn xy here to initialize the hitbox properly. For now, it is just assuming that it starts at 300 by 300
             }
