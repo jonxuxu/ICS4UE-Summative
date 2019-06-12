@@ -23,8 +23,7 @@ public class SafeMarksman extends Player{
     setMaxHealth(300);
     setHealth(300);
     setAttack(100);
-    //setMaxMobility(10);
-    setMobility(10);
+    setMobility(5);
     setRange(300);
     setAutoAttackCooldown(5);
     setFlareCooldown(100);

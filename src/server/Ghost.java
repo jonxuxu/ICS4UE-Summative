@@ -29,7 +29,7 @@ public class Ghost extends Player{
     setMaxHealth(300);
     setHealth(300);
     setAttack(300);
-    setMobility(10);
+    setMobility(5);
     setRange(50);//REE Change to -1 when add support for melee attacks
     setAutoAttackCooldown(10);
     setFlareCooldown(100);

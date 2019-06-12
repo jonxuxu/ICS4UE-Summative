@@ -10,7 +10,6 @@ import java.awt.AlphaComposite;
 
 class Shielded extends Status{
   private BufferedImage image;
-  private static int LENGTH = 60;
   Shielded(){
     try {
       image = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/orb/Shield_Yellow.png"));
@@ -22,7 +21,7 @@ class Shielded extends Status{
   public void draw(Graphics2D g2, int playerX, int playerY, int index){
     float alpha = (float)0.5; //draw half transparent
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
-    g2.drawImage(image, playerX + getXyAdjust()[0] - 60/2, playerY + getXyAdjust()[1] - 60/2, LENGTH, LENGTH, null);
+    g2.drawImage(image, playerX + getXyAdjust()[0] - getPlayerLength()/2, playerY + getXyAdjust()[1] - getPlayerLength()/2, getPlayerLength(), getPlayerLength(), null);
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,(float)1));
   }
 }

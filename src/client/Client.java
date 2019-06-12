@@ -60,8 +60,8 @@ public class Client extends JFrame implements WindowListener {
    private boolean receivedOnce;//Determines if a message was received
 
    // Screen stuff
-   private final int DESIRED_X = 1920;
-   private final int DESIRED_Y = 1080;
+   private final int DESIRED_X = 1600;
+   private final int DESIRED_Y = 900;
    private int[] xyAdjust = new int[2];
    private int MAX_Y, MAX_X;
    private double INTRO_SCALING;
@@ -641,6 +641,9 @@ public class Client extends JFrame implements WindowListener {
          }
          projectiles.clear();
          aoes.clear();
+         for (int i = 0; i < players.length; i++){
+           players[i].clearStatuses();
+         }
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
             char initializer = firstInput.charAt(0);
@@ -675,7 +678,6 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
                   int id = Integer.parseInt(secondSplit[0]);
                   Player player = players[Integer.parseInt(secondSplit[1])];
-                  player.clearStatuses();
                   if (id == 2) {
                      player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
                   } else if (id == 3) {
@@ -1032,11 +1034,24 @@ public class Client extends JFrame implements WindowListener {
                aoes.get(i).draw(g2);
             }
             resetXyAdjust();
+            /*
             for (int i = 0; i < players.length; i++) {
                for (int j = 0; j < players[i].getStatuses().size(); j++) {
                   players[i].getStatuses().get(j).draw(g2, players[i].getX(), players[i].getY(), j);
                }
-            }
+            }*/
+           
+           for (Player currentPlayer : players) {
+             //Status.setPlayerLength(currentPlayer.getPlayerLength());
+             //Status.setLength(Status.getPlayerLength()/6);
+             if (currentPlayer != null) {
+               if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
+                 for (int j = 0; j < currentPlayer.getStatuses().size(); j++) {
+                   currentPlayer.getStatuses().get(j).draw(g2, currentPlayer.getX(), currentPlayer.getY(), j);
+                 }
+               }
+             }
+           }
             //draw all components
 
             ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);

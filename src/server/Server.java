@@ -562,9 +562,9 @@ public class Server {
                             statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
                           }
                         }
-                        //if (ghostPassiveCount > 0){
+                        if (ghostPassiveCount > 0){
                           statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
-                        //}
+                        }
                         if (players[i].getShieldsSize() > 0){
                           statusOutput.append("S" + 13 + "," + i + " ");
                         }
