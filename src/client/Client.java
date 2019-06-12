@@ -124,7 +124,7 @@ public class Client extends JFrame implements WindowListener {
       GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
       GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
       screenDevice.setFullScreenWindow(this);
-
+      this.setResizable(false);
       DisplayMode dm = new DisplayMode(DESIRED_X, DESIRED_Y, 32, 60);
       screenDevice.setDisplayMode(dm);
       validate();
@@ -142,8 +142,8 @@ public class Client extends JFrame implements WindowListener {
       }
 
       // Display set up
-      MAX_X = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getWidth());
-      MAX_Y = (int) (GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getHeight());
+      MAX_X = DESIRED_X;
+      MAX_Y = DESIRED_Y;
       this.setSize(MAX_X, MAX_Y);
       this.setVisible(true);
       Dimension actualSize = this.getContentPane().getSize();
@@ -152,7 +152,7 @@ public class Client extends JFrame implements WindowListener {
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
-      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+      //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
       //Control set up (the mouse listeners are attached to the game panel)
       initializeScaling();
