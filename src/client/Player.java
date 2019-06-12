@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.util.ArrayList;
+import java.awt.AlphaComposite;
 
 /**
  * User.java
@@ -82,13 +83,20 @@ public abstract class Player extends User {
 
    public void draw(Graphics2D g2, Player mainPlayer) {
      int[] playerXy = mainPlayer.getXy();
+     if (invisible){
+       float alpha = (float)0.5; //draw half transparent
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
+     }
      drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (PLAYER_LENGTH / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (PLAYER_LENGTH) / 2, (int) (PLAYER_LENGTH), (int) (PLAYER_LENGTH), desiredSpell);
-      if (desiredSpell != -1) {
-         desiredSpell = -1;
-      }
-      // Draws status effects
-
-     // Draws health bars
+     if(invisible){
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,(float)1));
+     }
+     if (desiredSpell != -1) {
+       desiredSpell = -1;
+     }
+        // Draws status effects
+        
+        // Draws health bars
      g2.setColor(Color.white);
      g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 76, centerXy[1] + xy[1] - playerXy[1] - 71, 152, 8);
      g2.setColor(Color.black);
@@ -104,6 +112,14 @@ public abstract class Player extends User {
        g2.setColor(Color.red);
      }
      g2.drawString(getUsername(), centerXy[0] + xy[0] - playerXy[0] - g2.getFontMetrics().stringWidth(getUsername())/2, centerXy[1] + xy[1] - playerXy[1] - 80);
+     
+     if (dead){
+       float alpha = (float)0.5; //draw half transparent
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
+       g2.setColor(Color.BLACK);
+       g2.fillRect(0,0,1600,900);
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,(float)1));
+     }
    }
 
   /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
