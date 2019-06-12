@@ -38,9 +38,9 @@ public abstract class Player extends User {
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
    private boolean translated;
-   
+
    private boolean illuminated;
-   
+
    private boolean dead;
    private boolean invisible;
    private boolean uncollidable;
@@ -63,7 +63,7 @@ public abstract class Player extends User {
    public int[] getXy() {
       return (xy);
    }
-   
+
    public int getX(){
      return xy[0];
    }
@@ -94,8 +94,9 @@ public abstract class Player extends User {
      g2.setColor(Color.black);
      g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150, 6);
      g2.setColor(Color.red);
-     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150 * health /  maxHealth, 6);
-
+     if (maxHealth!=0) {
+        g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150 * health / maxHealth, 6);
+     }
      // Draws name
      if(getTeam() == mainPlayer.getTeam()){
        g2.setColor(Color.green);
@@ -197,7 +198,7 @@ public abstract class Player extends User {
      invisible = false;
      uncollidable = false;
    }
-   
+
    public boolean isDead(){
      return dead;
    }
@@ -207,7 +208,7 @@ public abstract class Player extends User {
    public boolean isUncollidable(){
      return uncollidable;
    }
-   
+
    public void setDead(boolean state){
      dead = state;
    }
