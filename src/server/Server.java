@@ -392,7 +392,9 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
+            System.out.println("{{{-------------------{{{{{{{{{");
             MainMapGenModule builder=  new MainMapGenModule();
+            System.out.println("{{{{{{{{{{{{{{{{{{{{{{{{{{");
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -460,6 +462,7 @@ public class Server {
                            }
                            allInput[i] = "";
                         } else {
+                           System.out.println(allInput[i]);
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
                               char initializer = firstInput.charAt(0);

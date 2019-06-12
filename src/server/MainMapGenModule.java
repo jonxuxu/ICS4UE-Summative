@@ -149,11 +149,11 @@ class MainMapGenModule extends JFrame{
                g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
             }
          }
-         try {
+        /* try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }
+         }*/
       }
    }
 
