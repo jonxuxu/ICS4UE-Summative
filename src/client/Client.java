@@ -11,6 +11,9 @@ import client.sound.*;
 import client.ui.*;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -68,7 +71,7 @@ public class Client extends JFrame implements WindowListener {
    private int[] mouseState = new int[3];
 
    // Assets
-   private soundEffectManager soundEffect = new soundEffectManager();
+   private soundEffectManager soundEffect = new soundEffectManager(this);
    private Clock time = new Clock(30);
 
    // Ui stuff
@@ -82,7 +85,7 @@ public class Client extends JFrame implements WindowListener {
    private int currentPanel, nextPanel; // 0 by default
    private boolean keyPressed = false;
    private char lastKeyTyped;
-
+   private float[] soundLevels = {0.5f, 0.5f, 0.5f};
 
    // Game states
    private ArrayList<User> onlineList = new ArrayList<User>();
@@ -387,6 +390,13 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+   public void changeSoundLevel(int type, float level){
+      soundLevels[type] = level;
+   }
+   public float[] getSoundLevel(){
+      return soundLevels;
+   }
+
    public void gameLogic() {
       // TODO: Initialize map ONCE after game begin
       try {
@@ -471,6 +481,7 @@ public class Client extends JFrame implements WindowListener {
       try {
          while (!inputReady) {
             if (input.ready()) {
+              //System.out.println("WI" + input.readLine().trim());
                inputReady = true;
                if (!gameBegin) {
                   if (!waitingForImage) {
@@ -653,6 +664,9 @@ public class Client extends JFrame implements WindowListener {
          }
          projectiles.clear();
          aoes.clear();
+         for (int i = 0; i < players.length; i++){
+           players[i].clearStatuses();
+         }
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
             char initializer = firstInput.charAt(0);
@@ -687,7 +701,6 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
                   int id = Integer.parseInt(secondSplit[0]);
                   Player player = players[Integer.parseInt(secondSplit[1])];
-                  player.clearStatuses();
                   if (id == 2) {
                      player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
                   } else if (id == 3) {
@@ -1013,10 +1026,14 @@ public class Client extends JFrame implements WindowListener {
 
             g2.setColor(new Color(0, 0, 0, 150));
             g2.fill(darkness);
+            resetXyAdjust();
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
                      currentPlayer.draw(g2, myPlayer);
+                     for (int j = 0; j < currentPlayer.getStatuses().size(); j++) {
+                       currentPlayer.getStatuses().get(j).draw(g2, currentPlayer.getX(), currentPlayer.getY(), j);
+                     }
                   }
                }
             }
@@ -1046,12 +1063,6 @@ public class Client extends JFrame implements WindowListener {
             }
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
-            }
-            resetXyAdjust();
-            for (int i = 0; i < players.length; i++) {
-               for (int j = 0; j < players[i].getStatuses().size(); j++) {
-                  players[i].getStatuses().get(j).draw(g2, players[i].getX(), players[i].getY(), j);
-               }
             }
             //draw all components
 

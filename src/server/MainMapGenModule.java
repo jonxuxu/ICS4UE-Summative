@@ -51,6 +51,7 @@ class MainMapGenModule extends JFrame{
          gen.makeObstaclesElliptical();
          gen.genClearingByNum(8, 500);
          gen.purgeRedundanices();
+         gen.addObstalceBoundingBoxes();
 
       }
       display = new Disp();
