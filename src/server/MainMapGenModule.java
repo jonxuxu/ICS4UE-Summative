@@ -150,21 +150,22 @@ class MainMapGenModule extends JFrame{
                g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
             }
          }
-         try {
+        /* try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }
+         }*/
       }
    }
 
    public void sendMap(Socket socket) {
+      System.out.println("reee");
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
-         socket.getOutputStream().flush();
       } catch (IOException e) {
          e.printStackTrace();
       }
+      System.out.println("e");
    }
 //Make it extend from JPanel
   /*    public void paintComponent(Graphics g) {
