@@ -19,14 +19,13 @@ public class PauseComponent extends ThemedPanel {
       // UI Components
       this.setLayout(new BorderLayout());
       this.setBackground(new Color(33, 35, 37));
-      /*
+
       JLabel title = new JLabel("Pause");
       title.setForeground(Color.WHITE);
-      title.setFont(new Font("Cambria Math", Font.PLAIN, 30));
-      */
-      CustomLabel title = new CustomLabel("Pause", "title", Color.WHITE);
+      title.setFont(new Font("Cambria Math", Font.PLAIN, 35));
       title.setHorizontalAlignment(JLabel.CENTER);
       this.add(title, BorderLayout.NORTH);
+      
       JButton back = new JButton("Return to game");
       back.addActionListener(new ActionListener() {
          @Override

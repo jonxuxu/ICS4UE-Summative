@@ -46,6 +46,7 @@ public class Projectile {
                particles.remove(i);
             } else {
                particles.get(i).render(g2);
+               /*
                BufferedImage arrow1 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow1.png"));
                AffineTransform at = AffineTransform.getTranslateInstance(x + xyAdjust[0], y + xyAdjust[1]);
 
@@ -58,6 +59,7 @@ public class Projectile {
 
                at.rotate(radians - Math.PI / 2);
                g2.drawImage(arrow1, at, null);
+               */
             }
          } catch (Exception e) {
             e.printStackTrace();

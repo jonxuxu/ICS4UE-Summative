@@ -33,7 +33,7 @@ public class MobileSupport extends Player{
     setMaxHealth(100);
     setHealth(100);
     setAttack(100);
-    setMobility(30);
+    setMobility(7);
     setRange(300);
     setAutoAttackCooldown(5);
     setFlareCooldown(100);

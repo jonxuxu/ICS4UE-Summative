@@ -20,6 +20,7 @@ public abstract class Player extends User {
    private int ID;
    private int[] xy = {300, 300};
    private int[] centerXy = new int[2];
+   private static int PLAYER_LENGTH = 120;
 
    private int desiredSpell = -1;
    private int[] spellPercent = {100, 100, 100};
@@ -74,11 +75,14 @@ public abstract class Player extends User {
       this.xy[0] = x;
       this.xy[1] = y;
    }
+   
+   public int getPlayerLength(){
+     return PLAYER_LENGTH;
+   }
 
    public void draw(Graphics2D g2, Player mainPlayer) {
      int[] playerXy = mainPlayer.getXy();
-
-      drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (120 / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (120) / 2, (int) (120), (int) (120), desiredSpell);
+     drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (PLAYER_LENGTH / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (PLAYER_LENGTH) / 2, (int) (PLAYER_LENGTH), (int) (PLAYER_LENGTH), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
