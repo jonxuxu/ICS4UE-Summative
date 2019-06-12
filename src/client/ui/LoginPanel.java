@@ -34,14 +34,14 @@ public class LoginPanel extends MenuPanel {
       });
       nameField.setFont(super.getFont("main"));
       System.out.println(MAX_X / 2);
-      nameField.setBounds(MAX_X / 2 - (int) (100), MAX_Y / 5, (200), (MAIN_FONT.getSize() + 20));
+      nameField.setBounds(MAX_X / 2 - 100, MAX_Y / 5, 200, (MAIN_FONT.getSize() + 20));
       this.add(nameField);
 
       testButton.addActionListener((ActionEvent e) -> {
          CLIENT.testingBegin();
       });
 
-      testButton.setBounds(MAX_X / 2 - (int) (100), MAX_Y * 2 / 5, (200), (MAIN_FONT.getSize() + 20));
+      testButton.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, (MAIN_FONT.getSize() + 20));
       this.add(testButton);
       //Basic visuals
       this.setDoubleBuffered(true);
