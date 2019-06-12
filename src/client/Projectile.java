@@ -36,8 +36,8 @@ public class Projectile {
 
    public void draw(Graphics2D g2) {
       g2.setColor(Color.WHITE);
-      g2.fillRect(x+xyAdjust[0], y+xyAdjust[1], 10, 10);
-      particles.add(new FireParticle(x+xyAdjust[0], y+xyAdjust[1], (int) ((Math.random() * 5 + 5))));
+      g2.fillRect(x + xyAdjust[0], y + xyAdjust[1], 10, 10);
+      particles.add(new FireParticle(x + xyAdjust[0], y + xyAdjust[1], (int) ((Math.random() * 5 + 5))));
 
       //Draws particles
       for (int i = 0; i < particles.size(); i++) {
@@ -47,16 +47,16 @@ public class Projectile {
             } else {
                particles.get(i).render(g2);
                BufferedImage arrow1 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow1.png"));
-               AffineTransform at = AffineTransform.getTranslateInstance(x+xyAdjust[0], y+xyAdjust[1]);
+               AffineTransform at = AffineTransform.getTranslateInstance(x + xyAdjust[0], y + xyAdjust[1]);
 
                //double xChange = (mouseX - x);
                //double yChange = (mouseY - y);
 
                //double radians = Math.atan2(yChange,xChange);
-               double radians = Math.atan2(xyAdjust[1],xyAdjust[0]);
+               double radians = Math.atan2(xyAdjust[1], xyAdjust[0]);
 
 
-               at.rotate(radians-Math.PI/2);
+               at.rotate(radians - Math.PI / 2);
                g2.drawImage(arrow1, at, null);
             }
          } catch (Exception e) {

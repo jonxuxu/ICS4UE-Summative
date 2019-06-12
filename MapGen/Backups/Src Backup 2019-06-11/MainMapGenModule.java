@@ -1,6 +1,5 @@
-/*import javax.swing.JPanel;
+import javax.swing.JPanel;
 
-import javafx.scene.shape.Polygon;
 
 import javax.swing.JFrame;
 
@@ -38,12 +37,13 @@ class MainMapGenModule extends JFrame{
 	    gen.tetherAllNodes2();	
 	    gen.makeNodesElliptical();
 	    gen.generateRegions();
+	    gen.generateCrevices(2);
+	    gen.insertArtifactClearing();
 	    gen.smokeTrees(7500, 1000, 0, false);    
 	    gen.smokeRocks(7500, 100, true);
 	    gen.makeObstaclesElliptical();
 	    gen.genClearingByNum(8, 500);  	    
-	    gen.purgeRedundanices();
-	    gen.generateCrevices(2);
+	    gen.purgeRedundanices();	    
     }
     display = new Disp();
     this.add(display);
@@ -76,6 +76,7 @@ class MainMapGenModule extends JFrame{
       this.setCenter(g);
       
       Graphics2D g2 = (Graphics2D) (g);
+      g2.scale(0.06, 0.06);
      
       if (!gen.testingState) {
 	      g.setColor(Color.BLUE);
@@ -96,12 +97,17 @@ class MainMapGenModule extends JFrame{
 	    		  g.setColor(Color.GRAY);	    		  
 	    	  } else if (gen.regionLayer.regions.get(idx).regionType == "swamp") {
 	    		  g.setColor(Color.CYAN);
+	    	  } else if (gen.regionLayer.regions.get(idx).regionType == "team_one_clearing" ||
+	    			  gen.regionLayer.regions.get(idx).regionType == "team_two_clearing") {
+	    		  g.setColor(Color.CYAN);
 	    	  } else {
 	    		  g.setColor(Color.RED);
 	    	  }
 	    	  g.drawPolygon(gen.regionLayer.regions.get(idx));    	  
 	      }
       }
+      
+      g.setColor(Color.BLACK);
       
       for (int i = 0; i < gen.nodes.size(); i++) {
 //        g.fillOval((int)gen.nodes.get(i).getPoint().getX() - 5,
@@ -139,4 +145,4 @@ class MainMapGenModule extends JFrame{
 		
 	}              
   }      
-}*/
+}

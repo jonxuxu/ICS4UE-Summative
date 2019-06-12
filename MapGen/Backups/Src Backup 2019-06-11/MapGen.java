@@ -1,5 +1,3 @@
-package server;
-
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -17,7 +15,7 @@ public class MapGen {
 	
     public ArrayList<RoadNode> nodes; 
     public ArrayList<Obstacle> obstacles;
-    public RegionLayer regionLayer;
+    public RegionLayer regionLayer; 
     public boolean testingState;
     
     
@@ -26,26 +24,11 @@ public class MapGen {
       this.nodes = new ArrayList<RoadNode>(0);
       this.obstacles = new ArrayList<Obstacle>(0);
       this.testingState = false;
+      
       this.ellipticalAdjust = eAdjust;
     }
     
-    public MapData finalGenerate() {
-    	this.selfInitialize();
-    	
-    	MapData returnMap = new MapData();
-    	returnMap.obstacles = this.obstacles;
-    	returnMap.rLayer = this.regionLayer;
-    	
-    	return returnMap;
-    }
-    
     public void selfInitialize() {
-    	this.nodes = new ArrayList<RoadNode>(0);
-        this.obstacles = new ArrayList<Obstacle>(0);
-        this.testingState = false;
-        
-        //this.ellipticalAdjust = eAdjust;
-    	
     	int loopRadiusSize = 10;
     	int nodeGenRange = 3750;
     	double nodeGenStDev = 0.5;
@@ -56,7 +39,7 @@ public class MapGen {
 	    this.makeNodesElliptical();
 	    this.generateRegions();
 	    this.generateCrevices(2);
-	    //this.insertArtifactClearing();
+	    this.insertArtifactClearing();
 	    this.smokeTrees(7500, 1000, 0, false);    
 	    this.smokeRocks(7500, 100, true);
 	    this.makeObstaclesElliptical();
@@ -85,7 +68,7 @@ public class MapGen {
     	Region map = new Region("map", 0); 
     			
     	map.mimicEllipse(0, 0, 7500, 1.75, 100);
-    	swamp.mimicEllipse(0, 0, 3000, 1.75, 20);
+    	swamp.mimicEllipse(0, 0, 3000, 1.75, 20);        	
     	
     	
     	this.regionLayer.regions.add(MAP_REGION_IDX, map);
