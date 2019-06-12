@@ -40,7 +40,6 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       System.out.println(MAX_X);
       gamePanel.setBounds(0, 0, this.getWidth(),this.getHeight());
       System.out.println(this.getWidth()+" "+MAX_X);
-      gamePanel.setDimensions(this.getWidth(),this.getHeight());
       chat = new ChatComponent(  MAX_X/6, MAX_Y/4, CLIENT);
       chat.setBounds(0, MAX_Y*3/4, MAX_X/4, MAX_Y/4);
 
