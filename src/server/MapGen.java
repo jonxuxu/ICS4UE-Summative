@@ -4,6 +4,16 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.awt.Polygon;
 
+/**
+ * MapGen.java
+ *
+ * The class responsible for doing the mathematics behind map generation and task delegation to lower classes
+ *
+ * @author Artem Sotnikov
+ * @version 2.2
+ * @since 2019-03-25
+ *
+ */
 
 public class MapGen {
 
@@ -22,15 +32,21 @@ public class MapGen {
     public boolean testingState;
     
     
-    
+
     MapGen(int mSize, int lRad, double eAdjust) {
       this.nodes = new ArrayList<RoadNode>(0);
       this.obstacles = new ArrayList<Obstacle>(0);
       this.testingState = false;
       this.ellipticalAdjust = eAdjust;
     }
-    
-    public MapData finalGenerate() {
+
+	/**
+	 *
+	 * Runs essential functions to generate an entire map without acessing other classes
+	 *
+	 * @return MapData, an object that contains the essential data contained within the map
+	 */
+	public MapData finalGenerate() {
     	this.selfInitialize();
     	
     	MapData returnMap = new MapData();
@@ -286,7 +302,7 @@ public class MapGen {
     	regionLayer.regions.add(t2Clearing);
     }
 
-    public void addObstalceBoundingBoxes() {
+    public void addObstacleBoundingBoxes() {
     	for (int idx = 0; idx < obstacles.size(); idx++) {
     		Polygon creation = new Polygon();
 
