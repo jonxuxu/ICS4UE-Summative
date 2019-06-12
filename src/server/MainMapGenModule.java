@@ -44,7 +44,7 @@ class MainMapGenModule extends JFrame{
          gen.makeNodesElliptical();
          gen.generateRegions();
          gen.generateCrevices(2);
-         gen.smokeTrees(7500, 100, 0, false);
+         gen.smokeTrees(7500, 130, 0, false);
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
