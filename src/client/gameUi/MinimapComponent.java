@@ -44,18 +44,18 @@ public class MinimapComponent extends GameComponent {
    private Area darkFog, lightFog;
    private Area playerShape, allyShape, enemyShape;
 
-   public MinimapComponent(FogMap fog, Player[] players, int myPlayerId){
+   public MinimapComponent(FogMap fog, Player[] players, int myPlayerId) {
       // Setting up refs
       this.fog = fog;
       this.players = players;
       this.myPlayerId = myPlayerId;
 
       // Border
-      BORDER_RECT = new Rectangle(scale(830), scale(379), scale(120), scale(120));
-      BORDER_RECT2 = new Rectangle(scale(832), scale(381), scale(116), scale(116));
-      BORDER_RECT3 = new Rectangle(scale(833), scale(382), scale(114), scale(114));
-      BORDER_RECT4 = new Rectangle(scale(835), scale(384), scale(110), scale(110));
-      INNER_RECT = new Rectangle(scale(836), scale(385), scale(108), scale(108));
+      BORDER_RECT = new Rectangle((830), (379), (120), (120));
+      BORDER_RECT2 = new Rectangle((832), (381), (116), (116));
+      BORDER_RECT3 = new Rectangle((833), (382), (114), (114));
+      BORDER_RECT4 = new Rectangle((835), (384), (110), (110));
+      INNER_RECT = new Rectangle((836), (385), (108), (108));
       BORDER_FILL = new Area(BORDER_RECT);
       BORDER_FILL2 = new Area(BORDER_RECT2);
       BORDER_FILL3 = new Area(BORDER_RECT3);
@@ -70,7 +70,7 @@ public class MinimapComponent extends GameComponent {
 
    public void draw(Graphics2D g2) {
       // Draws border
-      g2.setColor(new Color(72, 60, 32));
+     /* g2.setColor(new Color(72, 60, 32));
       g2.fill(BORDER_FILL);
       g2.setColor(new Color(141, 130, 103));
       g2.fill(BORDER_FILL2);
@@ -85,11 +85,11 @@ public class MinimapComponent extends GameComponent {
       // Draws map
 
       // Draws fog
-      xyAdjust[0] =  (int)(scale(890) -scale(players[myPlayerId].getXy()[0])*0.05);
-      xyAdjust[1] =  (int)(scale(440) - scale(players[myPlayerId].getXy()[1])*0.05);
+      xyAdjust[0] = (int) ((890) - (players[myPlayerId].getXy()[0]) * 0.05);
+      xyAdjust[1] = (int) ((440) - (players[myPlayerId].getXy()[1]) * 0.05);
       tx = new AffineTransform();
       tx.translate(xyAdjust[0], xyAdjust[1]);
-      tx.scale(0.05,0.05);
+      tx.scale(0.05, 0.05);
       darkFog = fog.getFog(1).createTransformedArea(tx);
       lightFog = fog.getExplored(1).createTransformedArea(tx);
       g2.setColor(Color.black); //Unexplored
@@ -104,16 +104,18 @@ public class MinimapComponent extends GameComponent {
       // Draws players and mobs
       allyShape = new Area();
       enemyShape = new Area();
-      for(Player player:players){
+      for (Player player : players) {
          tx = new AffineTransform();
-         xyAdjust[0] = -(int)(scale(players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
-         xyAdjust[1] = -(int)(scale(players[myPlayerId].getXy()[1] - player.getXy()[1])*0.05);
+         xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
+         xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.05);
          tx.translate(xyAdjust[0], xyAdjust[1]);
-         playerShape = new Area(new Rectangle(scale(888), scale(438), scale(4), scale(4))).createTransformedArea(tx);
-         if(player.getTeam() == players[myPlayerId].getTeam()){ // On same team
+         playerShape = new Area(new Rectangle((888), (438), (4), (4))).createTransformedArea(tx);
+         if (player.getTeam() == players[myPlayerId].getTeam()) { // On same team
             allyShape.add(playerShape);
          } else {
-            enemyShape.add(playerShape);
+            if (player.getIlluminated()) {
+               enemyShape.add(playerShape); //Added a way to avoid being seen by the enemy
+            }
          }
       }
       outputShape = new Area(INNER_RECT);
@@ -123,11 +125,11 @@ public class MinimapComponent extends GameComponent {
       outputShape = new Area(INNER_RECT);
       outputShape.intersect(enemyShape);
       g2.setColor(Color.red);
-      g2.fill(outputShape);
+      g2.fill(outputShape);*/
 
    }
 
-   public void update(){
+   public void update() {
 
    }
 }

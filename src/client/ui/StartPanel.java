@@ -17,16 +17,16 @@ import java.awt.event.ActionEvent;
 
 public class StartPanel extends MenuPanel {//State=2
    private Graphics2D g2;
-   private final double SCALING = super.getScaling();
+
    private final int MAX_X= super.getWidth();
    private final int MAX_Y= super.getHeight();
    private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
 
-   private CustomButton createButton = new CustomButton("Create Game", SCALING);
-   private CustomButton joinButton = new CustomButton("Join Game", SCALING);
-   private CustomButton instructionButton = new CustomButton("Instructions", SCALING);
-   private CustomButton logoutButton = new CustomButton("Logout", SCALING);
+   private CustomButton createButton = new CustomButton("Create Game");
+   private CustomButton joinButton = new CustomButton("Join Game");
+   private CustomButton instructionButton = new CustomButton("Instructions");
+   private CustomButton logoutButton = new CustomButton("Logout");
 
    private double introAlpha = 1;
 
@@ -38,20 +38,20 @@ public class StartPanel extends MenuPanel {//State=2
        CLIENT.setNextPanel(3);
        System.out.println("3");
       });
-      createButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 8.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
+      createButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 8.0 / 20.0), (int) (130 ), (int) (19 ));
       this.add(createButton);
 
       joinButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(4);
          System.out.println("4");
       });
-      joinButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 10.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
+      joinButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 10.0 / 20.0), (int) (130 ), (int) (19 ));
       this.add(joinButton);
       instructionButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(5);
          System.out.println("5");
       });
-      instructionButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 12.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
+      instructionButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 12.0 / 20.0), (int) (130 ), (int) (19 ));
 
       this.add(instructionButton);
       logoutButton.addActionListener((ActionEvent e) -> {
@@ -59,7 +59,7 @@ public class StartPanel extends MenuPanel {//State=2
          System.out.println("0");
          CLIENT.logout();
       });
-      logoutButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), (int) (MAX_Y * 14.0 / 20.0), (int) (130 * SCALING), (int) (19 * SCALING));
+      logoutButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 14.0 / 20.0), (int) (130 ), (int) (19 ));
       this.add(logoutButton);
 
       //Basic visuals
@@ -89,7 +89,7 @@ public class StartPanel extends MenuPanel {//State=2
          }
       }
       if (Math.random() < 0.2) {
-         MenuPanel.getParticles().add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) * SCALING), MAX_Y));
+         MenuPanel.getParticles().add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) ), MAX_Y));
       }
       drawAllParticles(g2);
    }

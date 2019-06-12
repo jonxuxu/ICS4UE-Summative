@@ -16,15 +16,15 @@ import java.awt.event.ActionEvent;
 
 public class LoginPanel extends MenuPanel {
    private Graphics2D g2;
-   private final double SCALING = super.getScaling();
+
    private final int MAX_X = super.getWidth();
    private final int MAX_Y = super.getHeight();
    private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
    private final Font HEADER_FONT = super.getFont("header");
 
-   private CustomTextField nameField = new CustomTextField(3, SCALING);
-   private CustomButton testButton = new CustomButton("Test", SCALING);
+   private CustomTextField nameField = new CustomTextField(3);
+   private CustomButton testButton = new CustomButton("Test");
 
    public LoginPanel() {
       //Basic username field
@@ -33,14 +33,15 @@ public class LoginPanel extends MenuPanel {
          CLIENT.testName(nameField.getText());
       });
       nameField.setFont(super.getFont("main"));
-      nameField.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y / 5, (int) (90 * SCALING), (int) (19 * SCALING));
+      System.out.println(MAX_X / 2);
+      nameField.setBounds(MAX_X / 2 - (int) (100), MAX_Y / 5, (200), (MAIN_FONT.getSize() + 20));
       this.add(nameField);
 
       testButton.addActionListener((ActionEvent e) -> {
          CLIENT.testingBegin();
       });
 
-      testButton.setBounds(MAX_X / 2 - (int) (45 * SCALING), MAX_Y * 2 / 5, (int) (90 * SCALING), (int) (19 * SCALING));
+      testButton.setBounds(MAX_X / 2 - (int) (100), MAX_Y * 2 / 5, (200), (MAIN_FONT.getSize() + 20));
       this.add(testButton);
       //Basic visuals
       this.setDoubleBuffered(true);
@@ -58,7 +59,7 @@ public class LoginPanel extends MenuPanel {
       //Begin drawing
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
-      g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 * SCALING));
+      g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 ));
       g2.setFont(MAIN_FONT);
       int tempConnectionState = CLIENT.getConnectionState();
       if (tempConnectionState == 0) {

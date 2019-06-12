@@ -16,7 +16,6 @@ import java.util.Base64;
 public class ChatComponent extends JPanel{
   private Client CLIENT;
   //https://www.javatpoint.com/java-jtextpane
-  private static double SCALING;
   private static int HEIGHT, WIDTH;
   private static int PARENT_WIDTH, PARENT_HEIGHT;
 
@@ -31,15 +30,14 @@ public class ChatComponent extends JPanel{
   private int mode = 1; // Default is to everyone
   private String[] modeString = {"To Team: ", "To Everyone: ", "To Player: "};
 
-  public ChatComponent(double SCALING, int width, int height, Client client){
-    SCALING = SCALING;
+  public ChatComponent( int width, int height, Client client){
     WIDTH = width;
     HEIGHT = height;
     this.CLIENT = client;
 
     // Setting up styles
     StyleConstants.setFontFamily(regular, "Cambria Math");
-    StyleConstants.setFontSize(regular, (int)(10 * SCALING));
+    StyleConstants.setFontSize(regular, (int)(20 ));
     friendly.addAttributes(regular);
     StyleConstants.setBold(friendly, true);
     StyleConstants.setForeground(friendly, Color.decode("#66bb6a"));
@@ -77,7 +75,7 @@ public class ChatComponent extends JPanel{
     JPanel bottomPanel = new JPanel();
     bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
     textField.setBackground(new Color(0,0,0,0));
-    textField.setFont(new Font("Cambria Math", Font.PLAIN, (int) (10 * SCALING)));
+    textField.setFont(new Font("Cambria Math", Font.PLAIN, (int) (20 )));
     textField.setForeground(Color.white);
     //this.setFocusTraversalKeysEnabled(false);
     textField.addActionListener(new ActionListener(){ // Do when enter key is pressed

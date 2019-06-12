@@ -23,15 +23,13 @@ public abstract class Player extends User {
 
    private int desiredSpell = -1;
    private int[] spellPercent = {100, 100, 100};
-   private ArrayList<Status> allStatus = new ArrayList<Status>();
+   private ArrayList<Status> statuses = new ArrayList<Status>();
    private int gold = 0;
    private boolean artifact;
    private int level = 0;
-   private int maxHealth;
-   private int health;
-   private int attack;
+   private int health, maxHealth;
+   private int attack, range;
    private int mobility = 20;
-   private int range;
    private boolean damaged;
    private int spriteID;
    private double flashlightAngle;
@@ -39,7 +37,12 @@ public abstract class Player extends User {
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
    private boolean translated;
+   
    private boolean illuminated;
+   
+   private boolean dead;
+   private boolean invisible;
+   private boolean uncollidable;
 
 
    Player(String username) {
@@ -59,17 +62,43 @@ public abstract class Player extends User {
    public int[] getXy() {
       return (xy);
    }
+   
+   public int getX(){
+     return xy[0];
+   }
+   public int getY(){
+     return xy[1];
+   }
 
    public void setXy(int x, int y) {
       this.xy[0] = x;
       this.xy[1] = y;
    }
 
-   public void draw(Graphics2D g2, int[] midXy) {
-      drawReal(g2, centerXy[0] + (int) ((xy[0] - midXy[0])) - (int) (60 / 2), centerXy[1] + (int) ((xy[1] - midXy[1])) - (int) (60) / 2, (int) (60), (int) (60), desiredSpell);
+   public void draw(Graphics2D g2, Player mainPlayer) {
+     int[] playerXy = mainPlayer.getXy();
+
+      drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (120 / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (120) / 2, (int) (120), (int) (120), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
+      // Draws status effects
+
+     // Draws health bars
+     g2.setColor(Color.white);
+     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 76, centerXy[1] + xy[1] - playerXy[1] - 71, 152, 8);
+     g2.setColor(Color.black);
+     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150, 6);
+     g2.setColor(Color.red);
+     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150 * health /  maxHealth, 6);
+
+     // Draws name
+     if(getTeam() == mainPlayer.getTeam()){
+       g2.setColor(Color.green);
+     } else {
+       g2.setColor(Color.red);
+     }
+     g2.drawString(getUsername(), centerXy[0] + xy[0] - playerXy[0] - g2.getFontMetrics().stringWidth(getUsername())/2, centerXy[1] + xy[1] - playerXy[1] - 80);
    }
 
   /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
@@ -150,9 +179,39 @@ public abstract class Player extends User {
       this.gold = gold;
    }
 
-   public void addStatus(int statusInt) {
-      allStatus.clear(); //very inefficient, possibly change?
-      allStatus.add(new Status(statusInt));
+   //Statuses
+   public ArrayList<Status> getStatuses(){
+     return statuses;
+   }
+   public void addStatus(Status status) {
+     statuses.add(status);
+   }
+   public void clearStatuses(){
+     statuses.clear();
+     dead = false;
+     //illuminated = false;
+     invisible = false;
+     uncollidable = false;
+   }
+   
+   public boolean isDead(){
+     return dead;
+   }
+   public boolean isInvisible(){
+     return invisible;
+   }
+   public boolean isUncollidable(){
+     return uncollidable;
+   }
+   
+   public void setDead(boolean state){
+     dead = state;
+   }
+   public void setInvisible(boolean state){
+     invisible = state;
+   }
+   public void setUncollidable(boolean state){
+     uncollidable = state;
    }
 
    public void setArtifact(boolean artifact) {

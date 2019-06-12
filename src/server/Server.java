@@ -392,18 +392,7 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
-            System.out.println("ww");
             MainMapGenModule builder=  new MainMapGenModule();
-            System.out.println("de");
-            for (int i=0;i<onlineGameSockets.size();i++){
-               builder.sendMap(onlineGameSockets.get(i));
-            }
-            for (int i = 0; i < players.length; i++) {
-               gameOutputs[i].println(""); //B for begin
-               gameOutputs[i].flush();
-            }
-            System.out.println("done");
-
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -413,6 +402,15 @@ public class Server {
                gameOutputs[i].println(beginLine.toString().trim()); //B for begin
                gameOutputs[i].flush();
             }
+            for (int i=0;i<onlineGameSockets.size();i++){
+               builder.sendMap(onlineGameSockets.get(i));
+               gameOutputs[i].flush();
+            }
+            for (int i = 0; i < players.length; i++) {
+               gameOutputs[i].println("FINAL");//B for begin
+               gameOutputs[i].flush();
+            }
+            System.out.println("done");
             playerNum = players.length;
             //Set up the players in each player
             Player.setPlayerReference(players, playerNum);
@@ -518,6 +516,7 @@ public class Server {
                   StringBuilder[] otherPlayers = new StringBuilder[playerNum];
                   StringBuilder projectileOutput = new StringBuilder();
                   StringBuilder aoeOutput = new StringBuilder();
+                  StringBuilder statusOutput = new StringBuilder();
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         mainPlayer[i] = new StringBuilder();
@@ -526,8 +525,9 @@ public class Server {
                         otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
+                        ArrayList<Status> theseStatuses = players[i].getAllStatuses();
                         for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " "); //, theseProjectiles.get(j).getAngle() + " ");
+                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
                            if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
@@ -551,6 +551,22 @@ public class Server {
                               }
                               aoeOutput.append(" ");
                            }
+                        }
+                        int ghostPassiveCount = 0;
+                        for (int j = 0; j < theseStatuses.size(); j++) {
+                          if (theseStatuses.get(j) instanceof GhostE){
+                            statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE)theseStatuses.get(j)).getX() + "," + ((GhostE)theseStatuses.get(j)).getY() + " ");
+                          } else if (theseStatuses.get(j) instanceof GhostPassive){
+                            ghostPassiveCount++;
+                          } else if (theseStatuses.get(j).getID() != -1){
+                            statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
+                          }
+                        }
+                        //if (ghostPassiveCount > 0){
+                          statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
+                        //}
+                        if (players[i].getShieldsSize() > 0){
+                          statusOutput.append("S" + 13 + "," + i + " ");
                         }
                      }
                   }
@@ -588,6 +604,14 @@ public class Server {
                      if (players[i] != null) {
                         if (!aoeOutput.toString().isEmpty()) {
                            outputString[i].append(aoeOutput);
+                        }
+                     }
+                  }
+                  //Write out all the Statuses
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        if (!statusOutput.toString().isEmpty()) {
+                           outputString[i].append(statusOutput);
                         }
                      }
                   }

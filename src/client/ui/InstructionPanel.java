@@ -19,14 +19,13 @@ import java.awt.event.ActionEvent;
 
 public class InstructionPanel extends MenuPanel { //State=5
    private Graphics2D g2;
-   private final double SCALING = super.getScaling();
    private final int MAX_X= super.getWidth();
    private final int MAX_Y= super.getHeight();
    private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
    private final Font HEADER_FONT = super.getFont("header");
 
-   private CustomButton backButton = new CustomButton("Back", SCALING);
+   private CustomButton backButton = new CustomButton("Back");
 
 
    public InstructionPanel() {
@@ -36,7 +35,7 @@ public class InstructionPanel extends MenuPanel { //State=5
        //  CLIENT.setAction(2);
          CLIENT.leaveGame();
       });
-      backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
+      backButton.setBounds(MAX_X / 2 - (int) (65 ), MAX_Y * 7 / 10, (int) (130 ), (int) (19 ));
       this.add(backButton);
 
       //Basic visuals

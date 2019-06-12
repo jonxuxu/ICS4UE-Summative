@@ -35,10 +35,7 @@ public abstract class Player extends User implements CanIntersect {
    private int spriteID;
    private int mouseX;
    private int mouseY;
-<<<<<<< HEAD
    private double mouseAngle;
-=======
->>>>>>> parent of aed9b30... Revert "Merge branch 'master' of https://github.com/JonathanXu1/ICS4UE-Summative"
    private boolean melee;
 
    //May 25//
@@ -72,7 +69,7 @@ public abstract class Player extends User implements CanIntersect {
    //Lighting
    private boolean flashlightOn;
    private Polygon flashlightBeam = new Polygon();
-   private int FLASHLIGHT_RADIUS = 200;
+   private int FLASHLIGHT_RADIUS = 600;
    private Polygon test = new Polygon();
    private static CustomPolygon[] constantHitboxes;
    private CustomPolygon lightingHitbox;
@@ -150,6 +147,9 @@ public abstract class Player extends User implements CanIntersect {
 
    public void setMouseAngle(double mouseAngle) {
       this.mouseAngle = mouseAngle;
+   }
+   public double getMouseAngle(){
+      return this.mouseAngle;
    }
 
    public void setID(int ID) {
@@ -354,7 +354,7 @@ public abstract class Player extends User implements CanIntersect {
       double dy = speed * Math.sin(theta);
       int totalTime = (int) Math.round(range * 1.0 / speed);
       statuses.add(new Launched(dx, dy, totalTime));
-      statuses.add(new Stun(totalTime));
+      statuses.add(new Stun(totalTime, -1));
    }
 
    public void moveTo(int targetX, int targetY, int speed) {
@@ -364,7 +364,7 @@ public abstract class Player extends User implements CanIntersect {
       double dy = speed * Math.sin(theta);
       int totalTime = (int) Math.round(range * 1.0 / speed);
       statuses.add(new Launched(dx, dy, totalTime));
-      statuses.add(new Stun(totalTime));
+      statuses.add(new Stun(totalTime, -1));
    }
 
    public abstract void update();
@@ -459,6 +459,7 @@ public abstract class Player extends User implements CanIntersect {
             } else if (removed instanceof Dead){
               setX(spawnX);
               setY(spawnY);
+              setHealth(maxHealth);
             }
          } else {
             applyStatus(statuses.get(i));
@@ -582,6 +583,10 @@ public abstract class Player extends User implements CanIntersect {
 
    public int getAOESize() {
       return aoes.size();
+   }
+   
+   public ArrayList<Status> getAllStatuses(){
+     return statuses;
    }
 
    public Status getStatus(int i) {

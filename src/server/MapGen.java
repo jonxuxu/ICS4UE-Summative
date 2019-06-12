@@ -56,7 +56,7 @@ public class MapGen {
 	    this.makeNodesElliptical();
 	    this.generateRegions();
 	    this.generateCrevices(2);
-	    this.insertArtifactClearing();
+	    //this.insertArtifactClearing();
 	    this.smokeTrees(7500, 1000, 0, false);    
 	    this.smokeRocks(7500, 100, true);
 	    this.makeObstaclesElliptical();

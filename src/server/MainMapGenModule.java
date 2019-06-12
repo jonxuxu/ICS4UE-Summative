@@ -151,6 +151,7 @@ class MainMapGenModule {
    public void sendMap(Socket socket) {
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
+         socket.getOutputStream().flush();
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -160,7 +161,7 @@ class MainMapGenModule {
          super.paintComponent(g);
          this.setCenter(g);
          Graphics2D g2 = (Graphics2D) (g);
-         g2.scale(0.04, 0.04);
+         g2.(0.04, 0.04);
 
          if (!gen.testingState) {
             g.setColor(Color.BLUE);
