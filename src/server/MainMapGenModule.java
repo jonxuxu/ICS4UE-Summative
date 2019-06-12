@@ -44,7 +44,7 @@ class MainMapGenModule extends JFrame{
          gen.makeNodesElliptical();
          gen.generateRegions();
          gen.generateCrevices(2);
-         gen.smokeTrees(7500, 200, 0, false);
+         gen.smokeTrees(7500, 100, 0, false);
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
@@ -143,17 +143,25 @@ class MainMapGenModule extends JFrame{
                g.setColor(Color.GRAY);
             }
             if (gen.obstacles.get(i).radius != 0) {
-               g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y,
-                       gen.obstacles.get(i).radius, gen.obstacles.get(i).radius);
+               this.fillOvalCustom(gen.obstacles.get(i).radius,gen.obstacles.get(i).location.x,
+                       gen.obstacles.get(i).location.y,g);
             } else {
-               g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
+               this.fillOvalCustom(50,gen.obstacles.get(i).location.x,
+                       gen.obstacles.get(i).location.y, g);
             }
          }
-        /* try {
+
+         g2.setColor(Color.white);
+         for (int i = 0; i < gen.obstacles.size(); i++) {
+            g2.fill(gen.obstacles.get(i).boundingBox);
+         }
+
+
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
 

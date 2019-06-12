@@ -16,24 +16,36 @@ import java.awt.Polygon;
  */
 
 public class MapGen {
-
-	//private final static int ROAD_WIDTH = 100;
+	// Constants that are used for map gen operations
+	private final static int ROAD_WIDTH = 100;
 	public final static int MAP_REGION_IDX = 0;
 	public final static int SWAMP_REGION_IDX = 1;
-	
+
+
+	//Variables for setting up the map generation parameters
 	public int mapSize;
 	public int loopRadius;
 	public int swampRadius;
 	public double ellipticalAdjust;
-	
+
+	//Data created during a generation cycle
     public ArrayList<RoadNode> nodes; 
     public ArrayList<Obstacle> obstacles;
     public RegionLayer regionLayer;
-    public boolean testingState;
-    
-    
 
-    MapGen(int mSize, int lRad, double eAdjust) {
+    //Boolean for configuring test states
+    public boolean testingState;
+
+
+	/**
+	 *
+	 * The constructor for the MapGen class
+	 *
+	 * @param mSize the size of the map for generation
+	 * @param lRad the radius of the loop for road node generation
+	 * @param eAdjust the eccentricity of the horizonatl adjust, tuning the map from a circle to an ellipse
+	 */
+	MapGen(int mSize, int lRad, double eAdjust) {
       this.nodes = new ArrayList<RoadNode>(0);
       this.obstacles = new ArrayList<Obstacle>(0);
       this.testingState = false;
@@ -41,7 +53,6 @@ public class MapGen {
     }
 
 	/**
-	 *
 	 * Runs essential functions to generate an entire map without acessing other classes
 	 *
 	 * @return MapData, an object that contains the essential data contained within the map
@@ -55,34 +66,41 @@ public class MapGen {
     	
     	return returnMap;
     }
-    
-    public void selfInitialize() {
+
+	/**
+	 * Runs the sequence of all methods performing the mathematics for creating one entire map
+	 */
+	public void selfInitialize() {
     	this.nodes = new ArrayList<RoadNode>(0);
         this.obstacles = new ArrayList<Obstacle>(0);
         this.testingState = false;
         
         //this.ellipticalAdjust = eAdjust;
-    	
+
+		// initializes basic values for generation
     	int loopRadiusSize = 10;
     	int nodeGenRange = 3750;
     	double nodeGenStDev = 0.5;
     	
-    	
+
+    	// runs the method sequence
     	this.generateMap2(40,loopRadiusSize,nodeGenRange,nodeGenStDev);
 	    this.tetherAllNodes2();	
 	    this.makeNodesElliptical();
 	    this.generateRegions();
 	    this.generateCrevices(2);
-	    //this.insertArtifactClearing();
+	    this.insertArtifactClearing();
 	    this.smokeTrees(7500, 1000, 0, false);    
 	    this.smokeRocks(7500, 100, true);
 	    this.makeObstaclesElliptical();
 	    this.genClearingByNum(8, 500);  	    
 	    this.purgeRedundanices();
     }
-        
-    
-    public void configueScenario1() {
+
+	/**
+	 * Configures a scenario for testing basic functionality
+	 */
+	public void configueScenario1() {
     	this.testingState = true;
     	
     	RoadNode node1 = new RoadNode(5000,5000);
@@ -94,15 +112,18 @@ public class MapGen {
     	this.nodes.add(node1);
     	this.nodes.add(node2);
     }
-    
-    public void generateRegions() {
+
+	/**
+	 * Generates the regions in the map based upon earlier generated nodes and connections
+	 */
+	public void generateRegions() {
     	this.regionLayer = new RegionLayer();
     	
     	Region swamp = new Region("swamp",1);
     	Region map = new Region("map", 0); 
     			
     	map.mimicEllipse(0, 0, 7500, 1.75, 100);
-    	swamp.mimicEllipse(0, 0, 3000, 1.75, 20);
+    	swamp.mimicEllipse(0, 0, 3125, 1.75, 20);
     	
     	
     	this.regionLayer.regions.add(MAP_REGION_IDX, map);
@@ -122,8 +143,13 @@ public class MapGen {
     		}
     	}    
     }
-    
-    public void makeElliptical(double eAdjust) {
+
+	/**
+	 * 	Makes all objects generated elliptical
+	 *
+	 * @param eAdjust, the value by which the adjustment is made
+	 */
+	public void makeElliptical(double eAdjust) {
     	for (int i = 0; i < nodes.size(); i++) {
     		nodes.get(i).location.x = (int) (nodes.get(i).location.x*eAdjust);
     	}
@@ -131,21 +157,33 @@ public class MapGen {
     		obstacles.get(i).location.x = (int) (obstacles.get(i).location.x*eAdjust);
     	}
     }
-    
-    public void makeNodesElliptical() {
+
+	/**
+	 * Makes all node positions elliptical, based upon an earlier-initialized value
+	 */
+	public void makeNodesElliptical() {
     	for (int i = 0; i < nodes.size(); i++) {
     		nodes.get(i).location.x = (int) (nodes.get(i).location.x*ellipticalAdjust);
     	}
     }
-    
-    public void makeObstaclesElliptical() {
+
+	/**
+	 * Makes all obstacle position elliptical, based upon an earlier-initialized value
+	 */
+	public void makeObstaclesElliptical() {
     	for (int i = 0; i < obstacles.size(); i++) {
     		obstacles.get(i).location.x = (int) (obstacles.get(i).location.x*ellipticalAdjust);
     	}
     }
-    
-    
-    public void genClearing(double clearingChance, int clearingSize) {
+
+	/**
+	 * Generates clearings on road nodes, implemented within the nodes themselves
+	 *
+	 * @param clearingChance, the chance that any individual node becomes a clearing/
+	 * @param clearingSize, the size that the clearing is.
+	 */
+
+	public void genClearing(double clearingChance, int clearingSize) {
     	for (int i = 0; i < nodes.size(); i++) {
     		if (roll(clearingChance)) {
     			nodes.get(i).isClearing = true;
@@ -153,8 +191,15 @@ public class MapGen {
     		}
     	}
     }
-    
-    public void genClearingByNum(int numClearings, int clearingSize) {
+
+	/**
+	 * Generate clearings on road nodes, implemented within the nodes themselves
+	 *
+	 * @param numClearings
+	 * @param clearingSize
+	 */
+
+	public void genClearingByNum(int numClearings, int clearingSize) {
     	for (int i = 0; i < numClearings; i++) {
     		int randomIdx = (int) (Math.random()*nodes.size()) ;
     		if (nodes.get(randomIdx).isClearing) {
@@ -315,9 +360,11 @@ public class MapGen {
 			double tempAngle;
 
 			for (int idx2 = 0; idx2 < numVertices; idx2++) {
-				tempAngle = 2*Math.PI*idx/numVertices;
+				tempAngle = 2*Math.PI*idx2/numVertices;
 				creation.xpoints[idx2] = (int) (radius*Math.cos(tempAngle)) + obstacles.get(idx).location.x;
+				System.out.println(creation.xpoints[idx2]);
 				creation.ypoints[idx2] = (int) (radius*Math.sin(tempAngle)) +  obstacles.get(idx).location.y;
+				System.out.println(creation.ypoints[idx2]);
 			}
 
 			obstacles.get(idx).boundingBox = creation;
