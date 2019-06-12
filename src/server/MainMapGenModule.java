@@ -9,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -51,6 +50,7 @@ class MainMapGenModule extends JFrame{
          gen.makeObstaclesElliptical();
          gen.genClearingByNum(8, 500);
          gen.purgeRedundanices();
+         gen.addObstacleBoundingBoxes();
 
       }
       display = new Disp();
