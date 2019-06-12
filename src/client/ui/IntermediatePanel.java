@@ -48,7 +48,7 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       this.setDoubleBuffered(true);
    }
 
-   public void toggleMode(){
+   public void toggleMode() {
       chat.requestFocus();
       /*
       chat.toggleMode();

@@ -124,7 +124,6 @@ public class Client extends JFrame implements WindowListener {
       GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
       GraphicsDevice screenDevice = gEnv.getDefaultScreenDevice();
       screenDevice.setFullScreenWindow(this);
-      this.setResizable(false);
       DisplayMode dm = new DisplayMode(DESIRED_X, DESIRED_Y, 32, 60);
       screenDevice.setDisplayMode(dm);
       validate();
@@ -152,7 +151,7 @@ public class Client extends JFrame implements WindowListener {
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
-      //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
       //Control set up (the mouse listeners are attached to the game panel)
       initializeScaling();
@@ -248,7 +247,7 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (!waitingForImage) {
             if (input.ready()) {
-               decipherMenuInput(input.readLine());
+               decipherMenuInput("I" + input.readLine());
             }
          } else {
             waitForInput();
@@ -1067,8 +1066,8 @@ public class Client extends JFrame implements WindowListener {
       }
 
       public void resetXyAdjust() {
-         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
-         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
+         xyAdjust[0] =  (midXy[0] - myPlayer.getXy()[0]);
+         xyAdjust[1] =  (midXy[1] - myPlayer.getXy()[1]);
       }
    }
 }
