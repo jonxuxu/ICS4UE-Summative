@@ -326,7 +326,7 @@ public class Client extends JFrame implements WindowListener {
             output.flush();
          }
          if (classChosen) {
-            classChosen = true;
+            classChosen = false;
             output.println("Z" + className);//Refers to class chosen
             output.flush();
          }

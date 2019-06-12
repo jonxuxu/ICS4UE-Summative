@@ -134,7 +134,7 @@ public class Server {
                         output.flush();
                      }
                   } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
-                     System.out.println(inputString);
+                     System.out.println("R"+inputString);
 
                    /*  if (myGame.getGameSize() <= 1) {
                         output.println(7);
@@ -367,7 +367,7 @@ public class Server {
 
             for (int i = 0; i < players.length; i++) {
                String playerClass = onlinePlayers.get(i).getSelectedClass();
-               System.out.println(playerClass);
+               System.out.println("P"+playerClass);
                if (playerClass != null) { //TESTING ONLY
                   if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
                      players[i] = new SafeMarksman(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
@@ -462,7 +462,7 @@ public class Server {
                            }
                            allInput[i] = "";
                         } else {
-                           System.out.println(allInput[i]);
+                           System.out.println("WWW"+allInput[i]);
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
                               char initializer = firstInput.charAt(0);
