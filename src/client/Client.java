@@ -30,7 +30,7 @@ import java.util.ArrayList;
 Here is how the messages work.
 First, the server must send a message to the client. The client immediately deciphers and sends it's own message, but it is
 limited by waiting for the server to send a message again. However, in the menu this is irrelevant
-If a server is trying to send two messages, then both can be recieved as the server is limiting here. Essentially, what will
+If a server is trying to send two messages, then both can be received as the server is limiting here. Essentially, what will
 occur is the client sending an output that does not reach anyone, which is perfectly fine.
  */
 
