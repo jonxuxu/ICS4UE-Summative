@@ -23,7 +23,7 @@ public abstract class Player extends User {
 
    private int desiredSpell = -1;
    private int[] spellPercent = {100, 100, 100};
-   private ArrayList<Status> allStatus = new ArrayList<Status>();
+   private ArrayList<Status> statuses = new ArrayList<Status>();
    private int gold = 0;
    private boolean artifact;
    private int level = 0;
@@ -39,7 +39,12 @@ public abstract class Player extends User {
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
    private boolean translated;
+   
    private boolean illuminated;
+   
+   private boolean dead;
+   private boolean invisible;
+   private boolean uncollidable;
 
 
    Player(String username) {
@@ -58,6 +63,13 @@ public abstract class Player extends User {
 
    public int[] getXy() {
       return (xy);
+   }
+   
+   public int getX(){
+     return xy[0];
+   }
+   public int getY(){
+     return xy[1];
    }
 
    public void setXy(int x, int y) {
@@ -154,9 +166,39 @@ public abstract class Player extends User {
       this.gold = gold;
    }
 
-   public void addStatus(int statusInt) {
-      allStatus.clear(); //very inefficient, possibly change?
-      allStatus.add(new Status(statusInt));
+   //Statuses
+   public ArrayList<Status> getStatuses(){
+     return statuses;
+   }
+   public void addStatus(Status status) {
+     statuses.add(status);
+   }
+   public void clearStatuses(){
+     statuses.clear();
+     dead = false;
+     //illuminated = false;
+     invisible = false;
+     uncollidable = false;
+   }
+   
+   public boolean isDead(){
+     return dead;
+   }
+   public boolean isInvisible(){
+     return invisible;
+   }
+   public boolean isUncollidable(){
+     return uncollidable;
+   }
+   
+   public void setDead(boolean state){
+     dead = state;
+   }
+   public void setInvisible(boolean state){
+     invisible = state;
+   }
+   public void setUncollidable(boolean state){
+     uncollidable = state;
    }
 
    public void setArtifact(boolean artifact) {

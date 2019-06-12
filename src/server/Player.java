@@ -584,6 +584,10 @@ public abstract class Player extends User implements CanIntersect {
    public int getAOESize() {
       return aoes.size();
    }
+   
+   public ArrayList<Status> getAllStatuses(){
+     return statuses;
+   }
 
    public Status getStatus(int i) {
       return statuses.get(i);
