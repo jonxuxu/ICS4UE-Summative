@@ -2,6 +2,7 @@ package server;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.awt.Polygon;
 
 
 public class MapGen {
@@ -77,6 +78,25 @@ public class MapGen {
     	this.nodes.add(node1);
     	this.nodes.add(node2);
     }
+
+	public void selfInitialize() {
+		int loopRadiusSize = 10;
+		int nodeGenRange = 3750;
+		double nodeGenStDev = 0.5;
+
+
+		this.generateMap2(40,loopRadiusSize,nodeGenRange,nodeGenStDev);
+		this.tetherAllNodes2();
+		this.makeNodesElliptical();
+		this.generateRegions();
+		this.generateCrevices(2);
+		this.insertArtifactClearing();
+		this.smokeTrees(7500, 7500, 0, false);
+		this.smokeRocks(7500, 100, true);
+		this.makeObstaclesElliptical();
+		this.genClearingByNum(8, 500);
+		this.purgeRedundanices();
+	}
     
     public void generateRegions() {
     	this.regionLayer = new RegionLayer();
@@ -99,7 +119,7 @@ public class MapGen {
     			
     			Region creation = new Region("road",3);
     			creation.adoptRoadShape(activeNode.location, 
-    					activeNode.connections.get(connectionIdx), 100);    
+    					activeNode.connections.get(connectionIdx), 200);
     			this.regionLayer.regions.add(creation);
     			
     		}
@@ -157,6 +177,8 @@ public class MapGen {
     		Obstacle temp = new Obstacle();
     		temp.type = "TREE";
     		temp.location = new Point();
+
+			int maxRadius = 600;
     		
     		int tempX, tempY;
     		int tempDeltaX, tempDeltaY;
@@ -171,17 +193,23 @@ public class MapGen {
     			tempY = (int) (Math.sin(angle)*radius);
     			
     			exit = true;
-    			    			
-    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
-    				tempDeltaX = tempX - obstacles.get(idx).location.x;
-    				tempDeltaY = tempY - obstacles.get(idx).location.y;
-    				
-    				if ((Math.pow(tempDeltaX,2) + 
-    						Math.pow(tempDeltaY,2)) <= 2500) {
-    							System.out.println((Math.pow(tempDeltaX,2) + 
-    		    						Math.pow(tempDeltaY,2)));
-    							exit = false;
-    				}
+    			if ((regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("map") ||
+    					regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) &&
+						regionLayer.checkCoordinate((int) (tempX*1.75), tempY) != ("road")
+				) {
+	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
+	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
+	    				tempDeltaY = tempY - obstacles.get(idx).location.y;
+	    				
+	    				if ((Math.pow(tempDeltaX,2) + 
+	    						Math.pow(tempDeltaY,2)) <= Math.pow(maxRadius,2)) {
+//	    							System.out.println((Math.pow(tempDeltaX,2) +
+//	    		    						Math.pow(tempDeltaY,2)));
+	    							exit = false;
+	    				}
+	    			}
+    			} else {
+    				exit = false;
     			}
     			
     			
@@ -189,6 +217,7 @@ public class MapGen {
     		
     		temp.location.x = tempX;
     		temp.location.y = tempY;
+    		temp.radius = maxRadius;
     		this.obstacles.add(temp);
     	}
     }
@@ -198,7 +227,7 @@ public class MapGen {
     		double angle;
     		double radius;
     		
-    		int maxRadius = 200;
+    		int maxRadius = 800;
     		
     		Obstacle temp = new Obstacle();
     		temp.type = "ROCK";
@@ -225,8 +254,8 @@ public class MapGen {
 	    				
 	    				if ((Math.pow(tempDeltaX,2) + 
 	    						Math.pow(tempDeltaY,2)) <= Math.pow(maxRadius,2)) {
-	    							System.out.println((Math.pow(tempDeltaX,2) + 
-	    		    						Math.pow(tempDeltaY,2)));
+//	    							System.out.println((Math.pow(tempDeltaX,2) +
+//	    		    						Math.pow(tempDeltaY,2)));
 	    							exit = false;
 	    				}
 	    			}
@@ -242,12 +271,61 @@ public class MapGen {
     		
     		if (randomization) {    			
     			double percentRand = 0.4;
-    			temp.radius = (int) (Math.random()*100*(percentRand) + 100*(1.0 - percentRand));
+    			temp.radius = (int) (Math.random()*maxRadius*(percentRand) + maxRadius*(1.0 - percentRand));
     		}
     		
     		this.obstacles.add(temp);
     	}
     }
+    
+    public void insertArtifactClearing() {
+    	int teamOneDistance = 0;  
+    	int teamTwoDistance = 0;
+    	int teamOneIdx = 0; 
+    	int teamTwoIdx = 0;
+    	
+    	for (int idx = 0; idx < this.nodes.size(); idx++) {
+    		if (nodes.get(idx).location.x > teamTwoDistance) {
+    			teamTwoDistance = nodes.get(idx).location.x;
+    			teamTwoIdx = idx;
+    		}
+    		if (nodes.get(idx).location.x < teamOneDistance) {
+    			teamOneDistance = nodes.get(idx).location.x;
+    			teamOneIdx = idx;
+    		}
+    	}
+    	
+    	Region t1Clearing = new Region("team_one_clearing",9);
+    	Region t2Clearing = new Region("team_two_clearing",9);
+    	
+    	t1Clearing.mimicCircle(nodes.get(teamOneIdx).location.x,nodes.get(teamOneIdx).location.y,750,12);
+    	t2Clearing.mimicCircle(nodes.get(teamTwoIdx).location.x,nodes.get(teamTwoIdx).location.y,750,12);
+    	
+    	regionLayer.regions.add(t1Clearing);
+    	regionLayer.regions.add(t2Clearing);
+    }
+
+    public void addObstalceBoundingBoxes() {
+    	for (int idx = 0; idx < obstacles.size(); idx++) {
+    		Polygon creation = new Polygon();
+
+    		int numVertices = 8;
+    		int radius = obstacles.get(idx).radius;
+
+			creation.xpoints = new int[numVertices];
+			creation.ypoints = new int[numVertices];
+			creation.npoints = numVertices;
+			double tempAngle;
+
+			for (int idx2 = 0; idx2 < numVertices; idx2++) {
+				tempAngle = 2*Math.PI*idx/numVertices;
+				creation.xpoints[idx2] = (int) (radius*Math.cos(tempAngle)) + obstacles.get(idx).location.x;
+				creation.ypoints[idx2] = (int) (radius*Math.sin(tempAngle)) +  obstacles.get(idx).location.y;
+			}
+
+			obstacles.get(idx).boundingBox = creation;
+		}
+	}
     
     public void tetherAllNodes() {
     	int numOfNodes = nodes.size();
@@ -478,10 +556,10 @@ public class MapGen {
     	Region creation = null;
     	
     	for (int iter = 0; iter < creviceNum; iter++) {
-    		source = new Point((int) (Math.random()*6000 - 3000),(int) (Math.random()*6000 - 3000)); 
+    		source = new Point((int) (Math.random()*7000 - 3500),(int) (Math.random()*7000 - 3500));
     		
 			do {
-				creviceEngine.generateFullCrevice(source,750,1.0,4,true,400);
+				creviceEngine.generateFullCrevice(source,1000,1.0,4,true,500);
 	    		creation = new Region("crevice",4);  
 	    		creation.uploadPolygon(creviceEngine.getPolygon());
 			} while (!regionLayer.regions.get(SWAMP_REGION_IDX).contains(creation));
