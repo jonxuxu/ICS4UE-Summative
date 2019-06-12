@@ -39,7 +39,7 @@ public class Server {
 
    private void go() {
       try {
-         ServerSocket serverSock = new ServerSocket(5001);  //assigns an port to the server
+         ServerSocket serverSock = new ServerSocket(5002);  //assigns an port to the server
          while (true) {  //this loops to accept multiple clients
             Socket newConnection = serverSock.accept();
             menuConnections.add(new MenuHandler(newConnection));
