@@ -94,7 +94,7 @@ public class SafeMarksman extends Player{
         } else if (getProjectile(i) instanceof SafeMarksmanQProjectile){
           for (int j = 0; j < getEnemiesSize(); j++){
             if(getProjectile(i).collides(getEnemy(j))){
-              getEnemy(j).addStatus(new Stun(STUN_DURATION));
+              getEnemy(j).addStatus(new Stun(STUN_DURATION, 12));
               removed = removeProjectile(i);
             }
           }
@@ -139,7 +139,7 @@ public class SafeMarksman extends Player{
         } else if  (getAOE(i) instanceof SafeMarksmanEAOE){
           for (int j = 0; j < getEnemiesSize(); j++){
             if (getAOE(i).collides(getEnemy(j))){
-              getEnemy(j).addStatus(new Stun(STUN_DURATION));
+              getEnemy(j).addStatus(new Stun(STUN_DURATION, 12));
             }
           }
         } else if (getAOE(i) instanceof SafeMarksmanSpaceAOE1){
@@ -209,6 +209,9 @@ public class SafeMarksman extends Player{
           addAOE(new SafeMarksmanEAOE(getX(),getY()));
         }
       }
+    }
+    if (getHealth() <= 0){
+      addStatus(new Dead());
     }
   }
 }

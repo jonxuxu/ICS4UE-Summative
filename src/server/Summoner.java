@@ -28,7 +28,7 @@ public class Summoner extends Player{
     setMaxHealth(200);
     setHealth(200);
     setAttack(200);
-    setMobility(10);
+    setMobility(7);
     setRange(300);
     setAutoAttackCooldown(5);
     setFlareCooldown(100);

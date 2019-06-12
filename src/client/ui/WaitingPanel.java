@@ -38,6 +38,8 @@ public class WaitingPanel extends MenuPanel { //State=6
 
    //Character visuals
    private BufferedImage[] idleCharacters = new BufferedImage[6];
+   private boolean selected = false;
+   private int boxMultiplier;
 
    //Mouse
    private int[] mouseState = CLIENT.getMouseState();
@@ -67,6 +69,7 @@ public class WaitingPanel extends MenuPanel { //State=6
       this.add(teamTwoButton);
 
       backButton.addActionListener((ActionEvent e) -> {
+         selected = false;
          CLIENT.setNextPanel(2);
          CLIENT.leaveGame();
       });
@@ -80,36 +83,48 @@ public class WaitingPanel extends MenuPanel { //State=6
       //Setting up the classes
       SAFE_MARKSMAN_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Archer");
+         selected = true;
+         boxMultiplier = 0;
       });
       SAFE_MARKSMAN_PEDESTAL.setBounds(1, 1, (stringSize), 1);
       this.add(SAFE_MARKSMAN_PEDESTAL);
 
       GHOST_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Ghost");
+         selected = true;
+         boxMultiplier = 1;
       });
       GHOST_PEDESTAL.setBounds(1, 1, (stringSize), 1);
       this.add(GHOST_PEDESTAL);
 
       TIME_MAGE_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("TimeMage");
+         selected = true;
+         boxMultiplier = 2;
       });
       TIME_MAGE_PEDESTAL.setBounds(1, 1, (stringSize), 1);
       this.add(TIME_MAGE_PEDESTAL);
 
       JUGGERNAUT_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Juggernaut");
+         selected = true;
+         boxMultiplier = 3;
       });
       JUGGERNAUT_PEDESTAL.setBounds(1, 1, (stringSize), 1);
       this.add(JUGGERNAUT_PEDESTAL);
 
       SUMMONER_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Summoner");
+         selected = true;
+         boxMultiplier = 4;
       });
       SUMMONER_PEDESTAL.setBounds(1, 1, (stringSize), 1);
       this.add(SUMMONER_PEDESTAL);
 
       MOBILE_SUPPORT_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("MobileSupport");
+         selected = true;
+         boxMultiplier = 5;
       });
       MOBILE_SUPPORT_PEDESTAL.setBounds(1, 1, (stringSize), 1);
       this.add(MOBILE_SUPPORT_PEDESTAL);
@@ -147,12 +162,12 @@ public class WaitingPanel extends MenuPanel { //State=6
       //Change buttons to fit size
       //Start button
       stringSize = metrics.stringWidth("   Begin game   ");
-      readyGameButton.setBounds(MAX_X / 2 - (int) (stringSize / 2), MAX_Y * 8 / 10, (int) (stringSize), (MAIN_FONT.getSize() + 20));
+      readyGameButton.setBounds(MAX_X / 2 - (int) (stringSize / 2), MAX_Y * 8 / 10, stringSize, (MAIN_FONT.getSize() + 20));
 
       //Team buttons
       stringSize = metrics.stringWidth("   Team two   ");
-      teamOneButton.setBounds(MAX_X / 2 - (int) ((stringSize + 50)), MAX_Y * 7 / 10, (int) (stringSize), (MAIN_FONT.getSize() + 20));
-      teamTwoButton.setBounds(MAX_X / 2 + (int) (50), MAX_Y * 7 / 10, (int) (stringSize), (int) (MAIN_FONT.getSize() + 20));
+      teamOneButton.setBounds(MAX_X / 2 - (int) ((stringSize + 50)), MAX_Y * 7 / 10, stringSize, (MAIN_FONT.getSize() + 20));
+      teamTwoButton.setBounds(MAX_X / 2 + (int) (50), MAX_Y * 7 / 10, stringSize, (MAIN_FONT.getSize() + 20));
 
       //Back button
       stringSize = metrics.stringWidth("   Back   ");
@@ -181,8 +196,16 @@ public class WaitingPanel extends MenuPanel { //State=6
 
       //Display classes:
       for (int i = 0; i < 6; i++){
-         g2.drawImage(idleCharacters[i], MAX_X / 2 - (int) (stringSize * 3 + 75) + (int)(stringSize + 30) * i, MAX_Y * 2 / 5, (int) (stringSize), (int) (stringSize), null);
+         g2.drawImage(idleCharacters[i], MAX_X / 2 - (stringSize * 3 + 75) + (stringSize + 30) * i, MAX_Y / 3, stringSize, stringSize, null);
       }
+
+      //Draw square around selected character
+      Stroke oldStroke = g2.getStroke();
+      g2.setStroke(new BasicStroke(5));
+      if (selected) {
+         g2.drawRect(MAX_X / 2 - (stringSize * 3 + 80) + (stringSize + 30) * boxMultiplier, MAX_Y / 3 - 5, stringSize + 10, stringSize + 10);
+      }
+      g2.setStroke(oldStroke);
 
       //Display all players
       StringBuilder players = new StringBuilder("Players: ");
