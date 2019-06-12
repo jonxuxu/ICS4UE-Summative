@@ -78,25 +78,6 @@ public class MapGen {
     	this.nodes.add(node1);
     	this.nodes.add(node2);
     }
-
-	public void selfInitialize() {
-		int loopRadiusSize = 10;
-		int nodeGenRange = 3750;
-		double nodeGenStDev = 0.5;
-
-
-		this.generateMap2(40,loopRadiusSize,nodeGenRange,nodeGenStDev);
-		this.tetherAllNodes2();
-		this.makeNodesElliptical();
-		this.generateRegions();
-		this.generateCrevices(2);
-		this.insertArtifactClearing();
-		this.smokeTrees(7500, 7500, 0, false);
-		this.smokeRocks(7500, 100, true);
-		this.makeObstaclesElliptical();
-		this.genClearingByNum(8, 500);
-		this.purgeRedundanices();
-	}
     
     public void generateRegions() {
     	this.regionLayer = new RegionLayer();
@@ -556,7 +537,7 @@ public class MapGen {
     	Region creation = null;
     	
     	for (int iter = 0; iter < creviceNum; iter++) {
-    		source = new Point((int) (Math.random()*7000 - 3500),(int) (Math.random()*7000 - 3500));
+    		source = new Point((int) (Math.random()*6000 - 3000),(int) (Math.random()*6000 - 3000));
     		
 			do {
 				creviceEngine.generateFullCrevice(source,1000,1.0,4,true,500);
