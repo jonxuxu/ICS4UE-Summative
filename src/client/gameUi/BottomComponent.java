@@ -33,8 +33,8 @@ public class BottomComponent extends GameComponent {
 
    public BottomComponent(Player myPlayer) {
 
-      int[] xPoints = {(MAX_X/2-370), (MAX_X/2-360), (MAX_X/2-350), (MAX_X/2+350), (MAX_X/2+360), (MAX_X/2+370)};
-      int[] yPoints = {(MAX_Y), (MAX_Y-80), (MAX_Y-85), (MAX_Y-85), (MAX_Y-80), (MAX_Y)};
+      int[] xPoints = {(MAX_X / 2 - 370), (MAX_X / 2 - 360), (MAX_X / 2 - 350), (MAX_X / 2 + 350), (MAX_X / 2 + 360), (MAX_X / 2 + 370)};
+      int[] yPoints = {(MAX_Y), (MAX_Y - 80), (MAX_Y - 85), (MAX_Y - 85), (MAX_Y - 80), (MAX_Y)};
 
       BOTTOM_BORDER = new Polygon(xPoints, yPoints, 6);
     /*  int[] x2Points = {(274), (267), (272), (678), (683), (676)};
@@ -79,14 +79,14 @@ public class BottomComponent extends GameComponent {
       */
       //Health bar
       g2.setColor(new Color(190, 40, 40));
-      if (myPlayer.getMaxHealth()!=0) {
+      if (myPlayer.getMaxHealth() != 0) {
          g2.fillRect(MAX_X / 2 - 260, (MAX_Y - 20), (121 * myPlayer.getHealth() / myPlayer.getMaxHealth()), (5));
       }
       g2.setColor(Color.white);
       g2.setFont(STATS_FONT);
-      if (myPlayer!=null) {
-         g2.drawString("Gold: " + myPlayer.getGold(), MAX_X/2-260, (MAX_Y-20) - g2.getFontMetrics().getHeight());
-         g2.drawString("User: " + myPlayer.getUsername(), MAX_X/2-260, (MAX_Y-20) - g2.getFontMetrics().getHeight() * 2);
+      if (myPlayer != null) {
+         g2.drawString("Gold: " + myPlayer.getGold(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight());
+         g2.drawString("User: " + myPlayer.getUsername(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight() * 2);
       }
    }
 }

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 Here is how the messages work.
 First, the server must send a message to the client. The client immediately deciphers and sends it's own message, but it is
 limited by waiting for the server to send a message again. However, in the menu this is irrelevant
-If a server is trying to send two messages, then both can be recieved as the server is limiting here. Essentially, what will
+If a server is trying to send two messages, then both can be received as the server is limiting here. Essentially, what will
 occur is the client sending an output that does not reach anyone, which is perfectly fine.
  */
 
@@ -635,7 +635,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherGameInput(String input) {
-      if ((!input.contains("END"))&&(!input.contains("FINAL"))) {
+      if ((!input.contains("END")) && (!input.contains("FINAL"))) {
          if (!receivedOnce) {
             receivedOnce = true;
          }
@@ -938,10 +938,11 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseMotionListener(myMouseAdapter);
          GameComponent.initializeSize(MAX_X, MAX_Y);
          allComponents = new GameComponent[4];
-         pauseComponent = new PauseComponent((int) (412), (int) (312));
-         pauseComponent.setBounds(MAX_X / 2 - (int) (206), MAX_Y / 2 - (int) (156), (int) (412), (int) (312));
+         pauseComponent = new PauseComponent(800, 500, super.getClient());
+         pauseComponent.setBounds(MAX_X / 2 - 400, MAX_Y / 2 - 250, 800, 500);
          this.add(pauseComponent);
-         //this.setDoubleBuffered(true);
+
+         this.setDoubleBuffered(true);
          this.setVisible(true);
       }
 
@@ -1002,7 +1003,7 @@ public class Client extends JFrame implements WindowListener {
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
-                     currentPlayer.draw(g2, myPlayer.getXy());
+                     currentPlayer.draw(g2, myPlayer);
                   }
                }
             }
@@ -1061,7 +1062,6 @@ public class Client extends JFrame implements WindowListener {
                   pauseComponent.setVisible(pause);
                   if (pause) {
                      pauseComponent.requestFocus();
-                     System.out.println("Pause");
                   }
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
