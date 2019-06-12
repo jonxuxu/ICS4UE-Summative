@@ -80,9 +80,9 @@ public abstract class Player extends User {
      return PLAYER_LENGTH;
    }
 
-   public void draw(Graphics2D g2, int[] midXy) {
+   public void draw(Graphics2D g2, Player mainPlayer) {
      int[] playerXy = mainPlayer.getXy();
-     drawReal(g2, centerXy[0] + (int) ((xy[0] - midXy[0])) - (int) (PLAYER_LENGTH / 2), centerXy[1] + (int) ((xy[1] - midXy[1])) - (int) (PLAYER_LENGTH) / 2, (int) (PLAYER_LENGTH), (int) (PLAYER_LENGTH), desiredSpell);
+     drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (PLAYER_LENGTH / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (PLAYER_LENGTH) / 2, (int) (PLAYER_LENGTH), (int) (PLAYER_LENGTH), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
