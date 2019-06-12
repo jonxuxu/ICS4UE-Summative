@@ -1,7 +1,6 @@
 package client.gameUi;
 
 import client.Client;
-import client.ui.CustomLabel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -14,7 +13,8 @@ public class PauseComponent extends ThemedPanel {
    public Client client;
    public PauseComponent thisComponent;
    private final static Font titleFont = new Font("Cambria Math", Font.PLAIN, 35);
-   private final static Font headerFont = new Font("Cambria Math", Font.PLAIN, 25);
+   private final static Font headerFont1 = new Font("Cambria Math", Font.PLAIN, 25);
+   private final static Font headerFont2 = new Font("Cambria Math", Font.PLAIN, 22);
 
    public PauseComponent(int width, int height, Client client) {
       super();
@@ -33,34 +33,42 @@ public class PauseComponent extends ThemedPanel {
       JPanel mainPanel = new JPanel();
       mainPanel.setLayout(new BorderLayout());
       //mainPanel.setPreferredSize(new Dimension(width, (int)(height*0.8)));
-      mainPanel.setBackground(new Color(0,0,0,0));
+      mainPanel.setBackground(null);
          JPanel leftPanel = new JPanel();
-         leftPanel.setBackground(Color.red);
+         leftPanel.setBackground(null);
          leftPanel.setPreferredSize(new Dimension(width/2, (int)(height*0.8)));
          leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.PAGE_AXIS));
             JLabel volumeTitle = new JLabel("   Volume");
             volumeTitle.setForeground(Color.WHITE);
-            volumeTitle.setFont(headerFont);
-            JSlider masterVolume = new JSlider(JSlider.HORIZONTAL, 0, 100, 50); // Setting master gain
-            masterVolume.addChangeListener(new ChangeListener() {
-               @Override
-               public void stateChanged(ChangeEvent e) {
-                  JSlider source = (JSlider)e.getSource();
-                  if (!source.getValueIsAdjusting()) {
-                     float val = (float)(20f * Math.log10(source.getValue()/100.0));
-                     System.out.println(val);
-                     client.changeSoundLevel(0, val);
+            volumeTitle.setFont(headerFont1);
+            JPanel row1 = new JPanel();
+            row1.setBackground(null);
+               JLabel masterTitle = new JLabel("Master Gain");
+               masterTitle.setForeground(Color.WHITE);
+               masterTitle.setFont(headerFont2);
+               JSlider masterVolume = new JSlider(JSlider.HORIZONTAL, 0, 100, 50); // Setting master gain
+               masterVolume.addChangeListener(new ChangeListener() {
+                  @Override
+                  public void stateChanged(ChangeEvent e) {
+                     JSlider source = (JSlider)e.getSource();
+                     if (!source.getValueIsAdjusting()) {
+                        float val = (float)(20f * Math.log10(source.getValue()/100.0));
+                        System.out.println(val);
+                        client.changeSoundLevel(0, val);
+                     }
                   }
-               }
-            });
+               });
+               masterVolume.setBackground(null);
+            row1.add(masterTitle);
+            row1.add(masterVolume);
          leftPanel.add(volumeTitle);
-         leftPanel.add(masterVolume);
+         leftPanel.add(row1);
          JPanel rightPanel = new JPanel();
-         rightPanel.setBackground(Color.blue);
+         rightPanel.setBackground(null);
          rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
             JLabel graphicsTitle = new JLabel("   Graphics");
             graphicsTitle.setForeground(Color.WHITE);
-            graphicsTitle.setFont(headerFont);
+            graphicsTitle.setFont(headerFont1);
          rightPanel.add(graphicsTitle);
       mainPanel.add(leftPanel, BorderLayout.WEST);
       mainPanel.add(rightPanel, BorderLayout.CENTER);
