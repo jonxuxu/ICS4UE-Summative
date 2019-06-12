@@ -944,7 +944,7 @@ public class Client extends JFrame implements WindowListener {
          pauseComponent = new PauseComponent( (int)(412), (int)(312));
          pauseComponent.setBounds(MAX_GAME_X / 2 - (int)(206), MAX_GAME_Y / 2 - (int)(156), (int)(412), (int)(312));
 
-         //this.setDoubleBuffered(true);
+         this.setDoubleBuffered(true);
          this.setVisible(true);
       }
 
@@ -1005,7 +1005,7 @@ public class Client extends JFrame implements WindowListener {
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
-                     currentPlayer.draw(g2, myPlayer.getXy());
+                     currentPlayer.draw(g2, myPlayer.getXy(), xyAdjust);
                   }
                }
             }

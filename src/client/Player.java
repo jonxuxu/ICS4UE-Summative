@@ -27,11 +27,9 @@ public abstract class Player extends User {
    private int gold = 0;
    private boolean artifact;
    private int level = 0;
-   private int maxHealth;
-   private int health;
-   private int attack;
+   private int health, maxHealth;
+   private int attack, range;
    private int mobility = 20;
-   private int range;
    private boolean damaged;
    private int spriteID;
    private double flashlightAngle;
@@ -77,15 +75,21 @@ public abstract class Player extends User {
       this.xy[1] = y;
    }
 
-   public void draw(Graphics2D g2, int[] midXy) {
-      drawReal(g2, centerXy[0] + (int) ((xy[0] - midXy[0])) - (int) (120 / 2), centerXy[1] + (int) ((xy[1] - midXy[1])) - (int) (120) / 2, (int) (120), (int) (120), desiredSpell);
+   public void draw(Graphics2D g2, int[] playerXy, int[]xyAdjust) {
+      drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (120 / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (120) / 2, (int) (120), (int) (120), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
       // Draws status effects
 
      // Draws health bars
+     g2.setColor(Color.black);
+     g2.fillRect(xyAdjust[0] + playerXy[0] - 76, xyAdjust[1] + playerXy[1] - 69, 152, 8);
+     g2.setColor(Color.red);
+     g2.fillRect(xyAdjust[0] + playerXy[0] - 75, xyAdjust[1] + playerXy[1] - 70, 150 * health /  maxHealth, 6);
+
      // Draws name
+     g2.setColor(Colo);
    }
 
   /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
