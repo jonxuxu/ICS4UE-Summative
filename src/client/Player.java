@@ -37,9 +37,9 @@ public abstract class Player extends User {
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
    private boolean translated;
-   
+
    private boolean illuminated;
-   
+
    private boolean dead;
    private boolean invisible;
    private boolean uncollidable;
@@ -62,7 +62,7 @@ public abstract class Player extends User {
    public int[] getXy() {
       return (xy);
    }
-   
+
    public int getX(){
      return xy[0];
    }
@@ -193,7 +193,7 @@ public abstract class Player extends User {
      invisible = false;
      uncollidable = false;
    }
-   
+
    public boolean isDead(){
      return dead;
    }
@@ -203,7 +203,7 @@ public abstract class Player extends User {
    public boolean isUncollidable(){
      return uncollidable;
    }
-   
+
    public void setDead(boolean state){
      dead = state;
    }

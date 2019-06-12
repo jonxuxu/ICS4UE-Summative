@@ -527,13 +527,15 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      char initializer = input.charAt(0);
-      input = input.substring(1);
-      if (isParsable(initializer)) {
-         if (currentPanel == 0) {
-            errors[0] = Integer.parseInt(initializer + "");
-            if (initializer == '0') {
-               //Start the opening here
+      System.out.println(input);
+      if (!input.contains("END")) {
+         char initializer = input.charAt(0);
+         input = input.substring(1);
+         if (isParsable(initializer)) {
+            if (currentPanel == 0) {
+               errors[0] = Integer.parseInt(initializer + "");
+               if (initializer == '0') {
+                  //Start the opening here
 /*
                   cardLayout.show(mainContainer, PANEL_NAMES[1]);
                   ((IntroPanel) (menuPanels[1])).go();
@@ -542,93 +544,94 @@ public class Client extends JFrame implements WindowListener {
                   } catch (Exception E) {
                   }
 */
-               cardLayout.show(mainContainer, PANEL_NAMES[2]);
-               nextPanel = 2;
-            } else {
-               username = null;
-            }
-         } else if ((currentPanel == 3) || (currentPanel == 4)) {
-            errors[1] = Integer.parseInt(initializer + "");
-         } else if (currentPanel == 6) {
-            if (initializer == '0') {
-               loading = true;
-            } else {
-               errors[3] = Integer.parseInt(initializer + input);
-            }
-         }
-      } else if (initializer == 'A') {
-         String[] allPlayers = input.split(" ", -1);
-         myUser = new User(username);
-         for (String aPlayer : allPlayers) {
-            if ((testingBegin) && (myUser.getUsername().equals(aPlayer.substring(1)))) {
-               if (aPlayer.charAt(0) != '9') {
-                  myUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+                  cardLayout.show(mainContainer, PANEL_NAMES[2]);
+                  nextPanel = 2;
+               } else {
+                  username = null;
                }
-               onlineList.add(myUser);
-            } else {
-               User tempUser = new User(aPlayer.substring(1));
-               if (aPlayer.charAt(0) != '9') {
-                  tempUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+            } else if ((currentPanel == 3) || (currentPanel == 4)) {
+               errors[1] = Integer.parseInt(initializer + "");
+            } else if (currentPanel == 6) {
+               if (initializer == '0') {
+                  loading = true;
+               } else {
+                  errors[3] = Integer.parseInt(initializer + input);
                }
-               onlineList.add(tempUser);
             }
-         }
-         nextPanel = 6;
-         if (currentPanel == 3) {
-            host = true;
-         }
-      } else if (initializer == 'N') {
-         onlineList.add(new User(input));
-      } else if (initializer == 'X') {
-         for (int i = 0; i < onlineList.size(); i++) {
-            if (onlineList.get(i).getUsername().equals(input)) {
-               onlineList.remove(i);
+         } else if (initializer == 'A') {
+            String[] allPlayers = input.split(" ", -1);
+            myUser = new User(username);
+            for (String aPlayer : allPlayers) {
+               if ((testingBegin) && (myUser.getUsername().equals(aPlayer.substring(1)))) {
+                  if (aPlayer.charAt(0) != '9') {
+                     myUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+                  }
+                  onlineList.add(myUser);
+               } else {
+                  User tempUser = new User(aPlayer.substring(1));
+                  if (aPlayer.charAt(0) != '9') {
+                     tempUser.setTeam(Integer.parseInt(aPlayer.charAt(0) + ""));
+                  }
+                  onlineList.add(tempUser);
+               }
             }
-         }
-      } else if (initializer == 'B') {
-         waitingForImage = true;
-         players = new Player[onlineList.size()];
-         input = input.trim();
-         String[] classes = input.split(" ", -1);
-         for (int i = 0; i < onlineList.size(); i++) {
-            thisClass = classes[i];
-            //TODO: Add class stuff here;
-            if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("TimeMage")) {
-               players[i] = new TimeMage(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("Ghost")) {
-               players[i] = new Ghost(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
-               players[i] = new MobileSupport(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("Juggernaut")) {
-               players[i] = new Juggernaut(onlineList.get(i).getUsername());
-            } else if (thisClass.equals("Summoner")) {
-               players[i] = new Summoner(onlineList.get(i).getUsername());
-            } else {//TESTING MODE ONLY
-               players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+            nextPanel = 6;
+            if (currentPanel == 3) {
+               host = true;
             }
-            if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-               myPlayer = players[i];
-               myPlayerID = i;
+         } else if (initializer == 'N') {
+            onlineList.add(new User(input));
+         } else if (initializer == 'X') {
+            for (int i = 0; i < onlineList.size(); i++) {
+               if (onlineList.get(i).getUsername().equals(input)) {
+                  onlineList.remove(i);
+               }
             }
-            try {
-               teams[0].add(players[i]);
-               teams[onlineList.get(i).getTeam()].add(players[i]);
-               players[i].setTeam(onlineList.get(i).getTeam());
-            } catch (Exception e) {
-               teams[0].add(players[i]);
-               players[i].setTeam(0);
-               System.out.println("Testing mode error");
+         } else if (initializer == 'B') {
+            waitingForImage = true;
+            players = new Player[onlineList.size()];
+            input = input.trim();
+            String[] classes = input.split(" ", -1);
+            for (int i = 0; i < onlineList.size(); i++) {
+               thisClass = classes[i];
+               //TODO: Add class stuff here;
+               if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("TimeMage")) {
+                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Ghost")) {
+                  players[i] = new Ghost(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Juggernaut")) {
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+               } else if (thisClass.equals("Summoner")) {
+                  players[i] = new Summoner(onlineList.get(i).getUsername());
+               } else {//TESTING MODE ONLY
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+               }
+               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
+                  myPlayer = players[i];
+                  myPlayerID = i;
+               }
+               try {
+                  teams[0].add(players[i]);
+                  teams[onlineList.get(i).getTeam()].add(players[i]);
+                  players[i].setTeam(onlineList.get(i).getTeam());
+               } catch (Exception e) {
+                  teams[0].add(players[i]);
+                  players[i].setTeam(0);
+                  System.out.println("Testing mode error");
+               }
             }
-         }
-      } else if (initializer == 'P') { //Then leave the game
-         onlineList.clear();
-         nextPanel = 2;
-      } else if (initializer == 'E') { //This is similar to when E was sent, it is for switching teams
-         for (int i = 0; i < onlineList.size(); i++) {
-            if (onlineList.get(i).getUsername().equals(input.substring(1))) {
-               onlineList.get(i).setTeam(Integer.parseInt(input.charAt(0) + ""));
+         } else if (initializer == 'P') { //Then leave the game
+            onlineList.clear();
+            nextPanel = 2;
+         } else if (initializer == 'E') { //This is similar to when E was sent, it is for switching teams
+            for (int i = 0; i < onlineList.size(); i++) {
+               if (onlineList.get(i).getUsername().equals(input.substring(1))) {
+                  onlineList.get(i).setTeam(Integer.parseInt(input.charAt(0) + ""));
+               }
             }
          }
       }
@@ -983,6 +986,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
 
+
             for (int i = 0; i < aoes.size(); i++) {
                if (aoes.get(i).getID() == 0) {
                   darkness.subtract(aoes.get(i).getArea());
@@ -1047,6 +1051,7 @@ public class Client extends JFrame implements WindowListener {
                   pauseComponent.setVisible(pause);
                   if (pause) {
                      pauseComponent.requestFocus();
+                     System.out.println("Pause");
                   }
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
@@ -1065,8 +1070,8 @@ public class Client extends JFrame implements WindowListener {
       }
 
       public void resetXyAdjust() {
-         xyAdjust[0] =  (midXy[0] - myPlayer.getXy()[0]);
-         xyAdjust[1] =  (midXy[1] - myPlayer.getXy()[1]);
+         xyAdjust[0] = (midXy[0] - myPlayer.getXy()[0]);
+         xyAdjust[1] = (midXy[1] - myPlayer.getXy()[1]);
       }
    }
 }
