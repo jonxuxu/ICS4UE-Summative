@@ -33,6 +33,7 @@ public class LoginPanel extends MenuPanel {
          CLIENT.testName(nameField.getText());
       });
       nameField.setFont(super.getFont("main"));
+      System.out.println(MAX_X / 2);
       nameField.setBounds(MAX_X / 2 - (int) (45 ), MAX_Y / 5, (int) (90 ), (int) (19 ));
       this.add(nameField);
 

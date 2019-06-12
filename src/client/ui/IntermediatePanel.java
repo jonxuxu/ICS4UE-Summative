@@ -36,20 +36,17 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       this.setBackground(new Color(0, 0, 0));
       this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
       this.setVisible(true);
-      gamePanel= CLIENT.new GamePanel();
-      System.out.println(MAX_X);
-      gamePanel.setBounds(0, 0, this.getWidth(),this.getHeight());
-      System.out.println(this.getWidth()+" "+MAX_X);
-      gamePanel.setDimensions(this.getWidth(),this.getHeight());
-      chat = new ChatComponent(  MAX_X/6, MAX_Y/4, CLIENT);
-      chat.setBounds(0, MAX_Y*3/4, MAX_X/4, MAX_Y/4);
+      gamePanel = CLIENT.new GamePanel();
+      gamePanel.setBounds(0, 0, MAX_X, MAX_Y);
+      chat = new ChatComponent(MAX_X / 6, MAX_Y / 4, CLIENT);
+      chat.setBounds(0, MAX_Y * 3 / 4, MAX_X / 4, MAX_Y / 4);
 
       this.add(gamePanel, new Integer(1));
       this.add(chat, new Integer(2));
       this.setDoubleBuffered(true);
    }
 
-   public void toggleMode(){
+   public void toggleMode() {
       chat.requestFocus();
       /*
       chat.toggleMode();
