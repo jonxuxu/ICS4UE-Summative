@@ -11,6 +11,9 @@ import client.sound.*;
 import client.ui.*;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -68,7 +71,7 @@ public class Client extends JFrame implements WindowListener {
    private int[] mouseState = new int[3];
 
    // Assets
-   private soundEffectManager soundEffect = new soundEffectManager();
+   private soundEffectManager soundEffect = new soundEffectManager(this);
    private Clock time = new Clock(30);
 
    // Ui stuff
@@ -82,7 +85,7 @@ public class Client extends JFrame implements WindowListener {
    private int currentPanel, nextPanel; // 0 by default
    private boolean keyPressed = false;
    private char lastKeyTyped;
-
+   private float[] soundLevels = {0.5f, 0.5f, 0.5f};
 
    // Game states
    private ArrayList<User> onlineList = new ArrayList<User>();
@@ -381,6 +384,13 @@ public class Client extends JFrame implements WindowListener {
             intermediatePanel.toggleMode();
          }
       }
+   }
+
+   public void changeSoundLevel(int type, float level){
+      soundLevels[type] = level;
+   }
+   public float[] getSoundLevel(){
+      return soundLevels;
    }
 
    public void gameLogic() {
