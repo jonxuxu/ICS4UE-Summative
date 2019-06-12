@@ -70,6 +70,10 @@ public abstract class Player extends User {
       if (desiredSpell != -1) {
          desiredSpell = -1;
       }
+      // Draws status effects
+
+     // Draws health bars
+     // Draws name
    }
 
   /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {

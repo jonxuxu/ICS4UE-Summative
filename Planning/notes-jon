@@ -1,11 +1,12 @@
 TODO:
 - clean up client code more
-- player names, health, status
 - volume gain
 - background music
+- finish adding particles to projectiles
 
 
 Work log:
 
 June 10:
-- finish adding particles to projectiles
+- player names, health, status
+
