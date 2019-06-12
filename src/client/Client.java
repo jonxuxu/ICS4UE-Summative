@@ -249,6 +249,7 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (!waitingForImage) {
             if (input.ready()) {
+              //System.out.println("ML" + input.readLine());
                decipherMenuInput(input.readLine());
             }
          } else {
@@ -469,6 +470,7 @@ public class Client extends JFrame implements WindowListener {
       try {
          while (!inputReady) {
             if (input.ready()) {
+              //System.out.println("WI" + input.readLine().trim());
                inputReady = true;
                if (!gameBegin) {
                   if (!waitingForImage) {
@@ -529,7 +531,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      System.out.println(input);
+      //System.out.println("M" + input);
       if (!input.contains("END")) {
          char initializer = input.charAt(0);
          input = input.substring(1);
@@ -646,6 +648,9 @@ public class Client extends JFrame implements WindowListener {
          }
          projectiles.clear();
          aoes.clear();
+         for (int i = 0; i < players.length; i++){
+           players[i].clearStatuses();
+         }
          System.out.println(input);
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
@@ -681,7 +686,6 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
                   int id = Integer.parseInt(secondSplit[0]);
                   Player player = players[Integer.parseInt(secondSplit[1])];
-                  player.clearStatuses();
                   if (id == 2) {
                      player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
                   } else if (id == 3) {
@@ -1007,10 +1011,14 @@ public class Client extends JFrame implements WindowListener {
 
             g2.setColor(new Color(0, 0, 0, 150));
             g2.fill(darkness);
+            resetXyAdjust();
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
                      currentPlayer.draw(g2, myPlayer);
+                     for (int j = 0; j < currentPlayer.getStatuses().size(); j++) {
+                       currentPlayer.getStatuses().get(j).draw(g2, currentPlayer.getX(), currentPlayer.getY(), j);
+                     }
                   }
                }
             }
@@ -1040,12 +1048,6 @@ public class Client extends JFrame implements WindowListener {
             }
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
-            }
-            resetXyAdjust();
-            for (int i = 0; i < players.length; i++) {
-               for (int j = 0; j < players[i].getStatuses().size(); j++) {
-                  players[i].getStatuses().get(j).draw(g2, players[i].getX(), players[i].getY(), j);
-               }
             }
             //draw all components
 
