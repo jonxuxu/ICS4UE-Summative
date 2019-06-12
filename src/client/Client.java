@@ -184,6 +184,7 @@ public class Client extends JFrame implements WindowListener {
       teams[1] = new ArrayList<Player>();
       Projectile.setXyAdjust(xyAdjust);
       AOE.setXyAdjust(xyAdjust);
+      Status.setXyAdjust(xyAdjust);
    }
 
    public static void main(String[] args) {
@@ -654,8 +655,38 @@ public class Client extends JFrame implements WindowListener {
                      aoes.add(new AutoAOE(id, points));
                   }
                }
-            } else if (initializer == 'S') {
-               //Set the spell of the appropriate player to the correct one using setSpell
+            } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
+              int id = Integer.parseInt(secondSplit[0]);
+              Player player = players[Integer.parseInt(secondSplit[1])];
+              player.clearStatuses();
+              if (id == 2){
+                player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]),Integer.parseInt(secondSplit[3])));
+              } else if (id == 3){
+                player.addStatus(new GhostPassive(Integer.parseInt(secondSplit[2])));
+              } else if (id == 0){
+                player.addStatus(new DamageBuff());
+              } else if (id == 1){
+                //player.addStatus(new Dead());
+                player.setDead(true);
+              } else if (id == 4){
+                //player.addStatus(new Illuminated());//Talk with will
+              } else if (id == 5){
+                //player.addStatus(new Invisible());
+                player.setInvisible(true);
+              } else if (id == 8){
+                player.addStatus(new MSBuff());
+              } else if (id == 9){
+                player.addStatus(new ReduceDamage());
+              } else if (id == 10){
+                //player.addStatus(new Uncollidable());
+                player.setUncollidable(true);
+              } else if (id == 11){
+                player.addStatus(new Unstoppable());
+              } else if (id == 12){
+                player.addStatus(new Stun());
+              } else if (id == 13) {
+                player.addStatus(new Shielded());
+              }
             } else if (initializer == 'W') { //Walking
                players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
             } else if (initializer == 'L') {// Flash light
@@ -691,9 +722,10 @@ public class Client extends JFrame implements WindowListener {
       }
       players[playerID].setDamaged(Boolean.parseBoolean(data[13]));
       players[playerID].setIlluminated(Boolean.parseBoolean(data[14]));
+      /*
       for (int j = 16; j < 16 + Integer.parseInt(data[15]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
-      }
+      }*/
       //Turn off flashlight
       players[playerID].setFlashlightOn(false);
    }
@@ -707,9 +739,10 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setArtifact(Boolean.parseBoolean(data[5]));
       players[playerID].setDamaged(Boolean.parseBoolean(data[6]));
       players[playerID].setIlluminated(Boolean.parseBoolean(data[7]));
+      /*
       for (int j = 9; j < 9 + Integer.parseInt(data[8]); j++) {
          players[playerID].addStatus(Integer.parseInt(data[j]));
-      }
+      }*/
    }
 
    public void repaintPanels() {
@@ -994,6 +1027,12 @@ public class Client extends JFrame implements WindowListener {
             }
             for (int i = 0; i < aoes.size(); i++) {
                aoes.get(i).draw(g2);
+            }
+            resetXyAdjust();
+            for (int i = 0; i < players.length; i++){
+              for (int j = 0; j < players[i].getStatuses().size(); j++){
+                players[i].getStatuses().get(j).draw(g2, players[i].getX(), players[i].getY(), j);
+              }
             }
             //draw all components
 

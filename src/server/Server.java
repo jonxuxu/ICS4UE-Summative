@@ -515,6 +515,7 @@ public class Server {
                   StringBuilder[] otherPlayers = new StringBuilder[playerNum];
                   StringBuilder projectileOutput = new StringBuilder();
                   StringBuilder aoeOutput = new StringBuilder();
+                  StringBuilder statusOutput = new StringBuilder();
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
                         mainPlayer[i] = new StringBuilder();
@@ -523,6 +524,7 @@ public class Server {
                         otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
+                        ArrayList<Status> theseStatuses = players[i].getAllStatuses();
                         for (int j = 0; j < theseProjectiles.size(); j++) {
                            projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
@@ -548,6 +550,22 @@ public class Server {
                               }
                               aoeOutput.append(" ");
                            }
+                        }
+                        int ghostPassiveCount = 0;
+                        for (int j = 0; j < theseStatuses.size(); j++) {
+                          if (theseStatuses.get(j) instanceof GhostE){
+                            statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE)theseStatuses.get(j)).getX() + "," + ((GhostE)theseStatuses.get(j)).getY() + " ");
+                          } else if (theseStatuses.get(j) instanceof GhostPassive){
+                            ghostPassiveCount++;
+                          } else if (theseStatuses.get(j).getID() != -1){
+                            statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
+                          }
+                        }
+                        //if (ghostPassiveCount > 0){
+                          statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
+                        //}
+                        if (players[i].getShieldsSize() > 0){
+                          statusOutput.append("S" + 13 + "," + i + " ");
                         }
                      }
                   }
@@ -585,6 +603,14 @@ public class Server {
                      if (players[i] != null) {
                         if (!aoeOutput.toString().isEmpty()) {
                            outputString[i].append(aoeOutput);
+                        }
+                     }
+                  }
+                  //Write out all the Statuses
+                  for (int i = 0; i < playerNum; i++) {
+                     if (players[i] != null) {
+                        if (!statusOutput.toString().isEmpty()) {
+                           outputString[i].append(statusOutput);
                         }
                      }
                   }
