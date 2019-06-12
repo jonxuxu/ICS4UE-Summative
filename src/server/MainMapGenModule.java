@@ -151,6 +151,7 @@ class MainMapGenModule {
    public void sendMap(Socket socket) {
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
+         socket.getOutputStream().flush();
       } catch (IOException e) {
          e.printStackTrace();
       }
