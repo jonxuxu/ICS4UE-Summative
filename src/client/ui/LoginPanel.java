@@ -34,14 +34,14 @@ public class LoginPanel extends MenuPanel {
       });
       nameField.setFont(super.getFont("main"));
       System.out.println(MAX_X / 2);
-      nameField.setBounds(MAX_X / 2 - (int) (100), MAX_Y / 5, (200), (MAIN_FONT.getSize() + 20));
+      nameField.setBounds(MAX_X / 2 - 100, MAX_Y / 5, 200, (MAIN_FONT.getSize() + 20));
       this.add(nameField);
 
       testButton.addActionListener((ActionEvent e) -> {
          CLIENT.testingBegin();
       });
 
-      testButton.setBounds(MAX_X / 2 - (int) (100), MAX_Y * 2 / 5, (200), (MAIN_FONT.getSize() + 20));
+      testButton.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, (MAIN_FONT.getSize() + 20));
       this.add(testButton);
       //Basic visuals
       this.setDoubleBuffered(true);
@@ -59,17 +59,17 @@ public class LoginPanel extends MenuPanel {
       //Begin drawing
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
-      g2.drawString("Login", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2.0), (int) (MAX_Y / 5.0 - 5 ));
+      g2.drawString("Login", (MAX_X - g2.getFontMetrics().stringWidth("Login")) / 2, MAX_Y / 6);
       g2.setFont(MAIN_FONT);
       int tempConnectionState = CLIENT.getConnectionState();
       if (tempConnectionState == 0) {
-         g2.drawString("Connecting...", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2.0), (int) (MAX_Y * 5 / 16.0));
+         g2.drawString("Connecting...", (MAX_X - g2.getFontMetrics().stringWidth("Connecting...")) / 2, MAX_Y * 5 / 16);
       } else if (tempConnectionState == 1) {
-         g2.drawString("Connected", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2.0), (int) (MAX_Y * 5 / 16.0));
+         g2.drawString("Connected", (MAX_X - g2.getFontMetrics().stringWidth("Connected")) / 2, MAX_Y * 5 / 16);
       } else {
-         g2.drawString("Unable to Connect", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2.0), (int) (MAX_Y * 5 / 16.0));
+         g2.drawString("Unable to Connect", (MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2, MAX_Y * 5 / 16);
       }
       //Write error
-      writeError(g2, MAX_X / 2, (int) (MAX_Y * 3 / 8.0));
+      writeError(g2, MAX_X / 2, MAX_Y * 3 / 8);
    }
 }
