@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class WaitingPanel extends MenuPanel { //State=6
    private Graphics2D g2;
-   private final double SCALING = super.getScaling();
+
    private final int MAX_X = super.getWidth();
    private final int MAX_Y = super.getHeight();
    private final Client CLIENT = super.getClient();
@@ -18,23 +18,23 @@ public class WaitingPanel extends MenuPanel { //State=6
 
    private boolean buttonAdd = true;
    private boolean buttonRemove = true;
-   private CustomButton readyGameButton = new CustomButton("Begin game", SCALING);
-   private CustomButton backButton = new CustomButton("Back", SCALING);
-   private CustomButton teamOneButton = new CustomButton("Team one", SCALING);
-   private CustomButton teamTwoButton = new CustomButton("Team two", SCALING);
+   private CustomButton readyGameButton = new CustomButton("Begin game");
+   private CustomButton backButton = new CustomButton("Back");
+   private CustomButton teamOneButton = new CustomButton("Team one");
+   private CustomButton teamTwoButton = new CustomButton("Team two");
 
    //Class pedestals
-   private CustomButton SAFE_MARKSMAN_PEDESTAL= new CustomButton("Archer", SCALING);
-   private CustomButton GHOST_PEDESTAL= new CustomButton("Ghost", SCALING);
-   private CustomButton SUMMONER_PEDESTAL= new CustomButton("Summoner", SCALING);
-   private CustomButton JUGGERNAUT_PEDESTAL= new CustomButton("Juggernaut", SCALING);
-   private CustomButton TIME_MAGE_PEDESTAL= new CustomButton("Time Mage", SCALING);
-   private CustomButton MOBILE_SUPPORT_PEDESTAL= new CustomButton("Mobile Support", SCALING);
+   private CustomButton SAFE_MARKSMAN_PEDESTAL = new CustomButton("Archer");
+   private CustomButton GHOST_PEDESTAL = new CustomButton("Ghost");
+   private CustomButton SUMMONER_PEDESTAL = new CustomButton("Summoner");
+   private CustomButton JUGGERNAUT_PEDESTAL = new CustomButton("Juggernaut");
+   private CustomButton TIME_MAGE_PEDESTAL = new CustomButton("Time Mage");
+   private CustomButton MOBILE_SUPPORT_PEDESTAL = new CustomButton("Mobile Support");
 
 
    //Mouse
    private int[] mouseState = CLIENT.getMouseState();
-   private boolean justPressed=false;
+   private boolean justPressed = false;
 
 
    private ArrayList<User> onlineList;
@@ -42,7 +42,7 @@ public class WaitingPanel extends MenuPanel { //State=6
 
    public WaitingPanel() {
       // Initializing buttons
-      readyGameButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 8 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
+      readyGameButton.setBounds(MAX_X / 2 - (int) (65), MAX_Y * 8 / 10, (int) (130), (int) (19));
       readyGameButton.addActionListener((ActionEvent e) -> {
          CLIENT.ready();
       });
@@ -50,20 +50,20 @@ public class WaitingPanel extends MenuPanel { //State=6
       teamOneButton.addActionListener((ActionEvent e) -> {
          CLIENT.setTeam(0);
       });
-      teamOneButton.setBounds(MAX_X / 2 - (int) ((65 + 200) * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
+      teamOneButton.setBounds(MAX_X / 2 - (int) ((65 + 200)), MAX_Y * 7 / 10, (int) (130), (int) (19));
       this.add(teamOneButton);
 
       teamTwoButton.addActionListener((ActionEvent e) -> {
          CLIENT.setTeam(1);
       });
-      teamTwoButton.setBounds(MAX_X / 2 - (int) ((65 - 200) * SCALING), MAX_Y * 7 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
+      teamTwoButton.setBounds(MAX_X / 2 - (int) ((65 - 200)), MAX_Y * 7 / 10, (int) (130), (int) (19));
       this.add(teamTwoButton);
 
       backButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(2);
          CLIENT.leaveGame();
       });
-      backButton.setBounds(MAX_X / 2 - (int) (65 * SCALING), MAX_Y * 9 / 10, (int) (130 * SCALING), (int) (19 * SCALING));
+      backButton.setBounds(MAX_X / 2 - (int) (65), MAX_Y * 9 / 10, (int) (130), (int) (19));
       this.add(backButton);
 
       //TODO: Make into buttons
@@ -71,37 +71,37 @@ public class WaitingPanel extends MenuPanel { //State=6
       SAFE_MARKSMAN_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Archer");
       });
-      SAFE_MARKSMAN_PEDESTAL.setBounds(MAX_X / 2 - (int) (290 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      SAFE_MARKSMAN_PEDESTAL.setBounds(MAX_X / 2 - (int) (290), MAX_Y * 3 / 5, (int) (100), (int) (15));
       this.add(SAFE_MARKSMAN_PEDESTAL);
 
       GHOST_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Ghost");
       });
-      GHOST_PEDESTAL.setBounds(MAX_X / 2 - (int) (170 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      GHOST_PEDESTAL.setBounds(MAX_X / 2 - (int) (170), MAX_Y * 3 / 5, (int) (100), (int) (15));
       this.add(GHOST_PEDESTAL);
 
       TIME_MAGE_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("TimeMage");
       });
-      TIME_MAGE_PEDESTAL.setBounds(MAX_X / 2 - (int) (50 * SCALING), MAX_Y * 3 /5, (int) (100 * SCALING), (int) (15 * SCALING));
+      TIME_MAGE_PEDESTAL.setBounds(MAX_X / 2 - (int) (50), MAX_Y * 3 / 5, (int) (100), (int) (15));
       this.add(TIME_MAGE_PEDESTAL);
 
       JUGGERNAUT_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Juggernaut");
       });
-      JUGGERNAUT_PEDESTAL.setBounds(MAX_X / 2 + (int) (70 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      JUGGERNAUT_PEDESTAL.setBounds(MAX_X / 2 + (int) (70), MAX_Y * 3 / 5, (int) (100), (int) (15));
       this.add(JUGGERNAUT_PEDESTAL);
 
       SUMMONER_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Summoner");
       });
-      SUMMONER_PEDESTAL.setBounds(MAX_X / 2 + (int) (190 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      SUMMONER_PEDESTAL.setBounds(MAX_X / 2 + (int) (190), MAX_Y * 3 / 5, (int) (100), (int) (15));
       this.add(SUMMONER_PEDESTAL);
 
       MOBILE_SUPPORT_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("MobileSupport");
       });
-      MOBILE_SUPPORT_PEDESTAL.setBounds(MAX_X / 2 + (int) (310 * SCALING), MAX_Y * 3 / 5, (int) (100 * SCALING), (int) (15 * SCALING));
+      MOBILE_SUPPORT_PEDESTAL.setBounds(MAX_X / 2 + (int) (310), MAX_Y * 3 / 5, (int) (100), (int) (15));
       this.add(MOBILE_SUPPORT_PEDESTAL);
 
       //Basic visuals
@@ -144,19 +144,19 @@ public class WaitingPanel extends MenuPanel { //State=6
          players.append(onlineList.get(i).getUsername() + ", ");
          if (onlineList.get(i).getTeam() != -1) {
             if (onlineList.get(i).getTeam() == 0) {
-               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 + 200) * SCALING), (int) (19 * SCALING) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift1 + 1));
+               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 + 200)), (int) (19) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift1 + 1));
                shift1++;
             } else if (onlineList.get(i).getTeam() == 1) {
-               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 - 200) * SCALING), (int) (19 * SCALING) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift2 + 1));
+               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - (int) ((65 - 200)), (int) (19) + MAX_Y * 7 / 10 + metrics.getHeight() * (shift2 + 1));
                shift2++;
             }
          }
       }
       if (!onlineList.isEmpty()) {
-         g2.drawString(players.toString().substring(0, players.toString().lastIndexOf(",")), (int) (2 * SCALING), (int) (10 * SCALING));
+         g2.drawString(players.toString().substring(0, players.toString().lastIndexOf(",")), (int) (2), (int) 15);
       }
-      g2.drawString("Server name: "+CLIENT.getGameName(), (int) (2 * SCALING), (int) (10 * SCALING)+metrics.getHeight());
-      g2.drawString("Server password: "+CLIENT.getGamePassword(), (int) (2 * SCALING), (int) (10 * SCALING)+2*metrics.getHeight());
+      g2.drawString("Server name: " + CLIENT.getGameName(), (int) (2), (int) (15) + metrics.getHeight());
+      g2.drawString("Server password: " + CLIENT.getGamePassword(), (int) (2), (int) (15) + 2 * metrics.getHeight());
       if (CLIENT.getLoading()) {
          if (buttonRemove) {
             this.remove(readyGameButton);

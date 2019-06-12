@@ -69,7 +69,7 @@ public abstract class Player extends User implements CanIntersect {
    //Lighting
    private boolean flashlightOn;
    private Polygon flashlightBeam = new Polygon();
-   private int FLASHLIGHT_RADIUS = 200;
+   private int FLASHLIGHT_RADIUS = 600;
    private Polygon test = new Polygon();
    private static CustomPolygon[] constantHitboxes;
    private CustomPolygon lightingHitbox;

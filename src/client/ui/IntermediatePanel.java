@@ -20,14 +20,12 @@ import java.awt.Font;
  */
 
 public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
-   private final double SCALING;
    private int MAX_X, MAX_Y;
    private Client.GamePanel gamePanel;
    private ChatComponent chat;
    private Client CLIENT;
 
-   public IntermediatePanel(int MAX_X, int MAX_Y, double SCALING, Client CLIENT) {
-      this.SCALING = SCALING;
+   public IntermediatePanel(int MAX_X, int MAX_Y, Client CLIENT) {
       this.MAX_X = MAX_X;
       this.MAX_Y = MAX_Y;
       this.CLIENT = CLIENT;
@@ -43,7 +41,7 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
       gamePanel.setBounds(0, 0, this.getWidth(),this.getHeight());
       System.out.println(this.getWidth()+" "+MAX_X);
       gamePanel.setDimensions(this.getWidth(),this.getHeight());
-      chat = new ChatComponent(SCALING,  MAX_X/6, MAX_Y/4, CLIENT);
+      chat = new ChatComponent(  MAX_X/6, MAX_Y/4, CLIENT);
       chat.setBounds(0, MAX_Y*3/4, MAX_X/4, MAX_Y/4);
 
       this.add(gamePanel, new Integer(1));

@@ -76,7 +76,7 @@ class MainMapGenModule extends JFrame{
       this.setCenter(g);
       
       Graphics2D g2 = (Graphics2D) (g);
-      g2.scale(0.06, 0.06);
+      g2.(0.06, 0.06);
      
       if (!gen.testingState) {
 	      g.setColor(Color.BLUE);

@@ -23,15 +23,13 @@ public class CustomMouseAdapter extends MouseAdapter {
    //The following booleans control the state of the mouse
    private int rotation;
    private boolean rotated = false;
-   private double SCALING;
    private int[] centerXy;
    private boolean[] leftRight = new boolean[2];
 
    private Client main;
 
-   public CustomMouseAdapter(Client main, double SCALING, int[] centerXy) {
+   public CustomMouseAdapter(Client main, int[] centerXy) {
       this.main = main;
-      this.SCALING = SCALING;
       this.centerXy = centerXy;
    }
 
@@ -182,20 +180,11 @@ public class CustomMouseAdapter extends MouseAdapter {
     * @return pressed, a boolean
     */
 
-   /*
-      public double getAngleOfClick() {
-         return (Math.atan2(centerXy[1] - clickXy[1], clickXy[0] - centerXy[0])); //REMEMBER, MATH A TAN2 IS Y AND THEN X
-      }
-
-      public double getLengthOfClick() {
-         return (Math.sqrt(Math.pow((centerXy[0] - clickXy[0]) / SCALING, 2) + Math.pow((centerXy[1] - clickXy[1]) / SCALING, 2)));
-      }
-   */
    // TODO: Streamline for even driven w/ kameron
    public int[] getDispXy() { //Returns the displacement from the top left corner in game coordinates
       int[] dispXy = new int[2];
-      dispXy[0] = (int) ((state[0] - centerXy[0]) / SCALING);
-      dispXy[1] = (int) ((state[1] - centerXy[1]) / SCALING);
+      dispXy[0] = (int) ((state[0] - centerXy[0]));
+      dispXy[1] = (int) ((state[1] - centerXy[1]));
       return (dispXy);
    }
 
