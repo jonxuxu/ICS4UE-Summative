@@ -936,7 +936,7 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseMotionListener(myMouseAdapter);
          GameComponent.initializeSize(MAX_X, MAX_Y);
          allComponents = new GameComponent[4];
-         pauseComponent = new PauseComponent(800, 500);
+         pauseComponent = new PauseComponent(800, 500, super.getClient());
          pauseComponent.setBounds(MAX_X / 2 - 400, MAX_Y / 2 - 250, 800, 500);
          this.add(pauseComponent);
 
@@ -1047,7 +1047,6 @@ public class Client extends JFrame implements WindowListener {
                   pauseComponent.setVisible(pause);
                   if (pause) {
                      pauseComponent.requestFocus();
-                     System.out.println("Pause");
                   }
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
