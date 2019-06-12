@@ -60,8 +60,8 @@ public class Client extends JFrame implements WindowListener {
    private boolean receivedOnce;//Determines if a message was received
 
    // Screen stuff
-   private final int DESIRED_X = 1920;
-   private final int DESIRED_Y = 1080;
+   private final int DESIRED_X = 1600;
+   private final int DESIRED_Y = 900;
    private int[] xyAdjust = new int[2];
    private int MAX_Y, MAX_X;
    private double INTRO_SCALING;
