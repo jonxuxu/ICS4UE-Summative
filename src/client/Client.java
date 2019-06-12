@@ -400,8 +400,8 @@ public class Client extends JFrame implements WindowListener {
                }
                AffineTransform tx = new AffineTransform();
                tx.translate(xyAdjust[0], xyAdjust[1]);
-               darkFog = fog.getFog(2).createTransformedArea(tx);
-               lightFog = fog.getExplored(2).createTransformedArea(tx);
+          /*     darkFog = fog.getFog(2).createTransformedArea(tx);
+               lightFog = fog.getExplored(2).createTransformedArea(tx);*/
                drawn = false;
             }
             // TODO: Update/improve when kameron is done
@@ -646,6 +646,7 @@ public class Client extends JFrame implements WindowListener {
          }
          projectiles.clear();
          aoes.clear();
+         System.out.println(input);
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
             char initializer = firstInput.charAt(0);
@@ -1028,11 +1029,11 @@ public class Client extends JFrame implements WindowListener {
             //Creating shapes
 
             //Draws fog
-            g2.setColor(Color.black); //Unexplored
+         /*   g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
             g2.fill(lightFog);
-            drawn = true;
+            drawn = true;*/
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
                projectiles.get(i).draw(g2);
