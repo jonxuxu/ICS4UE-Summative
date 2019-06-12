@@ -71,12 +71,12 @@ public class JoinPanel extends MenuPanel { //State =4
       drawBackground(g2);
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
-      g2.drawString("Join Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2.0), (MAX_Y / 5));
+      g2.drawString("Join Server", (MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2, (MAX_Y / 5));
       //Server name
       g2.setFont(MAIN_FONT);
-      g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y * 3 / 10 - MAIN_FONT.getSize() + 20));
+      g2.drawString("Server Name", (MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2, (MAX_Y * 3 / 10 - MAIN_FONT.getSize() + 20));
       //Server password
-      g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 2 / 5 - MAIN_FONT.getSize() + 20));
+      g2.drawString("Server Password", (MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2, (MAX_Y * 2 / 5 - MAIN_FONT.getSize() + 20));
       //Write error
       writeError(g2, MAX_X / 2, (int) (MAX_Y * 9.0 / 16.0));
       //Draws particles
