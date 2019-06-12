@@ -911,16 +911,14 @@ public class Client extends JFrame implements WindowListener {
          pauseComponent = new PauseComponent( (int)(412), (int)(312));
          pauseComponent.setBounds(MAX_GAME_X / 2 - (int)(206), MAX_GAME_Y / 2 - (int)(156), (int)(412), (int)(312));
 
-         this.add(pauseComponent);
-         this.setDoubleBuffered(true);
+         //this.setDoubleBuffered(true);
          this.setVisible(true);
       }
 
       @Override
       public void paintComponent(Graphics g) {
-         g2 = (Graphics2D) g;
-         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
          super.paintComponent(g);
+         g2 = (Graphics2D) g;
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new BottomComponent(myPlayer);
             allComponents[1] = new MinimapComponent(fog, players, myPlayerID);
@@ -982,7 +980,13 @@ public class Client extends JFrame implements WindowListener {
             // Updating fog
             resetXyAdjust();
 
-
+            for (int i = 0; i < players.length; i++) {
+               if (players[i] != null) {
+                  if (players[i].getTeam() == myTeam) {
+                     fog.scout(players[i].getXy());
+                  }
+               }
+            }
 
             //Creating shapes
 
@@ -1006,7 +1010,10 @@ public class Client extends JFrame implements WindowListener {
                if (lastKeyTyped == 27) { // Esc key
                   pause = !pause;
                   pauseComponent.setVisible(pause);
-                  System.out.println("Pause");
+                  if(pause){
+                     pauseComponent.requestFocus();
+                     System.out.println("Pause");
+                  }
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
                   System.out.println("Debug mode");
@@ -1019,7 +1026,6 @@ public class Client extends JFrame implements WindowListener {
                gameComponent.draw(g2);
             }
          }
-         //g2.dispose();
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          frames++;
       }

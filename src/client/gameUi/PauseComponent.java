@@ -17,6 +17,7 @@ public class PauseComponent extends ThemedPanel {
       this.add(new JButton("Cust me"), BorderLayout.SOUTH);
 
       this.setVisible(false);
+
    }
 
 }
