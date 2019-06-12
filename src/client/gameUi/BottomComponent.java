@@ -79,7 +79,10 @@ public class BottomComponent extends GameComponent {
       */
       //Health bar
       g2.setColor(new Color(190, 40, 40));
-      g2.fillRect(MAX_X/2-260, (MAX_Y-20), (121  * myPlayer.getHealth() /  myPlayer.getMaxHealth()), (5));
+      if (myPlayer.getMaxHealth()!=0) {
+         g2.fillRect(MAX_X / 2 - 260, (MAX_Y - 20), (121 * myPlayer.getHealth() / myPlayer.getMaxHealth()), (5));
+      }
+      //g2.fillRect(MAX_X/2-260, (MAX_Y-20), (121  * myPlayer.getHealth() /  myPlayer.getMaxHealth()), (5));
       g2.setColor(Color.white);
       g2.setFont(STATS_FONT);
       if (myPlayer!=null) {
