@@ -149,6 +149,8 @@ public class Client extends JFrame implements WindowListener {
       Dimension actualSize = this.getContentPane().getSize();
       MAX_X = actualSize.width;
       MAX_Y = actualSize.height;
+      //System.out.println(MAX_X);
+      //System.out.println(MAX_Y);
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
@@ -941,8 +943,9 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[4];
-         pauseComponent = new PauseComponent( (int)(412), (int)(312));
-         pauseComponent.setBounds(MAX_GAME_X / 2 - (int)(206), MAX_GAME_Y / 2 - (int)(156), (int)(412), (int)(312));
+         pauseComponent = new PauseComponent( 800, 500);
+         pauseComponent.setBounds(MAX_GAME_X/2 - 400, MAX_GAME_Y/2 - 250, 800, 500);
+         this.add(pauseComponent);
 
          this.setDoubleBuffered(true);
          this.setVisible(true);
@@ -1005,7 +1008,7 @@ public class Client extends JFrame implements WindowListener {
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
-                     currentPlayer.draw(g2, myPlayer.getXy(), xyAdjust);
+                     currentPlayer.draw(g2, myPlayer);
                   }
                }
             }

@@ -75,7 +75,9 @@ public abstract class Player extends User {
       this.xy[1] = y;
    }
 
-   public void draw(Graphics2D g2, int[] playerXy, int[]xyAdjust) {
+   public void draw(Graphics2D g2, Player mainPlayer) {
+     int[] playerXy = mainPlayer.getXy();
+
       drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (120 / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (120) / 2, (int) (120), (int) (120), desiredSpell);
       if (desiredSpell != -1) {
          desiredSpell = -1;
@@ -83,13 +85,20 @@ public abstract class Player extends User {
       // Draws status effects
 
      // Draws health bars
+     g2.setColor(Color.white);
+     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 76, centerXy[1] + xy[1] - playerXy[1] - 71, 152, 8);
      g2.setColor(Color.black);
-     g2.fillRect(xyAdjust[0] + playerXy[0] - 76, xyAdjust[1] + playerXy[1] - 69, 152, 8);
+     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150, 6);
      g2.setColor(Color.red);
-     g2.fillRect(xyAdjust[0] + playerXy[0] - 75, xyAdjust[1] + playerXy[1] - 70, 150 * health /  maxHealth, 6);
+     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150 * health /  maxHealth, 6);
 
      // Draws name
-     g2.setColor(Colo);
+     if(getTeam() == mainPlayer.getTeam()){
+       g2.setColor(Color.green);
+     } else {
+       g2.setColor(Color.red);
+     }
+     g2.drawString(getUsername(), centerXy[0] + xy[0] - playerXy[0] - g2.getFontMetrics().stringWidth(getUsername())/2, centerXy[1] + xy[1] - playerXy[1] - 80);
    }
 
   /* public void drawFlashlight(Graphics2D g2, int [] xyAdjust) {
