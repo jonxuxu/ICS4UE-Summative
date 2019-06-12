@@ -249,8 +249,9 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (!waitingForImage) {
             if (input.ready()) {
-              //System.out.println("ML" + input.readLine());
-               decipherMenuInput(input.readLine());
+               String tempString = input.readLine().trim();
+               System.out.println("ML" + tempString);
+               decipherMenuInput(tempString);
             }
          } else {
             waitForInput();
@@ -474,12 +475,15 @@ public class Client extends JFrame implements WindowListener {
                inputReady = true;
                if (!gameBegin) {
                   if (!waitingForImage) {
-                     decipherMenuInput(input.readLine().trim());
+                     String inputString = input.readLine().trim();
+                     System.out.println("WI" + inputString);
+                     decipherMenuInput(inputString);
                   } else {
                      sheet = ImageIO.read(socket.getInputStream());
                      waitingForImage = false;
                      nextPanel = 7;//Sends to the game screen
                      gameBegin = true;
+                     System.out.println("DONNEEE");
                   }
                }
             }
@@ -531,7 +535,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherMenuInput(String input) {
-      //System.out.println("M" + input);
+      System.out.println("MI" + input);
       if (!input.contains("END")) {
          char initializer = input.charAt(0);
          input = input.substring(1);
@@ -592,6 +596,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
          } else if (initializer == 'B') {
+            System.out.println("FWFWFWF");
             waitingForImage = true;
             players = new Player[onlineList.size()];
             input = input.trim();
@@ -642,6 +647,7 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherGameInput(String input) {
+      System.out.println("G" + input);
       if ((!input.contains("END")) && (!input.contains("FINAL"))) {
          if (!receivedOnce) {
             receivedOnce = true;
@@ -651,7 +657,6 @@ public class Client extends JFrame implements WindowListener {
          for (int i = 0; i < players.length; i++){
            players[i].clearStatuses();
          }
-         System.out.println(input);
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
             char initializer = firstInput.charAt(0);
@@ -790,7 +795,7 @@ public class Client extends JFrame implements WindowListener {
 
    public void connect() {
       try {
-         socket = new Socket("localhost", 5001);//localhost
+         socket = new Socket("localhost", 5002);//localhost
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -1002,7 +1007,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             int[] xP = {(int) (100), (int) (200), (int) (300), (int) (400), (int) (500)};
-             int[] yP = {(int) (100), (int) (200), (int) (200), (int) (100), 0};
+            int[] yP = {(int) (100), (int) (200), (int) (200), (int) (100), 0};
             Polygon test = new Polygon(xP, yP, 5);
             test.translate(xyAdjust[0], xyAdjust[1]);
             g2.setColor(Color.black);

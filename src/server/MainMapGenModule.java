@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
-class MainMapGenModule {
+class MainMapGenModule extends JFrame{
    private Disp display;
    private MapGen gen;
 
@@ -33,6 +33,8 @@ class MainMapGenModule {
       String config = "";
 
       gen = new MapGen(7500, 5000, ellipticalAdjust);
+      System.out.println("yay1");
+      config = "NO";
 
       if (config == "test") {
          gen.configueScenario1();
@@ -42,12 +44,14 @@ class MainMapGenModule {
          gen.tetherAllNodes2();
          gen.makeNodesElliptical();
          gen.generateRegions();
-         gen.smokeTrees(7500, 1000, 0, false);
-         gen.smokeRocks(7500, 100, true);
+         gen.generateCrevices(2);
+         gen.smokeTrees(7500, 200, 0, false);
+         System.out.println("generation");
+         gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
          gen.genClearingByNum(8, 500);
          gen.purgeRedundanices();
-         gen.generateCrevices(2);
+
       }
       display = new Disp();
       //this.add(display);
@@ -124,10 +128,10 @@ class MainMapGenModule {
                this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x,
                        gen.nodes.get(i).location.y, g);
             } else {
-               this.fillOvalCustom(50, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
+               //this.fillOvalCustom(50, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
             }
             for (int j = 0; j < gen.nodes.get(i).connections.size(); j++) {
-               this.drawLineCustom(gen.nodes.get(i).location, gen.nodes.get(i).connections.get(j), g);
+               //this.drawLineCustom(gen.nodes.get(i).location, gen.nodes.get(i).connections.get(j), g);
             }
 
          }
@@ -145,16 +149,22 @@ class MainMapGenModule {
                g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
             }
          }
+        /* try {
+            ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
+         } catch (Exception e) {
+            System.out.println("this is bad");
+         }*/
       }
    }
 
    public void sendMap(Socket socket) {
+      System.out.println("reee");
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
-         socket.getOutputStream().flush();
       } catch (IOException e) {
          e.printStackTrace();
       }
+      System.out.println("e");
    }
 //Make it extend from JPanel
   /*    public void paintComponent(Graphics g) {
