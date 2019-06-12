@@ -30,7 +30,7 @@ import java.util.ArrayList;
 Here is how the messages work.
 First, the server must send a message to the client. The client immediately deciphers and sends it's own message, but it is
 limited by waiting for the server to send a message again. However, in the menu this is irrelevant
-If a server is trying to send two messages, then both can be received as the server is limiting here. Essentially, what will
+If a server is trying to send two messages, then both can be recieved as the server is limiting here. Essentially, what will
 occur is the client sending an output that does not reach anyone, which is perfectly fine.
  */
 
@@ -148,10 +148,12 @@ public class Client extends JFrame implements WindowListener {
       Dimension actualSize = this.getContentPane().getSize();
       MAX_X = actualSize.width;
       MAX_Y = actualSize.height;
+      //System.out.println(MAX_X);
+      //System.out.println(MAX_Y);
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setLocationRelativeTo(null);
       this.setFocusable(true); //Necessary so that the buttons and stuff do not take over the focus
-      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+      //this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
       //Control set up (the mouse listeners are attached to the game panel)
       initializeScaling();
@@ -247,7 +249,7 @@ public class Client extends JFrame implements WindowListener {
       try {
          if (!waitingForImage) {
             if (input.ready()) {
-               decipherMenuInput("I" + input.readLine());
+               decipherMenuInput(input.readLine());
             }
          } else {
             waitForInput();
@@ -644,9 +646,6 @@ public class Client extends JFrame implements WindowListener {
          }
          projectiles.clear();
          aoes.clear();
-         for (int i = 0; i < players.length; i++){
-           players[i].clearStatuses();
-         }
          String[] firstSplit = input.split(" ", -1);
          for (String firstInput : firstSplit) {
             char initializer = firstInput.charAt(0);
@@ -681,6 +680,7 @@ public class Client extends JFrame implements WindowListener {
                } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
                   int id = Integer.parseInt(secondSplit[0]);
                   Player player = players[Integer.parseInt(secondSplit[1])];
+                  player.clearStatuses();
                   if (id == 2) {
                      player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
                   } else if (id == 3) {
@@ -930,6 +930,7 @@ public class Client extends JFrame implements WindowListener {
       //Game components
       private GameComponent[] allComponents;
       private PauseComponent pauseComponent;
+      private int MAX_GAME_X, MAX_GAME_Y;
       private Area darkness;
       private boolean pause = false;
 
@@ -939,10 +940,12 @@ public class Client extends JFrame implements WindowListener {
          this.addMouseListener(myMouseAdapter);
          this.addMouseWheelListener(myMouseAdapter);
          this.addMouseMotionListener(myMouseAdapter);
-         GameComponent.initializeSize(MAX_X, MAX_Y);
+         MAX_GAME_X = this.getWidth();
+         MAX_GAME_Y = this.getHeight();
+         GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
          allComponents = new GameComponent[4];
          pauseComponent = new PauseComponent(800, 500, super.getClient());
-         pauseComponent.setBounds(MAX_X / 2 - 400, MAX_Y / 2 - 250, 800, 500);
+         pauseComponent.setBounds(MAX_GAME_X / 2 - 400, MAX_GAME_Y / 2 - 250, 800, 500);
          this.add(pauseComponent);
 
          this.setDoubleBuffered(true);
@@ -966,7 +969,7 @@ public class Client extends JFrame implements WindowListener {
             g2.setFont(MAIN_FONT);
             generateGraphics = false;
             drawArea = new Rectangle(0, 0, MAX_X, MAX_Y);
-            darkness = new Area(new Rectangle(0, 0, (MAX_X), (MAX_Y)));
+            darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
             resetXyAdjust();
@@ -988,21 +991,20 @@ public class Client extends JFrame implements WindowListener {
                }
             }
 
-
             for (int i = 0; i < aoes.size(); i++) {
                if (aoes.get(i).getID() == 0) {
                   darkness.subtract(aoes.get(i).getArea());
                }
             }
             int[] xP = {(int) (100), (int) (200), (int) (300), (int) (400), (int) (500)};
-            int[] yP = {(int) (100), (int) (200), (int) (200), (int) (100), 0};
+             int[] yP = {(int) (100), (int) (200), (int) (200), (int) (100), 0};
             Polygon test = new Polygon(xP, yP, 5);
             test.translate(xyAdjust[0], xyAdjust[1]);
             g2.setColor(Color.black);
             g2.fillPolygon(test);
             g2.fillRect((int) (300) + xyAdjust[0], (int) (300) + xyAdjust[1], (int) (100), (int) (100));
 
-            g2.setColor(new Color(0, 0, 0, 200));
+            g2.setColor(new Color(0, 0, 0, 150));
             g2.fill(darkness);
             for (Player currentPlayer : players) {
                if (currentPlayer != null) {
@@ -1039,24 +1041,11 @@ public class Client extends JFrame implements WindowListener {
                aoes.get(i).draw(g2);
             }
             resetXyAdjust();
-            /*
             for (int i = 0; i < players.length; i++) {
                for (int j = 0; j < players[i].getStatuses().size(); j++) {
                   players[i].getStatuses().get(j).draw(g2, players[i].getX(), players[i].getY(), j);
                }
-            }*/
-           
-           for (Player currentPlayer : players) {
-             //Status.setPlayerLength(currentPlayer.getPlayerLength());
-             //Status.setLength(Status.getPlayerLength()/6);
-             if (currentPlayer != null) {
-               if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
-                 for (int j = 0; j < currentPlayer.getStatuses().size(); j++) {
-                   currentPlayer.getStatuses().get(j).draw(g2, currentPlayer.getX(), currentPlayer.getY(), j);
-                 }
-               }
-             }
-           }
+            }
             //draw all components
 
             ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
@@ -1080,13 +1069,13 @@ public class Client extends JFrame implements WindowListener {
                gameComponent.draw(g2);
             }
          }
-         darkness = new Area(new Rectangle(0, 0, (MAX_X), (MAX_Y)));
+         darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          frames++;
       }
 
       public void resetXyAdjust() {
-         xyAdjust[0] = (midXy[0] - myPlayer.getXy()[0]);
-         xyAdjust[1] = (midXy[1] - myPlayer.getXy()[1]);
+         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
+         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
       }
    }
 }
