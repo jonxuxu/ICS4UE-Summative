@@ -149,12 +149,13 @@ class MainMapGenModule {
    }
 
    public void sendMap(Socket socket) {
+      System.out.println("reee");
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
-         socket.getOutputStream().flush();
       } catch (IOException e) {
          e.printStackTrace();
       }
+      System.out.println("e");
    }
 //Make it extend from JPanel
   /*    public void paintComponent(Graphics g) {

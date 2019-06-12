@@ -398,14 +398,16 @@ public class Server {
                beginLine.append(" " + players[k].getSelectedClass());
             }
             System.out.println(beginLine.toString());
+            System.out.println("0");
             for (int i = 0; i < players.length; i++) {
                gameOutputs[i].println(beginLine.toString().trim()); //B for begin
                gameOutputs[i].flush();
             }
+            System.out.println("1");
             for (int i=0;i<onlineGameSockets.size();i++){
                builder.sendMap(onlineGameSockets.get(i));
-               gameOutputs[i].flush();
             }
+            System.out.println("2");
             for (int i = 0; i < players.length; i++) {
                gameOutputs[i].println("FINAL");//B for begin
                gameOutputs[i].flush();

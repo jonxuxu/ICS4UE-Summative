@@ -94,8 +94,9 @@ public abstract class Player extends User {
      g2.setColor(Color.black);
      g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150, 6);
      g2.setColor(Color.red);
-     g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150 * health /  maxHealth, 6);
-
+     if (maxHealth!=0) {
+        g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 75, centerXy[1] + xy[1] - playerXy[1] - 70, 150 * health / maxHealth, 6);
+     }
      // Draws name
      if(getTeam() == mainPlayer.getTeam()){
        g2.setColor(Color.green);
