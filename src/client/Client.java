@@ -1014,6 +1014,7 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          g2.scale(1/SCALING, 1/SCALING);
+         //g2.dispose();
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          frames++;
       }
