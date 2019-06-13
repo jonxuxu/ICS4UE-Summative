@@ -9,20 +9,19 @@ package server;
  */
 import java.util.ArrayList;
 public class MobileSupport extends Player{
-  private int[] spellCooldowns = {50,100,100};
-  private int PASSIVE_COOLDOWN = 100;
+  private int[] spellCooldowns = {100,100,100};
+  private int PASSIVE_COOLDOWN = 150;
   private int[] spellTimers = {0,0,0};
   private int passiveTimer = 0;
   private int stacks = 0;
   private static int PASSIVE_RANGE = 500;
   private static int Q_RANGE = 1000;
-  private static int Q_SPEED = 50;
+  private static int Q_SPEED = 25;
   private static int Q_DURATION = Q_RANGE/Q_SPEED;
   private static int Q_STUN_DURATION = 100;
-  private static int E_RANGE = 500;
   private static double E_DAMAGE_REDUCTION = 0.3;
   private static int E_STATUS_DURATION = 100;
-  private static int SPACE_DURATION = 100;
+  private static int SPACE_DURATION = 300;
   private static int SPACE_RANGE = 500;
   
   
@@ -114,8 +113,8 @@ public class MobileSupport extends Player{
     }
   }
   public int getSpellPercent(int spellIndex) {
-    return (spellCooldowns[spellIndex] - spellTimers[spellIndex])/spellCooldowns[spellIndex]*100;
-    /*
+    return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
+     /*
     if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
       return (100);
     } else {

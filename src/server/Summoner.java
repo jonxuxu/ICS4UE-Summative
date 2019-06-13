@@ -13,13 +13,13 @@ public class Summoner extends Player{
   private int[] spellTimers = {0,0,0};
   private ArrayList<SummonerPet> pets = new ArrayList<SummonerPet>();
   private static int PET_RANGE = 300;
-  private static int PET_ATTACK_COOLDOWN = 5;
+  private static int PET_ATTACK_COOLDOWN = 10;
   private static int PET_ATTACK_SPEED = 10;
   private static int Q_RANGE = 1000;
   private static int E_RANGE = 1000;
   private static int E_COOLDOWN = 10;
   private int eTimer;
-  private static int SPACE_SPEED = 50;
+  private static int SPACE_SPEED = 25;
   private boolean secondE = false;
   private SummonerPet chosenPet;
   
@@ -27,10 +27,10 @@ public class Summoner extends Player{
     super(username,teamNumber);
     setMaxHealth(200);
     setHealth(200);
-    setAttack(200);
+    setAttack(20);
     setMobility(7);
     setRange(300);
-    setAutoAttackCooldown(5);
+    setAutoAttackCooldown(15);
     setFlareCooldown(100);
     setMelee(false);
   }
@@ -89,7 +89,7 @@ public class Summoner extends Player{
     }
   }
   public int getSpellPercent(int spellIndex) {
-    return (spellCooldowns[spellIndex] - spellTimers[spellIndex])/spellCooldowns[spellIndex]*100;
+    return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
   }
   
   public void update(){

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.AlphaComposite;
 
 /**
  * TimeMage.java
@@ -90,6 +91,10 @@ public class TimeMage extends Player {
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {
+      if (isInvisible()){
+       float alpha = (float)0.5; //draw half transparent
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
+     }
       if (spellIndex != -1) {
          resetSpell(spellIndex);
          spellAnimation(g2, x, y, width, height, spellIndex);
@@ -105,6 +110,9 @@ public class TimeMage extends Player {
          } else {
             move(g2, x, y, width, height);
          }
+      }
+      if (isInvisible()){
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,(float)1));
       }
    }
 }

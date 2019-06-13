@@ -31,6 +31,14 @@ public class CustomPolygon implements CanIntersect{
    private int intersectingVectorIndex;
    private Area thisArea;
 
+   /**
+    * The constructor, which takes and calculates basic values
+    *
+    * @param xPoints the integer array for the x-values of the hitbox vertices
+    * @param yPoints the integer array for the y-values of the hitbox vertices
+    * @param pointNum the number of vertices that the hitbox has
+    */
+
    CustomPolygon(int[] xPoints, int[] yPoints, int pointNum) {
       this.pointNum = pointNum;
       //POINTS SHOULD BE GIVEN IN ORDER. (either clockwise or counterclockwise is fine)

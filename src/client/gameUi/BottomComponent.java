@@ -101,12 +101,18 @@ public class BottomComponent extends GameComponent {
       //Health bar
       g2.setColor(new Color(190, 40, 40));
       if (myPlayer.getMaxHealth() != 0) {
-         g2.fillRect(MAX_X / 2 - 260, (MAX_Y - 20), (121 * myPlayer.getHealth() / myPlayer.getMaxHealth()), (5));
+         g2.fillRect(MAX_X / 2 - 260, (MAX_Y - 20), (140 * myPlayer.getHealth() / myPlayer.getMaxHealth()), (5));
       }
       g2.setColor(Color.white);
       g2.setFont(STATS_FONT);
       if (myPlayer != null) {
-          g2.drawString("User: " + myPlayer.getUsername(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight() * 2);
+         g2.drawString("User: " + myPlayer.getUsername(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight() * 2);
+      }
+      g2.setColor(new Color (1f,1f,1f,0.2f));
+      for (int i = 0; i < 3; i++) {
+         if (myPlayer != null) {
+            g2.fillRect(MAX_X / 2 + 120 * i, (MAX_Y - 70), 60, (int)(6.0*myPlayer.getSpellPercent(i)/10.0));
+         }
       }
    }
 }

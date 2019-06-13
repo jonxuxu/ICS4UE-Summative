@@ -12,20 +12,18 @@ public class SafeMarksman extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
 
-  private static int SPACE_AOE_DURATION = 50;
-  private static int SPACE_AOE_RADIUS = 100;
-  private static int MS_BUFF_STRENGTH = 5;
-  private static int MS_BUFF_DURATION = 100;
+  private static int SPACE_AOE_DURATION = 100;
+  private static int SPACE_AOE_RADIUS = 200;
   private static int STUN_DURATION = 100;
 
   SafeMarksman(String username, int teamNumber) {
     super(username,teamNumber);
     setMaxHealth(300);
     setHealth(300);
-    setAttack(100);
+    setAttack(10);
     setMobility(5);
     setRange(300);
-    setAutoAttackCooldown(5);
+    setAutoAttackCooldown(15);
     setFlareCooldown(100);
     setMelee(false);
   }
@@ -54,7 +52,7 @@ public class SafeMarksman extends Player{
   }
 
   public int getSpellPercent(int spellIndex) {
-    return (spellCooldowns[spellIndex] - spellTimers[spellIndex])/spellCooldowns[spellIndex]*100;
+    return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
     /*
     if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
       return (100);
