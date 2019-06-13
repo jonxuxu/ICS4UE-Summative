@@ -578,8 +578,10 @@ public class Server {
                            boolean[] hasStatus = new boolean[15];
                            Status[] parallelStatus = new Status[15];
                            for (int j = 0; j < theseStatuses.size(); j++) {
-                             hasStatus[theseStatuses.get(j).getID()] = true;
-                             parallelStatus[theseStatuses.get(j).getID()] = theseStatuses.get(j);
+                             if (theseStatuses.get(j).getID() >= 0){
+                               hasStatus[theseStatuses.get(j).getID()] = true;
+                               parallelStatus[theseStatuses.get(j).getID()] = theseStatuses.get(j);
+                             }
                            }
                            for (int j = 0; j < theseProjectiles.size(); j++) {
                               projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
