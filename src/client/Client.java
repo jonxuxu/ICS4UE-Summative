@@ -1391,8 +1391,6 @@ public class Client extends JFrame implements WindowListener {
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
                   System.out.println("Debug mode");
-               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) { //C or c
-                  ((InventoryComponent) (allComponents[2])).toggle();
                }
                keyPressed = false;
             }
