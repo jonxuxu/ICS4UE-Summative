@@ -9,12 +9,25 @@ import java.awt.Polygon;
 
 import java.util.ArrayList;
 
+/**
+ *
+ * CreviceGenerator.java
+ *
+ * A special class that handles the complicated mathematics behind crevice generation
+ *
+ * @author Artem Sotnikov
+ * @since 2019-06-05
+ * @version 1.3
+ */
+
 public class CreviceGenerator {
 	public int[] xpoints;
 	public int[] ypoints;
 	ArrayList<Point> sourcePoints;
-	
-	
+
+	/**
+	 * A implementation to be tested using a seperate JFrame
+	 */
 	
 	public void test() {
 		JFrame frame = new JFrame();
@@ -31,6 +44,10 @@ public class CreviceGenerator {
 		frame.setVisible(true);
 		panel.repaint();
 	}
+
+	/**
+	 * An intermediary test method to generate the basic direction and turns of the crevice
+	 */
 	
 	public void generateCreviceSpine() {
 		ArrayList<Point> sourcePoints = new ArrayList<Point>(0);
@@ -79,13 +96,14 @@ public class CreviceGenerator {
 		
 	}
 	/**
-	 * 
-	 * @param source
-	 * @param jumpDist
-	 * @param angleVar
-	 * @param numBreaks
-	 * @param randomizedOffsets
-	 * @param offsetRange
+	 * A parameter-based method that generates a full crevice inside the CreviceGenerator instance
+	 *
+	 * @param source the point from which to begin generation
+	 * @param jumpDist how long each leg of the crevice is
+	 * @param angleVar how much the crevice can bend by
+	 * @param numBreaks how many segments the crevices have
+	 * @param randomizedOffsets whther randomizing the side-to-side offsets is enabled
+	 * @param offsetRange how much the offsets are by.
 	 */
 	
 	
@@ -159,21 +177,43 @@ public class CreviceGenerator {
 			ypoints[ypoints.length - i] = (int) (sourcePoints.get(i).y + offset2*Math.sin(targetAngle + Math.PI));
 			
 		}
-		
-		@SuppressWarnings("unused")
-		int testline = 0;
 	}
-	
+
+	/**
+	 * Returns the generated crevice as a polygon
+	 *
+	 * @return the polygon representation of the crevice
+	 */
+
 	public Polygon getPolygon() {		
 		return new Polygon(this.xpoints,this.ypoints,this.xpoints.length);
 	}
-	
+
+	/**
+	 * A testing method to run trial crevice generations
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		CreviceGenerator tester = new CreviceGenerator();
 		tester.test();
 	}
+
+	/**
+	 * A private subclass that handles he drawing for the JFrame testing implementation
+	 *
+	 * @author Artem Sotnikov
+	 * @since 2019-06-05
+	 * @version 1.0
+	 */
 	
 	private class CustomPanel extends JPanel {
+		/**
+		 * The paintComponent that actually performs the drawing for the testing implementation
+		 *
+		 * @param g, the graphics to be used for painting
+		 */
+
 		public void paintComponent(Graphics g) {
 			super.paintComponents(g);
 			this.setDoubleBuffered(true);

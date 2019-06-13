@@ -84,6 +84,7 @@ public class Client extends JFrame implements WindowListener {
    private boolean keyPressed = false;
    private char lastKeyTyped;
    private float[] soundLevels = {0.5f, 0.5f, 0.5f};
+   private boolean messageOk = false;
 
    // Game states
    private ArrayList<User> onlineList = new ArrayList<User>();
@@ -805,6 +806,7 @@ public class Client extends JFrame implements WindowListener {
                         isFriendly = true;
                      }
                   }
+                  messageOk = true;
                   intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
                }
             }
@@ -1065,8 +1067,25 @@ public class Client extends JFrame implements WindowListener {
      * @param mode the kind of chat being called
      */
    public void sendMessage(String message, int mode) {
-      output.println("C" + mode + "," + message);
-      output.flush();
+      // This works
+      Thread thread = new Thread(new Runnable() {
+         @Override
+         public void run() {
+            while(!messageOk) {
+               System.out.println("Sending: " + message);
+               output.println("C" + mode + "," + message);
+               output.flush();
+               try {
+                  Thread.sleep(10);
+               } catch (Exception e){
+                  e.printStackTrace();
+               }
+            }
+            messageOk = false;
+         }
+      });
+      thread.start();
+
    }
 
    //Info to panels
