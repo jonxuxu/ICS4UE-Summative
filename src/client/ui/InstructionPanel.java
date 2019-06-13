@@ -34,7 +34,7 @@ public class InstructionPanel extends MenuPanel { //State=5
    private CustomButton prevButton = new CustomButton("Previous Page");
 
    //Instructions pages
-   private BufferedImage[] pages = new BufferedImage[4];
+   private BufferedImage[] pages = new BufferedImage[5];
    private int currentPage = 0;
 
     /**
@@ -48,6 +48,7 @@ public class InstructionPanel extends MenuPanel { //State=5
          pages[1] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
          pages[2] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page3.png"));
          pages[3] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page4.png"));
+         pages[4] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page5.png"));
       } catch (IOException e) {
          System.out.println("Unable to find an image");
       }
@@ -61,7 +62,7 @@ public class InstructionPanel extends MenuPanel { //State=5
       //Next page button
       nextButton.addActionListener((ActionEvent e) -> {
          currentPage++;
-         if (currentPage == 3){ //Remove next button on last page
+         if (currentPage == 4){ //Remove next button on last page
             nextButton.setBounds(0, 0, 0, 0);
          } else if (currentPage == 1){ //Show previous button
             prevButton.setBounds(MAX_X / 2 - 350, MAX_Y * 8 / 10, 200, MAIN_FONT.getSize() + 20);
@@ -74,7 +75,7 @@ public class InstructionPanel extends MenuPanel { //State=5
          currentPage--;
          if (currentPage == 0){ //Remove previous button on first page
             prevButton.setBounds(0, 0, 0, 0);
-         } else if (currentPage == 2){ //Show next button
+         } else if (currentPage == 3){ //Show next button
             nextButton.setBounds(MAX_X / 2 + 150, MAX_Y * 8 / 10, 200, MAIN_FONT.getSize() + 20);
          }
       });
