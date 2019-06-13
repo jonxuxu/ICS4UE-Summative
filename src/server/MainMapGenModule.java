@@ -27,11 +27,19 @@ class MainMapGenModule extends JFrame {
    private double nodeGenStDev = 0.5;
    private File newImageFile = new File("Map.png");
    private BufferedImage mapImage;
+   private BufferedImage pathImage;
    private Socket socket;
 
    MainMapGenModule() {
 
       String config = "";
+
+      //Get images from files
+      try {
+         pathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Path.png"));
+      } catch (IOException e) {
+         System.out.println("Unable to find an image");
+      }
 
       gen = new MapGen(7500, 5000, ellipticalAdjust);
       System.out.println("yay1");
@@ -116,6 +124,8 @@ class MainMapGenModule extends JFrame {
                if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
                   g.setColor(new Color(150, 97, 37));
                   g.fillPolygon(gen.regionLayer.regions.get(idx));
+                  ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                  g.drawImage(pathImage, 0, 0, null);
                } else {
                   g.fillPolygon(gen.regionLayer.regions.get(idx));
                }
