@@ -137,7 +137,7 @@ public class MapGen {
        
        Region creation = new Region("road",3);
        creation.adoptRoadShape(activeNode.location, 
-         activeNode.connections.get(connectionIdx), 200);
+         activeNode.connections.get(connectionIdx), 250);
        this.regionLayer.regions.add(creation);
        
       }
@@ -340,7 +340,7 @@ public class MapGen {
       temp.location.y = tempY;
       
       if (randomization) {       
-       double percentRand = 0.4;
+       double percentRand = 0.8;
        temp.radius = (int) (Math.random()*maxRadius*(percentRand) + maxRadius*(1.0 - percentRand));
       }
       
@@ -349,7 +349,7 @@ public class MapGen {
     }
 
  /**
-  * Accesses the region layer retroactivley to insert artifact clearings at the rightmost and leftmost nodes
+  * Accesses the region layer retroactively to insert artifact clearings at the rightmost and leftmost nodes
   */
  public void insertArtifactClearing() {
      int teamOneDistance = 0;  
@@ -371,11 +371,18 @@ public class MapGen {
      Region t1Clearing = new Region("team_one_clearing",9);
      Region t2Clearing = new Region("team_two_clearing",9);
      
-     t1Clearing.mimicCircle(nodes.get(teamOneIdx).location.x,nodes.get(teamOneIdx).location.y,750,12);
-     t2Clearing.mimicCircle(nodes.get(teamTwoIdx).location.x,nodes.get(teamTwoIdx).location.y,750,12);
+     t1Clearing.mimicCircle(nodes.get(teamOneIdx).location.x,nodes.get(teamOneIdx).location.y,1000,12);
+     t2Clearing.mimicCircle(nodes.get(teamTwoIdx).location.x,nodes.get(teamTwoIdx).location.y,1000,12);
      
      regionLayer.regions.add(t1Clearing);
      regionLayer.regions.add(t2Clearing);
+
+     nodes.get(teamOneIdx).isClearing = false;
+  nodes.get(teamOneIdx).clearingSize = 0;
+  nodes.get(teamTwoIdx).isClearing = false;
+  nodes.get(teamTwoIdx).clearingSize = 0;
+
+
     }
 
  /**
@@ -714,6 +721,67 @@ public class MapGen {
   */
  public ArrayList<RoadNode> getNodes() {
       return this.nodes;
-    }             
+    }
+
+
+ /**
+  * Generates a barrier of rocks around the map
+  */
+
+ public void generateBarrier() {
+  ArrayList<Obstacle> tempList = new ArrayList<Obstacle>(0);
+  Obstacle creation1 = null;
+  Obstacle creation2 = null;
+  Obstacle creation3 = null;
+
+  for (int idx = 0; idx < regionLayer.regions.get(MAP_REGION_IDX).npoints; idx++) {
+   creation1 = new Obstacle();
+   creation2 = new Obstacle();
+
+   creation1.type = "ROCK";
+   creation2.type = "ROCK";
+
+   creation1.location = new Point(regionLayer.regions.get(MAP_REGION_IDX).xpoints[idx],
+     regionLayer.regions.get(MAP_REGION_IDX).ypoints[idx]);
+   creation2.location = new Point((int) (regionLayer.regions.get(MAP_REGION_IDX).xpoints[idx]*1.05),
+     (int)  (regionLayer.regions.get(MAP_REGION_IDX).ypoints[idx]*1.1));
+   creation1.radius = 1000;
+   creation2.radius = 1000;
+
+//   if (idx != 0) {
+//    creation3 = new Obstacle();
+//    creation3.type = "ROCK";
+//
+//    creation3.location = averagePoints(creation2.location,tempList.get(tempList.size() - 1).location);
+//
+//   }
+
+   //tempList.add(creation1);
+//   if (idx != 0) {
+//    creation3.radius = 1000;
+//    tempList.add(creation3);
+//   }
+   tempList.add(creation2);
+
+
+  }
+
+  obstacles.addAll(tempList);
+ }
+
+ /**
+  * This method averages the x and y values between two points to return a point in the middle
+  *
+  * @param point1 first point to be averaged
+  * @param point2 second point to be averaged
+  * @return the resultant point
+  */
+
+ public Point averagePoints(Point point1, Point point2) {
+  int finalX = (int) ((point1.x + point2.x)/2);
+  int finalY = (int) ((point1.y + point2.y)/2);
+
+  return new Point(finalX,finalY);
+ }
 }
 

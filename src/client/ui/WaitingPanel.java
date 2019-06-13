@@ -204,7 +204,7 @@ public class WaitingPanel extends MenuPanel { //State=6
       }
       g2.setStroke(oldStroke); //Reset stroke width
 
-      //Display all players
+      //Display all characters
       StringBuilder players = new StringBuilder("Players: ");
       int shift1 = 0;
       int shift2 = 0;

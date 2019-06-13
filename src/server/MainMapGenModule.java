@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Point;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,16 +20,15 @@ import java.util.ArrayList;
 
 /**
  * MainMapGenModule.java
- *
+ * <p>
  * Handles the sending and processing of all the data produced by the MapGen class
  *
  * @author Artem Sotnikov, Will Jeong
- * @since 2019-03-25
  * @version 3.3
- *
+ * @since 2019-03-25
  */
 
-class MainMapGenModule extends JFrame{
+class MainMapGenModule extends JFrame {
    private Disp display;
    private MapGen gen;
 
@@ -38,6 +38,11 @@ class MainMapGenModule extends JFrame{
    private double nodeGenStDev = 0.5;
    private File newImageFile = new File("Map.png");
    private BufferedImage mapImage;
+   private BufferedImage pathImage;
+   private BufferedImage darkPathImage;
+   private BufferedImage clearingImage;
+   private BufferedImage groundImage;
+   private BufferedImage swampImage;
    private Socket socket;
 
    /**
@@ -46,6 +51,17 @@ class MainMapGenModule extends JFrame{
    MainMapGenModule() {
 
       String config = "";
+
+      //Get images from files
+      try {
+         pathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Path.png"));
+         darkPathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_PathDark.png"));
+         clearingImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Clearing.png"));
+         groundImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Ground.png"));
+         swampImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Swamp.png"));
+      } catch (IOException e) {
+         System.out.println("Unable to find an image");
+      }
 
       gen = new MapGen(7500, 5000, ellipticalAdjust);
       System.out.println("yay1");
@@ -59,25 +75,28 @@ class MainMapGenModule extends JFrame{
          gen.tetherAllNodes2();
          gen.makeNodesElliptical();
          gen.generateRegions();
+         gen.insertArtifactClearing();
          gen.generateCrevices(2);
          gen.smokeTrees(7500, 130, 0, false);
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
-         gen.genClearingByNum(8, 500);
+         gen.genClearingByNum(10, 500);
          gen.purgeRedundancies();
+         gen.generateBarrier();
+
          gen.addObstacleBoundingBoxes();
 
       }
-
 
 
       display = new Disp();
 
       // Code for a potential JFrame implementation
 
+      display = new Disp();
       //this.add(display);
-      //  display.repaint();
+      //display.repaint();
 
 
       display.paintImage();
@@ -86,9 +105,7 @@ class MainMapGenModule extends JFrame{
 
 
    /**
-    *
     * An internal class handling the graphics for a JFrame implementation or for a direct image send
-    *
     */
 
    class Disp {
@@ -96,20 +113,19 @@ class MainMapGenModule extends JFrame{
        * Draws a oval with a custom radius centered at (0,0)
        *
        * @param radius the radius of the oval to be drawn
-       * @param g the graphics module with which the oval should be drawn
+       * @param g      the graphics module with which the oval should be drawn
        */
       private void drawOvalCustom(int radius, Graphics g) {
          g.drawOval(-radius, -radius, radius * 2, radius * 2);
       }
 
       /**
-       *
        * Draws a oval centered at a custom location, with a custom radius
        *
-       * @param radius the radius of the oval to be drawn
+       * @param radius  the radius of the oval to be drawn
        * @param xOffset the xCoordinate at which to start drawing
        * @param yOffset the yCoordinate at which to start drawing
-       * @param g the graphics module with which the oval should be drawn
+       * @param g       the graphics module with which the oval should be drawn
        */
 
       private void fillOvalCustom(int radius, int xOffset, int yOffset, Graphics g) {
@@ -117,12 +133,11 @@ class MainMapGenModule extends JFrame{
       }
 
       /**
-       *
        * Draws a oval centered at a custom location, with a custom radius
        *
-       * @param radius the radius of the oval to be drawn
+       * @param radius  the radius of the oval to be drawn
        * @param eAdjust the horizontal elliptical adjustment of the oval
-       * @param g the graphics module with which the oval should be drawn
+       * @param g       the graphics module with which the oval should be drawn
        */
 
       private void fillOvalCustom(int radius, double eAdjust, Graphics g) {
@@ -152,24 +167,42 @@ class MainMapGenModule extends JFrame{
             g.setColor(new Color(0, 80, 0));
             this.fillOvalCustom(7500, ellipticalAdjust, g);
          }
-         g.fillRect(-15000, -10000, 30000, 20000);
 
-         g.setColor(Color.RED);
+         g.drawImage(swampImage, -15000, -10000, 30000, 20000, null);
+
+         g.setColor(Color.BLACK);
 
          if (gen.regionLayer != null) {
             for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
-               if (gen.regionLayer.regions.get(idx).regionType.equals("crevice")) {
+               /*if (gen.regionLayer.regions.get(idx).regionType.equals("crevice")) {
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
-                  g.setColor(new Color(0, 50, 0));
+                   g.setColor(new Color(0, 50, 0));
+               } else */
+               if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing") || gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
+                   Polygon temp = (Polygon)(g.getClip());
+                   ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                   g.drawImage(clearingImage, -15000, -10000, 30000, 20000, null);
+                   g.setClip(temp);
+               } else if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
+                  Polygon temp = (Polygon)(g.getClip());
+                  ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                  g.drawImage(pathImage, -15000, -10000, 30000, 20000, null);
+                  g.setClip(temp);
                } else {
-                  g.setColor(new Color(0, 100, 0));
-               }
-               if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
-                  g.setColor(new Color(150, 97, 37));
-                  g.fillPolygon(gen.regionLayer.regions.get(idx));
-               } else {
-                  g.fillPolygon(gen.regionLayer.regions.get(idx));
+                  if (idx == 0){
+                     Polygon temp = (Polygon)(g.getClip());
+                     ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                     g.drawImage(groundImage, -15000, -10000, 30000, 20000, null);
+                     g.setClip(temp);
+                  } else if (idx == 1){
+                     Polygon temp = (Polygon)(g.getClip());
+                     ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                     g.drawImage(swampImage, -15000, -10000, 30000, 20000, null);
+                     g.setClip(temp);
+                  } else {
+                     g.fillPolygon(gen.regionLayer.regions.get(idx));
+                  }
                }
             }
          }
@@ -178,16 +211,22 @@ class MainMapGenModule extends JFrame{
 //        g.fillOval((int)gen.nodes.get(i).getPoint().getX() - 5,
 //        		(int)gen.nodes.get(i).getPoint().getY() - 5,50,50);
             if (gen.nodes.get(i).isClearing) {
-               g.setColor(new Color(150, 97, 37));
+               /*g.setColor(new Color(150, 97, 37));
                this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x,
-                       gen.nodes.get(i).location.y, g);
+                       gen.nodes.get(i).location.y, g);*/
+               Polygon temp = (Polygon)(g.getClip());
+               int clearingSize = gen.nodes.get(i).clearingSize;
+               ((Graphics2D) g).clip(new Ellipse2D.Double(gen.nodes.get(i).location.x - clearingSize, gen.nodes.get(i).location.y - clearingSize, clearingSize * 2, clearingSize * 2));
+               g.drawImage(darkPathImage, -15000, -10000, 30000, 20000, null);
+               g.setClip(temp);
+               /*g.setColor(new Color(150, 97, 37));
+               this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);*/
             } else {
                //this.fillOvalCustom(50, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
             }
             for (int j = 0; j < gen.nodes.get(i).connections.size(); j++) {
                //this.drawLineCustom(gen.nodes.get(i).location, gen.nodes.get(i).connections.get(j), g);
             }
-
          }
 
          for (int i = 0; i < gen.obstacles.size(); i++) {
@@ -199,25 +238,49 @@ class MainMapGenModule extends JFrame{
             if (gen.obstacles.get(i).radius != 0) {
                g2.fill(gen.obstacles.get(i).boundingBox);
             } else {
-               this.fillOvalCustom(50,gen.obstacles.get(i).location.x,
+               this.fillOvalCustom(50, gen.obstacles.get(i).location.x,
                        gen.obstacles.get(i).location.y, g);
             }
          }
-         /*try {
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
 
    /**
-    * Returns the full list of obstacles 
-    * 
+    * Returns the full list of obstacles
+    *
     * @return ArrayList<Obstacle>, the full list of obstacles contained within the instance of MapGen
     */
    public ArrayList<Obstacle> getObstacle() {
       return (gen.obstacles);
+   }
+
+   /**
+    * Returns the index of the team clearing region
+    *
+    * @param teamNumber the team number for which the index is to be retrieved
+    * @return the index within the region ArrayList of that team clearing
+    */
+
+   public Region getTeamClearing(int teamNumber) {
+      if (teamNumber == 0) {
+         for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
+            if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing")) {
+               return (gen.regionLayer.regions.get(idx));
+            }
+         }
+      } else {
+         for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
+            if (gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
+               return (gen.regionLayer.regions.get(idx));
+            }
+         }
+      }
+      return(null);
    }
 
    /**

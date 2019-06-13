@@ -11,15 +11,24 @@ import java.awt.Graphics2D;
  * @version 1.0
  * @since 2019-05-31
  */
-
 public class AutoAOE extends AOE{
    private int[][] points;
-
+   /**
+     * Constructor
+     *
+     * @param id used for communication between server and client, used to determine kind of AOE
+     * @param points corners of the square for the melee AOE
+     */
    AutoAOE(int[][] points) {
      super(0, 0, 0);
      this.points = points;
    }
-   
+
+   /**
+    * Draws the square Area Of Effect - can be inherited to change effects
+    *
+    * @param g2 graphics
+    */
    @Override
    public void draw(Graphics2D g2) {
      /*
