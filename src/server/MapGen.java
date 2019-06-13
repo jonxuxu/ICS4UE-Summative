@@ -340,7 +340,7 @@ public class MapGen {
     		temp.location.y = tempY;
     		
     		if (randomization) {    			
-    			double percentRand = 0.4;
+    			double percentRand = 0.8;
     			temp.radius = (int) (Math.random()*maxRadius*(percentRand) + maxRadius*(1.0 - percentRand));
     		}
     		
