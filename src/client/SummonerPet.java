@@ -10,7 +10,7 @@ class SummonerPet extends AOE{
   SummonerPet(int x, int y, int radius) {
     super(x,y,radius);
     try {
-      BufferedImage movementSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/summoner/summoner_jelly.png"));
+      BufferedImage movementSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/summoner/minion.png"));
       animations = new BufferedImage[3];
       for (int i = 0; i < 3; i++) {
         animations[i] = movementSheet.getSubimage(i * 32, 0, 32, 32);
@@ -20,10 +20,11 @@ class SummonerPet extends AOE{
     }
   }
   public void draw(Graphics2D g2) {
-    g2.drawImage(animations[INDEX%10], getX() + getXyAdjust()[0] - getRadius(), getY() + getXyAdjust()[1] - getRadius(), getRadius() * 2, getRadius() * 2 , null);
-    INDEX++;
     if (INDEX >= 30){
       INDEX = 0;
     }
+    g2.drawImage(animations[INDEX/10], getX() + getXyAdjust()[0] - getRadius(), getY() + getXyAdjust()[1] - getRadius(), getRadius() * 2, getRadius() * 2 , null);
+    INDEX++;
+    
   }
 }
