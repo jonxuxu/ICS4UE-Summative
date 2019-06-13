@@ -502,7 +502,6 @@ public class Client extends JFrame implements WindowListener {
       try {
          while (!inputReady) {
             if (input.ready()) {
-               //System.out.println("WI" + input.readLine().trim());
                inputReady = true;
                if (!gameBegin) {
                   if (!waitingForImage) {
@@ -514,7 +513,8 @@ public class Client extends JFrame implements WindowListener {
                      waitingForImage = false;
                      nextPanel = 7;//Sends to the game screen
                      gameBegin = true;
-                     System.out.println("DONNEEE");
+                     // Start game sound effect
+                     soundEffect.playSound("start");
                      System.out.println(sheet.getWidth() + " " + sheet.getHeight());
                   }
                }
