@@ -19,7 +19,7 @@ import java.util.HashSet;
  * Server.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-04-24
  */
@@ -443,7 +443,7 @@ public class Server {
                   xP[j] = allPolygons[i].xpoints[j] + 15000;
                   yP[j] = allPolygons[i].ypoints[j] + 10000;
                }
-               allPolygons[i] = new Polygon(xP,yP,xP.length);
+               allPolygons[i] = new Polygon(xP, yP, xP.length);
             }
 
             Player.setConstantHitboxes(players.length, builder.getObstacle());
@@ -486,11 +486,10 @@ public class Server {
                               String[] secondSplit = firstInput.split(",", -1);
                               if (secondSplit.length > 0) {
                                  if (initializer == 'M') {
-                                    if (!checkColliding(players[i])) {
+                                    if (!checkColliding(players[i], Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]))) {
                                        players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
-                                    }else{
-                                       System.out.println(players[i].getX()+"???"+players[i].getY());
                                     }
+
                                  } else if (initializer == 'S') {
                                     players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
                                     //The x y information about the spell is stored as secondSplit[1] and [2]
@@ -690,14 +689,13 @@ public class Server {
          //Initialize teams
       }
 
-      private boolean checkColliding(Player thisPlayer){
-         for (int i=0;i<allPolygons.length;i++){
-            if (allPolygons[i].intersects(thisPlayer.getHitboxRectangle())){
-               System.out.println(allPolygons[i].getBounds().getX()+" "+allPolygons[i].getBounds().getY());
-                return(true);
+      private boolean checkColliding(Player thisPlayer, double x, double y) {
+         for (int i = 0; i < allPolygons.length; i++) {
+            if (allPolygons[i].intersects(thisPlayer.getAdjustedHitboxRectangle(x,y))) {
+               return (true);
             }
          }
-         return(false);
+         return (false);
       }
 
       private boolean isHost(User myUser) {

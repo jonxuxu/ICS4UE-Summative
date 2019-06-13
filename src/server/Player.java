@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Player.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-04-24
  */
@@ -513,6 +513,10 @@ public abstract class Player extends User implements CanIntersect {
    }
    public Rectangle getHitboxRectangle() {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
+      return hitbox;
+   }
+   public Rectangle getAdjustedHitboxRectangle(double x, double y) {
+      hitbox.setLocation(((int) (xy[0] - WIDTH / 2+x)), ((int) (xy[1] - HEIGHT / 2+y)));
       return hitbox;
    }
    public boolean contains(int x, int y) {
