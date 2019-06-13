@@ -85,7 +85,7 @@ public class Juggernaut extends Player{
     for (int i = getProjectilesSize()-1; i >= 0; i--){
       getProjectile(i).advance();
       Projectile removed = null;
-      if (getProjectile(i).getRemainingDuration() <= 0){
+      if ((getProjectile(i).getRemainingDuration() <= 0) || hitObstacle(getProjectile(i))){
         removed = removeProjectile(i);
         if (removed instanceof FlareProjectile){
           addAOE(new FlareAOE(removed.getX(), removed.getY()));
