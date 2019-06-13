@@ -2,7 +2,7 @@ package client.gameUi;
 
 import client.Client;
 import client.ui.CustomButton;
-import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
+//import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

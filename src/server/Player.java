@@ -136,7 +136,6 @@ public abstract class Player extends User implements CanIntersect {
          for (int j = 0; j < thisPolygon.npoints; j++) {
             xP[j] = thisPolygon.xpoints[j]+15000;
             yP[j] = thisPolygon.ypoints[j]+10000;
-            System.out.println(xP[j]+"*"+yP[j]);
          }
          Player.obstacles[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
       }
@@ -395,8 +394,9 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void setSpawn(Region region){
-      /*xy[0]=region.;
-      xy[1]=region.;*/
+      xy[0]=(region.getMidXy()[0]+15000)+(int)(Math.random()*20);
+      xy[1]=(region.getMidXy()[1]+10000)+(int)(Math.random()*20);
+      System.out.println("XXXX"+xy[0]+" "+xy[1]);
    }
    public void setTeam(int teamNumber) {
       this.teamNumber = teamNumber;
