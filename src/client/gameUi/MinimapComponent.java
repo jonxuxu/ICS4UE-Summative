@@ -2,9 +2,13 @@ package client.gameUi;
 
 import client.Player;
 import client.map.FogMap;
-import sun.font.GraphicComponent;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
@@ -37,7 +41,15 @@ public class MinimapComponent extends GameComponent {
       outputShape = new Area(new Rectangle(1250, 550, 300, 300));
    }
 
-
+   /**
+    * Draws the map, and players in the minimap
+    * @param g2 Graphics2D, used to draw the minimap
+    * @param fog Team Fog of War (in progress)
+    * @param bgImage The image of the map
+    * @param players List of all players in the game
+    * @param myPlayerId The id number of the player player
+    * @param xyAdjust The translation amount based on the player
+    */
    public void draw(Graphics2D g2, FogMap fog, BufferedImage bgImage, Player[] players, int myPlayerId, int[] xyAdjust) {
       // Draws map
       Shape oldClip = g2.getClip();
@@ -47,12 +59,6 @@ public class MinimapComponent extends GameComponent {
       tx.scale(0.1*MAP_WIDTH/bgImage.getWidth(), 0.1*MAP_HEIGHT/bgImage.getHeight());
 
       g2.drawRenderedImage(bgImage, tx);
-     // g2.drawImage(bgImage, 1400 - players[myPlayerId].getXy()[0], 700 - players[myPlayerId].getXy()[1], (int)(bgImage.getWidth()), (int)(bgImage.getHeight()), null);
-      //g2.setColor(Color.pink);
-      //g2.fillRect(0, 0, 10000, 1000);
-      //g2.setColor(Color.red);
-     // g2.fillRect(1400 - players[myPlayerId].getXy()[0], 700 - players[myPlayerId].getXy()[1], (int)(bgImage.getWidth()), (int)(bgImage.getHeight()));
-
 
       // Draws fog
       /*
@@ -75,7 +81,7 @@ public class MinimapComponent extends GameComponent {
             xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.1);
             xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.1);
             tx.translate(xyAdjust[0], xyAdjust[1]);
-            playerShape = new Area(new Rectangle(1400, 700, 4, 4)).createTransformedArea(tx);
+            playerShape = new Area(new Rectangle(1396, 696, 8, 8)).createTransformedArea(tx);
             if (player.getTeam() == players[myPlayerId].getTeam()) { // On same team
                allyShape.add(playerShape);
             } else {
@@ -98,7 +104,4 @@ public class MinimapComponent extends GameComponent {
       g2.clip(oldClip);
    }
 
-   public void update() {
-
-   }
 }
