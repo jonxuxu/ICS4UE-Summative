@@ -1233,7 +1233,7 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
-         allComponents = new GameComponent[4];
+         allComponents = new GameComponent[3];
          pauseComponent = new PauseComponent(800, 500, super.getClient());
          pauseComponent.setBounds(MAX_GAME_X / 2 - 400, MAX_GAME_Y / 2 - 250, 800, 500);
          this.add(pauseComponent);
