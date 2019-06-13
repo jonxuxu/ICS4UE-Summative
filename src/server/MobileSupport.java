@@ -113,8 +113,8 @@ public class MobileSupport extends Player{
     }
   }
   public int getSpellPercent(int spellIndex) {
-    return (spellCooldowns[spellIndex] - spellTimers[spellIndex])/spellCooldowns[spellIndex]*100;
-    /*
+    return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
+     /*
     if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
       return (100);
     } else {
