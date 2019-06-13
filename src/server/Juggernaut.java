@@ -116,6 +116,12 @@ public class Juggernaut extends Player{
               getEnemy(j).addStatus(new Illuminated(500));
             }
           }
+        } else if (getAOE(i) instanceof AutoAOE){
+          for (int j = 0; j < getEnemiesSize(); j++){
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).damage(getAttack());
+            }
+          }
         } else if  (getAOE(i) instanceof JuggernautQAOE){
           ((JuggernautQAOE)getAOE(i)).setX(getX());
           ((JuggernautQAOE)getAOE(i)).setY(getY());

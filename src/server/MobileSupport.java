@@ -190,12 +190,19 @@ public class MobileSupport extends Player{
           getAOE(i).setX(getX());
           getAOE(i).setY(getY());
           for (int j = 0; j < getEnemiesSize(); j++){
-            for (int k = 0; k < qBlacklist.size(); k++){
-              if (getEnemy(j) != qBlacklist.get(k)){
-                if (getAOE(i).collides(getEnemy(j))){
-                  getEnemy(j).addStatus(new Stun(Q_STUN_DURATION, 12));
-                  qBlacklist.add(getEnemy(j));
+            if (!qBlacklist.isEmpty()){
+              for (int k = 0; k < qBlacklist.size(); k++){
+                if (getEnemy(j) != qBlacklist.get(k)){
+                  if (getAOE(i).collides(getEnemy(j))){
+                    getEnemy(j).addStatus(new Stun(Q_STUN_DURATION, 12));
+                    qBlacklist.add(getEnemy(j));
+                  }
                 }
+              }
+            } else {
+              if (getAOE(i).collides(getEnemy(j))){
+                getEnemy(j).addStatus(new Stun(Q_STUN_DURATION, 12));
+                qBlacklist.add(getEnemy(j));
               }
             }
           }
