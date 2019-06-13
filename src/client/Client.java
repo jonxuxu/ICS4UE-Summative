@@ -94,7 +94,7 @@ public class Client extends JFrame implements WindowListener {
    private String username, attemptedGameName, attemptedGamePassword;
    private boolean host, notifyReady, sendName, testGame, loading, logout, leaveGame, teamChosen, classChosen, gameBegin; // False by default
    private int[] errors = new int[4];
-   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough players", "One team is empty", "Team is full", "Not all players have selected a team", "Not all players have selected a class"};
+   private String errorMessages[] = {"Success", "This name is already taken", "Only letters and numbers are allowed", "This exceeds 15 characters", "This is blank", "Wrong username/password", "Game is full/has already begun", "Not enough characters", "One team is empty", "Team is full", "Not all characters have selected a team", "Not all characters have selected a class"};
    private int myTeam;
    private String className;
    private int myPlayerID;
@@ -484,7 +484,7 @@ public class Client extends JFrame implements WindowListener {
             outputString.append("R" + mouseAngle + " ");
             boolean walking = false;
             int positionIndex = -10;
-            //Refreshes the players animation
+            //Refreshes the characters animation
             if (keyAngle != -10) {
                positionIndex = (int) Math.abs(2 - Math.ceil(keyAngle / 2.0)); //*4*,3, *2*,1,*0*,-1,*-2*,-3
                //2,1.5 1,0.5 0,-0.5 ,-1,-1.5, so rounding UP will give 2,1,0,-1
@@ -746,20 +746,40 @@ public class Client extends JFrame implements WindowListener {
                   projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
                } else if (initializer == 'E') {
                   int id = Integer.parseInt(secondSplit[0]);
-                  if ((id != 4) && (id != 14)) {
-                     aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                  } else {
-                     int[][] points = new int[2][4];
+                  if (id == 0){
+                    aoes.add(new FlareAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 1){
+                    aoes.add(new SafeMarksmanEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 2){
+                    aoes.add(new SafeMarksmanSpaceAOE1((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 3){
+                    aoes.add(new SafeMarksmanSpaceAOE2((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 4){
+                    int[][] points = new int[2][4];
                      for (int m = 0; m < 2; m++) {
                         for (int n = 0; n < 4; n++) {
                            points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
                         }
                      }
-                     if (id == 4) {
-                        aoes.add(new TimeMageAOE(id, points));
-                     } else {
-                        aoes.add(new AutoAOE(id, points));
-                     }
+                     aoes.add(new TimeMageAOE(points));
+                  } else if (id == 5){
+                    aoes.add(new GhostQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 6){
+                    //aoes.add(new MobileSupportQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 7){
+                    aoes.add(new MobileSupportPassiveAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 8){
+                    aoes.add(new MobileSupportEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 9){
+                    aoes.add(new MobileSupportSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 10){
+                    aoes.add(new JuggernautQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 11){
+                    aoes.add(new JuggernautEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 12){
+                    aoes.add(new SummonerPet((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 13){
+                    aoes.add(new SummonerSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
                   }
                } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
                   int id = Integer.parseInt(secondSplit[0]);
@@ -835,15 +855,15 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setIlluminated(Boolean.parseBoolean(data[14]));
       /*
       for (int j = 16; j < 16 + Integer.parseInt(data[15]); j++) {
-         players[playerID].addStatus(Integer.parseInt(data[j]));
+         characters[playerID].addStatus(Integer.parseInt(data[j]));
       }*/
       //Turn off flashlight
       players[playerID].setFlashlightOn(false);
    }
 
     /**
-     * Setter method to update the information for the rest of the players
-     * @param data String of data denoting each update for the rest of the players
+     * Setter method to update the information for the rest of the characters
+     * @param data String of data denoting each update for the rest of the characters
      */
    public void updateOthers(String[] data) {
       int playerID = Integer.parseInt(data[0]);
@@ -856,7 +876,7 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setIlluminated(Boolean.parseBoolean(data[7]));
       /*
       for (int j = 9; j < 9 + Integer.parseInt(data[8]); j++) {
-         players[playerID].addStatus(Integer.parseInt(data[j]));
+         characters[playerID].addStatus(Integer.parseInt(data[j]));
       }*/
    }
 
@@ -1034,7 +1054,7 @@ public class Client extends JFrame implements WindowListener {
 
    //Sets the teams
     /**
-     * Sets the teams for the players
+     * Sets the teams for the characters
      * @param myTeam requested team of the player
      */
    public void setTeam(int myTeam) {
@@ -1067,10 +1087,10 @@ public class Client extends JFrame implements WindowListener {
      * @param mode the kind of chat being called
      */
    public void sendMessage(String message, int mode) {
-      // This works
       Thread thread = new Thread(new Runnable() {
          @Override
          public void run() {
+            // Sends repeat packets if messages haven't made it through
             while(!messageOk) {
                System.out.println("Sending: " + message);
                output.println("C" + mode + "," + message);
@@ -1234,7 +1254,7 @@ public class Client extends JFrame implements WindowListener {
             }
 
             for (int i = 0; i < aoes.size(); i++) {
-               if (aoes.get(i).getID() == 0) {
+               if (aoes.get(i) instanceof FlareAOE) {
                   darkness.subtract(aoes.get(i).getArea());
                }
             }

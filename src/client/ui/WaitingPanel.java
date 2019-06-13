@@ -191,7 +191,7 @@ public class WaitingPanel extends MenuPanel { //State=6
       }
 
 
-      //Display classes:
+      //Display all characters:
       for (int i = 0; i < 6; i++){
          g2.drawImage(idleCharacters[i], MAX_X / 2 - (stringSize * 3 + 75) + (stringSize + 30) * i, MAX_Y * 11 / 30, stringSize, stringSize, null);
       }
