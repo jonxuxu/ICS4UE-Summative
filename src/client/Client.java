@@ -826,7 +826,7 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setAttack(Integer.parseInt(data[5]));//attack
       players[playerID].setMobility(Integer.parseInt(data[6]));//movement
       players[playerID].setRange(Integer.parseInt(data[7]));//range
-      players[playerID].setArtifact(Boolean.parseBoolean(data[8]));//artifacts
+      players[playerID].setArtifact(Boolean.parseBoolean(data[8]));//artifact
       players[playerID].setGold(Integer.parseInt(data[9]));//gold amount
       for (int j = 10; j < 13; j++) {
          players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 10);
