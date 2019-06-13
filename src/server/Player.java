@@ -684,7 +684,11 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Status getStatus(int i) {
-      return statuses.get(i);
+      if (i < statuses.size()) {
+         return statuses.get(i);
+      } else {
+         return null;
+      }
    }
 
    public void addStatus(Status status) {
