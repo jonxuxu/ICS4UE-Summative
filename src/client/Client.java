@@ -195,9 +195,10 @@ public class Client extends JFrame implements WindowListener {
       this.addKeyListener(myKeyListener);
       this.addWindowListener(this);
 
-      // Setting up fog (should be moved soon TM)
-      int[] xy = {300, 300};
-      fog = new FogMap(xy, MAP_WIDTH, MAP_HEIGHT);
+      /*
+      // Setting up fog
+      int[] spawnXy = {300, 300};
+      fog = new FogMap(spawnXy, MAP_WIDTH, MAP_HEIGHT);*/
 
       //Variable set up
       teams[0] = new ArrayList<Player>();
@@ -1311,6 +1312,7 @@ public class Client extends JFrame implements WindowListener {
             }
 
             // Updating fog
+            /*
             resetXyAdjust();
 
             for (int i = 0; i < players.length; i++) {
@@ -1327,10 +1329,9 @@ public class Client extends JFrame implements WindowListener {
                   }
                }
             }
-            //Creating shapes
+            Creating shapes
+            Draws fog
 
-            //Draws fog
-            /*
             if(!drawn){
                fog.drawFog(g2, xyAdjust);
                drawn = true;
