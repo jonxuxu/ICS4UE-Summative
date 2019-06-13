@@ -333,7 +333,6 @@ public class Server {
          for (MenuHandler thisHandler : handlers) {
             thisHandler.kill();
          }
-         //TODO: ADD MAP LOADING HERE, set the polygons right after
          Polygon[] sampleObstacles = new Polygon[2];
          int[] xPoints = new int[4];
          int[] yPoints = new int[4];
@@ -444,7 +443,6 @@ public class Server {
             for (Player myPlayer : players) {
                myPlayer.sendInfo();
             }
-            //TODO: Map stuff should be slightly before this
             allPolygons = new Polygon[builder.getObstacle().size()];
             for (int i = 0; i < allPolygons.length; i++) {
                allPolygons[i] = builder.getObstacle().get(i).boundingBox;
@@ -459,7 +457,7 @@ public class Server {
 
             Player.setConstantHitboxes(players.length, builder.getObstacle());
             for (int i = 0; i < players.length; i++) {
-               players[i].setLightingHitbox(i);//TODO: Add the spawn xy here to initialize the hitbox properly. For now, it is just assuming that it starts at 300 by 300
+               players[i].setLightingHitbox(i);
             }
             while (!stopGame) {
                for (int i = 0; i < playerNum; i++) {
@@ -678,7 +676,6 @@ public class Server {
                            }
                         }
                      }
-                     //TODO:add spells ID here
                      for (int i = 0; i < playerNum; i++) {
                         if (players[i] != null) {
                            outputString[i].append("W" + i + "," + players[i].getPositionIndex() + "," + players[i].getWalking() + " ");

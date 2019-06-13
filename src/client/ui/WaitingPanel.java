@@ -76,7 +76,6 @@ public class WaitingPanel extends MenuPanel { //State=6
       backButton.setBounds(1, 1, 1, 1);
       this.add(backButton);
 
-      //TODO: Make into buttons
       //Setting up the classes
       SAFE_MARKSMAN_PEDESTAL.addActionListener((ActionEvent e) -> {
          CLIENT.setClassName("Archer");

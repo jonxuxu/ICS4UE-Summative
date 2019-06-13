@@ -183,7 +183,6 @@ public class CustomMouseAdapter extends MouseAdapter {
       return this.state[mouseArrayNumber];
    }
 
-   // TODO: Streamline for even driven w/ kameron
    public int[] getDispXy() { //Returns the displacement from the top left corner in game coordinates
       int[] dispXy = new int[2];
       dispXy[0] = (int) ((state[0] - centerXy[0]));

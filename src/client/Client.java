@@ -198,7 +198,6 @@ public class Client extends JFrame implements WindowListener {
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
       fog = new FogMap(xy, MAP_WIDTH, MAP_HEIGHT);
-      // TODO: Set player spawn xy later
 
       //Variable set up
       teams[0] = new ArrayList<Player>();
@@ -359,7 +358,6 @@ public class Client extends JFrame implements WindowListener {
             output.println("Z" + className);//Refers to class chosen
             output.flush();
          }
-         //TODO: Add class select here
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -408,7 +406,6 @@ public class Client extends JFrame implements WindowListener {
     * Initializer method for the start of the game
     */
    public void gameLogic() {
-      // TODO: Initialize map ONCE after game begin
       try {
          if (input.ready()) {
             decipherGameInput(input.readLine());
@@ -426,7 +423,6 @@ public class Client extends JFrame implements WindowListener {
                lightFog = fog.getExplored(2).createTransformedArea(tx);*/
                drawn = false;
             }
-            // TODO: Update/improve when kameron is done
             int[] xyPos = new int[2]; //Scaled to the map
             xyPos[0] = myMouseAdapter.getDispXy()[0] + myPlayer.getXy()[0];
             xyPos[1] = myMouseAdapter.getDispXy()[1] + myPlayer.getXy()[1];
@@ -471,7 +467,7 @@ public class Client extends JFrame implements WindowListener {
                }
             }
             if (positionIndex != -10) {
-               outputString.append("W" + positionIndex + " ");//TODO: make this event driven
+               outputString.append("W" + positionIndex + " ");
             }
             if (!outputString.toString().trim().isEmpty()) {
                output.println(outputString.toString().trim());
@@ -514,8 +510,6 @@ public class Client extends JFrame implements WindowListener {
                      waitingForImage = false;
                      nextPanel = 7;//Sends to the game screen
                      gameBegin = true;
-                     System.out.println("DONNEEE");
-                     System.out.println(sheet.getWidth() + " " + sheet.getHeight());
                   }
                }
             }
@@ -658,7 +652,6 @@ public class Client extends JFrame implements WindowListener {
             String[] classes = input.split(" ", -1);
             for (int i = 0; i < onlineList.size(); i++) {
                thisClass = classes[i];
-               //TODO: Add class stuff here;
                if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
                   players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("TimeMage")) {
