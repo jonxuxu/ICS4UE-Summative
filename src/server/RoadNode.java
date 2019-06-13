@@ -8,7 +8,7 @@ import java.util.ArrayList;
  *
  * A class for generating and storing the data of the road network on the map
  *
- * @author Artem Sotnikov
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @since 2019-03-25
  * @version 1.0
  *

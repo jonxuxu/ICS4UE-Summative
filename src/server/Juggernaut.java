@@ -13,22 +13,21 @@ public class Juggernaut extends Player{
   private int[] spellTimers = {0,0,0};
   private int[] passiveTimers = new int[getEnemiesSize()];
   private static int PASSIVE_RANGE = 700;
-  private static int Q_BASE_DAMAGE = 100;
-  private static int Q_DAMAGE_PER_STACK = 10;
-  private static int Q_SPEED = 5;
-  private static int Q_RANGE = 200;
+  private static int Q_BASE_DAMAGE = 50;
+  private static int Q_SPEED = 10;
+  private static int Q_RANGE = 300;
   private static int Q_DURATION = Q_RANGE/Q_SPEED;
-  private static int E_BASE_DAMAGE = 100;
-  private static int SPACE_DURATION = 100;
+  private static int E_BASE_DAMAGE = 50;
+  private static int SPACE_DURATION = 300;
   
   Juggernaut(String username, int teamNumber) {
     super(username,teamNumber);
     setMaxHealth(300);
     setHealth(300);
-    setAttack(300);
+    setAttack(30);
     setMobility(5);
-    setRange(50);//REE Change to -1 when add support for melee attacks
-    setAutoAttackCooldown(10);
+    setRange(75);//REE Change to -1 when add support for melee attacks
+    setAutoAttackCooldown(20);
     setFlareCooldown(100);
     setMelee(true);
   }

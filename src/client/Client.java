@@ -36,7 +36,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
 
 /**
  * Client.java
- * This is
+ * This is the main Client class where everything client-side runs
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -46,9 +46,9 @@ occur is the client sending an output that does not reach anyone, which is perfe
 public class Client extends JFrame implements WindowListener {
    private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
-   Runtime runtime = Runtime.getRuntime();
-   double maxMem = runtime.maxMemory();
-   double usedMem;
+   private Runtime runtime = Runtime.getRuntime();
+   private double maxMem = runtime.maxMemory();
+   private double usedMem;
 
    // Networking
    private Socket socket;

@@ -1,6 +1,6 @@
 package server;
 class GhostQAOE extends AOE{
-  private static int RADIUS = 25;
+  private static int RADIUS = 50;
   private static int ID = 5;//?
   GhostQAOE(int x, int y, int duration){
     super(x,y,duration,RADIUS,ID);

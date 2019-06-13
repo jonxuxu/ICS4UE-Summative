@@ -1,6 +1,6 @@
 package server;
 class JuggernautQAOE extends AOE{
-  private static int RADIUS = 25;
+  private static int RADIUS = 50;
   private static int ID = 10;//?
   JuggernautQAOE(int x, int y, int duration){
     super(x,y,duration,RADIUS,ID);

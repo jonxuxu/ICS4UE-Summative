@@ -22,6 +22,9 @@ public class Status {
   public int getRemainingDuration(){
     return duration-lifetime;
   }
+  public void refresh(){
+    lifetime = 0;
+  }
   public void setID(int id){
     this.id=id;
   }
