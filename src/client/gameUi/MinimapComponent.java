@@ -85,8 +85,8 @@ public class MinimapComponent extends GameComponent {
       // Draws map
 
       // Draws fog
-      xyAdjust[0] = (int) ((890) - (players[myPlayerId].getXy()[0]) * 0.05);
-      xyAdjust[1] = (int) ((440) - (players[myPlayerId].getXy()[1]) * 0.05);
+      xyAdjust[0] = (int) ((890) - (characters[myPlayerId].getXy()[0]) * 0.05);
+      xyAdjust[1] = (int) ((440) - (characters[myPlayerId].getXy()[1]) * 0.05);
       tx = new AffineTransform();
       tx.translate(xyAdjust[0], xyAdjust[1]);
       tx.scale(0.05, 0.05);
@@ -101,16 +101,16 @@ public class MinimapComponent extends GameComponent {
       outputShape.intersect(lightFog);
       g2.fill(outputShape);
 
-      // Draws players and mobs
+      // Draws characters and mobs
       allyShape = new Area();
       enemyShape = new Area();
-      for (Player player : players) {
+      for (Player player : characters) {
          tx = new AffineTransform();
-         xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
-         xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.05);
+         xyAdjust[0] = -(int) ((characters[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
+         xyAdjust[1] = -(int) ((characters[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.05);
          tx.translate(xyAdjust[0], xyAdjust[1]);
          playerShape = new Area(new Rectangle((888), (438), (4), (4))).createTransformedArea(tx);
-         if (player.getTeam() == players[myPlayerId].getTeam()) { // On same team
+         if (player.getTeam() == characters[myPlayerId].getTeam()) { // On same team
             allyShape.add(playerShape);
          } else {
             if (player.getIlluminated()) {
