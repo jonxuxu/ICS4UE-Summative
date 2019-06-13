@@ -1245,10 +1245,10 @@ public class Client extends JFrame implements WindowListener {
       //Game components
       private GameComponent[] allComponents;
       private PauseComponent pauseComponent;
+      private MinimapComponent minimapComponent;
       private int MAX_GAME_X, MAX_GAME_Y;
       private Area darkness;
       private boolean pause = false;
-      private float fadeOut = 0;
 
       /**
        * Constructor
@@ -1263,9 +1263,10 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
-         allComponents = new GameComponent[4];
+         allComponents = new GameComponent[3];
          pauseComponent = new PauseComponent(800, 500, super.getClient());
          pauseComponent.setBounds(MAX_GAME_X / 2 - 400, MAX_GAME_Y / 2 - 250, 800, 500);
+         minimapComponent = new MinimapComponent(300, 300, MAP_WIDTH, MAP_HEIGHT);
          this.add(pauseComponent);
 
          this.setDoubleBuffered(true);
@@ -1275,7 +1276,6 @@ public class Client extends JFrame implements WindowListener {
 
       /**
        * Paint Component class to set up what changes in the display every frame
-       *
        * @param g graphics
        */
       @Override
@@ -1284,9 +1284,8 @@ public class Client extends JFrame implements WindowListener {
          g2 = (Graphics2D) g;
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new BottomComponent(myPlayer);
-            allComponents[1] = new MinimapComponent(fog, players, myPlayerID);
-            allComponents[2] = new InventoryComponent();
-            allComponents[3] = new DebugComponent();
+            allComponents[1] = new InventoryComponent();
+            allComponents[2] = new DebugComponent();
             midXy[0] = (MAX_X / 2);
             midXy[1] = (MAX_Y / 2);
             for (Player currentPlayer : players) {
@@ -1306,8 +1305,6 @@ public class Client extends JFrame implements WindowListener {
             //Map
             g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], MAP_WIDTH, MAP_HEIGHT, null);
             g2.setColor(Color.black);
-
-
             //Game player
             resetXyAdjust();
 
@@ -1321,7 +1318,7 @@ public class Client extends JFrame implements WindowListener {
             }
 
             for (int i = 0; i < aoes.size(); i++) {
-               if (aoes.get(i) instanceof FlareAOE) {
+               if (aoes.get(i).getID() == 0) {
                   darkness.subtract(aoes.get(i).getArea());
                }
             }
@@ -1357,19 +1354,16 @@ public class Client extends JFrame implements WindowListener {
                   }
                }
             }
-            for (int i = 0; i < artifacts.length; i++) {
-               if (drawArtifact[i]) {
-                  artifacts[i].drawArtifact(g2, xyAdjust);
-               }
-            }
+
             //Creating shapes
 
             //Draws fog
-         /*   g2.setColor(Color.black); //Unexplored
-            g2.fill(darkFog);
-            g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);
-            drawn = true;*/
+            /*
+            if(!drawn){
+               fog.drawFog(g2, xyAdjust);
+               drawn = true;
+            }*/
+
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
                projectiles.get(i).draw(g2);
@@ -1379,7 +1373,7 @@ public class Client extends JFrame implements WindowListener {
             }
             //draw all components
 
-            ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
+            ((DebugComponent) (allComponents[2])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
             if (keyPressed) {
                if (lastKeyTyped == 27) { // Esc key
                   pause = !pause;
@@ -1389,51 +1383,28 @@ public class Client extends JFrame implements WindowListener {
                      System.out.println("Pause");
                   }
                } else if (lastKeyTyped == 8) { // Back key
-                  ((DebugComponent) (allComponents[3])).toggle();
+                  ((DebugComponent) (allComponents[2])).toggle();
                   System.out.println("Debug mode");
                } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) { //C or c
-                  ((InventoryComponent) (allComponents[2])).toggle();
+                  ((InventoryComponent) (allComponents[1])).toggle();
                }
                keyPressed = false;
             }
             for (GameComponent gameComponent : allComponents) {
                gameComponent.draw(g2);
             }
+            minimapComponent.draw(g2, fog, sheet, players, myPlayerID, xyAdjust);
          }
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          frames++;
-
-         if (finalScreen) {
-            intermediatePanel.hideChat();
-            if (fadeOut < 0.99) {
-               fadeOut += 0.01;
-               g2.setColor(new Color((float) 0, (float) 0, (float) 0, (fadeOut)));
-               g2.fillRect(0, 0, MAX_X, MAX_Y);
-               g2.setColor(Color.white);
-               g2.setFont(new Font("Akura Popo", Font.PLAIN, (int) (50)));
-               g2.drawString(teamWin, MAX_X / 2 - g2.getFontMetrics().stringWidth(teamWin) / 2, MAX_Y / 2);
-            } else {
-               g2.setColor(new Color((float) 0, (float) 0, (float) 0, 1));
-               g2.fillRect(0, 0, MAX_X, MAX_Y);
-               if (fadeOut > 1.5) {
-                  nextPanel = 2;//Sends to the main screen
-                  gameBegin = false;
-               } else {
-                  fadeOut += 0.01;
-               }
-               g2.setFont(new Font("Akura Popo", Font.PLAIN, (int) (50)));
-               g2.drawString(teamWin, MAX_X / 2 - g2.getFontMetrics().stringWidth(teamWin) / 2, MAX_Y / 2);
-            }
-            g2.drawImage(fullLeaf, MAX_X / 2 - 38, 70 + MAX_Y - 42, 76, 84, null);
-         }
       }
 
       /**
        * Setter method to reset the x and y values for something of the Client
        */
       public void resetXyAdjust() {
-         xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
-         xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
+         xyAdjust[0] = midXy[0] - myPlayer.getXy()[0];
+         xyAdjust[1] = midXy[1] - myPlayer.getXy()[1];
       }
    }
 }

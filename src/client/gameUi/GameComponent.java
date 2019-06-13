@@ -18,7 +18,7 @@ public abstract class GameComponent {
    private static Map<String, Font> fonts = new HashMap<String, Font>();
 
 
-   public abstract void draw(Graphics2D g2);
+   public void draw(Graphics2D g2) {};
 
    public static void initializeSize(int MAX_X1, int MAX_Y1) {
       MAX_X = MAX_X1;
