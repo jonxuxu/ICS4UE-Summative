@@ -628,7 +628,11 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Projectile getProjectile(int i) {
-      return projectiles.get(i);
+      if (i<projectiles.size()) {
+         return projectiles.get(i);
+      } else {
+         return null;
+      }
    }
 
    public ArrayList<Projectile> getAllProjectiles() {
