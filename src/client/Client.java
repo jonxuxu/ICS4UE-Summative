@@ -347,19 +347,19 @@ public class Client extends JFrame implements WindowListener {
             for (int i = 0; i < onlineList.size(); i++) {
                //TODO: Add class select here
                if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("TimeMage")) {
-                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+                  players[i] = new TimeMage(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("Ghost")) {
-                  players[i] = new Ghost(onlineList.get(i).getUsername());
+                  players[i] = new Ghost(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
-                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("Juggernaut")) {
-                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("Summoner")) {
-                  players[i] = new Summoner(onlineList.get(i).getUsername());
+                  players[i] = new Summoner(onlineList.get(i).getUsername(), myMouseAdapter);
                } else {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
                }
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
@@ -430,6 +430,7 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("S" + i + " ");
                }
             }
+            System.out.println(myPlayer.getX()+"???"+myPlayer.getY());
             if (keyAngle != -10) {
                outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
             }
@@ -494,6 +495,7 @@ public class Client extends JFrame implements WindowListener {
                      nextPanel = 7;//Sends to the game screen
                      gameBegin = true;
                      System.out.println("DONNEEE");
+                     System.out.println(sheet.getWidth()+" "+sheet.getHeight());
                   }
                }
             }
@@ -615,19 +617,19 @@ public class Client extends JFrame implements WindowListener {
                thisClass = classes[i];
                //TODO: Add class stuff here;
                if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("TimeMage")) {
-                  players[i] = new TimeMage(onlineList.get(i).getUsername());
+                  players[i] = new TimeMage(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("Ghost")) {
-                  players[i] = new Ghost(onlineList.get(i).getUsername());
+                  players[i] = new Ghost(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
-                  players[i] = new MobileSupport(onlineList.get(i).getUsername());
+                  players[i] = new MobileSupport(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("Juggernaut")) {
-                  players[i] = new Juggernaut(onlineList.get(i).getUsername());
+                  players[i] = new Juggernaut(onlineList.get(i).getUsername(), myMouseAdapter);
                } else if (thisClass.equals("Summoner")) {
-                  players[i] = new Summoner(onlineList.get(i).getUsername());
+                  players[i] = new Summoner(onlineList.get(i).getUsername(), myMouseAdapter);
                } else {//TESTING MODE ONLY
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername());
+                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
                }
                if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
                   myPlayer = players[i];
@@ -970,6 +972,7 @@ public class Client extends JFrame implements WindowListener {
 
          this.setDoubleBuffered(true);
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override

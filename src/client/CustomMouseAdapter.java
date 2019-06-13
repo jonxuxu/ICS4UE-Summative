@@ -179,6 +179,9 @@ public class CustomMouseAdapter extends MouseAdapter {
     *
     * @return pressed, a boolean
     */
+   public int getState(int mouseArrayNumber){
+      return this.state[mouseArrayNumber];
+   }
 
    // TODO: Streamline for even driven w/ kameron
    public int[] getDispXy() { //Returns the displacement from the top left corner in game coordinates

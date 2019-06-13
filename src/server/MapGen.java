@@ -220,7 +220,7 @@ public class MapGen {
     		temp.type = "TREE";
     		temp.location = new Point();
 
-			int maxRadius = 600;
+			int maxRadius = 400;
     		
     		int tempX, tempY;
     		int tempDeltaX, tempDeltaY;
@@ -235,24 +235,34 @@ public class MapGen {
     			tempY = (int) (Math.sin(angle)*radius);
     			
     			exit = true;
-    			if ((regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("map") ||
-    					regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) &&
-						regionLayer.checkCoordinate((int) (tempX*1.75), tempY) != ("road")
-				) {
-	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
-	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
-	    				tempDeltaY = tempY - obstacles.get(idx).location.y;
-	    				
-	    				if ((Math.pow(tempDeltaX,2) + 
-	    						Math.pow(tempDeltaY,2)) <= Math.pow(maxRadius,2)) {
+
+				if (regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) {
+					if (randRoll(700)) {
+						exit = false;
+					}
+				}
+
+				if (exit) {
+					if ((regionLayer.checkCoordinate((int) (tempX * 1.75), tempY) == ("map") ||
+							regionLayer.checkCoordinate((int) (tempX * 1.75), tempY) == ("swamp")) &&
+							regionLayer.checkCoordinate((int) (tempX * 1.75), tempY) != ("road")
+					) {
+						for (int idx = obstacles.size() - 1; idx > -1; idx--) {
+							tempDeltaX = tempX - obstacles.get(idx).location.x;
+							tempDeltaY = tempY - obstacles.get(idx).location.y;
+
+							if ((Math.pow(tempDeltaX, 2) +
+									Math.pow(tempDeltaY, 2)) <= Math.pow(maxRadius, 2)) {
 //	    							System.out.println((Math.pow(tempDeltaX,2) +
 //	    		    						Math.pow(tempDeltaY,2)));
-	    							exit = false;
-	    				}
-	    			}
-    			} else {
-    				exit = false;
-    			}
+								exit = false;
+							}
+						}
+					} else {
+						exit = false;
+					}
+				}
+
     			
     			
     		} while (!exit);
@@ -289,7 +299,7 @@ public class MapGen {
     			
     			exit = true;
     			    
-    			if (regionLayer.checkCoordinate(tempX, tempY) == ("map")) {
+    			if (regionLayer.checkCoordinate((int)(tempX*1.75), tempY) == ("map")) {
 	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
 	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
 	    				tempDeltaY = tempY - obstacles.get(idx).location.y;    				
@@ -600,10 +610,10 @@ public class MapGen {
     	Region creation = null;
     	
     	for (int iter = 0; iter < creviceNum; iter++) {
-    		source = new Point((int) (Math.random()*6000 - 3000),(int) (Math.random()*6000 - 3000));
+    		source = new Point((int) (Math.random()*5000 - 2500),(int) (Math.random()*5000 - 2500));
     		
 			do {
-				creviceEngine.generateFullCrevice(source,1000,1.0,4,true,500);
+				creviceEngine.generateFullCrevice(source,1250,1.0,4,true,1000);
 	    		creation = new Region("crevice",4);  
 	    		creation.uploadPolygon(creviceEngine.getPolygon());
 			} while (!regionLayer.regions.get(SWAMP_REGION_IDX).contains(creation));

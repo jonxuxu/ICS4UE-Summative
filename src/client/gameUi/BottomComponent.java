@@ -85,8 +85,7 @@ public class BottomComponent extends GameComponent {
       g2.setColor(Color.white);
       g2.setFont(STATS_FONT);
       if (myPlayer != null) {
-         g2.drawString("Gold: " + myPlayer.getGold(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight());
-         g2.drawString("User: " + myPlayer.getUsername(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight() * 2);
+          g2.drawString("User: " + myPlayer.getUsername(), MAX_X / 2 - 260, (MAX_Y - 20) - g2.getFontMetrics().getHeight() * 2);
       }
    }
 }

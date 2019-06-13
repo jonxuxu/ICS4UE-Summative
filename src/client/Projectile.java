@@ -50,14 +50,7 @@ public class Projectile {
                BufferedImage arrow1 = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/P_arrow1.png"));
                AffineTransform at = AffineTransform.getTranslateInstance(x + xyAdjust[0], y + xyAdjust[1]);
 
-               //double xChange = (mouseX - x);
-               //double yChange = (mouseY - y);
-
-               //double radians = Math.atan2(yChange,xChange);
-               double radians = Math.atan2(xyAdjust[1], xyAdjust[0]);
-
-
-               at.rotate(radians - Math.PI / 2);
+               at.rotate(Player.getCustomMouseAdapter().getAngle() - Math.PI / 2);
                g2.drawImage(arrow1, at, null);
                */
             }

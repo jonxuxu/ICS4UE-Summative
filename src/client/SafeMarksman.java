@@ -19,14 +19,17 @@ public class SafeMarksman extends Player {
    private int positionIndex;
    private int movementIndex;
    private boolean moving;
+   private int attackIndex;
+   private boolean attacking;
    private int[] animationIndex = {80, 80, 80};
    private int[] ANIMATION_LENGTH = {80, 80, 80};
-   private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[4][][];
-   private BufferedImage[] SPELL_SPRITES = new BufferedImage[3];
+   private BufferedImage[][][] ALL_ANIMATIONS = new BufferedImage[5][][];
+   //private BufferedImage[] SPELL_SPRITES = new BufferedImage[3];
 
-   SafeMarksman(String username) {
-      super(username);
+   SafeMarksman(String username, CustomMouseAdapter myMouseAdapter) {
+      super(username, myMouseAdapter);
       try {
+         //walking and attack sprites
          BufferedImage movementSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/archer/C_archer.png"));
          ALL_ANIMATIONS[0] = new BufferedImage[3][4];
          for (int i = 0; i < 4; i++) {
@@ -70,6 +73,11 @@ public class SafeMarksman extends Player {
       this.positionIndex = positionIndex;
    }
 
+   public void setAttackIndex(int attackIndex, boolean attacking) {
+      this.attacking = attacking;
+      this.attackIndex = attackIndex;
+   }
+
    public void move(Graphics2D g2, int x, int y, int width, int height) {
       if (moving) {
          movementIndex++;
@@ -78,6 +86,16 @@ public class SafeMarksman extends Player {
          movementIndex = 0;
       }
       g2.drawImage(ALL_ANIMATIONS[0][movementIndex / 5][positionIndex], x, y, width, height, null);
+   }
+
+   public void attack(Graphics2D g2, int x, int y, int width, int height) {
+      if (attacking) {
+         attackIndex++;
+      }
+      if (attackIndex == 20) {
+         attackIndex = 0;
+      }
+      g2.drawImage(ALL_ANIMATIONS[0][2][positionIndex], x, y, width, height, null);
    }
 
    public void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex) {
@@ -91,6 +109,8 @@ public class SafeMarksman extends Player {
             spellAnimation(g2, x, y, width, height, 1);
          } else if (animationIndex[2] != ANIMATION_LENGTH[2]) {
             spellAnimation(g2, x, y, width, height, 2);
+         } else if (this.getMouse() == true) {
+            attack(g2, x, y, width, height);
          } else {
             move(g2, x, y, width, height);
          }
