@@ -518,8 +518,8 @@ public abstract class Player extends User implements CanIntersect {
    }
    public Rectangle getAdjustedHitboxRectangle(double x, double y) {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2+x)), ((int) (xy[1] - HEIGHT / 2+y)));
-      return hitbox;
-   }
+         return hitbox;
+      }
 
    public boolean hitObstacle(Projectile projectile){
       for (int k=0;k<obstacles.length;k++) {

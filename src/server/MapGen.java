@@ -371,8 +371,8 @@ public class MapGen {
     	Region t1Clearing = new Region("team_one_clearing",9);
     	Region t2Clearing = new Region("team_two_clearing",9);
     	
-    	t1Clearing.mimicCircle(nodes.get(teamOneIdx).location.x,nodes.get(teamOneIdx).location.y,750,12);
-    	t2Clearing.mimicCircle(nodes.get(teamTwoIdx).location.x,nodes.get(teamTwoIdx).location.y,750,12);
+    	t1Clearing.mimicCircle(nodes.get(teamOneIdx).location.x,nodes.get(teamOneIdx).location.y,1000,12);
+    	t2Clearing.mimicCircle(nodes.get(teamTwoIdx).location.x,nodes.get(teamTwoIdx).location.y,1000,12);
     	
     	regionLayer.regions.add(t1Clearing);
     	regionLayer.regions.add(t2Clearing);

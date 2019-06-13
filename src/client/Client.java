@@ -825,6 +825,15 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+   public void quit(){
+      try {
+         output.println("X");
+         output.flush();
+      } catch (Exception E) {
+         System.out.println("Not connected");
+      }
+   }
+
    public void windowClosing(WindowEvent e) {
       dispose();
       try {

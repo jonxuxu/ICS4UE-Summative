@@ -19,16 +19,15 @@ import java.util.ArrayList;
 
 /**
  * MainMapGenModule.java
- *
+ * <p>
  * Handles the sending and processing of all the data produced by the MapGen class
  *
  * @author Artem Sotnikov, Will Jeong
- * @since 2019-03-25
  * @version 3.3
- *
+ * @since 2019-03-25
  */
 
-class MainMapGenModule extends JFrame{
+class MainMapGenModule extends JFrame {
    private Disp display;
    private MapGen gen;
 
@@ -59,6 +58,7 @@ class MainMapGenModule extends JFrame{
          gen.tetherAllNodes2();
          gen.makeNodesElliptical();
          gen.generateRegions();
+         gen.insertArtifactClearing();
          gen.generateCrevices(2);
          gen.smokeTrees(7500, 130, 0, false);
          System.out.println("generation");
@@ -69,7 +69,6 @@ class MainMapGenModule extends JFrame{
          gen.addObstacleBoundingBoxes();
 
       }
-
 
 
       display = new Disp();
@@ -86,9 +85,7 @@ class MainMapGenModule extends JFrame{
 
 
    /**
-    *
     * An internal class handling the graphics for a JFrame implementation or for a direct image send
-    *
     */
 
    class Disp {
@@ -96,20 +93,19 @@ class MainMapGenModule extends JFrame{
        * Draws a oval with a custom radius centered at (0,0)
        *
        * @param radius the radius of the oval to be drawn
-       * @param g the graphics module with which the oval should be drawn
+       * @param g      the graphics module with which the oval should be drawn
        */
       private void drawOvalCustom(int radius, Graphics g) {
          g.drawOval(-radius, -radius, radius * 2, radius * 2);
       }
 
       /**
-       *
        * Draws a oval centered at a custom location, with a custom radius
        *
-       * @param radius the radius of the oval to be drawn
+       * @param radius  the radius of the oval to be drawn
        * @param xOffset the xCoordinate at which to start drawing
        * @param yOffset the yCoordinate at which to start drawing
-       * @param g the graphics module with which the oval should be drawn
+       * @param g       the graphics module with which the oval should be drawn
        */
 
       private void fillOvalCustom(int radius, int xOffset, int yOffset, Graphics g) {
@@ -117,12 +113,11 @@ class MainMapGenModule extends JFrame{
       }
 
       /**
-       *
        * Draws a oval centered at a custom location, with a custom radius
        *
-       * @param radius the radius of the oval to be drawn
+       * @param radius  the radius of the oval to be drawn
        * @param eAdjust the horizontal elliptical adjustment of the oval
-       * @param g the graphics module with which the oval should be drawn
+       * @param g       the graphics module with which the oval should be drawn
        */
 
       private void fillOvalCustom(int radius, double eAdjust, Graphics g) {
@@ -162,6 +157,8 @@ class MainMapGenModule extends JFrame{
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
                   g.setColor(new Color(0, 50, 0));
+               } else if (gen.regionLayer.regions.get(idx).regionType == "team_one_clearing" || gen.regionLayer.regions.get(idx).regionType == "team_two_clearing") {
+                  g.setColor(new Color(150, 97, 37));
                } else {
                   g.setColor(new Color(0, 100, 0));
                }
@@ -179,8 +176,7 @@ class MainMapGenModule extends JFrame{
 //        		(int)gen.nodes.get(i).getPoint().getY() - 5,50,50);
             if (gen.nodes.get(i).isClearing) {
                g.setColor(new Color(150, 97, 37));
-               this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x,
-                       gen.nodes.get(i).location.y, g);
+               this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
             } else {
                //this.fillOvalCustom(50, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
             }
@@ -199,25 +195,41 @@ class MainMapGenModule extends JFrame{
             if (gen.obstacles.get(i).radius != 0) {
                g2.fill(gen.obstacles.get(i).boundingBox);
             } else {
-               this.fillOvalCustom(50,gen.obstacles.get(i).location.x,
+               this.fillOvalCustom(50, gen.obstacles.get(i).location.x,
                        gen.obstacles.get(i).location.y, g);
             }
          }
-         /*try {
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
 
    /**
-    * Returns the full list of obstacles 
-    * 
+    * Returns the full list of obstacles
+    *
     * @return ArrayList<Obstacle>, the full list of obstacles contained within the instance of MapGen
     */
    public ArrayList<Obstacle> getObstacle() {
       return (gen.obstacles);
+   }
+
+   public Region getTeamClearing(int teamNumber) {
+      if (teamNumber == 0) {
+         for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
+            if (gen.regionLayer.regions.get(idx).regionType == "team_one_clearing") {
+               return (gen.regionLayer.regions.get(idx));
+            }
+         }
+      } else {
+         for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
+            if (gen.regionLayer.regions.get(idx).regionType == "team_two_clearing") {
+               return (gen.regionLayer.regions.get(idx));
+            }
+         }
+      }
    }
 
    /**
