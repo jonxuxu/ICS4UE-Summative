@@ -1,7 +1,7 @@
 package server;
 /**
- * SafeMarksman.java
- * This is
+ * Juggernaut.java
+ * This is the class handling the Juggernaut extension of Player
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -20,6 +20,11 @@ public class Juggernaut extends Player{
   private static int E_BASE_DAMAGE = 50;
   private static int SPACE_DURATION = 300;
   
+  /**
+   * Another constructor for class Juggernaut
+   * @param username the username of the player on the server
+   * @param teamNumber the team which the player is on
+   */
   Juggernaut(String username, int teamNumber) {
     super(username,teamNumber);
     setMaxHealth(300);
@@ -32,6 +37,12 @@ public class Juggernaut extends Player{
     setMelee(true);
   }
   
+  /**
+   * Handles the casting of the 3 different spells
+   * @param spellIndex the spell which to cast, where 0 is q, 1 is e, and 2 is space
+   * @return a boolean for whether the spell is cast or not
+   */
+  @Override
   public boolean castSpell(int spellIndex){
     if (!getStunned()) {
       if (spellTimers[spellIndex]<=0) {
@@ -53,6 +64,13 @@ public class Juggernaut extends Player{
       return false;
     }
   }
+  
+  /**
+   * Gets the cooldown remaining, as a percent, of the chosen spell
+   * @param spellIndex the spell which to check, where 0 is q, 1 is e, and 2 is space
+   * @return the percent away from the spell being off cooldown
+   */
+  @Override
   public int getSpellPercent(int spellIndex) {
     return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
     /*
@@ -63,6 +81,10 @@ public class Juggernaut extends Player{
     }*/
   }
   
+  /**
+   * Updates the character and all the autoattacks, aoes, statuses, and shields each frame
+   */
+  @Override
   public void update(){
     //ARTIFACT ADDED HERE
     if ((checkOnArtifact())) {
