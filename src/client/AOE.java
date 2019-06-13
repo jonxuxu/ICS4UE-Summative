@@ -37,7 +37,7 @@ public class AOE {
       this.radius = radius;
    }
 
-   
+
    public void draw(Graphics2D g2) {
       if (ID!=0) {
          g2.setColor(Color.WHITE);
