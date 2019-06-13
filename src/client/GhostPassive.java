@@ -16,6 +16,6 @@ class GhostPassive extends Status{
     int blue = 200 - stacks;
     Color color = new Color((int)Math.max(0, red),(int)Math.max(0, green),(int)Math.max(0, blue));
     g2.setColor(color);
-    g2.fillRect(playerX + getXyAdjust()[0] - 60/2 + index*LENGTH, playerY + getXyAdjust()[1] -60/2 - LENGTH, LENGTH, LENGTH);
+    g2.fillRect(playerX + getXyAdjust()[0] - getPlayerLength()/2 + index*LENGTH, playerY + getXyAdjust()[1] - getPlayerLength()/2 - LENGTH, LENGTH, LENGTH);
   }
 }

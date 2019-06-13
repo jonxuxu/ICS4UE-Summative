@@ -136,7 +136,7 @@ public abstract class Player extends User implements CanIntersect {
          for (int j = 0; j < thisPolygon.npoints; j++) {
             xP[j] = thisPolygon.xpoints[j]+15000;
             yP[j] = thisPolygon.ypoints[j]+10000;
-            System.out.println(xP[j]+"*"+yP[j]);
+            //System.out.println(xP[j]+"*"+yP[j]);
          }
          Player.obstacles[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
       }

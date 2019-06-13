@@ -30,8 +30,7 @@ public class AOE {
     * @param y y-location of the circle
     * @param radius radius of the circle
     */
-   AOE(int ID, int x, int y, int radius) {
-      this.ID = ID;
+   AOE(int x, int y, int radius) {
       this.x = x;
       this.y = y;
       this.radius = radius;
@@ -58,5 +57,15 @@ public class AOE {
       //if (ID==0) {
          return (new Area(new Ellipse2D.Double(x + xyAdjust[0] - radius, y + xyAdjust[1] - radius, radius * 2, radius * 2)));
       //}
+   }
+   
+   public int getX(){
+     return x;
+   }
+   public int getY(){
+     return y;
+   }
+   public int getRadius(){
+     return radius;
    }
 }

@@ -15,13 +15,14 @@ import java.awt.Graphics2D;
 public class AutoAOE extends AOE{
    private int[][] points;
 
-   AutoAOE(int id, int[][] points) {
-     super(id, 0, 0, 0);
+   AutoAOE(int[][] points) {
+     super(0, 0, 0);
      this.points = points;
    }
    
    @Override
    public void draw(Graphics2D g2) {
+     /*
       g2.setColor(Color.WHITE);
       int[][] temp = new int[2][4];
       for (int i = 0; i < points.length; i++){
@@ -29,6 +30,6 @@ public class AutoAOE extends AOE{
           temp[i][j] = points[i][j]+getXyAdjust()[i];
         }
       }
-      g2.fillPolygon(temp[0], temp[1], 4);//REE Might need xyAdjust?
+      g2.fillPolygon(temp[0], temp[1], 4);//REE Might need xyAdjust?*/
    }
 }

@@ -684,20 +684,40 @@ public class Client extends JFrame implements WindowListener {
                   projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
                } else if (initializer == 'E') {
                   int id = Integer.parseInt(secondSplit[0]);
-                  if ((id != 4) && (id != 14)) {
-                     aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                  } else {
-                     int[][] points = new int[2][4];
+                  if (id == 0){
+                    aoes.add(new FlareAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 1){
+                    aoes.add(new SafeMarksmanEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 2){
+                    aoes.add(new SafeMarksmanSpaceAOE1((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 3){
+                    aoes.add(new SafeMarksmanSpaceAOE2((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 4){
+                    int[][] points = new int[2][4];
                      for (int m = 0; m < 2; m++) {
                         for (int n = 0; n < 4; n++) {
                            points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
                         }
                      }
-                     if (id == 4) {
-                        aoes.add(new TimeMageAOE(id, points));
-                     } else {
-                        aoes.add(new AutoAOE(id, points));
-                     }
+                     aoes.add(new TimeMageAOE(points));
+                  } else if (id == 5){
+                    aoes.add(new GhostQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 6){
+                    //aoes.add(new MobileSupportQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 7){
+                    aoes.add(new MobileSupportPassiveAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 8){
+                    aoes.add(new MobileSupportEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 9){
+                    aoes.add(new MobileSupportSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 10){
+                    aoes.add(new JuggernautQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 11){
+                    aoes.add(new JuggernautEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 12){
+                    aoes.add(new SummonerPet((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                  } else if (id == 13){
+                    aoes.add(new SummonerSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
                   }
                } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
                   int id = Integer.parseInt(secondSplit[0]);
@@ -1014,7 +1034,7 @@ public class Client extends JFrame implements WindowListener {
             }
 
             for (int i = 0; i < aoes.size(); i++) {
-               if (aoes.get(i).getID() == 0) {
+               if (aoes.get(i) instanceof FlareAOE) {
                   darkness.subtract(aoes.get(i).getArea());
                }
             }

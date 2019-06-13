@@ -9,7 +9,6 @@ import java.awt.Color;
 
 class MSBuff extends Status{
   private BufferedImage image;
-  private static int LENGTH = 10;
   MSBuff(){
     try {
       image = ImageIO.read(new File(System.getProperty("user.dir") + "/res/status/speed.png"));
@@ -19,6 +18,6 @@ class MSBuff extends Status{
   }
   
   public void draw(Graphics2D g2, int playerX, int playerY, int index){
-    g2.drawImage(image, playerX + getXyAdjust()[0] - 60/2 + index*LENGTH, playerY + getXyAdjust()[1] - 60/2 - LENGTH, LENGTH, LENGTH, null);
+    g2.drawImage(image, playerX + getXyAdjust()[0] - getPlayerLength()/2 + index*getLength(), playerY + getXyAdjust()[1] - getPlayerLength()/2 - getLength(), getLength(), getLength(), null);
   }
 }
