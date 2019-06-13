@@ -16,9 +16,9 @@ public class SafeMarksmanParticle extends Particle{
 
   /**
    * Class Constructor
-   * @param x
-   * @param y
-   * @param size
+   * @param x x-location
+   * @param y y-location
+   * @param size size of particle
    */
   public SafeMarksmanParticle(double x, double y, int size){
     super(x, y, size, (int)(Math.random()*20+20));
@@ -31,6 +31,11 @@ public class SafeMarksmanParticle extends Particle{
     dx = Math.cos(angle) * 20;
     dy = Math.sin(angle) * 20;
   }
+
+  /**
+   * update method for the particle
+   * @return the particle's state
+   */
   public boolean update(){
     return super.update(dx, dy);
   }
