@@ -7,12 +7,23 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import java.io.File;
+/**
+ * MusicManager.java
+ * This is for the music
+ *
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+ * @version 1.0
+ * @since 2019-06-02
+ */
 
 public class MusicManager {
   private float masterVolume = -6f; // 50% dB
   private float musicVolume = -6f;
   Clip clip;
 
+  /**
+   * Starts the audio
+   */
   public void start(){
     try{
       // Gets a sound clip resource
@@ -40,7 +51,10 @@ public class MusicManager {
 
   }
 
-  // Sets volume
+  /**
+   * Sets the volume
+   * @param value: the value of the volume
+   */
   public void setVolume(float[] value ){
     masterVolume = value[0];
     FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);

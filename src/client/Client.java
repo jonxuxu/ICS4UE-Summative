@@ -715,7 +715,9 @@ public class Client extends JFrame implements WindowListener {
             projectiles.clear();
             aoes.clear();
             for (int i = 0; i < players.length; i++) {
-               players[i].clearStatuses();
+               if (players[i]!=null) {
+                  players[i].clearStatuses();
+               }
             }
             String[] firstSplit = input.split(" ", -1);
             for (String firstInput : firstSplit) {

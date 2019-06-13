@@ -35,6 +35,14 @@ public class MinimapComponent extends GameComponent {
    private Area playerShape, allyShape, enemyShape;
    private int MAP_WIDTH, MAP_HEIGHT;
 
+   /**
+    * Minimap display
+    * @param WIDTH
+    * @param HEIGHT
+    * @param MAP_WIDTH
+    * @param MAP_HEIGHT
+    */
+
    public MinimapComponent(int WIDTH, int HEIGHT, int MAP_WIDTH, int MAP_HEIGHT) {
       this.MAP_WIDTH = MAP_WIDTH;
       this.MAP_HEIGHT = MAP_HEIGHT;
@@ -55,8 +63,8 @@ public class MinimapComponent extends GameComponent {
       Shape oldClip = g2.getClip();
       g2.clip(outputShape);
       tx = new AffineTransform();
-      tx.translate(1400 - players[myPlayerId].getXy()[0]*0.1, 700 - players[myPlayerId].getXy()[1]*0.1);
-      tx.scale(0.1*MAP_WIDTH/bgImage.getWidth(), 0.1*MAP_HEIGHT/bgImage.getHeight());
+      tx.translate(1400 - players[myPlayerId].getXy()[0] * 0.1, 700 - players[myPlayerId].getXy()[1] * 0.1);
+      tx.scale(0.1 * MAP_WIDTH / bgImage.getWidth(), 0.1 * MAP_HEIGHT / bgImage.getHeight());
 
       g2.drawRenderedImage(bgImage, tx);
 
@@ -76,7 +84,7 @@ public class MinimapComponent extends GameComponent {
       allyShape = new Area();
       enemyShape = new Area();
       for (Player player : players) {
-         if(player != null){
+         if (player != null) {
             tx = new AffineTransform();
             xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.1);
             xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.1);
@@ -95,11 +103,22 @@ public class MinimapComponent extends GameComponent {
       g2.fill(allyShape);
       g2.setColor(Color.red);
       g2.fill(enemyShape);
-
+      Rectangle tempRect = new Rectangle(1250, 550, 300, 300);
       g2.setColor(new Color(141, 130, 103));
-      Stroke oldStroke = g2.getStroke();
       g2.setStroke(new BasicStroke(10));
-      g2.drawRect(1250, 550, 300, 300);
+      g2.setColor(new Color(72, 60, 32));
+      g2.setStroke(new BasicStroke(18));
+      g2.draw(tempRect);
+      g2.setColor(new Color(141, 130, 103));
+      g2.setStroke(new BasicStroke(12));
+      g2.draw(tempRect);
+      g2.setColor(new Color(95, 87, 69));
+      g2.setStroke(new BasicStroke(4));
+      g2.draw(tempRect);
+      g2.setColor(new Color(50, 46, 41));
+      g2.draw(tempRect);
+
+
 
       g2.clip(oldClip);
    }
