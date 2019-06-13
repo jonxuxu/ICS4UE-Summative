@@ -118,7 +118,9 @@ public class Client extends JFrame implements WindowListener {
    private boolean testingBegin = false;
    //Graphics
 
-
+    /**
+     * Class Constructor
+      */
    public Client() {
       super("Artifact of the Shadowmage");
 
@@ -128,6 +130,7 @@ public class Client extends JFrame implements WindowListener {
       DisplayMode dm = new DisplayMode(DESIRED_X, DESIRED_Y, 32, 60);
       screenDevice.setDisplayMode(dm);
       validate();
+
       //Font set up
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -198,10 +201,17 @@ public class Client extends JFrame implements WindowListener {
       Status.setXyAdjust(xyAdjust);
    }
 
+    /**
+     * Main Method run for the Client
+     * @param args
+     */
    public static void main(String[] args) {
       new Client().go();
    }
 
+    /**
+     * Initiating function to start the game
+     */
    public void go() {
       // Sets up frame rate timer
       new java.util.Timer().scheduleAtFixedRate(
@@ -219,7 +229,8 @@ public class Client extends JFrame implements WindowListener {
       // Plays bg music
       bgMusic.start();
 
-      while (true) {  //Main game loop
+      //Main game loop
+      while (true) {
          if (time.getFramePassed()) {
             if (!gameBegin) {
                repaintPanels();
@@ -249,6 +260,9 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Initiates the menu and display screen
+     */
    public void menuLogic() {
       try {
          if (!waitingForImage) {
@@ -376,27 +390,45 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Setter method for the mouse state
+     * @param state array of integers describing the mouse state
+     *              [0] and [1] are the x and y values for the mouse
+     *              [2] is the type of click registered
+     */
    public void updateMouse(int[] state) {
       this.mouseState = state;
    }
 
+    /**
+     * Setter method for the inputted character
+     * @param c character
+     */
    public void typeKey(char c) {
       keyPressed = true;
       lastKeyTyped = c;
       //System.out.println("type");
       if (currentPanel == 7) {
-         if (c == 9) { // Tab key switches focus to game chat panel
+         if (c == 9) { //Tab key switches focus to game chat panel
             intermediatePanel.toggleMode();
          }
       }
    }
 
+    /**
+     * Setter to change the sound level of the game
+     * @param type type of sound
+     * @param level volume of sound
+     */
    public void changeSoundLevel(int type, float level){
       soundLevels[type] = level;
       soundEffect.setVolume(soundLevels);
       bgMusic.setVolume(soundLevels);
    }
 
+    /**
+     * Initializer method for the start of the game
+     */
    public void gameLogic() {
       // TODO: Initialize map ONCE after game begin
       try {
@@ -476,6 +508,9 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * While loop to await user input
+     */
    public void waitForInput() {
       boolean inputReady = false;
       try {
@@ -506,6 +541,11 @@ public class Client extends JFrame implements WindowListener {
 
    }
 
+    /**
+     * Parsing the input per character
+     * @param input
+     * @return boolean of whether this character is parsable or not
+     */
    public boolean isParsable(char input) {
       try {
          int test = Integer.parseInt(input + "");
@@ -515,6 +555,12 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Method to verify strings for game names and passwords
+     * @param testString string to be tested
+     * @param errorIndex kinds of errors encountered
+     * @return boolean of whether the string was right
+     */
    public boolean verifyString(String testString, int errorIndex) {
       errors[errorIndex] = 0;
       if (testString.length() < 15) {
@@ -537,6 +583,11 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Method to check whether the character is a letter or number
+     * @param letter the input character
+     * @return whether it is a letter or number
+     */
    public boolean letterOrNumber(char letter) {
       if (((letter >= 97) && (letter <= 122)) || ((letter >= 65) && (letter <= 90)) || ((letter >= 48) && (letter <= 57))) {
          return true;
@@ -545,6 +596,10 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Method to decipher the input from the menu
+     * @param input input to tell the client what to do
+     */
    public void decipherMenuInput(String input) {
       System.out.println("MI" + input);
       if (!input.contains("END")) {
@@ -657,6 +712,10 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Method to decipher the input from the game
+     * @param input String of inputs from the player
+     */
    public void decipherGameInput(String input) {
       //System.out.println("G" + input);
       if ((!input.contains("END")) && (!input.contains("FINAL"))) {
@@ -751,16 +810,20 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Setter method to update the information for the player
+     * @param data String of data denoting each update
+     */
    public void updatePlayer(String[] data) {
       int playerID = Integer.parseInt(data[0]);
-      players[playerID].setXy(Integer.parseInt(data[1]), Integer.parseInt(data[2]));
-      players[playerID].setHealth(Integer.parseInt(data[3]));
-      players[playerID].setMaxHealth(Integer.parseInt(data[4]));
-      players[playerID].setAttack(Integer.parseInt(data[5]));
-      players[playerID].setMobility(Integer.parseInt(data[6]));
-      players[playerID].setRange(Integer.parseInt(data[7]));
-      players[playerID].setArtifact(Boolean.parseBoolean(data[8]));
-      players[playerID].setGold(Integer.parseInt(data[9]));
+      players[playerID].setXy(Integer.parseInt(data[1]), Integer.parseInt(data[2]));//position
+      players[playerID].setHealth(Integer.parseInt(data[3]));//current health
+      players[playerID].setMaxHealth(Integer.parseInt(data[4]));//max health
+      players[playerID].setAttack(Integer.parseInt(data[5]));//attack
+      players[playerID].setMobility(Integer.parseInt(data[6]));//movement
+      players[playerID].setRange(Integer.parseInt(data[7]));//range
+      players[playerID].setArtifact(Boolean.parseBoolean(data[8]));//artifacts
+      players[playerID].setGold(Integer.parseInt(data[9]));//gold amount
       for (int j = 10; j < 13; j++) {
          players[playerID].setSpellPercent(Integer.parseInt(data[j]), j - 10);
       }
@@ -774,6 +837,10 @@ public class Client extends JFrame implements WindowListener {
       players[playerID].setFlashlightOn(false);
    }
 
+    /**
+     * Setter method to update the information for the rest of the players
+     * @param data String of data denoting each update for the rest of the players
+     */
    public void updateOthers(String[] data) {
       int playerID = Integer.parseInt(data[0]);
       players[playerID].setFlashlightOn(false);
@@ -789,6 +856,9 @@ public class Client extends JFrame implements WindowListener {
       }*/
    }
 
+    /**
+     * Updating method to repaint the panels
+     */
    public void repaintPanels() {
       if (currentPanel != nextPanel) {
          System.out.println("C" + currentPanel);
@@ -804,6 +874,9 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Connect method to attempt to connect to the server
+     */
    public void connect() {
       try {
          socket = new Socket("localhost", 5002);//localhost
@@ -815,6 +888,9 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Initializer method for the scale of the display
+     */
    public void initializeScaling() {
       int BG_Y = 1198;
       int BG_X = 1800;
@@ -825,6 +901,10 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Method to check if the window has been queued to close
+     * @param e WindowEvent
+     */
    public void windowClosing(WindowEvent e) {
       dispose();
       try {
@@ -837,43 +917,84 @@ public class Client extends JFrame implements WindowListener {
       System.exit(0);
    }
 
+    /**
+     * Window Opened
+     * @param e
+     */
    public void windowOpened(WindowEvent e) {
    }
 
+    /**
+     * Window Activated
+     * @param e
+     */
    public void windowActivated(WindowEvent e) {
    }
 
+    /**
+     * Window Iconified
+     * @param e
+     */
    public void windowIconified(WindowEvent e) {
    }
 
+    /**
+     * Window Deiconified
+     * @param e
+     */
    public void windowDeiconified(WindowEvent e) {
    }
 
+    /**
+     * Window Deactivated
+     * @param e
+     */
    public void windowDeactivated(WindowEvent e) {
    }
 
+    /**
+     * Window Closed
+     * @param e
+     */
    public void windowClosed(WindowEvent e) {
    }
 
 
    //Booleans to clients
+    /**
+     * Method to leave the game
+     */
    public void leaveGame() {
       leaveGame = true;
    }
 
+    /**
+     * Method to log out of the game
+     */
    public void logout() {
       logout = true;
    }
 
+    /**
+     * Method to begin testing
+     */
    public void testingBegin() {
       testingBegin = true;
    }
 
+    /**
+     * Method to ready the client
+     */
    public void ready() {
       notifyReady = true;
    }
 
    //Tested input to clients
+    /**
+     * Tests the inputs from each client
+     * @param attemptedGameName name for attempt
+     * @param attemptedGamePassword password for attempt
+     */
    public void testGame(String attemptedGameName, String attemptedGamePassword) {
       if (!testGame) {
          this.attemptedGameName = attemptedGameName;
@@ -884,6 +1005,10 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+    /**
+     * Method to attempt to send the name to the server
+     * @param username name the user requested
+     */
    public void testName(String username) {
       if (!sendName) {
          this.username = username;
@@ -892,56 +1017,109 @@ public class Client extends JFrame implements WindowListener {
    }
 
    //Sets the teams
+    /**
+     * Sets the teams for the players
+     * @param myTeam requested team of the player
+     */
    public void setTeam(int myTeam) {
       this.myTeam = myTeam;
       teamChosen = true;
    }
 
 
+    /**
+     * Setter method for the next panel
+     * @param nextPanel int for the number of the panel
+     */
    public void setNextPanel(int nextPanel) {
       this.nextPanel = nextPanel;
    }
 
+    /**
+     * Setter for the name of the class
+     * @param className class name requested
+     */
    public void setClassName(String className) {
       this.className = className;
       classChosen = true;
    }
 
    // Chat methods
+    /**
+     * Method to send a message to the server to be broad-casted to other clients
+     * @param message String to be broad-casted
+     * @param mode the kind of chat being called
+     */
    public void sendMessage(String message, int mode) {
       output.println("C" + mode + "," + message);
       output.flush();
    }
 
    //Info to panels
+    /**
+     * Getter for the connection state
+     * @return integer of the state of the connection
+     */
    public int getConnectionState() {
       return (connectionState);
    }
 
+    /**
+     * Getter for the host
+     * @return boolean of whether this player is the host
+     */
    public boolean getHost() {
       return (host);
    }
 
+    /**
+     * Getter for the loading
+     * @return boolean of whether loading is true
+     */
    public boolean getLoading() {
       return (loading);
    }
 
+    /**
+     * Getter for the online list
+     * @return ArrayList of the users of the online list
+     */
    public ArrayList<User> getOnlineList() {
       return (onlineList);
    }
 
+    /**
+     * Getter for the state of the mouse
+     * @return integer array of the mouse state
+     */
    public int[] getMouseState() {
       return (mouseState);
    }
 
+    /**
+     * Getter for the name of the server
+     * @return String of the server name
+     */
    public String getGameName() {
       return (serverName);
    }
 
+    /**
+     * Getter for the password of the game
+     * @return String of the game password
+     */
    public String getGamePassword() {
       return (serverPassword);
    }
 
+   /**
+    * GamePanel.java
+    * This is the inner class Game Panel inside of the Client, used to display virtually everything
+    *
+    * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+    * @version 1.0
+    * @since 2019-04-17
+    */
    public class GamePanel extends MenuPanel {//State=7
       private Graphics2D g2;
       private boolean generateGraphics = true;
@@ -955,6 +1133,10 @@ public class Client extends JFrame implements WindowListener {
       private Area darkness;
       private boolean pause = false;
 
+       /**
+        * Constructor
+        * Initiates the Game Panel and all the displays for the game
+        */
       public GamePanel() {
          this.setBackground(Color.black);
          this.setLayout(null); //Necessary so that the buttons can be placed in the correct location
@@ -974,6 +1156,10 @@ public class Client extends JFrame implements WindowListener {
          this.setFocusable(true);
       }
 
+       /**
+        * Paint Component class to set up what changes in the display every frame
+        * @param g graphics
+        */
       @Override
       public void paintComponent(Graphics g) {
          super.paintComponent(g);
@@ -1093,6 +1279,9 @@ public class Client extends JFrame implements WindowListener {
          frames++;
       }
 
+       /**
+        * Setter method to reset the x and y values for something of the Client
+        */
       public void resetXyAdjust() {
          xyAdjust[0] = (int) (midXy[0] - myPlayer.getXy()[0]);
          xyAdjust[1] = (int) (midXy[1] - myPlayer.getXy()[1]);
