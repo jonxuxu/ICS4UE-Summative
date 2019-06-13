@@ -98,16 +98,23 @@ public abstract class Player extends User {
        float alpha = (float)0.5; //draw half transparent
        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
      }
+     if(damaged){
+       g2.setXORMode(new Color(255, 0, 0, 0));
+     }
      drawReal(g2, centerXy[0] + (int) ((xy[0] - playerXy[0])) - (int) (PLAYER_LENGTH / 2), centerXy[1] + (int) ((xy[1] - playerXy[1])) - (int) (PLAYER_LENGTH) / 2, (int) (PLAYER_LENGTH), (int) (PLAYER_LENGTH), desiredSpell);
+     if(damaged){
+       g2.setPaintMode();
+     }
      if(invisible){
        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,(float)1));
      }
+
      if (desiredSpell != -1) {
        desiredSpell = -1;
      }
-        // Draws status effects
+     // Draws status effects
         
-        // Draws health bars
+     // Draws health bars
      g2.setColor(Color.white);
      g2.fillRect(centerXy[0] + xy[0] - playerXy[0] - 76, centerXy[1] + xy[1] - playerXy[1] - 71, 152, 8);
      g2.setColor(Color.black);

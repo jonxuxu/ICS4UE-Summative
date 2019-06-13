@@ -40,6 +40,7 @@ class MainMapGenModule extends JFrame {
    private BufferedImage mapImage;
    private BufferedImage pathImage;
    private BufferedImage darkPathImage;
+   private BufferedImage clearingImage;
    private BufferedImage groundImage;
    private BufferedImage swampImage;
    private Socket socket;
@@ -55,6 +56,7 @@ class MainMapGenModule extends JFrame {
       try {
          pathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Path.png"));
          darkPathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_PathDark.png"));
+         clearingImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Clearing.png"));
          groundImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Ground.png"));
          swampImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Swamp.png"));
       } catch (IOException e) {
@@ -79,8 +81,10 @@ class MainMapGenModule extends JFrame {
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
-         gen.genClearingByNum(8, 500);
+         gen.genClearingByNum(10, 500);
          gen.purgeRedundancies();
+         gen.generateBarrier();
+
          gen.addObstacleBoundingBoxes();
 
       }
@@ -178,7 +182,7 @@ class MainMapGenModule extends JFrame {
                if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing") || gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
                    Polygon temp = (Polygon)(g.getClip());
                    ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
-                   g.drawImage(darkPathImage, -15000, -10000, 30000, 20000, null);
+                   g.drawImage(clearingImage, -15000, -10000, 30000, 20000, null);
                    g.setClip(temp);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
                   Polygon temp = (Polygon)(g.getClip());
@@ -223,7 +227,6 @@ class MainMapGenModule extends JFrame {
             for (int j = 0; j < gen.nodes.get(i).connections.size(); j++) {
                //this.drawLineCustom(gen.nodes.get(i).location, gen.nodes.get(i).connections.get(j), g);
             }
-
          }
 
          for (int i = 0; i < gen.obstacles.size(); i++) {
@@ -255,6 +258,13 @@ class MainMapGenModule extends JFrame {
    public ArrayList<Obstacle> getObstacle() {
       return (gen.obstacles);
    }
+
+   /**
+    * Returns the index of the team clearing region
+    *
+    * @param teamNumber the team number for which the index is to be retrieved
+    * @return the index within the region ArrayList of that team clearing
+    */
 
    public Region getTeamClearing(int teamNumber) {
       if (teamNumber == 0) {

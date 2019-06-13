@@ -23,21 +23,24 @@ public class AOE {
    private static int[] xyAdjust;
 
    /**
-    * Constructor.
+    * Constructor
     *
     * @param ID used for communication between server and client, used to determine what kind of AOE it is
     * @param x x-location of the circle
     * @param y y-location of the circle
     * @param radius radius of the circle
     */
-   AOE(int ID, int x, int y, int radius) {
-      this.ID = ID;
+   AOE(int x, int y, int radius) {
       this.x = x;
       this.y = y;
       this.radius = radius;
    }
 
-
+   /**
+    * Draws the circular Area Of Effect - can be inherited to change effects
+    *
+    * @param g2 graphics
+    */
    public void draw(Graphics2D g2) {
       if (ID!=0) {
          g2.setColor(Color.WHITE);
@@ -45,18 +48,51 @@ public class AOE {
       }
    }
 
+   /**
+    * Setter for XyAdjust
+    *
+    * @param xyAdjust1 array of x and y adjustments
+    */
    public static void setXyAdjust(int[] xyAdjust1) {
       xyAdjust = xyAdjust1;
    }
+
+   /**
+    * Getter for XyAdjust
+    *
+    * @return xyAdjust array of x and y adjustments
+    */
    public int[] getXyAdjust(){
      return xyAdjust;
    }
+
+   /**
+    * Getter for ID
+    *
+    * @return ID of the Area Of Effect
+    */
    public int getID(){
       return ID;
    }
+
+   /**
+    * Getter for Area
+    *
+    * @return Area of the Area Of Effect
+    */
    public Area getArea(){
       //if (ID==0) {
          return (new Area(new Ellipse2D.Double(x + xyAdjust[0] - radius, y + xyAdjust[1] - radius, radius * 2, radius * 2)));
       //}
+   }
+   
+   public int getX(){
+     return x;
+   }
+   public int getY(){
+     return y;
+   }
+   public int getRadius(){
+     return radius;
    }
 }

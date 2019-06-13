@@ -134,10 +134,10 @@ public class Server {
                         output.println(error);
                         output.flush();
                      }
-                  } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
+                  } else if (initializer == 'R') { //You do not need to account for other characters, only the host will have the option to create a game anyways
                      System.out.println("R" + inputString);
 
-                   /*  if (myGame.getGameSize() <= 1) {
+                     if (myGame.getGameSize() <= 1) {
                         output.println(7);
                         output.flush();
                      } else if ((myGame.emptyTeam(0)) || (myGame.emptyTeam(1))) {
@@ -149,12 +149,12 @@ public class Server {
                      } else if (myGame.noClass()) {
                         output.println(10);
                         output.flush();
-                     } else {*/
-                     myGame.run();
-                     //   }
+                     } else {
+                        myGame.run();
+                     }
 
                      //Error verification is ignored
-                     //Each game is a thread that is run. There is only communication between the game and the players
+                     //Each game is a thread that is run. There is only communication between the game and the characters
                   } else if (initializer == 'B') {
                      if (myGame != null) {
                         if (!myGame.isHost(myUser)) {
@@ -168,7 +168,7 @@ public class Server {
                         } else {
                            myGame.removeGamePlayer(myUser, myConnection, this);
                            games.remove(myGame);
-                           //here is where you will send a message to everyone to remove all the players
+                           //here is where you will send a message to everyone to remove all the characters
                            ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
                            for (int i = 0; i < currentSocketList.size(); i++) {
                               output = new PrintWriter(currentSocketList.get(i).getOutputStream());
@@ -205,7 +205,7 @@ public class Server {
                         } else {
                            myGame.removeGamePlayer(myUser, myConnection, this);
                            games.remove(myGame);
-                           //here is where you will send a message to everyone to remove all the players
+                           //here is where you will send a message to everyone to remove all the characters
                            ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
                            for (int i = 0; i < currentSocketList.size(); i++) {
                               output = new PrintWriter(currentSocketList.get(i).getOutputStream());
@@ -268,7 +268,7 @@ public class Server {
       }
 
       private void adjustPlayerList(boolean noOneLeft) {
-         //N means new player, A means all players
+         //N means new player, A means all characters
          try {
             if (noOneLeft) {
                ArrayList<Socket> currentSocketList = myGame.getOnlineGameSockets();
@@ -310,13 +310,13 @@ public class Server {
       private ArrayList<Socket> onlineGameSockets = new ArrayList<Socket>();
       private ArrayList<MenuHandler> handlers = new ArrayList<MenuHandler>();
       private boolean stopGame = false;
-      private Player[] players;//For the ID's, even disconnected players will work
+      private Player[] players;//For the ID's, even disconnected characters will work
       private Socket[] gameSockets;
       private PrintWriter[] gameOutputs;
       private BufferedReader[] gameInputs;
       //private ObjectInputStream[] gameObjectInputs;
       //private ObjectOutputStream[] gameObjectOutputs;
-      private int playerNum;//For the ID's even disconnected players will work
+      private int playerNum;//For the ID's even disconnected characters will work
       private Clock time = new Clock();
       private int gameTick = 0;
       private int disconnectedPlayerNum = 0;
@@ -365,8 +365,8 @@ public class Server {
             gameSockets = new Socket[players.length];
             gameOutputs = new PrintWriter[players.length];
             gameInputs = new BufferedReader[players.length];
-            //gameObjectOutputs = new ObjectOutputStream[players.length];
-            //gameObjectInputs = new ObjectInputStream[players.length];
+            //gameObjectOutputs = new ObjectOutputStream[characters.length];
+            //gameObjectInputs = new ObjectInputStream[characters.length];
 
 
             for (int i = 0; i < players.length; i++) {
@@ -429,7 +429,7 @@ public class Server {
 
             System.out.println("done");
             playerNum = players.length;
-            //Set up the players in each player
+            //Set up the characters in each player
             Player.setPlayerReference(players, playerNum);
             for (int i = 0; i < playerNum; i++) {
                players[i].setID(i);
@@ -557,7 +557,7 @@ public class Server {
                } else {
                   // Output to clients
                   if (time.getFramePassed()) {
-                     //Check to see if anything was added from disconnecting players. If this is true, then add a space
+                     //Check to see if anything was added from disconnecting characters. If this is true, then add a space
                      StringBuilder[] mainPlayer = new StringBuilder[playerNum];
                      StringBuilder[] otherPlayers = new StringBuilder[playerNum];
                      StringBuilder projectileOutput = new StringBuilder();
