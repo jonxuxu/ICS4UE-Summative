@@ -8,12 +8,14 @@ import javax.swing.JFrame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * MainMapGenModule.java
@@ -192,26 +194,27 @@ class MainMapGenModule extends JFrame{
                g.setColor(Color.GRAY);
             }
             if (gen.obstacles.get(i).radius != 0) {
-               this.fillOvalCustom(gen.obstacles.get(i).radius,gen.obstacles.get(i).location.x,
-                       gen.obstacles.get(i).location.y,g);
+               g2.fill(gen.obstacles.get(i).boundingBox);
             } else {
                this.fillOvalCustom(50,gen.obstacles.get(i).location.x,
                        gen.obstacles.get(i).location.y, g);
             }
          }
-
-         g2.setColor(Color.white);
-         for (int i = 0; i < gen.obstacles.size(); i++) {
-            g2.fill(gen.obstacles.get(i).boundingBox);
-         }
-
-
-         try {
+         /*try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }
+         }*/
       }
+   }
+
+   /**
+    * Returns the full list of obstacles 
+    * 
+    * @return ArrayList<Obstacle>, the full list of obstacles contained within the instance of MapGen
+    */
+   public ArrayList<Obstacle> getObstacle() {
+      return (gen.obstacles);
    }
 
    /**
@@ -219,7 +222,6 @@ class MainMapGenModule extends JFrame{
     *
     * @param socket, the socket on which to send the map
     */
-
    public void sendMap(Socket socket) {
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
