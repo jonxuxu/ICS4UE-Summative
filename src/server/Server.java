@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Server.java
@@ -548,7 +549,8 @@ public class Server {
                         otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
-                        ArrayList<Status> theseStatuses = players[i].getAllStatuses();
+                        HashSet<Status> statusSet = new HashSet<Status>(players[i].getAllStatuses());
+                        ArrayList<Status> theseStatuses = new ArrayList<Status>(statusSet);
                         for (int j = 0; j < theseProjectiles.size(); j++) {
                            projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
