@@ -1,14 +1,15 @@
 package server;
+import java.util.ArrayList;
+
 /**
- * SafeMarksman.java
- * This is
+ * Ghost.java
+ *
+ * This is the class handling the Ghost class, an extension of the Player class
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-19
  */
-
-import java.util.ArrayList;
 
 public class Ghost extends Player {
    private int[] spellCooldowns = {100, 100, 100};
@@ -26,6 +27,11 @@ public class Ghost extends Player {
 
    private ArrayList<Player> qBlacklist = new ArrayList<Player>();
 
+   /**
+    * Another constructor for class Time1
+    * @param username the username of the player on the server
+    * @param teamNumber the team which the player is on
+    */
    Ghost(String username, int teamNumber) {
       super(username, teamNumber);
       setMaxHealth(300);
@@ -38,6 +44,12 @@ public class Ghost extends Player {
       setMelee(true);
    }
 
+   /**
+    * Handles the casting of the 3 different spells
+    * @param spellIndex the spell which to cast, where 0 is q, 1 is e, and 2 is space
+    * @return a boolean for whether the spell is cast or not
+    */
+   @Override
    public boolean castSpell(int spellIndex) {
       if (!getStunned()) {
          if (spellTimers[spellIndex] <= 0) {
@@ -61,18 +73,21 @@ public class Ghost extends Player {
          return false;
       }
    }
-
+   
+   /**
+    * Gets the cooldown remaining, as a percent, of the chosen spell
+    * @param spellIndex the spell which to check, where 0 is q, 1 is e, and 2 is space
+    * @return the percent away from the spell being off cooldown
+    */
+   @Override
    public int getSpellPercent(int spellIndex) {
-      return (spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex] * 100;
-    /*
-    if (spellTick - lastSpellTicks[spellIndex] > spellCooldowns[spellIndex]) {
-      return (100);
-    } else {
-      return ((int) ((100.0 * (spellTick - lastSpellTicks[spellIndex]) / spellCooldowns[spellIndex])));
-    }*/
+      return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
    }
 
-
+   /**
+    * Updates the character and all the autoattacks, aoes, statuses, and shields each frame
+    */
+   @Override
    public void update() {
       //ARTIFACT ADDED HERE
       if ((checkOnArtifact())) {
@@ -204,6 +219,10 @@ public class Ghost extends Player {
       }
    }
 
+   /**
+    * Applies damage to self, updates health and shield as needed
+    * @param damage the amount of damage to inflict
+    */
    @Override
    public void damage(int damage) {
       damage = (int) (damage * (1 - getDamageReduction()));

@@ -58,6 +58,7 @@ public abstract class Player extends User implements CanIntersect {
    private boolean illuminated = false;
    private boolean stunned = false;
    private boolean invisible = false;
+   private boolean uncollidable = false;
    private double damageReduction;
    private String selectedClass;
 
@@ -433,10 +434,14 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void setSpawn(Region region) {
-     spawnX = (region.getMidXy()[0]/2 + 7500) + (int) (Math.random() * 20);
-     spawnY = (region.getMidXy()[1]/2 + 5000) + (int) (Math.random() * 20);
-     xy[0]=spawnX;
-     xy[1]=spawnY;
+      //Random radius and random angle
+      double radius = 100 + Math.random() * 25;
+      double angle = Math.random() * Math.PI;
+      //Set spawn according to random numbers
+      spawnX = (region.getMidXy()[0]/2 + 7500) + (int) (radius * Math.cos(angle));
+      spawnY = (region.getMidXy()[1]/2 + 5000) + (int) (radius * Math.sin(angle));
+      xy[0]=spawnX;
+      xy[1] = spawnY;
    }
 
    public void setTeam(int teamNumber) {
@@ -497,6 +502,7 @@ public abstract class Player extends User implements CanIntersect {
       illuminated = false;
       stunned = false;
       invisible = false;
+      uncollidable = false;
       walking = false;
       damageReduction = 0;
       if (hasArtifact) {
@@ -549,7 +555,9 @@ public abstract class Player extends User implements CanIntersect {
       } else if (status instanceof Invisible) {
          invisible = true;
          illuminated = false;
-      } else if (status instanceof GhostE) {
+      } else if (status instanceof Uncollidable){
+        uncollidable = true;
+      }else if (status instanceof GhostE) {
          ((GhostE) status).setProjectedX(xy[0]);
          ((GhostE) status).setProjectedY(xy[1]);
       } else if (status instanceof ReduceDamage) {
@@ -561,7 +569,11 @@ public abstract class Player extends User implements CanIntersect {
 
    public Area getHitbox() {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
-      return new Area(hitbox);
+      if (!uncollidable){
+        return new Area(hitbox);
+      } else {
+        return new Area();
+      }
    }
 
    public Rectangle getHitboxRectangle() {
@@ -624,7 +636,11 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Projectile getProjectile(int i) {
-      return projectiles.get(i);
+      if (i<projectiles.size()) {
+         return projectiles.get(i);
+      } else {
+         return null;
+      }
    }
 
    public ArrayList<Projectile> getAllProjectiles() {
@@ -668,7 +684,11 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Status getStatus(int i) {
-      return statuses.get(i);
+      if (i < statuses.size()) {
+         return statuses.get(i);
+      } else {
+         return null;
+      }
    }
 
    public void addStatus(Status status) {

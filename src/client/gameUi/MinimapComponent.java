@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * MinimapComponent.java
- * This is
+ * This is for the minimap
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -41,10 +41,10 @@ public class MinimapComponent extends GameComponent {
    public void draw(Graphics2D g2, FogMap fog, BufferedImage bgImage, Player[] players, int myPlayerId, int[] xyAdjust) {
       // Draws map
       Shape oldClip = g2.getClip();
-      //g2.clip(outputShape);
+      g2.clip(outputShape);
       tx = new AffineTransform();
-      tx.translate(1400 - players[myPlayerId].getXy()[0]*0.05, 700 - players[myPlayerId].getXy()[1]*0.05);
-      tx.scale(0.05*MAP_WIDTH/bgImage.getWidth(), 0.05*MAP_HEIGHT/bgImage.getHeight());
+      tx.translate(1400 - players[myPlayerId].getXy()[0]*0.1, 700 - players[myPlayerId].getXy()[1]*0.1);
+      tx.scale(0.1*MAP_WIDTH/bgImage.getWidth(), 0.1*MAP_HEIGHT/bgImage.getHeight());
 
       g2.drawRenderedImage(bgImage, tx);
      // g2.drawImage(bgImage, 1400 - players[myPlayerId].getXy()[0], 700 - players[myPlayerId].getXy()[1], (int)(bgImage.getWidth()), (int)(bgImage.getHeight()), null);
@@ -70,10 +70,10 @@ public class MinimapComponent extends GameComponent {
       allyShape = new Area();
       enemyShape = new Area();
       for (Player player : players) {
-         if(player != null && player.getIlluminated()){
+         if(player != null){
             tx = new AffineTransform();
-            xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
-            xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.05);
+            xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.1);
+            xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.1);
             tx.translate(xyAdjust[0], xyAdjust[1]);
             playerShape = new Area(new Rectangle(1400, 700, 4, 4)).createTransformedArea(tx);
             if (player.getTeam() == players[myPlayerId].getTeam()) { // On same team

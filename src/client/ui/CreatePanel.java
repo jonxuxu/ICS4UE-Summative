@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 
 /**
  * CreatePanel.java
- * This is
+ * This is the panel for creating a game
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -32,29 +32,35 @@ public class CreatePanel extends MenuPanel { //State =3
    private final CustomButton backButton = new CustomButton("Back");
    private final CustomButton confirmButton = new CustomButton("Confirm Game");
 
-
+   /**
+    * Sets the panel up
+    */
    public CreatePanel() {
 
       //Setting up the size
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
+      //Name field
       gameNameField.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gameNameField.setFont(MAIN_FONT);
       gameNameField.setBounds(MAX_X / 2 - 100, MAX_Y * 3 / 10, 200, MAIN_FONT.getSize() + 20);
       this.add(gameNameField);
+      //Password field
       gamePasswordField.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gamePasswordField.setFont(MAIN_FONT);
       gamePasswordField.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, MAIN_FONT.getSize() + 20);
       this.add(gamePasswordField);
+      //Confirm button
       confirmButton.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       confirmButton.setBounds(MAX_X / 2 - 100, MAX_Y / 2, 200, MAIN_FONT.getSize() + 20);
       this.add(confirmButton);
+      //Back button
       backButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(2);
       });
@@ -68,6 +74,10 @@ public class CreatePanel extends MenuPanel { //State =3
       this.setFocusable(true);
    }
 
+   /**
+    * Paints the create panel on the screen
+    * @param g used to draw the panel
+    */
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
@@ -83,7 +93,7 @@ public class CreatePanel extends MenuPanel { //State =3
       //Server password
       g2.drawString("Server Password", (MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2, (MAX_Y * 2 / 5 - MAIN_FONT.getSize() + 20));
       //Write error
-      writeError(g2, MAX_X / 2, (int) (MAX_Y * 9.0 / 16.0));
+      writeError(g2, MAX_X / 2, MAX_Y * 3 / 5);
       //Draws particles
       drawAllParticles(g2);
    }

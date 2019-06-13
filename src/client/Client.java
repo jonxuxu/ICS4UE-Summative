@@ -3,7 +3,6 @@ package client;
 import client.gameUi.BottomComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
-import client.gameUi.InventoryComponent;
 import client.gameUi.MinimapComponent;
 import client.gameUi.PauseComponent;
 import client.map.*;
@@ -36,7 +35,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
 
 /**
  * Client.java
- * This is
+ * This is the main Client class where everything client-side runs
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -46,9 +45,9 @@ occur is the client sending an output that does not reach anyone, which is perfe
 public class Client extends JFrame implements WindowListener {
    private String thisClass = "Summoner";//Turn into an array or arraylist when people are able to select unique classes. Right now all are the same.
    //Finds memory usage before program starts
-   Runtime runtime = Runtime.getRuntime();
-   double maxMem = runtime.maxMemory();
-   double usedMem;
+   private Runtime runtime = Runtime.getRuntime();
+   private double maxMem = runtime.maxMemory();
+   private double usedMem;
 
    // Networking
    private Socket socket;
@@ -119,6 +118,7 @@ public class Client extends JFrame implements WindowListener {
    private Artifact[] artifacts = new Artifact[2];
    private boolean[] drawArtifact = {true, true};
    private BufferedImage fullLeaf;
+   private String ipTyped = "";
    // Debugging
    private boolean testingBegin = false;
    private boolean finalScreen = false;
@@ -249,7 +249,9 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          if (connectionState < 1) {
-            connect();
+            if (!ipTyped.isEmpty()) {
+               connect();
+            }
          } else {
             try {
                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -357,42 +359,6 @@ public class Client extends JFrame implements WindowListener {
             output.println("Z" + className);//Refers to class chosen
             output.flush();
          }
-         if (testingBegin) {
-            username = Math.random() + "";
-            myUser = new User(username);
-            serverName = Integer.toString((int) (Math.random() * 10000));
-            serverPassword = "0";
-            System.out.println(serverName);
-            output.println("T" + username + "," + serverName);//test
-            output.flush();
-            waitForInput();
-            host = true;
-            players = new Player[onlineList.size()];
-            for (int i = 0; i < onlineList.size(); i++) {
-               //TODO: Add class select here
-               if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("TimeMage")) {
-                  players[i] = new TimeMage(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("Ghost")) {
-                  players[i] = new Ghost(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
-                  players[i] = new MobileSupport(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("Juggernaut")) {
-                  players[i] = new Juggernaut(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("Summoner")) {
-                  players[i] = new Summoner(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
-               }
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
-               players[i].setTeam(onlineList.get(i).getTeam());
-            }
-            testingBegin = false;
-            nextPanel = 6;
-         }
          //TODO: Add class select here
       } catch (IOException e) {
          e.printStackTrace();
@@ -482,7 +448,7 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("A" + " ");
                }
                if (leftRight[1]) {
-                  soundEffect.playSound("cow");
+                  //soundEffect.playSound("cow"); //BIG NO
                   outputString.append("F" + " ");
                }
             }
@@ -650,7 +616,7 @@ public class Client extends JFrame implements WindowListener {
                errors[1] = Integer.parseInt(initializer + "");
             } else if (currentPanel == 6) {
                if (initializer == '0') {
-                  loading = true;
+                  loading=true;
                } else {
                   errors[3] = Integer.parseInt(initializer + input);
                }
@@ -859,9 +825,9 @@ public class Client extends JFrame implements WindowListener {
             }
          } else {
             if (Integer.parseInt(input.charAt(6) + "") == 0) {
-               teamWin = "Team east wins";
+               teamWin = "Team West Wins";
             } else {
-               teamWin = "Team west wins";
+               teamWin = "Team East Wins";
             }
             finalScreen = true;
          }
@@ -936,12 +902,16 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+   public void setIp(String ipTyped){
+      this.ipTyped = ipTyped;
+   }
+
    /**
     * Connect method to attempt to connect to the server
     */
    public void connect() {
       try {
-         socket = new Socket("localhost", 5002);//localhost
+         socket = new Socket(ipTyped, 5002);//localhost
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -1263,7 +1233,7 @@ public class Client extends JFrame implements WindowListener {
          MAX_GAME_X = this.getWidth();
          MAX_GAME_Y = this.getHeight();
          GameComponent.initializeSize(MAX_GAME_X, MAX_GAME_Y);
-         allComponents = new GameComponent[3];
+         allComponents = new GameComponent[2];
          pauseComponent = new PauseComponent(800, 500, super.getClient());
          pauseComponent.setBounds(MAX_GAME_X / 2 - 400, MAX_GAME_Y / 2 - 250, 800, 500);
          minimapComponent = new MinimapComponent(300, 300, MAP_WIDTH, MAP_HEIGHT);
@@ -1284,8 +1254,7 @@ public class Client extends JFrame implements WindowListener {
          g2 = (Graphics2D) g;
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new BottomComponent(myPlayer);
-            allComponents[1] = new InventoryComponent();
-            allComponents[2] = new DebugComponent();
+            allComponents[1] = new DebugComponent();
             midXy[0] = (MAX_X / 2);
             midXy[1] = (MAX_Y / 2);
             for (Player currentPlayer : players) {
@@ -1354,7 +1323,13 @@ public class Client extends JFrame implements WindowListener {
                   }
                }
             }
-
+            for (int i = 0; i < artifacts.length; i++) {
+               if (drawArtifact[i]) {
+                  if (artifacts[i]!=null) {
+                     artifacts[i].drawArtifact(g2, xyAdjust);
+                  }
+               }
+            }
             //Creating shapes
 
             //Draws fog
@@ -1373,7 +1348,7 @@ public class Client extends JFrame implements WindowListener {
             }
             //draw all components
 
-            ((DebugComponent) (allComponents[2])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
+            ((DebugComponent) (allComponents[1])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
             if (keyPressed) {
                if (lastKeyTyped == 27) { // Esc key
                   pause = !pause;
@@ -1383,10 +1358,8 @@ public class Client extends JFrame implements WindowListener {
                      System.out.println("Pause");
                   }
                } else if (lastKeyTyped == 8) { // Back key
-                  ((DebugComponent) (allComponents[2])).toggle();
+                  ((DebugComponent) (allComponents[1])).toggle();
                   System.out.println("Debug mode");
-               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) { //C or c
-                  ((InventoryComponent) (allComponents[1])).toggle();
                }
                keyPressed = false;
             }

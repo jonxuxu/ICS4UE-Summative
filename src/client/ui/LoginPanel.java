@@ -24,7 +24,7 @@ public class LoginPanel extends MenuPanel {
    private final Font HEADER_FONT = super.getFont("header");
 
    private CustomTextField nameField = new CustomTextField(3);
-   private CustomButton testButton = new CustomButton("Test");
+   private CustomTextField ipField = new CustomTextField(3);
 
    public LoginPanel() {
       //Basic username field
@@ -33,16 +33,15 @@ public class LoginPanel extends MenuPanel {
          CLIENT.testName(nameField.getText());
       });
       nameField.setFont(super.getFont("main"));
-      System.out.println(MAX_X / 2);
       nameField.setBounds(MAX_X / 2 - 100, MAX_Y / 5, 200, (MAIN_FONT.getSize() + 20));
       this.add(nameField);
-
-      testButton.addActionListener((ActionEvent e) -> {
-         CLIENT.testingBegin();
+      ipField.addActionListener((ActionEvent e) -> {
+         CLIENT.setIp(ipField.getText());
       });
-
-      testButton.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, (MAIN_FONT.getSize() + 20));
-      this.add(testButton);
+      ipField.setFont(super.getFont("main"));
+      ipField.setBounds(MAX_X / 2 - 100, MAX_Y *3/ 5, 200, (MAIN_FONT.getSize() + 20));
+      this.add(ipField);
+      this.add(nameField);
       //Basic visuals
       this.setDoubleBuffered(true);
       this.setBackground(new Color(20, 20, 20));
@@ -69,6 +68,7 @@ public class LoginPanel extends MenuPanel {
       } else {
          g2.drawString("Unable to Connect", (MAX_X - g2.getFontMetrics().stringWidth("Unable to Connect")) / 2, MAX_Y * 5 / 16);
       }
+      g2.drawString("Ip", (MAX_X - g2.getFontMetrics().stringWidth("Ip")) / 2, MAX_Y * 9 / 16);
       //Write error
       writeError(g2, MAX_X / 2, MAX_Y * 3 / 8);
    }
