@@ -448,7 +448,7 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("A" + " ");
                }
                if (leftRight[1]) {
-                  soundEffect.playSound("cow");
+                  //soundEffect.playSound("cow"); //BIG NO
                   outputString.append("F" + " ");
                }
             }
