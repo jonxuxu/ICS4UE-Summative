@@ -3,7 +3,7 @@ package server;
  * SafeMarksman.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-19
  */
@@ -132,7 +132,6 @@ public class TimeMage extends Player{
                 if (getEnemy(j) != qBlacklist.get(k)){
                   if (getAOE(i).collides(getEnemy(j))){
                     getEnemy(j).damage(Q_DAMAGE);
-                    System.out.println("DAMAGE");
                     qBlacklist.add(getEnemy(j));
                   }
                 }
@@ -140,7 +139,6 @@ public class TimeMage extends Player{
             } else {
               if (getAOE(i).collides(getEnemy(j))){
                 getEnemy(j).damage(Q_DAMAGE);
-                System.out.println("DAMAGE");
                 qBlacklist.add(getEnemy(j));
               }
             }

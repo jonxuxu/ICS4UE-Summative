@@ -7,9 +7,9 @@ import java.awt.geom.Ellipse2D;
 
 /**
  * AOE.java
- * This is
+ * This is the Area Of Effect class for spells and effects used in the game
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-31
  */
@@ -22,6 +22,14 @@ public class AOE {
    private Area area;
    private static int[] xyAdjust;
 
+   /**
+    * Constructor.
+    *
+    * @param ID used for communication between server and client, used to determine what kind of AOE it is
+    * @param x x-location of the circle
+    * @param y y-location of the circle
+    * @param radius radius of the circle
+    */
    AOE(int ID, int x, int y, int radius) {
       this.ID = ID;
       this.x = x;
@@ -29,6 +37,7 @@ public class AOE {
       this.radius = radius;
    }
 
+   
    public void draw(Graphics2D g2) {
       if (ID!=0) {
          g2.setColor(Color.WHITE);
