@@ -236,11 +236,11 @@ class MainMapGenModule extends JFrame {
                        gen.obstacles.get(i).location.y, g);
             }
          }
-         try {
+       /*  try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }
+         }*/
       }
    }
 

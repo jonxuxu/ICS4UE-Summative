@@ -313,15 +313,17 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          if (notifyReady) {
-            notifyReady = false;
-            output.println("R");
-            output.flush();
-
-            waitForInput();
-            if (errors[3] != 0) {
-               menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println("Error:" + errorMessages[errors[3]]);
-               soundEffect.playSound("error");
+            if (!waitingForImage) {
+               notifyReady = false;
+               output.println("R");
+               System.out.println("RRRRRRR");
+               output.flush();
+               waitForInput();
+               if (errors[3] != 0) {
+                  menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+                  System.out.println("Error:" + errorMessages[errors[3]]);
+                  soundEffect.playSound("error");
+               }
             }
          }
          if (teamChosen) {
