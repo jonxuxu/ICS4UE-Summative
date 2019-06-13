@@ -859,9 +859,9 @@ public class Client extends JFrame implements WindowListener {
             }
          } else {
             if (Integer.parseInt(input.charAt(6) + "") == 0) {
-               teamWin = "Team east wins";
+               teamWin = "Team West Wins";
             } else {
-               teamWin = "Team west wins";
+               teamWin = "Team East Wins";
             }
             finalScreen = true;
          }
