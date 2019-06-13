@@ -378,9 +378,9 @@ public class MapGen {
      regionLayer.regions.add(t2Clearing);
 
      nodes.get(teamOneIdx).isClearing = false;
-  nodes.get(teamOneIdx).clearingSize = 0;
-  nodes.get(teamTwoIdx).isClearing = false;
-  nodes.get(teamTwoIdx).clearingSize = 0;
+     nodes.get(teamOneIdx).clearingSize = 0;
+     nodes.get(teamTwoIdx).isClearing = false;
+     nodes.get(teamTwoIdx).clearingSize = 0;
 
 
     }
