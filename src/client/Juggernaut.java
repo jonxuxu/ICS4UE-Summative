@@ -10,7 +10,7 @@ import java.io.IOException;
  * Juggernaut.java
  * This is the character class for Juggernaut
  *
- * @author Will Jeong + company
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-19
  */
@@ -37,13 +37,13 @@ public class Juggernaut extends Player {
             }
          }
          BufferedImage dashSheet = ImageIO.read(new File(System.getProperty("user.dir") + "/res/characters/juggernaut/juggernaut_dash.png"));
-         ALL_ANIMATIONS[1] = new BufferedImage[3][2];
-         for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 3; j++) {
-               ALL_ANIMATIONS[1][j][i] = movementSheet.getSubimage(j * 32, i * 32, 32, 32);
-               //i refers to row number, j refers to column number
-            }//dash order is left, middle, right, *next row* back
-         }
+         ALL_ANIMATIONS[1] = new BufferedImage[1][4];
+         ALL_ANIMATIONS[1][1][0] = dashSheet.getSubimage(0, 0, 32, 32);
+         ALL_ANIMATIONS[1][1][1] = dashSheet.getSubimage(32, 0, 32, 32);
+         ALL_ANIMATIONS[1][1][2] = dashSheet.getSubimage(64, 0, 32, 32);
+         ALL_ANIMATIONS[1][1][3] = dashSheet.getSubimage(0, 32, 32, 32);
+         //dash direction order is left, middle, right, back
+
          /*
          BufferedImage animationSheet = ImageIO.read(new File(".\\res\\C.png"));
          ALL_ANIMATIONS[1] = new BufferedImage[4];

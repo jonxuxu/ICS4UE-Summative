@@ -41,7 +41,7 @@ occur is the client sending an output that does not reach anyone, which is perfe
  * Client.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-04-17
  */
