@@ -650,7 +650,7 @@ public class Client extends JFrame implements WindowListener {
                errors[1] = Integer.parseInt(initializer + "");
             } else if (currentPanel == 6) {
                if (initializer == '0') {
-                  loading = true;
+                  loading=true;
                } else {
                   errors[3] = Integer.parseInt(initializer + input);
                }
