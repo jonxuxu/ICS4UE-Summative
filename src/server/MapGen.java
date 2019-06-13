@@ -297,7 +297,7 @@ public class MapGen {
       double angle;
       double radius;
       
-      int maxRadius = 800;
+      int maxRadius = 700;
       
       Obstacle temp = new Obstacle();
       temp.type = "ROCK";

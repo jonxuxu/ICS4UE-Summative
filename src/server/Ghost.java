@@ -1,14 +1,15 @@
 package server;
+import java.util.ArrayList;
+
 /**
- * SafeMarksman.java
- * This is
+ * Ghost.java
+ *
+ * This is the class handling the Ghost class, an extension of the Player class
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-19
  */
-
-import java.util.ArrayList;
 
 public class Ghost extends Player {
    private int[] spellCooldowns = {100, 100, 100};
