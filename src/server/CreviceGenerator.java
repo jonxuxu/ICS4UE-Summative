@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * A special class that handles the complicated mathematics behind crevice generation
  *
- * @author Artem Sotnikov
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @since 2019-06-05
  * @version 1.3
  */
@@ -202,7 +202,7 @@ public class CreviceGenerator {
 	/**
 	 * A private subclass that handles he drawing for the JFrame testing implementation
 	 *
-	 * @author Artem Sotnikov
+	 * @author Artem Sotnikov, Will Jeong, Jonathan Xu, Bill Wang, Kolby Chong
 	 * @since 2019-06-05
 	 * @version 1.0
 	 */

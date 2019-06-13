@@ -2,6 +2,10 @@ package server;
 
 import java.awt.Rectangle;
 
+/**
+ *
+ */
+
 public class Artifact {
     private boolean isHeld;
     private int []xy = new int[2];
