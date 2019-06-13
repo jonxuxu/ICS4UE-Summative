@@ -2,12 +2,25 @@ package client.particle;
 
 import java.awt.*;
 
+/**
+ * TimeMageParticle.java
+ * This is a particle class used for Timemage's animations
+ *
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+ * @version 1.0
+ * @since 2019-06-13
+ */
 public class TimeMageParticle extends Particle{
   private double angle;
   private double dx, dy;
   private static Color colours[] = {new Color(240,248,255), new Color(0,191,255), new Color(0,0,139)};
 
-
+  /**
+   * Class constructor
+   * @param x x-location
+   * @param y y-location
+   * @param size size of particle
+   */
   public TimeMageParticle(double x, double y, int size){
     super(x, y, size, (int)(Math.random()*20+20));
 
@@ -19,6 +32,10 @@ public class TimeMageParticle extends Particle{
     dx = Math.cos(angle) * 20;
     dy = Math.sin(angle) * 20;
   }
+  /**
+   * method used to update the particle
+   * @return the state of the particle
+   */
   public boolean update(){
     return super.update(dx, dy);
   }
