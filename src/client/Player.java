@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.awt.AlphaComposite;
 
 /**
- * User.java
- * This is
+ * Player.java
+ * This is the player superclass for each player of the game 
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
