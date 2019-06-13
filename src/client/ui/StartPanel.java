@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
  * StartPanel.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-31
  */
@@ -22,6 +22,7 @@ public class StartPanel extends MenuPanel {//State=2
    private final int MAX_Y= super.getHeight();
    private final Client CLIENT = super.getClient();
    private final Font MAIN_FONT = super.getFont("main");
+   private int stringSize;
 
    private CustomButton createButton = new CustomButton("Create Game");
    private CustomButton joinButton = new CustomButton("Join Game");
@@ -38,20 +39,20 @@ public class StartPanel extends MenuPanel {//State=2
        CLIENT.setNextPanel(3);
        System.out.println("3");
       });
-      createButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 8.0 / 20.0), (int) (130 ), (int) (19 ));
+      createButton.setBounds(1, 1, 1, 1);
       this.add(createButton);
 
       joinButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(4);
          System.out.println("4");
       });
-      joinButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 10.0 / 20.0), (int) (130 ), (int) (19 ));
+      joinButton.setBounds(1, 1, 1, 1);
       this.add(joinButton);
       instructionButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(5);
          System.out.println("5");
       });
-      instructionButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 12.0 / 20.0), (int) (130 ), (int) (19 ));
+      instructionButton.setBounds(1, 1, 1, 1);
 
       this.add(instructionButton);
       logoutButton.addActionListener((ActionEvent e) -> {
@@ -59,7 +60,7 @@ public class StartPanel extends MenuPanel {//State=2
          System.out.println("0");
          CLIENT.logout();
       });
-      logoutButton.setBounds(MAX_X / 2 - (int) (65 ), (int) (MAX_Y * 14.0 / 20.0), (int) (130 ), (int) (19 ));
+      logoutButton.setBounds(1, 1, 1, 1);
       this.add(logoutButton);
 
       //Basic visuals
@@ -74,8 +75,16 @@ public class StartPanel extends MenuPanel {//State=2
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
       g2.setFont(MAIN_FONT);
+
+      //Set buttons to proper size and location
+      stringSize = g2.getFontMetrics().stringWidth("     Instructions     ");
+      createButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 4 / 10, stringSize, MAIN_FONT.getSize() + 20);
+      joinButton.setBounds((MAX_X - stringSize) / 2, MAX_Y / 2, stringSize, MAIN_FONT.getSize() + 20);
+      instructionButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 6 / 10, stringSize, MAIN_FONT.getSize() + 20);
+      logoutButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 7 / 10, stringSize, MAIN_FONT.getSize() + 20);
+
       super.paintComponent(g);
-      //Adds particles
+
       //Background
       drawBackground(g2);
       //Title
@@ -88,6 +97,7 @@ public class StartPanel extends MenuPanel {//State=2
             introAlpha = 0;
          }
       }
+      //Adds particles
       if (Math.random() < 0.2) {
          MenuPanel.getParticles().add(new AshParticle(Math.random() * MAX_X + MAX_X / 20, 0, (int) ((Math.random() * 3 + 3) ), MAX_Y));
       }

@@ -13,12 +13,13 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Server.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-04-24
  */
@@ -134,7 +135,7 @@ public class Server {
                         output.flush();
                      }
                   } else if (initializer == 'R') { //You do not need to account for other players, only the host will have the option to create a game anyways
-                     System.out.println(inputString);
+                     System.out.println("R" + inputString);
 
                    /*  if (myGame.getGameSize() <= 1) {
                         output.println(7);
@@ -321,6 +322,7 @@ public class Server {
       private int disconnectedPlayerNum = 0;
       private boolean begin;
       private int playerDisconnected = -1;
+      private Polygon[] allPolygons;
 
 
       @Override
@@ -367,7 +369,7 @@ public class Server {
 
             for (int i = 0; i < players.length; i++) {
                String playerClass = onlinePlayers.get(i).getSelectedClass();
-               System.out.println(playerClass);
+               System.out.println("P" + playerClass);
                if (playerClass != null) { //TESTING ONLY
                   if (playerClass.equals("Archer") || playerClass.equals("Marksman") || playerClass.equals("SafeMarksman")) {
                      players[i] = new SafeMarksman(onlinePlayers.get(i).getUsername(), onlinePlayers.get(i).getTeam());
@@ -393,8 +395,9 @@ public class Server {
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
             System.out.println("{{{-------------------{{{{{{{{{");
-            MainMapGenModule builder=  new MainMapGenModule();
+            MainMapGenModule builder = new MainMapGenModule();
             System.out.println("{{{{{{{{{{{{{{{{{{{{{{{{{{");
+
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {
                beginLine.append(" " + players[k].getSelectedClass());
@@ -406,7 +409,7 @@ public class Server {
                gameOutputs[i].flush();
             }
             System.out.println("1");
-            for (int i=0;i<onlineGameSockets.size();i++){
+            for (int i = 0; i < onlineGameSockets.size(); i++) {
                builder.sendMap(onlineGameSockets.get(i));
             }
             System.out.println("2");
@@ -414,6 +417,7 @@ public class Server {
                gameOutputs[i].println("FINAL");//B for begin
                gameOutputs[i].flush();
             }
+
             System.out.println("done");
             playerNum = players.length;
             //Set up the players in each player
@@ -430,7 +434,19 @@ public class Server {
                myPlayer.sendInfo();
             }
             //TODO: Map stuff should be slightly before this
-            Player.setConstantHitboxes(players.length, sampleObstacles);
+            allPolygons = new Polygon[builder.getObstacle().size()];
+            for (int i = 0; i < allPolygons.length; i++) {
+               allPolygons[i] = builder.getObstacle().get(i).boundingBox;
+               int[] xP = new int[allPolygons[i].npoints];
+               int[] yP = new int[allPolygons[i].npoints];
+               for (int j = 0; j < allPolygons[i].npoints; j++) {
+                  xP[j] = allPolygons[i].xpoints[j] + 15000;
+                  yP[j] = allPolygons[i].ypoints[j] + 10000;
+               }
+               allPolygons[i] = new Polygon(xP, yP, xP.length);
+            }
+
+            Player.setConstantHitboxes(players.length, builder.getObstacle());
             for (int i = 0; i < players.length; i++) {
                players[i].setLightingHitbox(i);//TODO: Add the spawn xy here to initialize the hitbox properly. For now, it is just assuming that it starts at 300 by 300
             }
@@ -462,7 +478,7 @@ public class Server {
                            }
                            allInput[i] = "";
                         } else {
-                           System.out.println(allInput[i]);
+                           System.out.println("WWW" + allInput[i]);
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
                               char initializer = firstInput.charAt(0);
@@ -470,7 +486,10 @@ public class Server {
                               String[] secondSplit = firstInput.split(",", -1);
                               if (secondSplit.length > 0) {
                                  if (initializer == 'M') {
-                                    players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
+                                    if (!checkColliding(players[i], Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]))) {
+                                       players[i].addXy(Double.parseDouble(secondSplit[0]), Double.parseDouble(secondSplit[1]));
+                                    }
+
                                  } else if (initializer == 'S') {
                                     players[i].setSpell(players[i].castSpell(Integer.parseInt(secondSplit[0])), Integer.parseInt(secondSplit[0]));
                                     //The x y information about the spell is stored as secondSplit[1] and [2]
@@ -488,7 +507,7 @@ public class Server {
                                  } else if (initializer == 'L') {
                                     players[i].setFlashlightOn(true);
                                     players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
-                                    players[i].setIlluminated(true);
+                                    players[i].addStatus(new Illuminated(2));
                                  } else if (initializer == 'C') { // Chat coming in
                                     String mode = secondSplit[0];
                                     String message = secondSplit[1];
@@ -530,14 +549,15 @@ public class Server {
                         otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
                         ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                         ArrayList<AOE> theseAOES = players[i].getAllAOES();
-                        ArrayList<Status> theseStatuses = players[i].getAllStatuses();
+                        HashSet<Status> statusSet = new HashSet<Status>(players[i].getAllStatuses());
+                        ArrayList<Status> theseStatuses = new ArrayList<Status>(statusSet);
                         for (int j = 0; j < theseProjectiles.size(); j++) {
                            projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                         }
                         for (int j = 0; j < theseAOES.size(); j++) {
                            if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
                               aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
-                           } else if (theseAOES.get(j).getID() == 4){//Time Mage AOE is different
+                           } else if (theseAOES.get(j).getID() == 4) {//Time Mage AOE is different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
                               for (int m = 0; m < points.length; m++) {
@@ -546,7 +566,7 @@ public class Server {
                                  }
                               }
                               aoeOutput.append(" ");
-                           } else if (theseAOES.get(j).getID() == 14){//AutAOE is also different
+                           } else if (theseAOES.get(j).getID() == 14) {//AutAOE is also different
                               aoeOutput.append("E" + theseAOES.get(j).getID());
                               int[][] points = ((AutoAOE) theseAOES.get(j)).getPoints();
                               for (int m = 0; m < points.length; m++) {
@@ -559,19 +579,19 @@ public class Server {
                         }
                         int ghostPassiveCount = 0;
                         for (int j = 0; j < theseStatuses.size(); j++) {
-                          if (theseStatuses.get(j) instanceof GhostE){
-                            statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE)theseStatuses.get(j)).getX() + "," + ((GhostE)theseStatuses.get(j)).getY() + " ");
-                          } else if (theseStatuses.get(j) instanceof GhostPassive){
-                            ghostPassiveCount++;
-                          } else if (theseStatuses.get(j).getID() != -1){
-                            statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
-                          }
+                           if (theseStatuses.get(j) instanceof GhostE) {
+                              statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE) theseStatuses.get(j)).getX() + "," + ((GhostE) theseStatuses.get(j)).getY() + " ");
+                           } else if (theseStatuses.get(j) instanceof GhostPassive) {
+                              ghostPassiveCount++;
+                           } else if (theseStatuses.get(j).getID() != -1) {
+                              statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
+                           }
                         }
-                        if (ghostPassiveCount > 0){
-                          statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
+                        if (ghostPassiveCount > 0) {
+                           statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
                         }
-                        if (players[i].getShieldsSize() > 0){
-                          statusOutput.append("S" + 13 + "," + i + " ");
+                        if (players[i].getShieldsSize() > 0) {
+                           statusOutput.append("S" + 13 + "," + i + " ");
                         }
                      }
                   }
@@ -667,6 +687,15 @@ public class Server {
          this.serverName = serverName;
          this.serverPassword = serverPassword;
          //Initialize teams
+      }
+
+      private boolean checkColliding(Player thisPlayer, double x, double y) {
+         for (int i = 0; i < allPolygons.length; i++) {
+            if (allPolygons[i].intersects(thisPlayer.getAdjustedHitboxRectangle(x,y))) {
+               return (true);
+            }
+         }
+         return (false);
       }
 
       private boolean isHost(User myUser) {

@@ -3,7 +3,7 @@ package server;
  * SafeMarksman.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-19
  */
@@ -114,6 +114,12 @@ public class Juggernaut extends Player{
           for (int j = 0; j < getEnemiesSize(); j++){
             if (getAOE(i).collides(getEnemy(j))){
               getEnemy(j).addStatus(new Illuminated(500));
+            }
+          }
+        } else if (getAOE(i) instanceof AutoAOE){
+          for (int j = 0; j < getEnemiesSize(); j++){
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).damage(getAttack());
             }
           }
         } else if  (getAOE(i) instanceof JuggernautQAOE){

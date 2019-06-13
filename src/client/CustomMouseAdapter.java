@@ -7,7 +7,7 @@ import java.awt.event.MouseWheelEvent;
 /**
  * This mouse adapter uses the extended methods to scroll, pan, and more.
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-02-12
  */
@@ -179,6 +179,9 @@ public class CustomMouseAdapter extends MouseAdapter {
     *
     * @return pressed, a boolean
     */
+   public int getState(int mouseArrayNumber){
+      return this.state[mouseArrayNumber];
+   }
 
    // TODO: Streamline for even driven w/ kameron
    public int[] getDispXy() { //Returns the displacement from the top left corner in game coordinates

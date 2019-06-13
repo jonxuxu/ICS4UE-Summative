@@ -3,7 +3,7 @@ package server;
  * SafeMarksman.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-19
  */
@@ -132,12 +132,31 @@ public class Ghost extends Player{
               getEnemy(j).addStatus(new Illuminated(500));
             }
           }
+        } else if (getAOE(i) instanceof AutoAOE){
+          for (int j = 0; j < getEnemiesSize(); j++){
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).damage(getAttack());
+            }
+          }
         } else if  (getAOE(i) instanceof GhostQAOE){
           ((GhostQAOE)getAOE(i)).setX(getX());
           ((GhostQAOE)getAOE(i)).setY(getY());
           for (int j = 0; j < getEnemiesSize(); j++){
             for (int k = 0; k < qBlacklist.size(); k++){
-              if (getEnemy(j) != qBlacklist.get(k)){
+              if (!qBlacklist.isEmpty()){
+                if (getEnemy(j) != qBlacklist.get(k)){
+                  if (getAOE(i).collides(getEnemy(j))){
+                    int numStacks = 0;
+                    for (int m = 0; m < getEnemy(j).getStatusesSize(); m++){
+                      if (getEnemy(j).getStatus(m) instanceof GhostPassive){
+                        numStacks++;
+                      }
+                    }
+                    getEnemy(j).damage(Q_BASE_DAMAGE + Q_DAMAGE_PER_STACK * numStacks);
+                    qBlacklist.add(getEnemy(j));
+                  }
+                }
+              } else {
                 if (getAOE(i).collides(getEnemy(j))){
                   int numStacks = 0;
                   for (int m = 0; m < getEnemy(j).getStatusesSize(); m++){

@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
  * InstructionPanel.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-31
  */
@@ -33,9 +33,9 @@ public class InstructionPanel extends MenuPanel { //State=5
       backButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(2);
        //  CLIENT.setAction(2);
-         CLIENT.leaveGame();
+       //  CLIENT.leaveGame();
       });
-      backButton.setBounds(MAX_X / 2 - (int) (65 ), MAX_Y * 7 / 10, (int) (130 ), (int) (19 ));
+      backButton.setBounds(MAX_X / 2 - 100, MAX_Y * 7 / 10, 200, MAIN_FONT.getSize() + 20);
       this.add(backButton);
 
       //Basic visuals

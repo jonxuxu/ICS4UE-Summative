@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
  * JoinPanel.java
  * This is
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-05-31
  */
@@ -36,24 +36,25 @@ public class JoinPanel extends MenuPanel { //State =4
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gameNameField.setFont(MAIN_FONT);
-      gameNameField.setBounds(MAX_X / 2 - (int) (45 ), MAX_Y * 3 / 10, (int) (90 ), (int) (19 ));
+      gameNameField.setBounds(MAX_X / 2 - 100, MAX_Y * 3 / 10, 200, MAIN_FONT.getSize() + 20);
       this.add(gameNameField);
       gamePasswordField.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gamePasswordField.setFont(MAIN_FONT);
-      gamePasswordField.setBounds(MAX_X / 2 - (int) (45 ), MAX_Y * 2 / 5, (int) (90 ), (int) (19 ));
+      gamePasswordField.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, MAIN_FONT.getSize() + 20);
       this.add(gamePasswordField);
       confirmButton.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
-      confirmButton.setBounds(MAX_X / 2 - (int) (65 ), MAX_Y / 2, (int) (130 ), (int) (19 ));
+      confirmButton.setBounds(MAX_X / 2 - 100, MAX_Y / 2, 200, MAIN_FONT.getSize() + 20);
       this.add(confirmButton);
       backButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(2);
       });
-      backButton.setBounds(MAX_X / 2 - (int) (65 ), MAX_Y * 7 / 10, (int) (130 ), (int) (19 ));
+      backButton.setBounds(MAX_X / 2 - 100, MAX_Y * 7 / 10, 200, MAIN_FONT.getSize() + 20);
       this.add(backButton);
+
       //Basic visuals
       this.setDoubleBuffered(true);
       this.setBackground(new Color(20, 20, 20));
@@ -70,12 +71,12 @@ public class JoinPanel extends MenuPanel { //State =4
       drawBackground(g2);
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
-      g2.drawString("Join Server", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2.0), (MAX_Y / 5));
+      g2.drawString("Join Server", (MAX_X - g2.getFontMetrics().stringWidth("Join Server")) / 2, (MAX_Y / 5));
       //Server name
       g2.setFont(MAIN_FONT);
-      g2.drawString("Server Name", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2.0), (MAX_Y * 3 / 10 - g2.getFontMetrics().getHeight()));
+      g2.drawString("Server Name", (MAX_X - g2.getFontMetrics().stringWidth("Server Name")) / 2, (MAX_Y * 3 / 10 - MAIN_FONT.getSize() + 20));
       //Server password
-      g2.drawString("Server Password", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2.0), (MAX_Y * 2 / 5 - g2.getFontMetrics().getHeight()));
+      g2.drawString("Server Password", (MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2, (MAX_Y * 2 / 5 - MAIN_FONT.getSize() + 20));
       //Write error
       writeError(g2, MAX_X / 2, (int) (MAX_Y * 9.0 / 16.0));
       //Draws particles

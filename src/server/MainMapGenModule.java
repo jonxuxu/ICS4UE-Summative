@@ -8,13 +8,25 @@ import javax.swing.JFrame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+
+/**
+ * MainMapGenModule.java
+ *
+ * Handles the sending and processing of all the data produced by the MapGen class
+ *
+ * @author Artem Sotnikov, Will Jeong
+ * @since 2019-03-25
+ * @version 3.3
+ *
+ */
 
 class MainMapGenModule extends JFrame{
    private Disp display;
@@ -28,6 +40,9 @@ class MainMapGenModule extends JFrame{
    private BufferedImage mapImage;
    private Socket socket;
 
+   /**
+    * The constructor that sets up all necessary data and handles all the MapGen methods
+    */
    MainMapGenModule() {
 
       String config = "";
@@ -45,39 +60,78 @@ class MainMapGenModule extends JFrame{
          gen.makeNodesElliptical();
          gen.generateRegions();
          gen.generateCrevices(2);
-         gen.smokeTrees(7500, 200, 0, false);
+         gen.smokeTrees(7500, 130, 0, false);
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
          gen.genClearingByNum(8, 500);
-         gen.purgeRedundanices();
+         gen.purgeRedundancies();
+         gen.addObstacleBoundingBoxes();
 
       }
+
+
+
       display = new Disp();
+
+      // Code for a potential JFrame implementation
+
       //this.add(display);
       //  display.repaint();
+
+
       display.paintImage();
       System.out.println("done");
    }
 
 
-   class Disp {
+   /**
+    *
+    * An internal class handling the graphics for a JFrame implementation or for a direct image send
+    *
+    */
 
+   class Disp {
+      /**
+       * Draws a oval with a custom radius centered at (0,0)
+       *
+       * @param radius the radius of the oval to be drawn
+       * @param g the graphics module with which the oval should be drawn
+       */
       private void drawOvalCustom(int radius, Graphics g) {
          g.drawOval(-radius, -radius, radius * 2, radius * 2);
       }
+
+      /**
+       *
+       * Draws a oval centered at a custom location, with a custom radius
+       *
+       * @param radius the radius of the oval to be drawn
+       * @param xOffset the xCoordinate at which to start drawing
+       * @param yOffset the yCoordinate at which to start drawing
+       * @param g the graphics module with which the oval should be drawn
+       */
 
       private void fillOvalCustom(int radius, int xOffset, int yOffset, Graphics g) {
          g.fillOval(xOffset - radius, yOffset - radius, radius * 2, radius * 2);
       }
 
+      /**
+       *
+       * Draws a oval centered at a custom location, with a custom radius
+       *
+       * @param radius the radius of the oval to be drawn
+       * @param eAdjust the horizontal elliptical adjustment of the oval
+       * @param g the graphics module with which the oval should be drawn
+       */
+
       private void fillOvalCustom(int radius, double eAdjust, Graphics g) {
          g.fillOval((int) (-radius * eAdjust), -radius, (int) (radius * 2 * eAdjust), radius * 2);
       }
 
-      private void drawLineCustom(Point start, Point end, Graphics g) {
-         g.drawLine(start.x, start.y, end.x, end.y);
-      }
+      /**
+       * Paints the map into a image to be exported for use in the game
+       */
 
       public void paintImage() {
          //6000 by 4000
@@ -143,13 +197,13 @@ class MainMapGenModule extends JFrame{
                g.setColor(Color.GRAY);
             }
             if (gen.obstacles.get(i).radius != 0) {
-               g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y,
-                       gen.obstacles.get(i).radius, gen.obstacles.get(i).radius);
+               g2.fill(gen.obstacles.get(i).boundingBox);
             } else {
-               g.fillOval(gen.obstacles.get(i).location.x, gen.obstacles.get(i).location.y, 50, 50);
+               this.fillOvalCustom(50,gen.obstacles.get(i).location.x,
+                       gen.obstacles.get(i).location.y, g);
             }
          }
-        /* try {
+         /*try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
@@ -157,16 +211,31 @@ class MainMapGenModule extends JFrame{
       }
    }
 
+   /**
+    * Returns the full list of obstacles 
+    * 
+    * @return ArrayList<Obstacle>, the full list of obstacles contained within the instance of MapGen
+    */
+   public ArrayList<Obstacle> getObstacle() {
+      return (gen.obstacles);
+   }
+
+   /**
+    * sends the map image over to socket to the clients
+    *
+    * @param socket, the socket on which to send the map
+    */
    public void sendMap(Socket socket) {
-      System.out.println("reee");
       try {
          ImageIO.write(mapImage, "PNG", socket.getOutputStream());//also try png
       } catch (IOException e) {
          e.printStackTrace();
       }
-      System.out.println("e");
    }
-//Make it extend from JPanel
+
+// Code for a JFrame implementation, unused as of last update (2019-06-11)
+
+// Make it extend from JPanel
   /*    public void paintComponent(Graphics g) {
          super.paintComponent(g);
          this.setCenter(g);

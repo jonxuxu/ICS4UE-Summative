@@ -4,33 +4,60 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.awt.Polygon;
 
+/**
+ * MapGen.java
+ *
+ * The class responsible for doing the mathematics behind map generation and task delegation to lower classes
+ *
+ * @author Artem Sotnikov
+ * @version 2.3
+ * @since 2019-03-25
+ *
+ */
 
 public class MapGen {
-
-	//private final static int ROAD_WIDTH = 100;
+	// Constants that are used for map gen operations
+	private final static int ROAD_WIDTH = 100;
 	public final static int MAP_REGION_IDX = 0;
 	public final static int SWAMP_REGION_IDX = 1;
-	
+
+
+	//Variables for setting up the map generation parameters
 	public int mapSize;
 	public int loopRadius;
 	public int swampRadius;
 	public double ellipticalAdjust;
-	
+
+	//Data created during a generation cycle
     public ArrayList<RoadNode> nodes; 
     public ArrayList<Obstacle> obstacles;
     public RegionLayer regionLayer;
+
+    //Boolean for configuring test states
     public boolean testingState;
-    
-    
-    
-    MapGen(int mSize, int lRad, double eAdjust) {
+
+
+	/**
+	 *
+	 * The constructor for the MapGen class
+	 *
+	 * @param mSize the size of the map for generation
+	 * @param lRad the radius of the loop for road node generation
+	 * @param eAdjust the eccentricity of the horizonatl adjust, tuning the map from a circle to an ellipse
+	 */
+	MapGen(int mSize, int lRad, double eAdjust) {
       this.nodes = new ArrayList<RoadNode>(0);
       this.obstacles = new ArrayList<Obstacle>(0);
       this.testingState = false;
       this.ellipticalAdjust = eAdjust;
     }
-    
-    public MapData finalGenerate() {
+
+	/**
+	 * Runs essential functions to generate an entire map without acessing other classes
+	 *
+	 * @return MapData, an object that contains the essential data contained within the map
+	 */
+	public MapData finalGenerate() {
     	this.selfInitialize();
     	
     	MapData returnMap = new MapData();
@@ -39,34 +66,41 @@ public class MapGen {
     	
     	return returnMap;
     }
-    
-    public void selfInitialize() {
+
+	/**
+	 * Runs the sequence of all methods performing the mathematics for creating one entire map
+	 */
+	public void selfInitialize() {
     	this.nodes = new ArrayList<RoadNode>(0);
         this.obstacles = new ArrayList<Obstacle>(0);
         this.testingState = false;
         
         //this.ellipticalAdjust = eAdjust;
-    	
+
+		// initializes basic values for generation
     	int loopRadiusSize = 10;
     	int nodeGenRange = 3750;
     	double nodeGenStDev = 0.5;
     	
-    	
+
+    	// runs the method sequence
     	this.generateMap2(40,loopRadiusSize,nodeGenRange,nodeGenStDev);
 	    this.tetherAllNodes2();	
 	    this.makeNodesElliptical();
 	    this.generateRegions();
 	    this.generateCrevices(2);
-	    //this.insertArtifactClearing();
+	    this.insertArtifactClearing();
 	    this.smokeTrees(7500, 1000, 0, false);    
 	    this.smokeRocks(7500, 100, true);
 	    this.makeObstaclesElliptical();
 	    this.genClearingByNum(8, 500);  	    
-	    this.purgeRedundanices();
+	    this.purgeRedundancies();
     }
-        
-    
-    public void configueScenario1() {
+
+	/**
+	 * Configures a scenario for testing basic functionality
+	 */
+	public void configueScenario1() {
     	this.testingState = true;
     	
     	RoadNode node1 = new RoadNode(5000,5000);
@@ -78,15 +112,18 @@ public class MapGen {
     	this.nodes.add(node1);
     	this.nodes.add(node2);
     }
-    
-    public void generateRegions() {
+
+	/**
+	 * Generates the regions in the map based upon earlier generated nodes and connections
+	 */
+	public void generateRegions() {
     	this.regionLayer = new RegionLayer();
     	
     	Region swamp = new Region("swamp",1);
     	Region map = new Region("map", 0); 
     			
     	map.mimicEllipse(0, 0, 7500, 1.75, 100);
-    	swamp.mimicEllipse(0, 0, 3000, 1.75, 20);
+    	swamp.mimicEllipse(0, 0, 3125, 1.75, 20);
     	
     	
     	this.regionLayer.regions.add(MAP_REGION_IDX, map);
@@ -106,8 +143,13 @@ public class MapGen {
     		}
     	}    
     }
-    
-    public void makeElliptical(double eAdjust) {
+
+	/**
+	 * 	Makes all objects generated elliptical
+	 *
+	 * @param eAdjust, the value by which the adjustment is made
+	 */
+	public void makeElliptical(double eAdjust) {
     	for (int i = 0; i < nodes.size(); i++) {
     		nodes.get(i).location.x = (int) (nodes.get(i).location.x*eAdjust);
     	}
@@ -115,21 +157,33 @@ public class MapGen {
     		obstacles.get(i).location.x = (int) (obstacles.get(i).location.x*eAdjust);
     	}
     }
-    
-    public void makeNodesElliptical() {
+
+	/**
+	 * Makes all node positions elliptical, based upon an earlier-initialized value
+	 */
+	public void makeNodesElliptical() {
     	for (int i = 0; i < nodes.size(); i++) {
     		nodes.get(i).location.x = (int) (nodes.get(i).location.x*ellipticalAdjust);
     	}
     }
-    
-    public void makeObstaclesElliptical() {
+
+	/**
+	 * Makes all obstacle position elliptical, based upon an earlier-initialized value
+	 */
+	public void makeObstaclesElliptical() {
     	for (int i = 0; i < obstacles.size(); i++) {
     		obstacles.get(i).location.x = (int) (obstacles.get(i).location.x*ellipticalAdjust);
     	}
     }
-    
-    
-    public void genClearing(double clearingChance, int clearingSize) {
+
+	/**
+	 * Generates clearings on road nodes, implemented within the nodes themselves
+	 *
+	 * @param clearingChance, the chance that any individual node becomes a clearing/
+	 * @param clearingSize, the size that the clearing is.
+	 */
+
+	public void genClearing(double clearingChance, int clearingSize) {
     	for (int i = 0; i < nodes.size(); i++) {
     		if (roll(clearingChance)) {
     			nodes.get(i).isClearing = true;
@@ -137,8 +191,15 @@ public class MapGen {
     		}
     	}
     }
-    
-    public void genClearingByNum(int numClearings, int clearingSize) {
+
+	/**
+	 * Generate clearings on road nodes, implemented within the nodes themselves
+	 *
+	 * @param numClearings
+	 * @param clearingSize
+	 */
+
+	public void genClearingByNum(int numClearings, int clearingSize) {
     	for (int i = 0; i < numClearings; i++) {
     		int randomIdx = (int) (Math.random()*nodes.size()) ;
     		if (nodes.get(randomIdx).isClearing) {
@@ -149,8 +210,18 @@ public class MapGen {
     		}
     	}
     }
-    
-    public void smokeTrees(int mapRadius, int numOfTrees, int intensity, boolean randomization) {
+
+	/**
+	 *
+	 * Generates trees in the 'obstacles' list based on given parameters
+	 *
+	 * @param mapRadius how large the range of tree generation is
+	 * @param numOfTrees how many trees should be spawned
+	 * @param intensity how intense the spawning of the tress is tuned to the center
+	 * @param randomization whether randomization of trees is allowed
+	 */
+
+	public void smokeTrees(int mapRadius, int numOfTrees, int intensity, boolean randomization) {
     	for (int i = 0; i < numOfTrees;i++) {
     		double angle;
     		double radius;
@@ -159,7 +230,7 @@ public class MapGen {
     		temp.type = "TREE";
     		temp.location = new Point();
 
-			int maxRadius = 600;
+			int maxRadius = 400;
     		
     		int tempX, tempY;
     		int tempDeltaX, tempDeltaY;
@@ -174,24 +245,34 @@ public class MapGen {
     			tempY = (int) (Math.sin(angle)*radius);
     			
     			exit = true;
-    			if ((regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("map") ||
-    					regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) &&
-						regionLayer.checkCoordinate((int) (tempX*1.75), tempY) != ("road")
-				) {
-	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
-	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
-	    				tempDeltaY = tempY - obstacles.get(idx).location.y;
-	    				
-	    				if ((Math.pow(tempDeltaX,2) + 
-	    						Math.pow(tempDeltaY,2)) <= Math.pow(maxRadius,2)) {
+
+				if (regionLayer.checkCoordinate( (int) (tempX*1.75), tempY) == ("swamp")) {
+					if (randRoll(700)) {
+						exit = false;
+					}
+				}
+
+				if (exit) {
+					if ((regionLayer.checkCoordinate((int) (tempX * 1.75), tempY) == ("map") ||
+							regionLayer.checkCoordinate((int) (tempX * 1.75), tempY) == ("swamp")) &&
+							regionLayer.checkCoordinate((int) (tempX * 1.75), tempY) != ("road")
+					) {
+						for (int idx = obstacles.size() - 1; idx > -1; idx--) {
+							tempDeltaX = tempX - obstacles.get(idx).location.x;
+							tempDeltaY = tempY - obstacles.get(idx).location.y;
+
+							if ((Math.pow(tempDeltaX, 2) +
+									Math.pow(tempDeltaY, 2)) <= Math.pow(maxRadius, 2)) {
 //	    							System.out.println((Math.pow(tempDeltaX,2) +
 //	    		    						Math.pow(tempDeltaY,2)));
-	    							exit = false;
-	    				}
-	    			}
-    			} else {
-    				exit = false;
-    			}
+								exit = false;
+							}
+						}
+					} else {
+						exit = false;
+					}
+				}
+
     			
     			
     		} while (!exit);
@@ -202,7 +283,15 @@ public class MapGen {
     		this.obstacles.add(temp);
     	}
     }
-    
+
+	/**
+	 *
+	 * Generates trees in the 'obstacles' list based on given parameters
+	 *
+	 * @param mapRadius how large the range of rock generation is
+	 * @param numOfRocks how many rocks should be spawned
+	 * @param randomization whether randomization of rocks is allowed
+	 */
     public void smokeRocks(int mapRadius, int numOfRocks, boolean randomization) {
     	for (int i = 0; i < numOfRocks;i++) {
     		double angle;
@@ -228,7 +317,7 @@ public class MapGen {
     			
     			exit = true;
     			    
-    			if (regionLayer.checkCoordinate(tempX, tempY) == ("map")) {
+    			if (regionLayer.checkCoordinate((int)(tempX*1.75), tempY) == ("map")) {
 	    			for (int idx = obstacles.size() - 1; idx > -1; idx--) {
 	    				tempDeltaX = tempX - obstacles.get(idx).location.x;
 	    				tempDeltaY = tempY - obstacles.get(idx).location.y;    				
@@ -258,8 +347,11 @@ public class MapGen {
     		this.obstacles.add(temp);
     	}
     }
-    
-    public void insertArtifactClearing() {
+
+	/**
+	 * Accesses the region layer retroactivley to insert artifact clearings at the rightmost and leftmost nodes
+	 */
+	public void insertArtifactClearing() {
     	int teamOneDistance = 0;  
     	int teamTwoDistance = 0;
     	int teamOneIdx = 0; 
@@ -286,7 +378,11 @@ public class MapGen {
     	regionLayer.regions.add(t2Clearing);
     }
 
-    public void addObstalceBoundingBoxes() {
+	/**
+	 * Adds polygon bounding shapes to all the obstacles
+	 */
+
+	public void addObstacleBoundingBoxes() {
     	for (int idx = 0; idx < obstacles.size(); idx++) {
     		Polygon creation = new Polygon();
 
@@ -299,14 +395,21 @@ public class MapGen {
 			double tempAngle;
 
 			for (int idx2 = 0; idx2 < numVertices; idx2++) {
-				tempAngle = 2*Math.PI*idx/numVertices;
+				tempAngle = 2*Math.PI*idx2/numVertices;
 				creation.xpoints[idx2] = (int) (radius*Math.cos(tempAngle)) + obstacles.get(idx).location.x;
+				System.out.println(creation.xpoints[idx2]);
 				creation.ypoints[idx2] = (int) (radius*Math.sin(tempAngle)) +  obstacles.get(idx).location.y;
+				System.out.println(creation.ypoints[idx2]);
 			}
 
 			obstacles.get(idx).boundingBox = creation;
 		}
 	}
+
+	/**
+	 * Tethers all the generated nodes to create paths for road generation
+	 * note: outdated
+	 */
     
     public void tetherAllNodes() {
     	int numOfNodes = nodes.size();
@@ -366,8 +469,15 @@ public class MapGen {
     	}   
     	
     	
-    }    
-    
+    }
+
+	/**
+	 * Tethers all the generated nodes to create paths for road generation
+	 * NOTE: most recent version
+	 */
+
+
+
     public void tetherAllNodes2() {
     	int quad1Best,quad2Best,quad3Best,quad4Best;
     	int q1Idx,q2Idx,q3Idx,q4Idx;
@@ -437,24 +547,49 @@ public class MapGen {
     	
     }
 
-    
-    private boolean randRoll(int chance) {
+	/**
+	 * Calculates a boolean based on a probability
+	 *
+	 * @param chance how large the integer probability out of 1000 is
+	 * @return boolean whether the roll succeeded or not
+	 */
+
+	private boolean randRoll(int chance) {
       if (Math.random()*1000 < chance) {
         return true;
       }
       
       return false;
     }
-    
-    private boolean roll (double chance) {
+
+	/**
+	 * Calculates a boolean based on a probability
+	 *
+	 * @param chance how large the double probability out of 1 is
+	 * @return boolean whether the roll succeeded or not
+	 */
+
+	private boolean roll (double chance) {
       if (Math.random() < chance) {
         return true;
       }
       
       return false;
     }
-    
-    public void generateMap(int numOfNodes, int targetRadius, int offsetRange, int offsetPacking) {
+
+	/**
+	 *
+	 * Generates the initial nodes around which the rest of the map is generated
+	 *
+	 * NOTE: outdated
+	 *
+	 * @param numOfNodes the number  of nodes that should be generated
+	 * @param targetRadius what the optimal radius of node generation is
+	 * @param offsetRange what the maximum range of node offset is
+	 * @param offsetPacking how much the offset is packed by
+	 */
+
+	public void generateMap(int numOfNodes, int targetRadius, int offsetRange, int offsetPacking) {
       for (int i = 0; i < numOfNodes; i ++) {
         double angle = Math.random()*2*Math.PI;
         int distance = targetRadius;
@@ -476,6 +611,19 @@ public class MapGen {
         nodes.add(new RoadNode(new Point(pointY,pointX)));        
       }
     }
+
+	/**
+	 *
+	 * Generates the initial nodes around which the rest of the map is generated,
+	 * based on a modified normal distribution
+	 *
+	 * NOTE: most recent version
+	 *
+	 * @param numOfNodes the number  of nodes that should be generated
+	 * @param targetRadius what the optimal radius of node generation is
+	 * @param offsetFactor what the maximum range of node offset is
+	 * @param stDev how much the offset is packed by
+	 */
     
     public void generateMap2(int numOfNodes, double targetRadius, double offsetFactor, double stDev) {
       for (int i = 0; i < numOfNodes; i++) {
@@ -519,28 +667,38 @@ public class MapGen {
       }
             
     }
-        
-    public void purgeRedundanices() {
+
+	/**
+	 * Purges unnecessary connections created during node tethering
+	 */
+
+	public void purgeRedundancies() {
     	for (int idx = 0; idx < nodes.size(); idx++) {
     		RoadNode activeNode = nodes.get(idx);
     		for (int cIdx = 0; cIdx < activeNode.connections.size(); cIdx++) {
-    			if (activeNode.location == activeNode.connections.get(cIdx)) {
+
     				activeNode.connections.remove(cIdx);
-    			}
+
     		}
     	}
     }
-    
-    public void generateCrevices(int creviceNum) {
+
+	/**
+	 * Using additional classes, inserts crevice regions into the region layer retroactively
+	 *
+	 * @param creviceNum how many crevices should be generates
+	 */
+
+	public void generateCrevices(int creviceNum) {
     	CreviceGenerator creviceEngine = new CreviceGenerator();
     	Point source;
     	Region creation = null;
     	
     	for (int iter = 0; iter < creviceNum; iter++) {
-    		source = new Point((int) (Math.random()*6000 - 3000),(int) (Math.random()*6000 - 3000));
+    		source = new Point((int) (Math.random()*5000 - 2500),(int) (Math.random()*5000 - 2500));
     		
 			do {
-				creviceEngine.generateFullCrevice(source,1000,1.0,4,true,500);
+				creviceEngine.generateFullCrevice(source,1250,1.0,4,true,1000);
 	    		creation = new Region("crevice",4);  
 	    		creation.uploadPolygon(creviceEngine.getPolygon());
 			} while (!regionLayer.regions.get(SWAMP_REGION_IDX).contains(creation));
@@ -548,9 +706,14 @@ public class MapGen {
     		regionLayer.regions.add(creation);
     	}
     }
-    
-    public ArrayList<RoadNode> getNodes() {
+
+	/**
+	 * Returns the raw data of the nodes
+	 *
+	 * @return the ArrayList of nodes that are contained within the MapGen instance
+	 */
+	public ArrayList<RoadNode> getNodes() {
       return this.nodes;
     }             
-
 }
+
