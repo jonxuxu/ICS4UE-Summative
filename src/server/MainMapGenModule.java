@@ -67,6 +67,8 @@ class MainMapGenModule extends JFrame{
          gen.makeObstaclesElliptical();
          gen.genClearingByNum(8, 500);
          gen.purgeRedundancies();
+         gen.generateBarrier();
+
          gen.addObstacleBoundingBoxes();
 
       }
@@ -191,7 +193,6 @@ class MainMapGenModule extends JFrame{
             for (int j = 0; j < gen.nodes.get(i).connections.size(); j++) {
                //this.drawLineCustom(gen.nodes.get(i).location, gen.nodes.get(i).connections.get(j), g);
             }
-
          }
 
          for (int i = 0; i < gen.obstacles.size(); i++) {
