@@ -53,7 +53,7 @@ public class MusicManager {
 
   /**
    * Sets the volume
-   * @param value: the value of the volume
+   * @param value: A float array for different gain values
    */
   public void setVolume(float[] value ){
     masterVolume = value[0];
