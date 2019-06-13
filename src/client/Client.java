@@ -1003,6 +1003,7 @@ public class Client extends JFrame implements WindowListener {
             darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          }
          if (drawArea != null) {
+
             resetXyAdjust();
             g2.clip(drawArea);
             g2.setFont(MAIN_FONT);

@@ -12,18 +12,28 @@ import java.util.Map;
 
 public class SoundEffectManager {
   private Map<String, String> urls = new HashMap<String, String>();
+  private static Clip clip;
   private float masterVolume = -6f; // 50% dB
   private float effectVolume = -6f;
 
   public SoundEffectManager(){
     urls.put("cow", "cow-moo.wav");
     urls.put("error", "error.wav");
+    urls.put("arrow", "arrowShoot.wav");
+    urls.put("dagger", "daggerSwing.wav");
+    urls.put("sword", "dirk.wav");
+    urls.put("bow", "fire_bow.wav");
+    urls.put("explosion", "fire_spray.wav");
+    urls.put("ghost", "fire_wand.wav");
+    urls.put("start", "game_start.wav");
+    urls.put("hammer", "golden_sword.wav");
+    urls.put("towerSpawn", "magic_nova.wav");
   }
 
   public void playSound(String name) { // Add synchronized?
       try {
         // Gets a sound clip resource
-        Clip clip = AudioSystem.getClip();
+        clip = AudioSystem.getClip();
         clip.addLineListener(new LineListener() {
           public void update(LineEvent myLineEvent) {
             if (myLineEvent.getType() == LineEvent.Type.STOP)
