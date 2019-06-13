@@ -44,8 +44,8 @@ public class InstructionPanel extends MenuPanel { //State=5
       try {
          pages[0] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page1.png"));
          pages[1] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
-         pages[2] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
-         pages[3] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
+         pages[2] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page3.png"));
+         pages[3] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page4.png"));
       } catch (IOException e) {
          System.out.println("Unable to find an image");
       }
