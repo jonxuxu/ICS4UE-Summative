@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class TimeMage extends Player{
   private int[] spellCooldowns = {100,100,100};
   private int[] spellTimers = {0,0,0};
-  private static int Q_DAMAGE = 50;
+  private static int Q_DAMAGE = 75;
   private static int E_RANGE = 500;
   private static int SPACE_DURATION = 100;
   
@@ -21,10 +21,10 @@ public class TimeMage extends Player{
     super(username,teamNumber);
     setMaxHealth(200);
     setHealth(200);
-    setAttack(300);
+    setAttack(30);
     setMobility(7);
-    setRange(50);//REE Change to -1 when add support for melee attacks
-    setAutoAttackCooldown(10);
+    setRange(75);//REE Change to -1 when add support for melee attacks
+    setAutoAttackCooldown(20);
     setFlareCooldown(100);
     setMelee(true);
   }
