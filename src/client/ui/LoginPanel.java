@@ -25,7 +25,6 @@ public class LoginPanel extends MenuPanel {
 
    private CustomTextField nameField = new CustomTextField(3);
    private CustomTextField ipField = new CustomTextField(3);
-   private CustomButton testButton = new CustomButton("Test");
 
    public LoginPanel() {
       //Basic username field
@@ -36,14 +35,6 @@ public class LoginPanel extends MenuPanel {
       nameField.setFont(super.getFont("main"));
       nameField.setBounds(MAX_X / 2 - 100, MAX_Y / 5, 200, (MAIN_FONT.getSize() + 20));
       this.add(nameField);
-
-      testButton.addActionListener((ActionEvent e) -> {
-         CLIENT.testingBegin();
-      });
-
-      testButton.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, (MAIN_FONT.getSize() + 20));
-      this.add(testButton);
-
       ipField.addActionListener((ActionEvent e) -> {
          CLIENT.setIp(ipField.getText());
       });

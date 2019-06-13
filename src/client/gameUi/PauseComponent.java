@@ -86,13 +86,6 @@ public class PauseComponent extends ThemedPanel {
       bottomPanel.setBackground(null);
         JPanel bottomRow1 = new JPanel();
         bottomRow1.setBackground(null);
-          CustomButton surrender = new CustomButton("Surrender");
-          surrender.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-              //TODO: Add support for surrendering game but staying connected to the server
-            }
-          });
           CustomButton quit = new CustomButton("Quit Game");
           quit.addActionListener(new ActionListener() {
             @Override
@@ -101,7 +94,6 @@ public class PauseComponent extends ThemedPanel {
               System.exit(0);
             }
           });
-        bottomRow1.add(surrender);
         bottomRow1.add(quit);
         JPanel bottomRow2 = new JPanel();
         bottomRow2.setBackground(null);

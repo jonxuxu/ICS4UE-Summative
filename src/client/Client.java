@@ -359,42 +359,6 @@ public class Client extends JFrame implements WindowListener {
             output.println("Z" + className);//Refers to class chosen
             output.flush();
          }
-         if (testingBegin) {
-            username = Math.random() + "";
-            myUser = new User(username);
-            serverName = Integer.toString((int) (Math.random() * 10000));
-            serverPassword = "0";
-            System.out.println(serverName);
-            output.println("T" + username + "," + serverName);//test
-            output.flush();
-            waitForInput();
-            host = true;
-            players = new Player[onlineList.size()];
-            for (int i = 0; i < onlineList.size(); i++) {
-               //TODO: Add class select here
-               if (thisClass.equals("Archer") || thisClass.equals("Marksman") || thisClass.equals("SafeMarksman")) {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("TimeMage")) {
-                  players[i] = new TimeMage(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("Ghost")) {
-                  players[i] = new Ghost(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("MobileSupport") || thisClass.equals("Support")) {
-                  players[i] = new MobileSupport(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("Juggernaut")) {
-                  players[i] = new Juggernaut(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else if (thisClass.equals("Summoner")) {
-                  players[i] = new Summoner(onlineList.get(i).getUsername(), myMouseAdapter);
-               } else {
-                  players[i] = new SafeMarksman(onlineList.get(i).getUsername(), myMouseAdapter);
-               }
-               if (onlineList.get(i).getUsername().equals(myUser.getUsername())) {
-                  myPlayer = players[i];
-               }
-               players[i].setTeam(onlineList.get(i).getTeam());
-            }
-            testingBegin = false;
-            nextPanel = 6;
-         }
          //TODO: Add class select here
       } catch (IOException e) {
          e.printStackTrace();
