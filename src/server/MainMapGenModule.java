@@ -40,6 +40,7 @@ class MainMapGenModule extends JFrame {
    private BufferedImage mapImage;
    private BufferedImage pathImage;
    private BufferedImage darkPathImage;
+   private BufferedImage clearingImage;
    private BufferedImage groundImage;
    private BufferedImage swampImage;
    private Socket socket;
@@ -55,6 +56,7 @@ class MainMapGenModule extends JFrame {
       try {
          pathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Path.png"));
          darkPathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_PathDark.png"));
+         clearingImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Clearing.png"));
          groundImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Ground.png"));
          swampImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Swamp.png"));
       } catch (IOException e) {
@@ -180,7 +182,7 @@ class MainMapGenModule extends JFrame {
                if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing") || gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
                    Polygon temp = (Polygon)(g.getClip());
                    ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
-                   g.drawImage(darkPathImage, -15000, -10000, 30000, 20000, null);
+                   g.drawImage(clearingImage, -15000, -10000, 30000, 20000, null);
                    g.setClip(temp);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
                   Polygon temp = (Polygon)(g.getClip());
