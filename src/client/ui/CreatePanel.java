@@ -83,7 +83,7 @@ public class CreatePanel extends MenuPanel { //State =3
       //Server password
       g2.drawString("Server Password", (MAX_X - g2.getFontMetrics().stringWidth("Server Password")) / 2, (MAX_Y * 2 / 5 - MAIN_FONT.getSize() + 20));
       //Write error
-      writeError(g2, MAX_X / 2, (int) (MAX_Y * 9.0 / 16.0));
+      writeError(g2, MAX_X / 2, MAX_Y * 3 / 5);
       //Draws particles
       drawAllParticles(g2);
    }
