@@ -219,10 +219,11 @@ public class Ghost extends Player {
       }
       if (inE) {
          inE = false;
-         for (int i = 0; i < getStatusesSize(); i++) {
+         for (int i = getStatusesSize()-1; i >= 0; i--) {
             if (getStatus(i) instanceof GhostE) {
                setX(((GhostE) getStatus(i)).getX());
                setY(((GhostE) getStatus(i)).getY());
+               removeStatus(i);
             }
          }
       }
