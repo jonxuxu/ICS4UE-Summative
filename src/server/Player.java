@@ -81,22 +81,24 @@ public abstract class Player extends User implements CanIntersect {
    private static Player[] players;
    private static int playerNum;
 
-   Player(String username){
+   Player(String username) {
       super(username);
    }
 
-   Player(String username,int teamNumber) {
+   Player(String username, int teamNumber) {
       super(username);
       this.teamNumber = teamNumber;
    }
 
 
-   public void setSelectedClass (String selectedClass){
-      this.selectedClass=selectedClass;
+   public void setSelectedClass(String selectedClass) {
+      this.selectedClass = selectedClass;
    }
-   public String getSelectedClass (){
-      return(selectedClass);
+
+   public String getSelectedClass() {
+      return (selectedClass);
    }
+
 
    public static void updateHitbox() {
       for (int i = 0; i < players.length; i++) {
@@ -121,18 +123,21 @@ public abstract class Player extends User implements CanIntersect {
       int[] yP = {(int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2};
       lightingHitbox = new CustomPolygon(xP, yP, 4);
       constantHitboxes[i] = lightingHitbox;
+      //REPLACE WITH getHitboxRectangle
    }
 
-   public static void setConstantHitboxes(int playerNum, Polygon[] obstacles) {
-      constantHitboxes = new CustomPolygon[playerNum + obstacles.length];//For each shape, add another
-      for (int i = 0; i < obstacles.length; i++) {
-         int[] xP = new int[obstacles[i].npoints];
-         int[] yP = new int[obstacles[i].npoints];
-         for (int j = 0; j < obstacles[i].npoints; j++) {
-            xP[j] = obstacles[i].xpoints[j];
-            yP[j] = obstacles[i].ypoints[j];
+   public static void setConstantHitboxes(int playerNum, ArrayList<Obstacle> obstacles) {
+      constantHitboxes = new CustomPolygon[playerNum + obstacles.size()];//For each shape, add another
+      for (int i = 0; i < obstacles.size(); i++) {
+         Polygon thisPolygon = obstacles.get(i).boundingBox;
+         int[] xP = new int[thisPolygon.npoints];
+         int[] yP = new int[thisPolygon.npoints];
+         for (int j = 0; j < thisPolygon.npoints; j++) {
+            xP[j] = thisPolygon.xpoints[j]+15000;
+            yP[j] = thisPolygon.ypoints[j]+10000;
+            System.out.println(xP[j]+"*"+yP[j]);
          }
-         constantHitboxes[i + playerNum] = (new CustomPolygon(xP, yP, obstacles[i].npoints));
+         constantHitboxes[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
       }
    }
 
@@ -148,7 +153,8 @@ public abstract class Player extends User implements CanIntersect {
    public void setMouseAngle(double mouseAngle) {
       this.mouseAngle = mouseAngle;
    }
-   public double getMouseAngle(){
+
+   public double getMouseAngle() {
       return this.mouseAngle;
    }
 
@@ -331,15 +337,15 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void autoAttack() {
-     if (!stunned && (autoAttackTimer <= 0)) {
-       if (!melee){
-         projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
-         autoAttackTimer = autoAttackCooldown;
-       } else {
-         addAOE(new AutoAOE(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, range));
-         autoAttackTimer = autoAttackCooldown;
-       }
-     }
+      if (!stunned && (autoAttackTimer <= 0)) {
+         if (!melee) {
+            projectiles.add(new AutoProjectile(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, autoSpeed, range));
+            autoAttackTimer = autoAttackCooldown;
+         } else {
+            addAOE(new AutoAOE(((int) (xy[0])), ((int) (xy[1])), mouseX, mouseY, range));
+            autoAttackTimer = autoAttackCooldown;
+         }
+      }
    }
 
    public void flare() {
@@ -348,6 +354,7 @@ public abstract class Player extends User implements CanIntersect {
          flareTimer = flareCooldown;
       }
    }
+
    public void launch(int targetX, int targetY, int speed, int range) {
       double theta = Math.atan2(targetY - xy[1], targetX - xy[0]);
       double dx = speed * Math.cos(theta);
@@ -381,8 +388,8 @@ public abstract class Player extends User implements CanIntersect {
             shields.remove(0);
          }
       }
-      if (health <= 0){
-        addStatus(new Dead());
+      if (health <= 0) {
+         addStatus(new Dead());
       }
    }
 
@@ -456,10 +463,10 @@ public abstract class Player extends User implements CanIntersect {
             } else if (removed instanceof TimeMageE) {
                setX(((TimeMageE) removed).getX());
                setY(((TimeMageE) removed).getY());
-            } else if (removed instanceof Dead){
-              setX(spawnX);
-              setY(spawnY);
-              setHealth(maxHealth);
+            } else if (removed instanceof Dead) {
+               setX(spawnX);
+               setY(spawnY);
+               setHealth(maxHealth);
             }
          } else {
             applyStatus(statuses.get(i));
@@ -504,7 +511,14 @@ public abstract class Player extends User implements CanIntersect {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
       return new Area(hitbox);
    }
-
+   public Rectangle getHitboxRectangle() {
+      hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
+      return hitbox;
+   }
+   public Rectangle getAdjustedHitboxRectangle(double x, double y) {
+      hitbox.setLocation(((int) (xy[0] - WIDTH / 2+x)), ((int) (xy[1] - HEIGHT / 2+y)));
+      return hitbox;
+   }
    public boolean contains(int x, int y) {
       return hitbox.contains(x, y);
    }
@@ -584,9 +598,9 @@ public abstract class Player extends User implements CanIntersect {
    public int getAOESize() {
       return aoes.size();
    }
-   
-   public ArrayList<Status> getAllStatuses(){
-     return statuses;
+
+   public ArrayList<Status> getAllStatuses() {
+      return statuses;
    }
 
    public Status getStatus(int i) {
@@ -684,8 +698,8 @@ public abstract class Player extends User implements CanIntersect {
    public double getDamageReduction() {
       return damageReduction;
    }
-   
-   public void setMelee(boolean melee){
-     this.melee = melee;
+
+   public void setMelee(boolean melee) {
+      this.melee = melee;
    }
 }

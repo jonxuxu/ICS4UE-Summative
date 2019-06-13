@@ -494,6 +494,7 @@ public class Client extends JFrame implements WindowListener {
                      nextPanel = 7;//Sends to the game screen
                      gameBegin = true;
                      System.out.println("DONNEEE");
+                     System.out.println(sheet.getWidth()+" "+sheet.getHeight());
                   }
                }
             }
@@ -970,6 +971,7 @@ public class Client extends JFrame implements WindowListener {
 
          this.setDoubleBuffered(true);
          this.setVisible(true);
+         this.setFocusable(true);
       }
 
       @Override
