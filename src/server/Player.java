@@ -58,6 +58,7 @@ public abstract class Player extends User implements CanIntersect {
    private boolean illuminated = false;
    private boolean stunned = false;
    private boolean invisible = false;
+   private boolean uncollidable = false;
    private double damageReduction;
    private String selectedClass;
 
@@ -501,6 +502,7 @@ public abstract class Player extends User implements CanIntersect {
       illuminated = false;
       stunned = false;
       invisible = false;
+      uncollidable = false;
       walking = false;
       damageReduction = 0;
       if (hasArtifact) {
@@ -553,7 +555,9 @@ public abstract class Player extends User implements CanIntersect {
       } else if (status instanceof Invisible) {
          invisible = true;
          illuminated = false;
-      } else if (status instanceof GhostE) {
+      } else if (status instanceof Uncollidable){
+        uncollidable = true;
+      }else if (status instanceof GhostE) {
          ((GhostE) status).setProjectedX(xy[0]);
          ((GhostE) status).setProjectedY(xy[1]);
       } else if (status instanceof ReduceDamage) {
@@ -565,7 +569,11 @@ public abstract class Player extends User implements CanIntersect {
 
    public Area getHitbox() {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
-      return new Area(hitbox);
+      if (!uncollidable){
+        return new Area(hitbox);
+      } else {
+        return new Area();
+      }
    }
 
    public Rectangle getHitboxRectangle() {
