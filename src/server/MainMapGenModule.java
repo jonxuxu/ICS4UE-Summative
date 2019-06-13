@@ -39,6 +39,7 @@ class MainMapGenModule extends JFrame {
    private File newImageFile = new File("Map.png");
    private BufferedImage mapImage;
    private BufferedImage pathImage;
+   private BufferedImage darkPathImage;
    private BufferedImage groundImage;
    private BufferedImage swampImage;
    private Socket socket;
@@ -53,6 +54,7 @@ class MainMapGenModule extends JFrame {
       //Get images from files
       try {
          pathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Path.png"));
+         darkPathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_PathDark.png"));
          groundImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Ground.png"));
          swampImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Swamp.png"));
       } catch (IOException e) {
@@ -171,14 +173,14 @@ class MainMapGenModule extends JFrame {
                /*if (gen.regionLayer.regions.get(idx).regionType.equals("crevice")) {
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
-                  //g.setColor(new Color(0, 50, 0));
-                  g.setColor(new Color(0, 50, 0));
-               } else if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing") || gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
-                  g.setColor(new Color(150, 97, 37));
-               } else {
-                  //
-               }*/
-               if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
+                   g.setColor(new Color(0, 50, 0));
+               } else */
+               if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing") || gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
+                   Polygon temp = (Polygon)(g.getClip());
+                   ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                   g.drawImage(darkPathImage, -15000, -10000, 30000, 20000, null);
+                   g.setClip(temp);
+               } else if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
                   Polygon temp = (Polygon)(g.getClip());
                   ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
                   g.drawImage(pathImage, -15000, -10000, 30000, 20000, null);
@@ -209,11 +211,12 @@ class MainMapGenModule extends JFrame {
                this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x,
                        gen.nodes.get(i).location.y, g);*/
                Polygon temp = (Polygon)(g.getClip());
-               ((Graphics2D) g).clip(new Ellipse2D.Double(gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, (gen.nodes.get(i).clearingSize) * 2, (gen.nodes.get(i).clearingSize) * 2));
-               g.drawImage(pathImage, -15000, -10000, 30000, 20000, null);
+               int clearingSize = gen.nodes.get(i).clearingSize;
+               ((Graphics2D) g).clip(new Ellipse2D.Double(gen.nodes.get(i).location.x - clearingSize, gen.nodes.get(i).location.y - clearingSize, clearingSize * 2, clearingSize * 2));
+               g.drawImage(darkPathImage, -15000, -10000, 30000, 20000, null);
                g.setClip(temp);
-               g.setColor(new Color(150, 97, 37));
-               this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
+               /*g.setColor(new Color(150, 97, 37));
+               this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);*/
             } else {
                //this.fillOvalCustom(50, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
             }
