@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Point;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,8 @@ class MainMapGenModule extends JFrame{
    private File newImageFile = new File("Map.png");
    private BufferedImage mapImage;
    private BufferedImage pathImage;
+   private BufferedImage groundImage;
+   private BufferedImage swampImage;
    private Socket socket;
 
    /**
@@ -51,6 +54,8 @@ class MainMapGenModule extends JFrame{
       //Get images from files
       try {
          pathImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Path.png"));
+         groundImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Ground.png"));
+         swampImage = ImageIO.read(new File(System.getProperty("user.dir") + "/res/Full_Swamp.png"));
       } catch (IOException e) {
          System.out.println("Unable to find an image");
       }
@@ -80,9 +85,9 @@ class MainMapGenModule extends JFrame{
 
       // Code for a potential JFrame implementation
 
-      //display = new Disp();
+      display = new Disp();
       //this.add(display);
-      //  display.repaint();
+      //display.repaint();
 
 
       display.paintImage();
@@ -157,26 +162,39 @@ class MainMapGenModule extends JFrame{
             g.setColor(new Color(0, 80, 0));
             this.fillOvalCustom(7500, ellipticalAdjust, g);
          }
-         g.fillRect(-15000, -10000, 30000, 20000);
 
-         g.setColor(Color.RED);
+         g.drawImage(swampImage, -15000, -10000, 30000, 20000, null);
+
+         g.setColor(Color.BLACK);
 
          if (gen.regionLayer != null) {
             for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
-               if (gen.regionLayer.regions.get(idx).regionType.equals("crevice")) {
+               /*if (gen.regionLayer.regions.get(idx).regionType.equals("crevice")) {
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
-                  g.setColor(new Color(0, 50, 0));
+                  //g.setColor(new Color(0, 50, 0));
                } else {
-                  g.setColor(new Color(0, 100, 0));
-               }
+                  //
+               }*/
                if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
-                  g.setColor(new Color(150, 97, 37));
-                  g.fillPolygon(gen.regionLayer.regions.get(idx));
+                  Polygon temp = (Polygon)(g.getClip());
                   ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
-                  g.drawImage(pathImage, 0, 0, null);
+                  g.drawImage(pathImage, -15000, -10000, 30000, 20000, null);
+                  g.setClip(temp);
                } else {
-                  g.fillPolygon(gen.regionLayer.regions.get(idx));
+                  if (idx == 0){
+                     Polygon temp = (Polygon)(g.getClip());
+                     ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                     g.drawImage(groundImage, -15000, -10000, 30000, 20000, null);
+                     g.setClip(temp);
+                  } else if (idx == 1){
+                     Polygon temp = (Polygon)(g.getClip());
+                     ((Graphics2D) g).clip(gen.regionLayer.regions.get(idx));
+                     g.drawImage(swampImage, -15000, -10000, 30000, 20000, null);
+                     g.setClip(temp);
+                  } else {
+                     g.fillPolygon(gen.regionLayer.regions.get(idx));
+                  }
                }
             }
          }
@@ -185,9 +203,13 @@ class MainMapGenModule extends JFrame{
 //        g.fillOval((int)gen.nodes.get(i).getPoint().getX() - 5,
 //        		(int)gen.nodes.get(i).getPoint().getY() - 5,50,50);
             if (gen.nodes.get(i).isClearing) {
-               g.setColor(new Color(150, 97, 37));
+               /*g.setColor(new Color(150, 97, 37));
                this.fillOvalCustom(gen.nodes.get(i).clearingSize, gen.nodes.get(i).location.x,
-                       gen.nodes.get(i).location.y, g);
+                       gen.nodes.get(i).location.y, g);*/
+               Polygon temp = (Polygon)(g.getClip());
+               ((Graphics2D) g).clip(new Ellipse2D.Double(gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, (gen.nodes.get(i).clearingSize) * 2, (gen.nodes.get(i).clearingSize) * 2));
+               g.drawImage(pathImage, -15000, -10000, 30000, 20000, null);
+               g.setClip(temp);
             } else {
                //this.fillOvalCustom(50, gen.nodes.get(i).location.x, gen.nodes.get(i).location.y, g);
             }
@@ -210,11 +232,11 @@ class MainMapGenModule extends JFrame{
                        gen.obstacles.get(i).location.y, g);
             }
          }
-         /*try {
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
 
