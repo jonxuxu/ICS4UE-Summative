@@ -10,6 +10,15 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * SoundEffectManager.java
+ * This is responsible for playing sound effects
+ *
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+ * @version 1.0
+ * @since 2019-06-02
+ */
+
 public class SoundEffectManager {
   private Map<String, String> urls = new HashMap<String, String>();
   private static Clip clip;
@@ -29,6 +38,11 @@ public class SoundEffectManager {
     urls.put("hammer", "golden_sword.wav");
     urls.put("towerSpawn", "magic_nova.wav");
   }
+
+  /**
+   * This method plays the clip of a sound effect
+   * @param name String, the name of the sound effect
+   */
 
   public void playSound(String name) { // Add synchronized?
       try {
@@ -56,7 +70,10 @@ public class SoundEffectManager {
       }
   }
 
-  // Sets volume
+  /**
+   * This method sets the volume of the sound effect manager
+   * @param value A float array for different gain values
+   */
   public void setVolume(float[] value ){
     masterVolume = value[0];
   }

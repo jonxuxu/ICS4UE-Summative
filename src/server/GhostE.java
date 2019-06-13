@@ -32,6 +32,10 @@ class GhostE extends Status{
     dx = w/TOTAL_TIME;
     dy = h/TOTAL_TIME;
   }
+  
+  /**
+   * Advances location each frame
+   */
   @Override
   public void advance(){
     lifetime++;
