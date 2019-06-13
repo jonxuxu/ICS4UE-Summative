@@ -157,7 +157,7 @@ class MainMapGenModule extends JFrame {
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
                   g.setColor(new Color(0, 50, 0));
-               } else if (gen.regionLayer.regions.get(idx).regionType == "team_one_clearing" || gen.regionLayer.regions.get(idx).regionType == "team_two_clearing") {
+               } else if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing") || gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
                   g.setColor(new Color(150, 97, 37));
                } else {
                   g.setColor(new Color(0, 100, 0));
@@ -219,13 +219,13 @@ class MainMapGenModule extends JFrame {
    public Region getTeamClearing(int teamNumber) {
       if (teamNumber == 0) {
          for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
-            if (gen.regionLayer.regions.get(idx).regionType == "team_one_clearing") {
+            if (gen.regionLayer.regions.get(idx).regionType.equals("team_one_clearing")) {
                return (gen.regionLayer.regions.get(idx));
             }
          }
       } else {
          for (int idx = 0; idx < gen.regionLayer.regions.size(); idx++) {
-            if (gen.regionLayer.regions.get(idx).regionType == "team_two_clearing") {
+            if (gen.regionLayer.regions.get(idx).regionType.equals("team_two_clearing")) {
                return (gen.regionLayer.regions.get(idx));
             }
          }

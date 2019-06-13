@@ -417,6 +417,13 @@ public class Server {
                gameOutputs[i].println("FINAL");//B for begin
                gameOutputs[i].flush();
             }
+            ///SET SPAWNING
+
+/*            for (int i=0;i<players.length;i++){
+               builder.getTeamClearing(players[i]);
+            }*?
+
+
 
             System.out.println("done");
             playerNum = players.length;
