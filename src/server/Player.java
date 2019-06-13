@@ -433,8 +433,10 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void setSpawn(Region region) {
-      xy[0] = (region.getMidXy()[0]/2 + 7500) + (int) (Math.random() * 20);
-      xy[1] = (region.getMidXy()[1]/2 + 5000) + (int) (Math.random() * 20);
+     spawnX = (region.getMidXy()[0]/2 + 7500) + (int) (Math.random() * 20);
+     spawnY = (region.getMidXy()[1]/2 + 5000) + (int) (Math.random() * 20);
+     xy[0]=spawnX;
+     xy[1]=spawnY;
    }
 
    public void setTeam(int teamNumber) {

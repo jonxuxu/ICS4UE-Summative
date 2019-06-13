@@ -9,7 +9,7 @@ import java.awt.Polygon;
  *
  * The class responsible for doing the mathematics behind map generation and task delegation to lower classes
  *
- * @author Artem Sotnikov
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 2.3
  * @since 2019-03-25
  *
