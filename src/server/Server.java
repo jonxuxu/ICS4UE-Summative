@@ -507,7 +507,7 @@ public class Server {
                                  } else if (initializer == 'L') {
                                     players[i].setFlashlightOn(true);
                                     players[i].calculateFlashlightPolygon(Double.parseDouble(secondSplit[0]));
-                                    players[i].setIlluminated(true);
+                                    players[i].addStatus(new Illuminated(2));
                                  } else if (initializer == 'C') { // Chat coming in
                                     String mode = secondSplit[0];
                                     String message = secondSplit[1];

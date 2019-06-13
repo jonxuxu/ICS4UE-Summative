@@ -78,10 +78,10 @@ public class StartPanel extends MenuPanel {//State=2
 
       //Set buttons to proper size and location
       stringSize = g2.getFontMetrics().stringWidth("     Instructions     ");
-      createButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 8 / 20, stringSize, MAIN_FONT.getSize() + 20);
-      joinButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 10 / 20, stringSize, MAIN_FONT.getSize() + 20);
-      instructionButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 12 / 20, stringSize, MAIN_FONT.getSize() + 20);
-      logoutButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 14 / 20, stringSize, MAIN_FONT.getSize() + 20);
+      createButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 4 / 10, stringSize, MAIN_FONT.getSize() + 20);
+      joinButton.setBounds((MAX_X - stringSize) / 2, MAX_Y / 2, stringSize, MAIN_FONT.getSize() + 20);
+      instructionButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 6 / 10, stringSize, MAIN_FONT.getSize() + 20);
+      logoutButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 7 / 10, stringSize, MAIN_FONT.getSize() + 20);
 
       super.paintComponent(g);
 
