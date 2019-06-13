@@ -485,7 +485,7 @@ public class Server {
                            }
                            allInput[i] = "";
                         } else {
-                           System.out.println("WWW" + allInput[i]);
+                           //System.out.println("WWW" + allInput[i]);
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
                               char initializer = firstInput.charAt(0);

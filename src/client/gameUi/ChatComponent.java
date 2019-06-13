@@ -82,7 +82,7 @@ public class ChatComponent extends JPanel{
       public void actionPerformed(ActionEvent e){
         //TODO: add support for dm and teams
         if(!textField.getText().isEmpty()){
-          System.out.println("Sending: " + textField.getText());
+          //System.out.println("Sending: " + textField.getText());
           byte[] encodedBytes = Base64.getEncoder().encode(textField.getText().getBytes());
           CLIENT.sendMessage(new String(encodedBytes), mode);
           textField.setText("");
