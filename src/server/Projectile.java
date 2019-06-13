@@ -3,9 +3,13 @@ package server;
 import java.awt.Rectangle;
 
 /**
+ * Projectile.java
+ * This is the projectile class for projectiles of the game
  *
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+ * @version 1.0
+ * @since 2019-04-24
  */
-
 class Projectile implements HasID{
    private int spawnX, spawnY;
    private int targetX, targetY;
@@ -20,6 +24,16 @@ class Projectile implements HasID{
    private Rectangle hitbox;
    private int totalTime;
 
+   /**
+    * Class Constructor
+    * @param spawnX
+    * @param spawnY
+    * @param targetX
+    * @param targetY
+    * @param speed
+    * @param range
+    * @param ID
+    */
    Projectile(int spawnX, int spawnY, int targetX, int targetY, int speed, int range, int ID) {
       this.spawnX = spawnX;
       this.spawnY = spawnY;
@@ -41,6 +55,9 @@ class Projectile implements HasID{
           totalTime = (int)Math.round(range*1.0/speed);
    }
 
+   /**
+    * method to move the projectile
+    */
    public void advance() {
       lifetime++;
       x += dx;
@@ -48,26 +65,51 @@ class Projectile implements HasID{
       hitbox.setLocation((int)x, (int)y);
    }
 
+   /**
+    * Getter for the remaining life of the projectile
+    * @return int of the time left
+    */
    public int getRemainingDuration() {
       return totalTime - lifetime;
    }
 
+   /**
+    * check method to see if the projectile has collided
+    * @param object
+    * @return
+    */
    public boolean collides(CanIntersect object) {
       return object.getHitbox().intersects(hitbox);
    }
 
+   /**
+    * Getter for the x position
+    * @return
+    */
    public int getX(){
      return (int)x;
    }
-   
+
+   /**
+    * Setter for the y position
+    * @return
+    */
    public int getY(){
      return (int)y;
    }
 
+   /**
+    * Getter for the ID
+    * @return
+    */
    public int getID() {
       return (ID);
    }
-   
+
+   /**
+    * Setter for the ID
+    * @param ID
+    */
    public void setID(int ID) {
     this.ID = ID;
   }
