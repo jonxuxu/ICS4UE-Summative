@@ -66,14 +66,14 @@ public class BottomComponent extends GameComponent {
 
    public void draw(Graphics2D g2) {
       //Bottom panel
-      g2.setColor(new Color(141, 130, 103));
-      g2.setStroke(new BasicStroke(500));
-      g2.drawPolygon(BOTTOM_BORDER);
       g2.setColor(new Color(72, 60, 32));
-      g2.setStroke(new BasicStroke(20));
+      g2.setStroke(new BasicStroke(18));
+      g2.drawPolygon(BOTTOM_BORDER);
+      g2.setColor(new Color(141, 130, 103));
+      g2.setStroke(new BasicStroke(12));
       g2.drawPolygon(BOTTOM_BORDER);
       g2.setColor(new Color(95, 87, 69));
-      g2.setStroke(new BasicStroke(10));
+      g2.setStroke(new BasicStroke(4));
       g2.drawPolygon(BOTTOM_BORDER);
       g2.setColor(new Color(50, 46, 41));
       //g2.setStroke(new BasicStroke(2));
