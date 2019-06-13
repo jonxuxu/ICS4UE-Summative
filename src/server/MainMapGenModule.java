@@ -60,6 +60,7 @@ class MainMapGenModule extends JFrame{
          gen.makeNodesElliptical();
          gen.generateRegions();
          gen.generateCrevices(2);
+         gen.insertArtifactClearing();
          gen.smokeTrees(7500, 130, 0, false);
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
@@ -162,7 +163,10 @@ class MainMapGenModule extends JFrame{
                   g.setColor(Color.BLACK);
                } else if (gen.regionLayer.regions.get(idx).regionType.equals("swamp")) {
                   g.setColor(new Color(0, 50, 0));
-               } else {
+               } else if (gen.regionLayer.regions.get(idx).regionType == "team_one_clearing" ||
+                       gen.regionLayer.regions.get(idx).regionType == "team_two_clearing") {
+                  g.setColor(Color.CYAN);
+               }else {
                   g.setColor(new Color(0, 100, 0));
                }
                if (gen.regionLayer.regions.get(idx).regionType.equals("road")) {
@@ -203,11 +207,11 @@ class MainMapGenModule extends JFrame{
                        gen.obstacles.get(i).location.y, g);
             }
          }
-         /*try {
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
 

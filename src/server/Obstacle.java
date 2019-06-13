@@ -2,6 +2,11 @@ package server;
 
 import java.awt.Point;
 
+/**
+ * Obstacle.java
+ *
+ * A class containing all the information that individual
+ */
 
 public class Obstacle {
 	public Point location;
