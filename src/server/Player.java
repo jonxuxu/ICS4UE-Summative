@@ -139,8 +139,8 @@ public abstract class Player extends User implements CanIntersect {
          int[] xP = new int[thisPolygon.npoints];
          int[] yP = new int[thisPolygon.npoints];
          for (int j = 0; j < thisPolygon.npoints; j++) {
-            xP[j] = thisPolygon.xpoints[j] + 15000;
-            yP[j] = thisPolygon.ypoints[j] + 10000;
+            xP[j] = thisPolygon.xpoints[j]/2 + 7500;
+            yP[j] = thisPolygon.ypoints[j]/2 + 5000;
          }
          Player.obstacles[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
       }
@@ -271,7 +271,7 @@ public abstract class Player extends User implements CanIntersect {
       int points = 1;
       boolean hit;
       double tempFlashlightAngle = flashlightAngle;
-      int FLASHLIGHT_SPREAD = 30;
+      int FLASHLIGHT_SPREAD = 44;
       tempFlashlightAngle -= 0.01 * FLASHLIGHT_SPREAD / 2;
       for (double k = 0; k < FLASHLIGHT_SPREAD; k++) {//If you want to change this, change the 29 below
          hit = false;
@@ -425,7 +425,7 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public static void setArtifacts(Region region, int artifactNum) {
-      artifacts[artifactNum] = new Artifact((region.getMidXy()[0] + 15000), (region.getMidXy()[1] + 10000), artifactNum);
+      artifacts[artifactNum] = new Artifact((region.getMidXy()[0]/2 + 7500), (region.getMidXy()[1]/2 + 5000), artifactNum);
    }
 
    public static Artifact getArtifacts(int teamN) {
@@ -433,9 +433,8 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void setSpawn(Region region) {
-      xy[0] = (region.getMidXy()[0] + 15000) + (int) (Math.random() * 20);
-      xy[1] = (region.getMidXy()[1] + 10000) + (int) (Math.random() * 20);
-      System.out.println();
+      xy[0] = (region.getMidXy()[0]/2 + 7500) + (int) (Math.random() * 20);
+      xy[1] = (region.getMidXy()[1]/2 + 5000) + (int) (Math.random() * 20);
    }
 
    public void setTeam(int teamNumber) {

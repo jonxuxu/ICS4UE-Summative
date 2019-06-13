@@ -449,8 +449,8 @@ public class Server {
                int[] xP = new int[allPolygons[i].npoints];
                int[] yP = new int[allPolygons[i].npoints];
                for (int j = 0; j < allPolygons[i].npoints; j++) {
-                  xP[j] = allPolygons[i].xpoints[j] + 15000;
-                  yP[j] = allPolygons[i].ypoints[j] + 10000;
+                  xP[j] = allPolygons[i].xpoints[j]/2 + 7500;
+                  yP[j] = allPolygons[i].ypoints[j]/2 + 5000;
                }
                allPolygons[i] = new Polygon(xP, yP, xP.length);
             }

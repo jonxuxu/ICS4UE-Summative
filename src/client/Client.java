@@ -111,8 +111,8 @@ public class Client extends JFrame implements WindowListener {
    private double mouseAngle;
    private int keyAngle;
    private boolean flashlightOn;
-   private int MAP_WIDTH = 30000;
-   private int MAP_HEIGHT = 20000;
+   private int MAP_WIDTH = 15000;
+   private int MAP_HEIGHT = 10000;
    private boolean waitingForImage;
    private BufferedImage sheet;
    private boolean drawn = true;
