@@ -430,7 +430,6 @@ public class Client extends JFrame implements WindowListener {
                   outputString.append("S" + i + " ");
                }
             }
-            System.out.println(myPlayer.getX()+"???"+myPlayer.getY());
             if (keyAngle != -10) {
                outputString.append("M" + myPlayer.getDisp(keyAngle)[0] + "," + myPlayer.getDisp(keyAngle)[1] + " ");
             }
