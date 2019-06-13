@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 
 /**
  * JoinPanel.java
- * This is
+ * This is the panel for joining a game
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -28,27 +28,34 @@ public class JoinPanel extends MenuPanel { //State =4
    private final CustomButton backButton = new CustomButton("Back");
    private final CustomButton confirmButton = new CustomButton("Confirm Game");
 
+   /**
+    * Sets up the join screen
+    */
    public JoinPanel() {
       //Setting up the size
       this.setPreferredSize(new Dimension(MAX_X, MAX_Y));
       //Basic create and join server buttons
+      //Game name
       gameNameField.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gameNameField.setFont(MAIN_FONT);
       gameNameField.setBounds(MAX_X / 2 - 100, MAX_Y * 3 / 10, 200, MAIN_FONT.getSize() + 20);
       this.add(gameNameField);
+      //Game password
       gamePasswordField.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       gamePasswordField.setFont(MAIN_FONT);
       gamePasswordField.setBounds(MAX_X / 2 - 100, MAX_Y * 2 / 5, 200, MAIN_FONT.getSize() + 20);
       this.add(gamePasswordField);
+      //Confirm button
       confirmButton.addActionListener((ActionEvent e) -> {
          CLIENT.testGame(gameNameField.getText(), gamePasswordField.getText());
       });
       confirmButton.setBounds(MAX_X / 2 - 100, MAX_Y / 2, 200, MAIN_FONT.getSize() + 20);
       this.add(confirmButton);
+      //Back button
       backButton.addActionListener((ActionEvent e) -> {
          CLIENT.setNextPanel(2);
       });
@@ -63,6 +70,11 @@ public class JoinPanel extends MenuPanel { //State =4
       this.setFocusable(true);
    }
 
+   /**
+    * Paints the create panel on the screen
+    *
+    * @param g used to draw the panel
+    */
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;

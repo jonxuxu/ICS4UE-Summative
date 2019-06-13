@@ -137,7 +137,7 @@ public class ChatComponent extends JPanel {
 
   /**
    * Returns the visiblity mode
-   * @return
+   * @return mode The type of communication the client wants to make
    */
   public int getMode(){
     return mode;

@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 
 /**
  * DebugComponent.java
- * This is responsible for drawing debug
+ * This is responsible for drawing debug info
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
