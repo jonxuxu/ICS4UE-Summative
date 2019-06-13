@@ -125,10 +125,12 @@ public class Summoner extends Player{
       } else {
         //Insert Collision with Terrain
         if (getProjectile(i) instanceof AutoProjectile){
-          for (int j = 0; j < getEnemiesSize(); j++){
-            if(getProjectile(i).collides(getEnemy(j))){
-              getEnemy(j).damage(getAttack());
-              removed = removeProjectile(i);
+          for (int j = 0; j < getEnemiesSize(); j++) {
+            if (getProjectile(i) != null) {
+              if (getProjectile(i).collides(getEnemy(j))) {
+                getEnemy(j).damage(getAttack());
+                removed = removeProjectile(i);
+              }
             }
           }
         }

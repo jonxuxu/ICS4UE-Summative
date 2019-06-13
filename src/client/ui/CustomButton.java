@@ -1,7 +1,11 @@
 package client.ui;
 
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 
 public class CustomButton extends JButton {
   private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
@@ -10,6 +14,10 @@ public class CustomButton extends JButton {
   private Color pressedColor = new Color(1f, 1f, 1f, 0.2f);
   private CustomButton thisButton;
 
+  /**
+   * Sets up a custom button for use
+   * @param text Text to be inserted in the button
+   */
   public CustomButton(String text) {
     super(text);
     super.setContentAreaFilled(false);
@@ -21,6 +29,10 @@ public class CustomButton extends JButton {
     this.setFocusPainted(false);
   }
 
+    /**
+     * Paints the create panel on the screen
+     * @param g used to draw the panel
+     */
   @Override
   protected void paintComponent(Graphics g) {
     if (getModel().isPressed()) {
