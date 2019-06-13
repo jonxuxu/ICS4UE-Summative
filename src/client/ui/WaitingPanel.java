@@ -237,7 +237,7 @@ public class WaitingPanel extends MenuPanel { //State=6
             this.remove(readyGameButton);
             buttonRemove = false;
          }
-         g2.drawString("LOADING", (MAX_X - metrics.stringWidth("LOADING")) / 2, (MAX_Y * 9 / 16));
+         g2.drawString("Loading...", (MAX_X - metrics.stringWidth("Loading...")) / 2, (MAX_Y * 13 / 16));
       }
       writeError(g2, MAX_X / 2, (int) (MAX_Y * 11.0 / 16.0));
       drawAllParticles(g2);

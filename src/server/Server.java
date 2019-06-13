@@ -395,9 +395,12 @@ public class Server {
                gameInputs[i] = new BufferedReader(new InputStreamReader(onlineGameSockets.get(i).getInputStream()));
                //gameObjectOutputs[i] = new ObjectOutputStream(onlineGameSockets.get(i).getOutputStream());
             }
-            System.out.println("{{{-------------------{{{{{{{{{");
+            for (int i = 0; i < players.length; i++) {
+               gameOutputs[i].println("0");//B for begin
+               gameOutputs[i].flush();
+            }
+
             MainMapGenModule builder = new MainMapGenModule();
-            System.out.println("{{{{{{{{{{{{{{{{{{{{{{{{{{");
 
             StringBuilder beginLine = new StringBuilder("B");
             for (int k = 0; k < players.length; k++) {

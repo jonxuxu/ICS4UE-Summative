@@ -650,7 +650,7 @@ public class Client extends JFrame implements WindowListener {
                errors[1] = Integer.parseInt(initializer + "");
             } else if (currentPanel == 6) {
                if (initializer == '0') {
-                  loading = true;
+                  loading=true;
                } else {
                   errors[3] = Integer.parseInt(initializer + input);
                }
@@ -941,7 +941,7 @@ public class Client extends JFrame implements WindowListener {
     */
    public void connect() {
       try {
-         socket = new Socket("localhost", 5002);//localhost
+         socket = new Socket("10.242.169.116", 5002);//localhost
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -1359,7 +1359,9 @@ public class Client extends JFrame implements WindowListener {
             }
             for (int i = 0; i < artifacts.length; i++) {
                if (drawArtifact[i]) {
-                  artifacts[i].drawArtifact(g2, xyAdjust);
+                  if (artifacts[i]!=null) {
+                     artifacts[i].drawArtifact(g2, xyAdjust);
+                  }
                }
             }
             //Creating shapes
@@ -1391,8 +1393,6 @@ public class Client extends JFrame implements WindowListener {
                } else if (lastKeyTyped == 8) { // Back key
                   ((DebugComponent) (allComponents[3])).toggle();
                   System.out.println("Debug mode");
-               } else if ((lastKeyTyped == 99) || (lastKeyTyped == 67)) { //C or c
-                  ((InventoryComponent) (allComponents[2])).toggle();
                }
                keyPressed = false;
             }

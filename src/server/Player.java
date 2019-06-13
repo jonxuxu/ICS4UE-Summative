@@ -434,10 +434,14 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void setSpawn(Region region) {
-     spawnX = (region.getMidXy()[0]/2 + 7500) + (int) (Math.random() * 20);
-     spawnY = (region.getMidXy()[1]/2 + 5000) + (int) (Math.random() * 20);
-     xy[0]=spawnX;
-     xy[1]=spawnY;
+      //Random radius and random angle
+      double radius = 100 + Math.random() * 25;
+      double angle = Math.random() * Math.PI;
+      //Set spawn according to random numbers
+      spawnX = (region.getMidXy()[0]/2 + 7500) + (int) (radius * Math.cos(angle));
+      spawnY = (region.getMidXy()[1]/2 + 5000) + (int) (radius * Math.sin(angle));
+      xy[0]=spawnX;
+      xy[1] = spawnY;
    }
 
    public void setTeam(int teamNumber) {
@@ -632,7 +636,11 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public Projectile getProjectile(int i) {
-      return projectiles.get(i);
+      if (i<projectiles.size()) {
+         return projectiles.get(i);
+      } else {
+         return null;
+      }
    }
 
    public ArrayList<Projectile> getAllProjectiles() {

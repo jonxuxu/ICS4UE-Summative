@@ -210,8 +210,8 @@ public abstract class Player extends User {
       this.spellPercent[spellIndex] = spellPercent;
    }
 
-   public double getSpellPercent(int spellIndex) {
-      return spellPercent[spellIndex] / 100.0;
+   public int getSpellPercent(int spellIndex) {
+      return spellPercent[spellIndex];
    }
 
    public void setGold(int gold) {
