@@ -70,9 +70,12 @@ class MainMapGenModule extends JFrame{
 
       }
 
+
+
+      display = new Disp();
+
       // Code for a potential JFrame implementation
 
-      //display = new Disp();
       //this.add(display);
       //  display.repaint();
 
