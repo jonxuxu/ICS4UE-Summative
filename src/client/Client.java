@@ -327,15 +327,17 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          if (notifyReady) {
-            notifyReady = false;
-            output.println("R");
-            output.flush();
-
-            waitForInput();
-            if (errors[3] != 0) {
-               menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println("Error:" + errorMessages[errors[3]]);
-               soundEffect.playSound("error");
+            if (!waitingForImage) {
+               notifyReady = false;
+               output.println("R");
+               System.out.println("RRRRRRR");
+               output.flush();
+               waitForInput();
+               if (errors[3] != 0) {
+                  menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+                  System.out.println("Error:" + errorMessages[errors[3]]);
+                  soundEffect.playSound("error");
+               }
             }
          }
          if (teamChosen) {
@@ -901,10 +903,22 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-    /**
-     * Method to check if the window has been queued to close
-     * @param e WindowEvent
-     */
+   /**
+    * Method to quit the game
+    */
+   public void quit(){
+      try {
+         output.println("X");
+         output.flush();
+      } catch (Exception E) {
+         System.out.println("Not connected");
+      }
+   }
+
+   /**
+    * Method to check if the window has been queued to close
+    * @param e WindowEvent
+    */
    public void windowClosing(WindowEvent e) {
       dispose();
       try {
