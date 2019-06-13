@@ -42,7 +42,7 @@ class MainMapGenModule extends JFrame{
 	    gen.smokeRocks(7500, 100, true);
 	    gen.makeObstaclesElliptical();
 	    gen.genClearingByNum(8, 500);  	    
-	    gen.purgeRedundanices();
+	    gen.purgeRedundancies();
 	    gen.generateCrevices(2);
     }
     display = new Disp();
