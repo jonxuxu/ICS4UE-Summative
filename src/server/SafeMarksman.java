@@ -38,9 +38,7 @@ public class SafeMarksman extends Player{
           addShield(new SafeMarksmanEShield());
         }else {//Space
           addAOE(new SafeMarksmanSpaceAOE1(getX(), getY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
-          //System.out.println("First AOE made at " + getX() + "," + getY());
           addAOE(new SafeMarksmanSpaceAOE2(getMouseX(), getMouseY(), SPACE_AOE_DURATION, SPACE_AOE_RADIUS));
-          //System.out.println("Second AOE made at " + getMouseX() + "," + getMouseY());
         }
         return true;
       } else {
