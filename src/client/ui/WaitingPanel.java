@@ -25,8 +25,8 @@ public class WaitingPanel extends MenuPanel { //State=6
    private boolean buttonRemove = true;
    private CustomButton readyGameButton = new CustomButton("Begin game");
    private CustomButton backButton = new CustomButton("Back");
-   private CustomButton teamOneButton = new CustomButton("Team one");
-   private CustomButton teamTwoButton = new CustomButton("Team two");
+   private CustomButton teamOneButton = new CustomButton("West");
+   private CustomButton teamTwoButton = new CustomButton("East");
 
    //Class pedestals
    private CustomButton SAFE_MARKSMAN_PEDESTAL = new CustomButton("Archer");
@@ -162,9 +162,9 @@ public class WaitingPanel extends MenuPanel { //State=6
       readyGameButton.setBounds((MAX_X - stringSize) / 2, MAX_Y * 4 / 5, stringSize, MAIN_FONT.getSize() + 20);
 
       //Team buttons
-      stringSize = metrics.stringWidth("   Team two   ");
-      teamOneButton.setBounds(MAX_X / 2 - (stringSize + 250), MAX_Y * 7 / 10, stringSize, MAIN_FONT.getSize() + 20);
-      teamTwoButton.setBounds(MAX_X / 2 + 250, MAX_Y * 7 / 10, stringSize, MAIN_FONT.getSize() + 20);
+      stringSize = metrics.stringWidth("    West    ");
+      teamOneButton.setBounds(MAX_X / 2 - (stringSize + 200), MAX_Y * 7 / 10, stringSize, MAIN_FONT.getSize() + 20);
+      teamTwoButton.setBounds(MAX_X / 2 + 200, MAX_Y * 7 / 10, stringSize, MAIN_FONT.getSize() + 20);
 
       //Back button
       stringSize = metrics.stringWidth("   Back   ");
@@ -204,19 +204,23 @@ public class WaitingPanel extends MenuPanel { //State=6
       }
       g2.setStroke(oldStroke); //Reset stroke width
 
-      //Display all players
+      //Display all players under respective team
       StringBuilder players = new StringBuilder("Players: ");
-      int shift1 = 0;
-      int shift2 = 0;
-      stringSize = metrics.stringWidth("   Team two   ");
+      //Shifts for each line
+      int shift1 = 1;
+      int shift2 = 1;
+      stringSize = metrics.stringWidth("   West   ");
+      String tempString; // Variable for username being drawn
+
       for (int i = 0; i < onlineList.size(); i++) {
          players.append(onlineList.get(i).getUsername() + ", ");
          if (onlineList.get(i).getTeam() != -1) {
+            tempString = onlineList.get(i).getUsername(); //Store username
             if (onlineList.get(i).getTeam() == 0) {
-               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 - ((stringSize + 50)), MAX_Y * 7 / 10 + metrics.getHeight() * (shift1 + 1));
+               g2.drawString(tempString, (MAX_X - stringSize - metrics.stringWidth(tempString)) / 2 - 205, MAX_Y * 7 / 10 + 20 + metrics.getHeight() * (shift1 + 1));
                shift1++;
             } else if (onlineList.get(i).getTeam() == 1) {
-               g2.drawString(onlineList.get(i).getUsername(), MAX_X / 2 + (50), MAX_Y * 7 / 10 + metrics.getHeight() * (shift2 + 1));
+               g2.drawString(tempString, (MAX_X + stringSize - metrics.stringWidth(tempString)) / 2 + 205, MAX_Y * 7 / 10 + 20 + metrics.getHeight() * (shift2 + 1));
                shift2++;
             }
          }
