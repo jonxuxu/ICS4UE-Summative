@@ -28,7 +28,7 @@ public class Ghost extends Player {
    private ArrayList<Player> qBlacklist = new ArrayList<Player>();
 
    /**
-    * Another constructor for class Time1
+    * Another constructor for class Ghost
     * @param username the username of the player on the server
     * @param teamNumber the team which the player is on
     */
