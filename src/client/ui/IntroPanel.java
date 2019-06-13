@@ -26,6 +26,8 @@ import java.util.ArrayList;
  */
 
 public class IntroPanel extends MenuPanel {
+
+   //Variable names
    static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
    static double w = screenSize.getWidth();
    static double h = screenSize.getHeight();//This adjusts height to be a bit smaller to fit nicer on screen
@@ -44,6 +46,9 @@ public class IntroPanel extends MenuPanel {
    static boolean animationOver = false;
    static int animationWait = 120;
 
+   /**
+    * Setup for the intro panel
+    */
    public IntroPanel() {
       try {
          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -55,6 +60,9 @@ public class IntroPanel extends MenuPanel {
       this.setBackground(new Color(17, 17, 17));
    }
 
+   /**
+    * Runs the intro animation
+    */
    public void go() {
       for (double i = 0; i < Math.PI * 7 / 2; i += 0.01) {
          //particles.add(new IntroParticle(x,y,(Math.random()*10-5),(Math.random()*10),(int)(Math.random()*12),(int)(Math.random()*(50)+200),new Color(255-(int)(Math.random()*0),255-(int)(Math.random()*0),(int)(Math.random()*255))));
