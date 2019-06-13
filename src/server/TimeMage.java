@@ -119,24 +119,46 @@ public class TimeMage extends Player{
               getEnemy(j).addStatus(new Illuminated(500));
             }
           }
+        } else if (getAOE(i) instanceof AutoAOE){
+          for (int j = 0; j < getEnemiesSize(); j++){
+            if (getAOE(i).collides(getEnemy(j))){
+              getEnemy(j).damage(getAttack());
+            }
+          }
         } else if  (getAOE(i) instanceof TimeMageQAOE){
           for (int j = 0; j < getEnemiesSize(); j++){
-            for (int k = 0; k < qBlacklist.size(); k++){
-              if (getEnemy(j) != qBlacklist.get(k)){
-                if (getAOE(i).collides(getEnemy(j))){
-                  getEnemy(j).damage(Q_DAMAGE);
-                  qBlacklist.add(getEnemy(j));
+            if (!qBlacklist.isEmpty()){
+              for (int k = 0; k < qBlacklist.size(); k++){
+                if (getEnemy(j) != qBlacklist.get(k)){
+                  if (getAOE(i).collides(getEnemy(j))){
+                    getEnemy(j).damage(Q_DAMAGE);
+                    System.out.println("DAMAGE");
+                    qBlacklist.add(getEnemy(j));
+                  }
                 }
+              }
+            } else {
+              if (getAOE(i).collides(getEnemy(j))){
+                getEnemy(j).damage(Q_DAMAGE);
+                System.out.println("DAMAGE");
+                qBlacklist.add(getEnemy(j));
               }
             }
           }
           for (int j = 0; j < getAlliesSize(); j++){
-            for (int k = 0; k < qBlacklist.size(); k++){
-              if (getAlly(j) != qBlacklist.get(k)){
-                if (getAOE(i).collides(getAlly(j))){
-                  getAlly(j).addShield(new TimeMageQShield());
-                  qBlacklist.add(getAlly(j));
+            if (!qBlacklist.isEmpty()){
+              for (int k = 0; k < qBlacklist.size(); k++){
+                if (getAlly(j) != qBlacklist.get(k)){
+                  if (getAOE(i).collides(getAlly(j))){
+                    getAlly(j).addShield(new TimeMageQShield());
+                    qBlacklist.add(getAlly(j));
+                  }
                 }
+              }
+            } else {
+              if (getAOE(i).collides(getAlly(j))){
+                getAlly(j).addShield(new TimeMageQShield());
+                qBlacklist.add(getAlly(j));
               }
             }
           }
