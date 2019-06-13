@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Server.java
@@ -574,8 +573,14 @@ public class Server {
                            otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
                            ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
                            ArrayList<AOE> theseAOES = players[i].getAllAOES();
-                           HashSet<Status> statusSet = new HashSet<Status>(players[i].getAllStatuses());
-                           ArrayList<Status> theseStatuses = new ArrayList<Status>(statusSet);
+                           //HashSet<Status> statusSet = new HashSet<Status>(players[i].getAllStatuses());
+                           ArrayList<Status> theseStatuses = players[i].getAllStatuses();
+                           boolean[] hasStatus = new boolean[15];
+                           Status[] parallelStatus = new Status[15];
+                           for (int j = 0; j < theseStatuses.size(); j++) {
+                             hasStatus[theseStatuses.get(j).getID()] = true;
+                             parallelStatus[theseStatuses.get(j).getID()] = theseStatuses.get(j);
+                           }
                            for (int j = 0; j < theseProjectiles.size(); j++) {
                               projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
                            }
@@ -603,13 +608,13 @@ public class Server {
                               }
                            }
                            int ghostPassiveCount = 0;
-                           for (int j = 0; j < theseStatuses.size(); j++) {
-                              if (theseStatuses.get(j) instanceof GhostE) {
-                                 statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE) theseStatuses.get(j)).getX() + "," + ((GhostE) theseStatuses.get(j)).getY() + " ");
-                              } else if (theseStatuses.get(j) instanceof GhostPassive) {
+                           for (int j = 0; j < hasStatus.length; j++) {
+                              if ((j == 2) && (hasStatus[j])) {
+                                 statusOutput.append("S" + j + "," + i + "," + ((GhostE) parallelStatus[j]).getX() + "," + ((GhostE) parallelStatus[j]).getY() + " ");
+                              } else if ((j == 3) && (hasStatus[j])) {
                                  ghostPassiveCount++;
-                              } else if (theseStatuses.get(j).getID() != -1) {
-                                 statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
+                              } else if ((j == -1) && (hasStatus[j])) {
+                                 statusOutput.append("S" + j + "," + i + " ");
                               }
                            }
                            if (ghostPassiveCount > 0) {
