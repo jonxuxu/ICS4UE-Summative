@@ -1,6 +1,7 @@
 package client.gameUi;
 
 import client.Client;
+import client.ui.CustomButton;
 import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
 
 import javax.swing.*;
@@ -79,16 +80,18 @@ public class PauseComponent extends ThemedPanel {
       bottomPanel.setBackground(null);
         JPanel bottomRow1 = new JPanel();
         bottomRow1.setBackground(null);
-          JButton surrender = new JButton("Surrender");
+          CustomButton surrender = new CustomButton("Surrender");
           surrender.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+              //TODO: Add support for surrendering game but staying connected to the server
             }
           });
-          JButton quit = new JButton("Quit Game");
+          CustomButton quit = new CustomButton("Quit Game");
           quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+              client.quit();
               System.exit(0);
             }
           });
@@ -96,7 +99,7 @@ public class PauseComponent extends ThemedPanel {
         bottomRow1.add(quit);
         JPanel bottomRow2 = new JPanel();
         bottomRow2.setBackground(null);
-          JButton back = new JButton("Return to game");
+        CustomButton back = new CustomButton("Return to game");
           back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
