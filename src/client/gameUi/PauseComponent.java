@@ -17,6 +17,16 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
+/**
+ * DebugComponent.java
+ * This is responsible for drawing debug
+ *
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+ * @version 1.0
+ * @since 2019-06-02
+ */
+
 public class PauseComponent extends ThemedPanel {
    public Client client;
    public PauseComponent thisComponent;
@@ -24,6 +34,12 @@ public class PauseComponent extends ThemedPanel {
    private final static Font headerFont1 = new Font("Cambria Math", Font.PLAIN, 25);
    private final static Font headerFont2 = new Font("Cambria Math", Font.PLAIN, 22);
 
+   /**
+    *
+    * @param width: the width of the component
+    * @param height: the height of the component
+    * @param client: a reference to the class
+    */
    public PauseComponent(int width, int height, Client client) {
       super();
       thisComponent = this;

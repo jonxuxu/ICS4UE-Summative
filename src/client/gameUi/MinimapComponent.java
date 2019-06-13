@@ -44,6 +44,12 @@ public class MinimapComponent extends GameComponent {
    private Area darkFog, lightFog;
    private Area playerShape, allyShape, enemyShape;
 
+   /**
+    * Minimap component
+    * @param fog
+    * @param players
+    * @param myPlayerId
+    */
    public MinimapComponent(FogMap fog, Player[] players, int myPlayerId) {
       // Setting up refs
       this.fog = fog;
