@@ -6,7 +6,6 @@ import java.awt.Color;
 class GhostE extends Status{
   private int x,y;
   private static int RADIUS = 25;
-  private static int[] xyAdjust;
   GhostE(int x, int y){
     this.x = x;
     this.y = y;
@@ -14,6 +13,6 @@ class GhostE extends Status{
   
   public void draw(Graphics2D g2, int playerX, int playerY, int index){
     g2.setColor(Color.GRAY);
-    g2.fillOval(x + xyAdjust[0] - RADIUS, y + xyAdjust[1] - RADIUS, RADIUS * 2, RADIUS * 2);
+    g2.fillOval(x + getXyAdjust()[0] - RADIUS, y + getXyAdjust()[1] - RADIUS, RADIUS * 2, RADIUS * 2);
   }
 }

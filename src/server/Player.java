@@ -99,6 +99,7 @@ public abstract class Player extends User implements CanIntersect {
       return (selectedClass);
    }
 
+
    public static void updateHitbox() {
       for (int i = 0; i < players.length; i++) {
          if (players[i] != null) {
@@ -122,6 +123,7 @@ public abstract class Player extends User implements CanIntersect {
       int[] yP = {(int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2};
       lightingHitbox = new CustomPolygon(xP, yP, 4);
       constantHitboxes[i] = lightingHitbox;
+      //REPLACE WITH getHitboxRectangle
    }
 
    public static void setConstantHitboxes(int playerNum, ArrayList<Obstacle> obstacles) {
@@ -509,7 +511,10 @@ public abstract class Player extends User implements CanIntersect {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
       return new Area(hitbox);
    }
-
+   public Rectangle getHitboxRectangle() {
+      hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
+      return hitbox;
+   }
    public boolean contains(int x, int y) {
       return hitbox.contains(x, y);
    }
