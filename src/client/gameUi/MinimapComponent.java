@@ -1,15 +1,12 @@
 package client.gameUi;
 
-import client.Client;
 import client.Player;
 import client.map.FogMap;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 /**
  * MinimapComponent.java
@@ -24,115 +21,99 @@ public class MinimapComponent extends GameComponent {
    private FogMap fog;
    private Player[] players;
    private static int myPlayerId;
-   private int[] xyAdjust = new int[2];
    private AffineTransform tx;
 
-   private final int MAX_X = super.getMAX_X();
-   private final int MAX_Y = super.getMAX_Y();
    private double zoom = 1;
 
-   private Rectangle2D BORDER_RECT;
-   private Rectangle2D BORDER_RECT2;
-   private Rectangle2D BORDER_RECT3;
-   private Rectangle2D BORDER_RECT4;
-   private Rectangle2D INNER_RECT;
-   private Area BORDER_FILL;
-   private Area BORDER_FILL2;
-   private Area BORDER_FILL3;
-   private Area BORDER_FILL4;
    private Area outputShape;
    private Area darkFog, lightFog;
    private Area playerShape, allyShape, enemyShape;
+   private int MAP_WIDTH, MAP_HEIGHT;
 
    /**
-    * Minimap component
-    * @param fog
-    * @param players
-    * @param myPlayerId
+    * Minimap display
+    * @param WIDTH
+    * @param HEIGHT
+    * @param MAP_WIDTH
+    * @param MAP_HEIGHT
     */
-   public MinimapComponent(FogMap fog, Player[] players, int myPlayerId) {
-      // Setting up refs
-      this.fog = fog;
-      this.players = players;
-      this.myPlayerId = myPlayerId;
 
-      // Border
-      BORDER_RECT = new Rectangle((830), (379), (120), (120));
-      BORDER_RECT2 = new Rectangle((832), (381), (116), (116));
-      BORDER_RECT3 = new Rectangle((833), (382), (114), (114));
-      BORDER_RECT4 = new Rectangle((835), (384), (110), (110));
-      INNER_RECT = new Rectangle((836), (385), (108), (108));
-      BORDER_FILL = new Area(BORDER_RECT);
-      BORDER_FILL2 = new Area(BORDER_RECT2);
-      BORDER_FILL3 = new Area(BORDER_RECT3);
-      BORDER_FILL4 = new Area(BORDER_RECT4);
-      Area tempArea = new Area(INNER_RECT);
-      BORDER_FILL.subtract(BORDER_FILL2);
-      BORDER_FILL2.subtract(BORDER_FILL3);
-      BORDER_FILL3.subtract(BORDER_FILL4);
-      BORDER_FILL4.subtract(tempArea);
+   public MinimapComponent(int WIDTH, int HEIGHT, int MAP_WIDTH, int MAP_HEIGHT) {
+      this.MAP_WIDTH = MAP_WIDTH;
+      this.MAP_HEIGHT = MAP_HEIGHT;
+      outputShape = new Area(new Rectangle(1250, 550, 300, 300));
    }
 
 
-   public void draw(Graphics2D g2) {
-      // Draws border
-     /* g2.setColor(new Color(72, 60, 32));
-      g2.fill(BORDER_FILL);
-      g2.setColor(new Color(141, 130, 103));
-      g2.fill(BORDER_FILL2);
-      g2.setColor(new Color(95, 87, 69));
-      g2.fill(BORDER_FILL3);
-      g2.setColor(new Color(50, 46, 41));
-      g2.fill(BORDER_FILL4);
-      outputShape = new Area(INNER_RECT);
-      g2.setColor(Color.white);
-      g2.fill(outputShape);
-
+   public void draw(Graphics2D g2, FogMap fog, BufferedImage bgImage, Player[] players, int myPlayerId, int[] xyAdjust) {
       // Draws map
+      Shape oldClip = g2.getClip();
+      g2.clip(outputShape);
+      tx = new AffineTransform();
+      tx.translate(1400 - players[myPlayerId].getXy()[0] * 0.1, 700 - players[myPlayerId].getXy()[1] * 0.1);
+      tx.scale(0.1 * MAP_WIDTH / bgImage.getWidth(), 0.1 * MAP_HEIGHT / bgImage.getHeight());
+
+      g2.drawRenderedImage(bgImage, tx);
+      // g2.drawImage(bgImage, 1400 - players[myPlayerId].getXy()[0], 700 - players[myPlayerId].getXy()[1], (int)(bgImage.getWidth()), (int)(bgImage.getHeight()), null);
+      //g2.setColor(Color.pink);
+      //g2.fillRect(0, 0, 10000, 1000);
+      //g2.setColor(Color.red);
+      // g2.fillRect(1400 - players[myPlayerId].getXy()[0], 700 - players[myPlayerId].getXy()[1], (int)(bgImage.getWidth()), (int)(bgImage.getHeight()));
+
 
       // Draws fog
-      xyAdjust[0] = (int) ((890) - (characters[myPlayerId].getXy()[0]) * 0.05);
-      xyAdjust[1] = (int) ((440) - (characters[myPlayerId].getXy()[1]) * 0.05);
-      tx = new AffineTransform();
-      tx.translate(xyAdjust[0], xyAdjust[1]);
-      tx.scale(0.05, 0.05);
+      /*
+      xyAdjust[0] = (int) ((890) - (players[myPlayerId].getXy()[0]) * 0.05);
+      xyAdjust[1] = (int) ((440) - (players[myPlayerId].getXy()[1]) * 0.05);
       darkFog = fog.getFog(1).createTransformedArea(tx);
       lightFog = fog.getExplored(1).createTransformedArea(tx);
       g2.setColor(Color.black); //Unexplored
-      outputShape = new Area(INNER_RECT);
-      outputShape.intersect(darkFog);
+      g2.setClip(new Area(INNER_RECT));
       g2.fill(outputShape);
       g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-      outputShape = new Area(INNER_RECT);
-      outputShape.intersect(lightFog);
-      g2.fill(outputShape);
+      g2.fill(lightFog);*/
 
       // Draws characters and mobs
       allyShape = new Area();
       enemyShape = new Area();
-      for (Player player : characters) {
-         tx = new AffineTransform();
-         xyAdjust[0] = -(int) ((characters[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.05);
-         xyAdjust[1] = -(int) ((characters[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.05);
-         tx.translate(xyAdjust[0], xyAdjust[1]);
-         playerShape = new Area(new Rectangle((888), (438), (4), (4))).createTransformedArea(tx);
-         if (player.getTeam() == characters[myPlayerId].getTeam()) { // On same team
-            allyShape.add(playerShape);
-         } else {
-            if (player.getIlluminated()) {
-               enemyShape.add(playerShape); //Added a way to avoid being seen by the enemy
+      for (Player player : players) {
+         if (player != null) {
+            tx = new AffineTransform();
+            xyAdjust[0] = -(int) ((players[myPlayerId].getXy()[0] - player.getXy()[0]) * 0.1);
+            xyAdjust[1] = -(int) ((players[myPlayerId].getXy()[1] - player.getXy()[1]) * 0.1);
+            tx.translate(xyAdjust[0], xyAdjust[1]);
+            playerShape = new Area(new Rectangle(1400, 700, 4, 4)).createTransformedArea(tx);
+            if (player.getTeam() == players[myPlayerId].getTeam()) { // On same team
+               allyShape.add(playerShape);
+            } else {
+               if (player.getIlluminated()) {
+                  enemyShape.add(playerShape); //Added a way to avoid being seen by the enemy
+               }
             }
          }
       }
-      outputShape = new Area(INNER_RECT);
-      outputShape.intersect(allyShape);
       g2.setColor(Color.green);
-      g2.fill(outputShape);
-      outputShape = new Area(INNER_RECT);
-      outputShape.intersect(enemyShape);
+      g2.fill(allyShape);
       g2.setColor(Color.red);
-      g2.fill(outputShape);*/
+      g2.fill(enemyShape);
+      Rectangle tempRect = new Rectangle(1250, 550, 300, 300);
+      g2.setColor(new Color(141, 130, 103));
+      g2.setStroke(new BasicStroke(10));
+      g2.setColor(new Color(72, 60, 32));
+      g2.setStroke(new BasicStroke(18));
+      g2.draw(tempRect);
+      g2.setColor(new Color(141, 130, 103));
+      g2.setStroke(new BasicStroke(12));
+      g2.draw(tempRect);
+      g2.setColor(new Color(95, 87, 69));
+      g2.setStroke(new BasicStroke(4));
+      g2.draw(tempRect);
+      g2.setColor(new Color(50, 46, 41));
+      g2.draw(tempRect);
 
+
+
+      g2.clip(oldClip);
    }
 
    public void update() {

@@ -20,10 +20,11 @@ public abstract class GameComponent {
    private static Map<String, Font> fonts = new HashMap<String, Font>();
 
    /**
-    * Abstract method to draw all the game components
+    * Method to draw all the game components
     * @param g2 Graphics2D
     */
-   public abstract void draw(Graphics2D g2);
+   public void draw(Graphics2D g2){};
+
 
    /**
     * Initializes fonts and screen dimensions
