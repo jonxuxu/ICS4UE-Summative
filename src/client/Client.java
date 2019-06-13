@@ -753,105 +753,107 @@ public class Client extends JFrame implements WindowListener {
             }
             String[] firstSplit = input.split(" ", -1);
             for (String firstInput : firstSplit) {
-               char initializer = firstInput.charAt(0);
-               firstInput = firstInput.substring(1);
-               String[] secondSplit = firstInput.split(",", -1);
-               if (secondSplit.length > 0) {
-                  if (initializer == 'P') {
-                     updatePlayer(secondSplit);
-                  } else if (initializer == 'O') {
-                     updateOthers(secondSplit);
-                  } else if (initializer == 'D') {
-                     players[Integer.parseInt(secondSplit[0])] = null;
-                  } else if (initializer == 'R') {
-                     projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
-                  } else if (initializer == 'E') {
-                     int id = Integer.parseInt(secondSplit[0]);
-                     if (id == 0) {
-                        aoes.add(new FlareAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 1) {
-                        aoes.add(new SafeMarksmanEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 2) {
-                        aoes.add(new SafeMarksmanSpaceAOE1((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 3) {
-                        aoes.add(new SafeMarksmanSpaceAOE2((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 4) {
-                        int[][] points = new int[2][4];
-                        for (int m = 0; m < 2; m++) {
-                           for (int n = 0; n < 4; n++) {
-                              points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
+               if (!firstInput.isEmpty()) {
+                  char initializer = firstInput.charAt(0);
+                  firstInput = firstInput.substring(1);
+                  String[] secondSplit = firstInput.split(",", -1);
+                  if (secondSplit.length > 0) {
+                     if (initializer == 'P') {
+                        updatePlayer(secondSplit);
+                     } else if (initializer == 'O') {
+                        updateOthers(secondSplit);
+                     } else if (initializer == 'D') {
+                        players[Integer.parseInt(secondSplit[0])] = null;
+                     } else if (initializer == 'R') {
+                        projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
+                     } else if (initializer == 'E') {
+                        int id = Integer.parseInt(secondSplit[0]);
+                        if (id == 0) {
+                           aoes.add(new FlareAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 1) {
+                           aoes.add(new SafeMarksmanEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 2) {
+                           aoes.add(new SafeMarksmanSpaceAOE1((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 3) {
+                           aoes.add(new SafeMarksmanSpaceAOE2((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 4) {
+                           int[][] points = new int[2][4];
+                           for (int m = 0; m < 2; m++) {
+                              for (int n = 0; n < 4; n++) {
+                                 points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
+                              }
                            }
+                           aoes.add(new TimeMageAOE(points));
+                        } else if (id == 5) {
+                           aoes.add(new GhostQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 6) {
+                           //aoes.add(new MobileSupportQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 7) {
+                           aoes.add(new MobileSupportPassiveAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 8) {
+                           aoes.add(new MobileSupportEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 9) {
+                           aoes.add(new MobileSupportSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 10) {
+                           aoes.add(new JuggernautQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 11) {
+                           aoes.add(new JuggernautEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 12) {
+                           aoes.add(new SummonerPet((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                        } else if (id == 13) {
+                           aoes.add(new SummonerSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
                         }
-                        aoes.add(new TimeMageAOE(points));
-                     } else if (id == 5) {
-                        aoes.add(new GhostQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 6) {
-                        //aoes.add(new MobileSupportQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 7) {
-                        aoes.add(new MobileSupportPassiveAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 8) {
-                        aoes.add(new MobileSupportEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 9) {
-                        aoes.add(new MobileSupportSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 10) {
-                        aoes.add(new JuggernautQAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 11) {
-                        aoes.add(new JuggernautEAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 12) {
-                        aoes.add(new SummonerPet((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     } else if (id == 13) {
-                        aoes.add(new SummonerSpaceAOE((int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                     }
-                  } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
-                     int id = Integer.parseInt(secondSplit[0]);
-                     Player player = players[Integer.parseInt(secondSplit[1])];
-                     if (id == 2) {
-                        player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
-                     } else if (id == 3) {
-                        player.addStatus(new GhostPassive(Integer.parseInt(secondSplit[2])));
-                     } else if (id == 0) {
-                        player.addStatus(new DamageBuff());
-                     } else if (id == 1) {
-                        //player.addStatus(new Dead());
-                        player.setDead(true);
-                     } else if (id == 4) {
-                        //player.addStatus(new Illuminated());//Talk with will
-                     } else if (id == 5) {
-                        //player.addStatus(new Invisible());
-                        player.setInvisible(true);
-                     } else if (id == 8) {
-                        player.addStatus(new MSBuff());
-                     } else if (id == 9) {
-                        player.addStatus(new ReduceDamage());
-                     } else if (id == 10) {
-                        //player.addStatus(new Uncollidable());
-                        player.setUncollidable(true);
-                     } else if (id == 11) {
-                        player.addStatus(new Unstoppable());
-                     } else if (id == 12) {
-                        player.addStatus(new Stun());
-                     } else if (id == 13) {
-                        player.addStatus(new Shielded());
-                     }
-                  } else if (initializer == 'W') { //Walking
-                     players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
-                  } else if (initializer == 'L') {// Flash light
-                     players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
-                     for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
-                        players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
-                     }
-                  } else if (initializer == 'C') { //Message in
-                     boolean isFriendly = false;
-                     for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
-                        if (player.getUsername().equals(secondSplit[0])) {
-                           isFriendly = true;
-                           intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
+                     } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
+                        int id = Integer.parseInt(secondSplit[0]);
+                        Player player = players[Integer.parseInt(secondSplit[1])];
+                        if (id == 2) {
+                           player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
+                        } else if (id == 3) {
+                           player.addStatus(new GhostPassive(Integer.parseInt(secondSplit[2])));
+                        } else if (id == 0) {
+                           player.addStatus(new DamageBuff());
+                        } else if (id == 1) {
+                           //player.addStatus(new Dead());
+                           player.setDead(true);
+                        } else if (id == 4) {
+                           //player.addStatus(new Illuminated());//Talk with will
+                        } else if (id == 5) {
+                           //player.addStatus(new Invisible());
+                           player.setInvisible(true);
+                        } else if (id == 8) {
+                           player.addStatus(new MSBuff());
+                        } else if (id == 9) {
+                           player.addStatus(new ReduceDamage());
+                        } else if (id == 10) {
+                           //player.addStatus(new Uncollidable());
+                           player.setUncollidable(true);
+                        } else if (id == 11) {
+                           player.addStatus(new Unstoppable());
+                        } else if (id == 12) {
+                           player.addStatus(new Stun());
+                        } else if (id == 13) {
+                           player.addStatus(new Shielded());
                         }
-                        messageOk = true;
+                     } else if (initializer == 'W') { //Walking
+                        players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
+                     } else if (initializer == 'L') {// Flash light
+                        players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+                        for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+                           players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
+                        }
+                     } else if (initializer == 'C') { //Message in
+                        boolean isFriendly = false;
+                        for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
+                           if (player.getUsername().equals(secondSplit[0])) {
+                              isFriendly = true;
+                              intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
+                           }
+                           messageOk = true;
+                        }
+                     } else if (initializer == 'A') { //Sets up the artifact locations
+                        artifacts[0] = new Artifact(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]), 0);
+                        artifacts[1] = new Artifact(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3]), 1);
                      }
-                  } else if (initializer == 'A') { //Sets up the artifact locations
-                     artifacts[0] = new Artifact(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]), 0);
-                     artifacts[1] = new Artifact(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3]), 1);
                   }
                }
             }

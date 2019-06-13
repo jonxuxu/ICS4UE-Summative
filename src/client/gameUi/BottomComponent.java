@@ -3,6 +3,8 @@ package client.gameUi;
 import client.Player;
 import client.gameUi.GameComponent;
 
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,6 +32,7 @@ public class BottomComponent extends GameComponent {
    private Polygon BOTTOM_POLYGON;
    private Player myPlayer;
    private final Font STATS_FONT = super.getFont("stats");
+   private static Border border1, border2, border3, border4, compound;
 
    public BottomComponent(Player myPlayer) {
 
@@ -49,13 +52,31 @@ public class BottomComponent extends GameComponent {
       int[] x5Points = {(278), (271), (276), (674), (679), (672)};
       int[] y5Points = {(496), (446), (441), (441), (446), (496)};
       BOTTOM_INNER = new Polygon(x5Points, y5Points, 6);*/
+      border1 = BorderFactory.createLineBorder(new Color(72, 60, 32), 4);
+      border2 = BorderFactory.createLineBorder(new Color(141, 130, 103), 3);
+      border3 = BorderFactory.createLineBorder(new Color(95, 87, 69), 4);
+      border4 = BorderFactory.createLineBorder(new Color(50, 46, 41), 2);
+      compound = BorderFactory.createCompoundBorder(border1, border2);
+      compound = BorderFactory.createCompoundBorder(compound, border3);
+      compound = BorderFactory.createCompoundBorder(compound, border4);
+
       this.myPlayer = myPlayer;
    }
 
 
    public void draw(Graphics2D g2) {
       //Bottom panel
+      g2.setColor(new Color(141, 130, 103));
+      g2.setStroke(new BasicStroke(500));
+      g2.drawPolygon(BOTTOM_BORDER);
       g2.setColor(new Color(72, 60, 32));
+      g2.setStroke(new BasicStroke(20));
+      g2.drawPolygon(BOTTOM_BORDER);
+      g2.setColor(new Color(95, 87, 69));
+      g2.setStroke(new BasicStroke(10));
+      g2.drawPolygon(BOTTOM_BORDER);
+      g2.setColor(new Color(50, 46, 41));
+      //g2.setStroke(new BasicStroke(2));
       g2.fillPolygon(BOTTOM_BORDER);
      /* g2.setColor(new Color(141, 130, 103));
       g2.fillPolygon(BOTTOM_BORDER2);
