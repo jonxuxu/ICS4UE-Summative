@@ -191,7 +191,7 @@ public class Client extends JFrame implements WindowListener {
 
       // Setting up fog (should be moved soon TM)
       int[] xy = {300, 300};
-      fog = new FogMap(xy, MAP_WIDTH, MAP_HEIGHT);
+      fog = new FogMap(xy, MAP_WIDTH, MAP_HEIGHT, MAX_X, MAX_Y);
       // TODO: Set player spawn xy later
 
       //Variable set up
@@ -445,9 +445,10 @@ public class Client extends JFrame implements WindowListener {
                      }
                   }
                }
+               /*
                AffineTransform tx = new AffineTransform();
                tx.translate(xyAdjust[0], xyAdjust[1]);
-          /*     darkFog = fog.getFog(2).createTransformedArea(tx);
+               darkFog = fog.getFog(2).createTransformedArea(tx);
                lightFog = fog.getExplored(2).createTransformedArea(tx);*/
                drawn = false;
             }
@@ -1274,11 +1275,16 @@ public class Client extends JFrame implements WindowListener {
             //Creating shapes
 
             //Draws fog
-         /*   g2.setColor(Color.black); //Unexplored
+            if(!drawn){
+               fog.drawFog(g2, xyAdjust);
+            /*
+            g2.setColor(Color.black); //Unexplored
             g2.fill(darkFog);
             g2.setColor(new Color(0, 0, 0, 128)); //Previously explored
-            g2.fill(lightFog);
-            drawn = true;*/
+            g2.fill(lightFog); */
+               drawn = true;
+            }
+
             // Draws projectiles and AOEs
             for (int i = 0; i < projectiles.size(); i++) {
                projectiles.get(i).draw(g2);
