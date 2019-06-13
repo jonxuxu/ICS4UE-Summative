@@ -98,6 +98,7 @@ public class Client extends JFrame implements WindowListener {
    private String className;
    private int myPlayerID;
    private int frames, fps;
+   private String teamWin;
 
    // Game itself
    private FogMap fog;
@@ -114,8 +115,12 @@ public class Client extends JFrame implements WindowListener {
    private boolean waitingForImage;
    private BufferedImage sheet;
    private boolean drawn = true;
+   private Artifact[] artifacts = new Artifact[2];
+   private boolean[] drawArtifact = {true, true};
+   private BufferedImage fullLeaf;
    // Debugging
    private boolean testingBegin = false;
+   private boolean finalScreen = false;
    //Graphics
 
 
@@ -136,6 +141,7 @@ public class Client extends JFrame implements WindowListener {
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Light.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Quicksand-Medium.ttf")));
          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(".\\graphicFonts\\Akura Popo.ttf")));
+         fullLeaf  = ImageIO.read(new File(System.getProperty("user.dir") + "/res/FullLeaf.png"));
       } catch (IOException | FontFormatException e) {
          System.out.println("Font not available");
          e.printStackTrace();
@@ -393,7 +399,7 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   public void changeSoundLevel(int type, float level){
+   public void changeSoundLevel(int type, float level) {
       soundLevels[type] = level;
       soundEffect.setVolume(soundLevels);
       bgMusic.setVolume(soundLevels);
@@ -405,7 +411,7 @@ public class Client extends JFrame implements WindowListener {
          if (input.ready()) {
             decipherGameInput(input.readLine());
             if (drawn) {
-               for (int i = 0; i < players.length; i++) {
+               /*for (int i = 0; i < players.length; i++) {
                   if (players[i] != null) {
                      if (players[i].getTeam() == myTeam) {
                         fog.scout(players[i].getXy());
@@ -413,7 +419,7 @@ public class Client extends JFrame implements WindowListener {
                   }
                }
                AffineTransform tx = new AffineTransform();
-               tx.translate(xyAdjust[0], xyAdjust[1]);
+               tx.translate(xyAdjust[0], xyAdjust[1]);*/
           /*     darkFog = fog.getFog(2).createTransformedArea(tx);
                lightFog = fog.getExplored(2).createTransformedArea(tx);*/
                drawn = false;
@@ -469,8 +475,16 @@ public class Client extends JFrame implements WindowListener {
                output.println(outputString.toString().trim());
                output.flush();
             }
-
-            //Update positions:
+            //Update artifact:
+            drawArtifact[0] = true;
+            drawArtifact[1] = true;
+            for (Player currentPlayer : players) {
+               if (currentPlayer != null) {
+                  if (currentPlayer.getArtifact()) {
+                     drawArtifact[1 - currentPlayer.getTeam()] = false;
+                  }
+               }
+            }
          }
       } catch (
               IOException e) {
@@ -483,7 +497,7 @@ public class Client extends JFrame implements WindowListener {
       try {
          while (!inputReady) {
             if (input.ready()) {
-              //System.out.println("WI" + input.readLine().trim());
+               //System.out.println("WI" + input.readLine().trim());
                inputReady = true;
                if (!gameBegin) {
                   if (!waitingForImage) {
@@ -496,7 +510,7 @@ public class Client extends JFrame implements WindowListener {
                      nextPanel = 7;//Sends to the game screen
                      gameBegin = true;
                      System.out.println("DONNEEE");
-                     System.out.println(sheet.getWidth()+" "+sheet.getHeight());
+                     System.out.println(sheet.getWidth() + " " + sheet.getHeight());
                   }
                }
             }
@@ -660,95 +674,106 @@ public class Client extends JFrame implements WindowListener {
    }
 
    public void decipherGameInput(String input) {
-      //System.out.println("G" + input);
       if ((!input.contains("END")) && (!input.contains("FINAL"))) {
-         if (!receivedOnce) {
-            receivedOnce = true;
-         }
-         projectiles.clear();
-         aoes.clear();
-         for (int i = 0; i < players.length; i++){
-           players[i].clearStatuses();
-         }
-         String[] firstSplit = input.split(" ", -1);
-         for (String firstInput : firstSplit) {
-            char initializer = firstInput.charAt(0);
-            firstInput = firstInput.substring(1);
-            String[] secondSplit = firstInput.split(",", -1);
-            if (secondSplit.length > 0) {
-               if (initializer == 'P') {
-                  updatePlayer(secondSplit);
-               } else if (initializer == 'O') {
-                  updateOthers(secondSplit);
-               } else if (initializer == 'D') {
-                  players[Integer.parseInt(secondSplit[0])] = null;
-               } else if (initializer == 'R') {
-                  projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
-               } else if (initializer == 'E') {
-                  int id = Integer.parseInt(secondSplit[0]);
-                  if ((id != 4) && (id != 14)) {
-                     aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
-                  } else {
-                     int[][] points = new int[2][4];
-                     for (int m = 0; m < 2; m++) {
-                        for (int n = 0; n < 4; n++) {
-                           points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
+         if (!input.contains("WINNER")) {
+            if (!receivedOnce) {
+               receivedOnce = true;
+            }
+            projectiles.clear();
+            aoes.clear();
+            for (int i = 0; i < players.length; i++) {
+               players[i].clearStatuses();
+            }
+            String[] firstSplit = input.split(" ", -1);
+            for (String firstInput : firstSplit) {
+               char initializer = firstInput.charAt(0);
+               firstInput = firstInput.substring(1);
+               String[] secondSplit = firstInput.split(",", -1);
+               if (secondSplit.length > 0) {
+                  if (initializer == 'P') {
+                     updatePlayer(secondSplit);
+                  } else if (initializer == 'O') {
+                     updateOthers(secondSplit);
+                  } else if (initializer == 'D') {
+                     players[Integer.parseInt(secondSplit[0])] = null;
+                  } else if (initializer == 'R') {
+                     projectiles.add(new Projectile(Integer.parseInt(secondSplit[0]), (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2]))));
+                  } else if (initializer == 'E') {
+                     int id = Integer.parseInt(secondSplit[0]);
+                     if ((id != 4) && (id != 14)) {
+                        aoes.add(new AOE(id, (int) (Integer.parseInt(secondSplit[1])), (int) (Integer.parseInt(secondSplit[2])), (int) (Integer.parseInt(secondSplit[3]))));
+                     } else {
+                        int[][] points = new int[2][4];
+                        for (int m = 0; m < 2; m++) {
+                           for (int n = 0; n < 4; n++) {
+                              points[m][n] = (int) (Integer.parseInt(secondSplit[1 + m * 4 + n]));
+                           }
+                        }
+                        if (id == 4) {
+                           aoes.add(new TimeMageAOE(id, points));
+                        } else {
+                           aoes.add(new AutoAOE(id, points));
                         }
                      }
-                     if (id == 4) {
-                        aoes.add(new TimeMageAOE(id, points));
-                     } else {
-                        aoes.add(new AutoAOE(id, points));
+                  } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
+                     int id = Integer.parseInt(secondSplit[0]);
+                     Player player = players[Integer.parseInt(secondSplit[1])];
+                     if (id == 2) {
+                        player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
+                     } else if (id == 3) {
+                        player.addStatus(new GhostPassive(Integer.parseInt(secondSplit[2])));
+                     } else if (id == 0) {
+                        player.addStatus(new DamageBuff());
+                     } else if (id == 1) {
+                        //player.addStatus(new Dead());
+                        player.setDead(true);
+                     } else if (id == 4) {
+                        //player.addStatus(new Illuminated());//Talk with will
+                     } else if (id == 5) {
+                        //player.addStatus(new Invisible());
+                        player.setInvisible(true);
+                     } else if (id == 8) {
+                        player.addStatus(new MSBuff());
+                     } else if (id == 9) {
+                        player.addStatus(new ReduceDamage());
+                     } else if (id == 10) {
+                        //player.addStatus(new Uncollidable());
+                        player.setUncollidable(true);
+                     } else if (id == 11) {
+                        player.addStatus(new Unstoppable());
+                     } else if (id == 12) {
+                        player.addStatus(new Stun());
+                     } else if (id == 13) {
+                        player.addStatus(new Shielded());
                      }
-                  }
-               } else if (initializer == 'S') {//Statuses now, use a different letter for spell using setspell//Set the spell of the appropriate player to the correct one using setSpell
-                  int id = Integer.parseInt(secondSplit[0]);
-                  Player player = players[Integer.parseInt(secondSplit[1])];
-                  if (id == 2) {
-                     player.addStatus(new GhostE(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3])));
-                  } else if (id == 3) {
-                     player.addStatus(new GhostPassive(Integer.parseInt(secondSplit[2])));
-                  } else if (id == 0) {
-                     player.addStatus(new DamageBuff());
-                  } else if (id == 1) {
-                     //player.addStatus(new Dead());
-                     player.setDead(true);
-                  } else if (id == 4) {
-                     //player.addStatus(new Illuminated());//Talk with will
-                  } else if (id == 5) {
-                     //player.addStatus(new Invisible());
-                     player.setInvisible(true);
-                  } else if (id == 8) {
-                     player.addStatus(new MSBuff());
-                  } else if (id == 9) {
-                     player.addStatus(new ReduceDamage());
-                  } else if (id == 10) {
-                     //player.addStatus(new Uncollidable());
-                     player.setUncollidable(true);
-                  } else if (id == 11) {
-                     player.addStatus(new Unstoppable());
-                  } else if (id == 12) {
-                     player.addStatus(new Stun());
-                  } else if (id == 13) {
-                     player.addStatus(new Shielded());
-                  }
-               } else if (initializer == 'W') { //Walking
-                  players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
-               } else if (initializer == 'L') {// Flash light
-                  players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
-                  for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
-                     players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
-                  }
-               } else if (initializer == 'C') { //Message in
-                  boolean isFriendly = false;
-                  for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
-                     if (player.getUsername().equals(secondSplit[0])) {
-                        isFriendly = true;
+                  } else if (initializer == 'W') { //Walking
+                     players[Integer.parseInt(secondSplit[0])].setMovementIndex(Integer.parseInt(secondSplit[1]), Boolean.parseBoolean(secondSplit[2]));
+                  } else if (initializer == 'L') {// Flash light
+                     players[Integer.parseInt(secondSplit[0])].setFlashlightOn(true);//Resets the flashlight
+                     for (int i = 2; i < Integer.parseInt(secondSplit[1]) * 2 + 2; i += 2) { //Parses all the points
+                        players[Integer.parseInt(secondSplit[0])].setFlashlightPoint(Integer.parseInt(secondSplit[i]), Integer.parseInt(secondSplit[i + 1]));
                      }
+                  } else if (initializer == 'C') { //Message in
+                     boolean isFriendly = false;
+                     for (Player player : teams[myTeam]) { // Checks to see if username belongs to a player in 1st team
+                        if (player.getUsername().equals(secondSplit[0])) {
+                           isFriendly = true;
+                        }
+                     }
+                     intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
+                  } else if (initializer == 'A') { //Sets up the artifact locations
+                     artifacts[0] = new Artifact(Integer.parseInt(secondSplit[0]), Integer.parseInt(secondSplit[1]), 0);
+                     artifacts[1] = new Artifact(Integer.parseInt(secondSplit[2]), Integer.parseInt(secondSplit[3]), 1);
                   }
-                  intermediatePanel.messageIn(secondSplit[0], secondSplit[1], isFriendly);
                }
             }
+         } else {
+            if (Integer.parseInt(input.charAt(6) + "") == 0) {
+               teamWin = "Team east wins";
+            } else {
+               teamWin = "Team west wins";
+            }
+            finalScreen = true;
          }
       }
    }
@@ -795,7 +820,9 @@ public class Client extends JFrame implements WindowListener {
       if (currentPanel != nextPanel) {
          System.out.println("C" + currentPanel);
          System.out.println("V" + nextPanel);
-         menuPanels[currentPanel].setErrorUpdate("");
+         if (currentPanel != 7) {
+            menuPanels[currentPanel].setErrorUpdate("");
+         }
          currentPanel = nextPanel;
          cardLayout.show(mainContainer, PANEL_NAMES[currentPanel]);
       }
@@ -827,7 +854,7 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
-   public void quit(){
+   public void quit() {
       try {
          output.println("X");
          output.flush();
@@ -965,6 +992,7 @@ public class Client extends JFrame implements WindowListener {
       private int MAX_GAME_X, MAX_GAME_Y;
       private Area darkness;
       private boolean pause = false;
+      private float fadeOut = 0;
 
       public GamePanel() {
          this.setBackground(Color.black);
@@ -1012,6 +1040,8 @@ public class Client extends JFrame implements WindowListener {
             //Map
             g2.drawImage(sheet, xyAdjust[0], xyAdjust[1], MAP_WIDTH, MAP_HEIGHT, null);
             g2.setColor(Color.black);
+
+
             //Game player
             resetXyAdjust();
 
@@ -1045,7 +1075,7 @@ public class Client extends JFrame implements WindowListener {
                   if ((currentPlayer.getTeam() == myTeam) || (currentPlayer.getIlluminated())) {
                      currentPlayer.draw(g2, myPlayer);
                      for (int j = 0; j < currentPlayer.getStatuses().size(); j++) {
-                       currentPlayer.getStatuses().get(j).draw(g2, currentPlayer.getX(), currentPlayer.getY(), j);
+                        currentPlayer.getStatuses().get(j).draw(g2, currentPlayer.getX(), currentPlayer.getY(), j);
                      }
                   }
                }
@@ -1062,6 +1092,11 @@ public class Client extends JFrame implements WindowListener {
                }
             }
 
+            for (int i = 0; i < artifacts.length; i++) {
+               if (drawArtifact[i]) {
+                  artifacts[i].drawArtifact(g2, xyAdjust);
+               }
+            }
             //Creating shapes
 
             //Draws fog
@@ -1079,7 +1114,7 @@ public class Client extends JFrame implements WindowListener {
             }
             //draw all components
 
-            ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem);
+            ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
             if (keyPressed) {
                if (lastKeyTyped == 27) { // Esc key
                   pause = !pause;
@@ -1102,6 +1137,30 @@ public class Client extends JFrame implements WindowListener {
          }
          darkness = new Area(new Rectangle(0, 0, (MAX_GAME_X), (MAX_GAME_Y)));
          frames++;
+
+         if (finalScreen) {
+            intermediatePanel.hideChat();
+            if (fadeOut < 0.99) {
+               fadeOut += 0.01;
+               g2.setColor(new Color((float) 0, (float) 0, (float) 0, (fadeOut)));
+               g2.fillRect(0, 0, MAX_X, MAX_Y);
+               g2.setColor(Color.white);
+               g2.setFont(new Font("Akura Popo", Font.PLAIN, (int) (50)));
+               g2.drawString(teamWin, MAX_X / 2 - g2.getFontMetrics().stringWidth(teamWin) / 2, MAX_Y / 2);
+            } else {
+               g2.setColor(new Color((float) 0, (float) 0, (float) 0, 1));
+               g2.fillRect(0, 0, MAX_X, MAX_Y);
+               if (fadeOut > 1.5) {
+                  nextPanel = 2;//Sends to the main screen
+                  gameBegin = false;
+               }else{
+                  fadeOut += 0.01;
+               }
+               g2.setFont(new Font("Akura Popo", Font.PLAIN, (int) (50)));
+               g2.drawString(teamWin, MAX_X / 2 - g2.getFontMetrics().stringWidth(teamWin) / 2, MAX_Y / 2);
+            }
+            g2.drawImage(fullLeaf, MAX_X/2-38,70+MAX_Y-42,76,84,null);
+         }
       }
 
       public void resetXyAdjust() {

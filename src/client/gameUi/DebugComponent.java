@@ -15,6 +15,7 @@ public class DebugComponent extends GameComponent {
    private char keyPress;
    private double mb = 1024 * 1024;
    private double usedMem, maxMem;
+   private int [] currentXy;
 
    public void draw(Graphics2D g2) {
       if (visible) {
@@ -27,6 +28,8 @@ public class DebugComponent extends GameComponent {
          g2.drawString("Mouse: " + mouse[0] + "x " + mouse[1] + "y " + mouseMessage[mouse[2]], 0, (int) (60 ));
          g2.drawString("Keyboard: " + keyPress, 0, (int) (80 ));
          g2.drawString("Memory: " + String.format("%.2f", usedMem) + "mb out of " + maxMem + "mb   " + String.format("%.2f", usedMem / maxMem * 100) + "%", 0, (int) (100 ));
+         g2.drawString("X: "+currentXy[0]+" Y:"+currentXy[1], 0, (int) (120 ));
+
       }
    }
 
@@ -34,11 +37,12 @@ public class DebugComponent extends GameComponent {
       visible = !visible;
    }
 
-   public void update(int fps, int[] mouseState, char keyPress, double usedMem, double totalMem) {
+   public void update(int fps, int[] mouseState, char keyPress, double usedMem, double totalMem, int[] currentXy) {
       this.fps = fps;
       this.mouse = mouseState;
       this.keyPress = keyPress;
       this.usedMem = usedMem / mb;
       this.maxMem = totalMem / mb;
+      this.currentXy = currentXy;
    }
 }

@@ -65,6 +65,16 @@ public class Juggernaut extends Player{
   }
   
   public void update(){
+    //ARTIFACT ADDED HERE
+    if ((checkOnArtifact())) {
+      setHasArtifact(true);
+    }
+    if (getHasArtifact()) {
+      if (checkOnBaseArtifact()) {
+        getArtifacts(getTeam()).setWinner(true);
+      }
+    }
+
     for (int i = 0; i < 3; i++){
       if (spellTimers[i] > 0){
         spellTimers[i]--;

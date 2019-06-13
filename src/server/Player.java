@@ -22,7 +22,6 @@ public abstract class Player extends User implements CanIntersect {
    private int spawnX = 300;
    private int spawnY = 300;
    private boolean spells[] = new boolean[3];
-   private boolean artifact = false;
    private boolean damaged = false;
    private int gold = 0;
    private int maxHealth;
@@ -77,9 +76,15 @@ public abstract class Player extends User implements CanIntersect {
    private int yCo;
    private int cVal;
 
+   //Artifact
+   private boolean hasArtifact;
+
    //Player references
    private static Player[] players;
    private static int playerNum;
+
+   //Player artifact num
+   private static Artifact[] artifacts = new Artifact[2];
 
    Player(String username) {
       super(username);
@@ -134,8 +139,8 @@ public abstract class Player extends User implements CanIntersect {
          int[] xP = new int[thisPolygon.npoints];
          int[] yP = new int[thisPolygon.npoints];
          for (int j = 0; j < thisPolygon.npoints; j++) {
-            xP[j] = thisPolygon.xpoints[j]+15000;
-            yP[j] = thisPolygon.ypoints[j]+10000;
+            xP[j] = thisPolygon.xpoints[j] + 15000;
+            yP[j] = thisPolygon.ypoints[j] + 10000;
          }
          Player.obstacles[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
       }
@@ -185,7 +190,7 @@ public abstract class Player extends User implements CanIntersect {
       StringBuilder outputString = new StringBuilder();
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
       outputString.append(health + "," + maxHealth + "," + attack + "," + (mobility + mobilityBoost) + "," + range + ",");//Stats
-      outputString.append(artifact + "," + gold + ",");//General
+      outputString.append(hasArtifact + "," + gold + ",");//General
       outputString.append(getSpellPercent(0) + "," + getSpellPercent(1) + "," + getSpellPercent(2) + ",");//Spells
       outputString.append(damaged + ",");
       outputString.append(illuminated + "," + 0);//Temporary "fix"
@@ -203,7 +208,7 @@ public abstract class Player extends User implements CanIntersect {
       StringBuilder outputString = new StringBuilder();
       outputString.append((int) (xy[0]) + "," + (int) (xy[1]) + ",");//Coords
       outputString.append(health + "," + maxHealth + ",");//stats
-      outputString.append(artifact + ",");//General
+      outputString.append(hasArtifact + ",");//General
       outputString.append(damaged + ",");
       outputString.append(illuminated + "," + 0);//Temporary "fix"
 
@@ -233,6 +238,24 @@ public abstract class Player extends User implements CanIntersect {
    public static void setPlayerReference(Player[] players1, int playerNum1) {
       players = players1;
       playerNum = playerNum1;
+   }
+
+   public boolean checkOnArtifact() {
+      if ((!(getArtifacts(1 - getTeam()).getPickedUp())) && (getArtifacts(1 - getTeam()).getBoundingBox().contains(getX(), getY()))) {
+         getArtifacts(1 - getTeam()).setPickedUp(true);
+         return true;
+      } else {
+         return false;
+      }
+   }
+
+   public boolean checkOnBaseArtifact() {
+      if ((!(getArtifacts(getTeam()).getPickedUp())) && (getArtifacts(getTeam()).getBoundingBox().contains(getX(), getY()))) {
+         getArtifacts(getTeam()).setPickedUp(true);
+         return true;
+      } else {
+         return false;
+      }
    }
 
    public void calculateFlashlightPolygon(double flashlightAngle) {
@@ -393,11 +416,28 @@ public abstract class Player extends User implements CanIntersect {
       }
    }
 
-   public void setSpawn(Region region){
-      xy[0]=(region.getMidXy()[0]+15000)+(int)(Math.random()*20);
-      xy[1]=(region.getMidXy()[1]+10000)+(int)(Math.random()*20);
-      System.out.println("XXXX"+xy[0]+" "+xy[1]);
+   public void setHasArtifact(boolean hasArtifact) {
+      this.hasArtifact = hasArtifact;
    }
+
+   public boolean getHasArtifact() {
+      return hasArtifact;
+   }
+
+   public static void setArtifacts(Region region, int artifactNum) {
+      artifacts[artifactNum] = new Artifact((region.getMidXy()[0] + 15000), (region.getMidXy()[1] + 10000), artifactNum);
+   }
+
+   public static Artifact getArtifacts(int teamN) {
+      return (artifacts[teamN]);
+   }
+
+   public void setSpawn(Region region) {
+      xy[0] = (region.getMidXy()[0] + 15000) + (int) (Math.random() * 20);
+      xy[1] = (region.getMidXy()[1] + 10000) + (int) (Math.random() * 20);
+      System.out.println();
+   }
+
    public void setTeam(int teamNumber) {
       this.teamNumber = teamNumber;
    }
@@ -422,6 +462,7 @@ public abstract class Player extends User implements CanIntersect {
    public int getPositionIndex() {
       return (positionIndex);
    }
+
 
    /*
    public int getAutoAttackTimer(){
@@ -457,6 +498,9 @@ public abstract class Player extends User implements CanIntersect {
       invisible = false;
       walking = false;
       damageReduction = 0;
+      if (hasArtifact) {
+         statuses.add(new Illuminated(2));
+      }
       for (int i = statuses.size() - 1; i >= 0; i--) {
          statuses.get(i).advance();
          Status removed = null;
@@ -471,6 +515,9 @@ public abstract class Player extends User implements CanIntersect {
                setX(spawnX);
                setY(spawnY);
                setHealth(maxHealth);
+               //Add here
+               getArtifacts(getTeam()).setPickedUp(false);
+               setHasArtifact(false);
             }
          } else {
             applyStatus(statuses.get(i));
@@ -515,17 +562,19 @@ public abstract class Player extends User implements CanIntersect {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
       return new Area(hitbox);
    }
+
    public Rectangle getHitboxRectangle() {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2)), ((int) (xy[1] - HEIGHT / 2)));
       return hitbox;
    }
-   public Rectangle getAdjustedHitboxRectangle(double x, double y) {
-      hitbox.setLocation(((int) (xy[0] - WIDTH / 2+x)), ((int) (xy[1] - HEIGHT / 2+y)));
-         return hitbox;
-      }
 
-   public boolean hitObstacle(Projectile projectile){
-      for (int k=0;k<obstacles.length;k++) {
+   public Rectangle getAdjustedHitboxRectangle(double x, double y) {
+      hitbox.setLocation(((int) (xy[0] - WIDTH / 2 + x)), ((int) (xy[1] - HEIGHT / 2 + y)));
+      return hitbox;
+   }
+
+   public boolean hitObstacle(Projectile projectile) {
+      for (int k = 0; k < obstacles.length; k++) {
          if (projectile.collides(obstacles[k])) {
             return true;
          }

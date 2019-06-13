@@ -323,6 +323,8 @@ public class Server {
       private boolean begin;
       private int playerDisconnected = -1;
       private Polygon[] allPolygons;
+      private boolean startMessage = true;
+      private int winner;
 
 
       @Override
@@ -419,11 +421,11 @@ public class Server {
             }
             ///SET SPAWNING
 
-            for (int i=0;i<players.length;i++){
+            for (int i = 0; i < players.length; i++) {
                players[i].setSpawn(builder.getTeamClearing(players[i].getTeam()));
             }
-
-
+            Player.setArtifacts(builder.getTeamClearing(0), 0);
+            Player.setArtifacts(builder.getTeamClearing(1), 1);
 
             System.out.println("done");
             playerNum = players.length;
@@ -485,7 +487,6 @@ public class Server {
                            }
                            allInput[i] = "";
                         } else {
-                           System.out.println("WWW" + allInput[i]);
                            String[] firstSplit = allInput[i].split(" ", -1);
                            for (String firstInput : firstSplit) {
                               char initializer = firstInput.charAt(0);
@@ -540,149 +541,170 @@ public class Server {
                   }
                }
                Player.updateHitbox();
-               // Output to clients
-               if (time.getFramePassed()) {
-                  //Check to see if anything was added from disconnecting players. If this is true, then add a space
-                  StringBuilder[] mainPlayer = new StringBuilder[playerNum];
-                  StringBuilder[] otherPlayers = new StringBuilder[playerNum];
-                  StringBuilder projectileOutput = new StringBuilder();
-                  StringBuilder aoeOutput = new StringBuilder();
-                  StringBuilder statusOutput = new StringBuilder();
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        mainPlayer[i] = new StringBuilder();
-                        otherPlayers[i] = new StringBuilder();
-                        mainPlayer[i].append("P" + i + "," + players[i].getMainOutput());
-                        otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
-                        ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
-                        ArrayList<AOE> theseAOES = players[i].getAllAOES();
-                        HashSet<Status> statusSet = new HashSet<Status>(players[i].getAllStatuses());
-                        ArrayList<Status> theseStatuses = new ArrayList<Status>(statusSet);
-                        for (int j = 0; j < theseProjectiles.size(); j++) {
-                           projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
-                        }
-                        for (int j = 0; j < theseAOES.size(); j++) {
-                           if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
-                              aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
-                           } else if (theseAOES.get(j).getID() == 4) {//Time Mage AOE is different
-                              aoeOutput.append("E" + theseAOES.get(j).getID());
-                              int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
-                              for (int m = 0; m < points.length; m++) {
-                                 for (int n = 0; n < points[m].length; n++) {
-                                    aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
-                                 }
-                              }
-                              aoeOutput.append(" ");
-                           } else if (theseAOES.get(j).getID() == 14) {//AutAOE is also different
-                              aoeOutput.append("E" + theseAOES.get(j).getID());
-                              int[][] points = ((AutoAOE) theseAOES.get(j)).getPoints();
-                              for (int m = 0; m < points.length; m++) {
-                                 for (int n = 0; n < points[m].length; n++) {
-                                    aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
-                                 }
-                              }
-                              aoeOutput.append(" ");
-                           }
-                        }
-                        int ghostPassiveCount = 0;
-                        for (int j = 0; j < theseStatuses.size(); j++) {
-                           if (theseStatuses.get(j) instanceof GhostE) {
-                              statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE) theseStatuses.get(j)).getX() + "," + ((GhostE) theseStatuses.get(j)).getY() + " ");
-                           } else if (theseStatuses.get(j) instanceof GhostPassive) {
-                              ghostPassiveCount++;
-                           } else if (theseStatuses.get(j).getID() != -1) {
-                              statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
-                           }
-                        }
-                        if (ghostPassiveCount > 0) {
-                           statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
-                        }
-                        if (players[i].getShieldsSize() > 0) {
-                           statusOutput.append("S" + 13 + "," + i + " ");
-                        }
-                     }
+               for (int i = 0; i < 2; i++) {
+                  if (Player.getArtifacts(i).getWinner()) {
+                     stopGame = true;
+                     winner = i;
                   }
+               }
+               if (stopGame) {
                   for (int i = 0; i < playerNum; i++) {
                      if (players[i] != null) {
-                        if (playerDisconnected != -1) {
-                           outputString[i].append("D" + playerDisconnected + " ");
-                           playerDisconnected = -1;
-                        }
-                     }
-                  }
-                  //Output will be here. The first loop generates the full message, the second distributes it
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        outputString[i].append(mainPlayer[i] + " ");
-                        for (int j = 0; j < playerNum; j++) {
-                           if (i != j) {
-                              if (players[j] != null) {
-                                 outputString[i].append(otherPlayers[j] + " ");
-                              }
-                           }
-                        }
-                     }
-                  }
-                  //Write out all the projectiles
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        if (!projectileOutput.toString().isEmpty()) {
-                           outputString[i].append(projectileOutput);
-                        }
-                     }
-                  }
-                  //Write out all the AOEs
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        if (!aoeOutput.toString().isEmpty()) {
-                           outputString[i].append(aoeOutput);
-                        }
-                     }
-                  }
-                  //Write out all the Statuses
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        if (!statusOutput.toString().isEmpty()) {
-                           outputString[i].append(statusOutput);
-                        }
-                     }
-                  }
-                  //TODO:add spells ID here
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        outputString[i].append("W" + i + "," + players[i].getPositionIndex() + "," + players[i].getWalking() + " ");
-                     }
-                  }
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        if (players[i].getFlashlightOn()) {
-                           int[] tempX = players[i].getFlashlightPointX();
-                           int[] tempY = players[i].getFlashlightPointY();
-                           for (int j = 0; j < playerNum; j++) {
-                              if (players[j] != null) {
-                                 outputString[j].append("L" + i + "," + players[i].getFlashlightPointNum());
-                                 for (int k = 0; k < players[i].getFlashlightPointNum(); k++) {
-                                    outputString[j].append("," + tempX[k] + "," + tempY[k]);
-                                 }
-                              }
-                              outputString[j].append(" ");
-                           }
-                        }
-                     }
-                  }
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        gameOutputs[i].println(outputString[i].toString().trim());
+                        gameOutputs[i].println("WINNER" + winner);
                         gameOutputs[i].flush();
                      }
                   }
-                  for (int i = 0; i < playerNum; i++) {
-                     if (players[i] != null) {
-                        players[i].update();
-                        players[i].setFlashlightOn(false);
+               } else {
+                  // Output to clients
+                  if (time.getFramePassed()) {
+                     //Check to see if anything was added from disconnecting players. If this is true, then add a space
+                     StringBuilder[] mainPlayer = new StringBuilder[playerNum];
+                     StringBuilder[] otherPlayers = new StringBuilder[playerNum];
+                     StringBuilder projectileOutput = new StringBuilder();
+                     StringBuilder aoeOutput = new StringBuilder();
+                     StringBuilder statusOutput = new StringBuilder();
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           mainPlayer[i] = new StringBuilder();
+                           otherPlayers[i] = new StringBuilder();
+                           if (startMessage) {
+                              mainPlayer[i].append("A" + Player.getArtifacts(0).getXy()[0] + "," + Player.getArtifacts(0).getXy()[1] + "," + Player.getArtifacts(1).getXy()[0] + "," + Player.getArtifacts(1).getXy()[1] + " ");
+                           }
+                           mainPlayer[i].append("P" + i + "," + players[i].getMainOutput());
+                           otherPlayers[i].append("O" + i + "," + players[i].getOtherOutput());
+                           ArrayList<Projectile> theseProjectiles = players[i].getAllProjectiles();
+                           ArrayList<AOE> theseAOES = players[i].getAllAOES();
+                           HashSet<Status> statusSet = new HashSet<Status>(players[i].getAllStatuses());
+                           ArrayList<Status> theseStatuses = new ArrayList<Status>(statusSet);
+                           for (int j = 0; j < theseProjectiles.size(); j++) {
+                              projectileOutput.append("R" + theseProjectiles.get(j).getID() + "," + theseProjectiles.get(j).getX() + "," + theseProjectiles.get(j).getY() + " ");
+                           }
+                           for (int j = 0; j < theseAOES.size(); j++) {
+                              if ((theseAOES.get(j).getID() != 4) && (theseAOES.get(j).getID() != 14)) {
+                                 aoeOutput.append("E" + theseAOES.get(j).getID() + "," + theseAOES.get(j).getX() + "," + theseAOES.get(j).getY() + "," + theseAOES.get(j).getRadius() + " ");
+                              } else if (theseAOES.get(j).getID() == 4) {//Time Mage AOE is different
+                                 aoeOutput.append("E" + theseAOES.get(j).getID());
+                                 int[][] points = ((TimeMageQAOE) theseAOES.get(j)).getPoints();
+                                 for (int m = 0; m < points.length; m++) {
+                                    for (int n = 0; n < points[m].length; n++) {
+                                       aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                                    }
+                                 }
+                                 aoeOutput.append(" ");
+                              } else if (theseAOES.get(j).getID() == 14) {//AutAOE is also different
+                                 aoeOutput.append("E" + theseAOES.get(j).getID());
+                                 int[][] points = ((AutoAOE) theseAOES.get(j)).getPoints();
+                                 for (int m = 0; m < points.length; m++) {
+                                    for (int n = 0; n < points[m].length; n++) {
+                                       aoeOutput.append("," + points[m][n]);//xpoints, then ypoints
+                                    }
+                                 }
+                                 aoeOutput.append(" ");
+                              }
+                           }
+                           int ghostPassiveCount = 0;
+                           for (int j = 0; j < theseStatuses.size(); j++) {
+                              if (theseStatuses.get(j) instanceof GhostE) {
+                                 statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + "," + ((GhostE) theseStatuses.get(j)).getX() + "," + ((GhostE) theseStatuses.get(j)).getY() + " ");
+                              } else if (theseStatuses.get(j) instanceof GhostPassive) {
+                                 ghostPassiveCount++;
+                              } else if (theseStatuses.get(j).getID() != -1) {
+                                 statusOutput.append("S" + theseStatuses.get(j).getID() + "," + i + " ");
+                              }
+                           }
+                           if (ghostPassiveCount > 0) {
+                              statusOutput.append("S" + 3 + "," + i + "," + ghostPassiveCount + " ");
+                           }
+                           if (players[i].getShieldsSize() > 0) {
+                              statusOutput.append("S" + 13 + "," + i + " ");
+                           }
+                        }
                      }
+                     if (startMessage) {
+                        startMessage = false;
+                     }
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           if (playerDisconnected != -1) {
+                              outputString[i].append("D" + playerDisconnected + " ");
+                              playerDisconnected = -1;
+                           }
+                        }
+                     }
+                     //Output will be here. The first loop generates the full message, the second distributes it
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           outputString[i].append(mainPlayer[i] + " ");
+                           for (int j = 0; j < playerNum; j++) {
+                              if (i != j) {
+                                 if (players[j] != null) {
+                                    outputString[i].append(otherPlayers[j] + " ");
+                                 }
+                              }
+                           }
+                        }
+                     }
+                     //Write out all the projectiles
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           if (!projectileOutput.toString().isEmpty()) {
+                              outputString[i].append(projectileOutput);
+                           }
+                        }
+                     }
+                     //Write out all the AOEs
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           if (!aoeOutput.toString().isEmpty()) {
+                              outputString[i].append(aoeOutput);
+                           }
+                        }
+                     }
+                     //Write out all the Statuses
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           if (!statusOutput.toString().isEmpty()) {
+                              outputString[i].append(statusOutput);
+                           }
+                        }
+                     }
+                     //TODO:add spells ID here
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           outputString[i].append("W" + i + "," + players[i].getPositionIndex() + "," + players[i].getWalking() + " ");
+                        }
+                     }
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           if (players[i].getFlashlightOn()) {
+                              int[] tempX = players[i].getFlashlightPointX();
+                              int[] tempY = players[i].getFlashlightPointY();
+                              for (int j = 0; j < playerNum; j++) {
+                                 if (players[j] != null) {
+                                    outputString[j].append("L" + i + "," + players[i].getFlashlightPointNum());
+                                    for (int k = 0; k < players[i].getFlashlightPointNum(); k++) {
+                                       outputString[j].append("," + tempX[k] + "," + tempY[k]);
+                                    }
+                                 }
+                                 outputString[j].append(" ");
+                              }
+                           }
+                        }
+                     }
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           gameOutputs[i].println(outputString[i].toString().trim());
+                           gameOutputs[i].flush();
+                        }
+                     }
+                     for (int i = 0; i < playerNum; i++) {
+                        if (players[i] != null) {
+                           players[i].update();
+                           players[i].setFlashlightOn(false);
+                        }
+                     }
+                     gameTick++;
                   }
-                  gameTick++;
                }
             }
          } catch (IOException e) {
@@ -698,7 +720,7 @@ public class Server {
 
       private boolean checkColliding(Player thisPlayer, double x, double y) {
          for (int i = 0; i < allPolygons.length; i++) {
-            if (allPolygons[i].intersects(thisPlayer.getAdjustedHitboxRectangle(x,y))) {
+            if (allPolygons[i].intersects(thisPlayer.getAdjustedHitboxRectangle(x, y))) {
                return (true);
             }
          }

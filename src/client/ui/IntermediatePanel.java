@@ -67,4 +67,7 @@ public class IntermediatePanel extends JLayeredPane { //State=7 (intermediate)=
    public void repaintReal() {
       gamePanel.repaint();
    }
+   public void hideChat(){
+      chat.setVisible(false);
+   }
 }

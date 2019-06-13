@@ -250,6 +250,9 @@ public abstract class Player extends User {
       this.artifact = artifact;
    }
 
+   public boolean getArtifact() {
+      return artifact;
+   }
    public void setLevel(int level) {
       this.level = level;
    }
