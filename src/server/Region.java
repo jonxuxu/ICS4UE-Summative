@@ -8,7 +8,6 @@ import java.awt.Polygon;
 public class Region extends Polygon {
 	public String regionType;
 	public int regionPriority;
-	public int assosiatedObjectID;
 	
 	Region(String type, int priority) {
 		this.regionType = type;
