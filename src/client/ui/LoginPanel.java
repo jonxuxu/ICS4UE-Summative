@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 
 /**
  * LoginPanel.java
- * This is
+ * This is the panel for logging in and entering ip
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -26,6 +26,9 @@ public class LoginPanel extends MenuPanel {
    private CustomTextField nameField = new CustomTextField(3);
    private CustomTextField ipField = new CustomTextField(3);
 
+   /**
+    * Sets up the login panel
+    */
    public LoginPanel() {
       //Basic username field
       //sendName = true;
@@ -50,6 +53,11 @@ public class LoginPanel extends MenuPanel {
       this.setFocusable(true);
    }
 
+   /**
+    * Paints the create panel on the screen
+    *
+    * @param g used to draw the panel
+    */
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;

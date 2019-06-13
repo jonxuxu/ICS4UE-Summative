@@ -14,7 +14,7 @@ import java.io.IOException;
 
 /**
  * InstructionPanel.java
- * This is
+ * This is the panel for displaying instructions
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -37,7 +37,9 @@ public class InstructionPanel extends MenuPanel { //State=5
    private BufferedImage[] pages = new BufferedImage[4];
    private int currentPage = 0;
 
-
+    /**
+     * Sets up the panel
+     */
    public InstructionPanel() {
 
       //Import instructions pages
@@ -88,6 +90,11 @@ public class InstructionPanel extends MenuPanel { //State=5
       this.setFocusable(true);
    }
 
+    /**
+     * Paints the create panel on the screen
+     *
+     * @param g used to draw the panel
+     */
    @Override
    public void paintComponent(Graphics g) {
       g2 = (Graphics2D) g;
