@@ -71,7 +71,7 @@ public abstract class Player extends User implements CanIntersect {
    private Polygon flashlightBeam = new Polygon();
    private int FLASHLIGHT_RADIUS = 600;
    private Polygon test = new Polygon();
-   private static CustomPolygon[] constantHitboxes;
+   private static CustomPolygon[] obstacles;
    private CustomPolygon lightingHitbox;
    private int xCo;
    private int yCo;
@@ -105,12 +105,13 @@ public abstract class Player extends User implements CanIntersect {
          if (players[i] != null) {
             players[i].setCenter();
          } else {
-            if (constantHitboxes[i] != null) {
-               constantHitboxes[i] = null;
+            if (obstacles[i] != null) {
+               obstacles[i] = null;
             }
          }
       }
    }
+
 
    public void setCenter() {
       int[] xP = {(int) (xy[0]) - WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) - WIDTH / 2};
@@ -122,12 +123,12 @@ public abstract class Player extends User implements CanIntersect {
       int[] xP = {(int) (xy[0]) - WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) + WIDTH / 2, (int) (xy[0]) - WIDTH / 2};
       int[] yP = {(int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) - HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2, (int) (xy[1]) + HEIGHT / 2};
       lightingHitbox = new CustomPolygon(xP, yP, 4);
-      constantHitboxes[i] = lightingHitbox;
+      obstacles[i] = lightingHitbox;
       //REPLACE WITH getHitboxRectangle
    }
 
    public static void setConstantHitboxes(int playerNum, ArrayList<Obstacle> obstacles) {
-      constantHitboxes = new CustomPolygon[playerNum + obstacles.size()];//For each shape, add another
+      Player.obstacles = new CustomPolygon[playerNum + obstacles.size()];//For each shape, add another
       for (int i = 0; i < obstacles.size(); i++) {
          Polygon thisPolygon = obstacles.get(i).boundingBox;
          int[] xP = new int[thisPolygon.npoints];
@@ -137,12 +138,12 @@ public abstract class Player extends User implements CanIntersect {
             yP[j] = thisPolygon.ypoints[j]+10000;
             System.out.println(xP[j]+"*"+yP[j]);
          }
-         constantHitboxes[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
+         Player.obstacles[i + playerNum] = (new CustomPolygon(xP, yP, thisPolygon.npoints));
       }
    }
 
-   public static CustomPolygon[] getConstantHitboxes() {
-      return (constantHitboxes);
+   public static CustomPolygon[] getObstacles() {
+      return (obstacles);
    }
 
    public void setMouse(int mouseX, int mouseY) {
@@ -255,18 +256,18 @@ public abstract class Player extends User implements CanIntersect {
          tempFlashlightAngle += 0.01;
          setPlayerVector(xy, xy[0] + (int) (FLASHLIGHT_RADIUS * Math.cos(tempFlashlightAngle)), xy[1] + (int) (FLASHLIGHT_RADIUS * Math.sin(tempFlashlightAngle)));
          int smallestDist = FLASHLIGHT_RADIUS * FLASHLIGHT_RADIUS;
-         for (int i = 0; i < constantHitboxes.length; i++) {
-            if (!constantHitboxes[i].equals(lightingHitbox)) {
-               constantHitboxes[i].setPlayerScalar(xCo, yCo, cVal);
-               constantHitboxes[i].setPlayerVector(Math.cos(tempFlashlightAngle), Math.sin(tempFlashlightAngle));
-               constantHitboxes[i].setVectorMagnitude(Math.abs(tempFlashlightAngle - flashlightAngle));
-               if (constantHitboxes[i].intersect(xy)) {
-                  if ((distance(constantHitboxes[i].getIntersect(), xy) < smallestDist)) {
-                     smallestDist = distance(constantHitboxes[i].getIntersect(), xy);
+         for (int i = 0; i < obstacles.length; i++) {
+            if (!obstacles[i].equals(lightingHitbox)) {
+               obstacles[i].setPlayerScalar(xCo, yCo, cVal);
+               obstacles[i].setPlayerVector(Math.cos(tempFlashlightAngle), Math.sin(tempFlashlightAngle));
+               obstacles[i].setVectorMagnitude(Math.abs(tempFlashlightAngle - flashlightAngle));
+               if (obstacles[i].intersect(xy)) {
+                  if ((distance(obstacles[i].getIntersect(), xy) < smallestDist)) {
+                     smallestDist = distance(obstacles[i].getIntersect(), xy);
                      newShapeIndex = i;
-                     newIntersectionIndex = constantHitboxes[i].getIntersectionIndex();
-                     savedPoint[0] = constantHitboxes[i].getIntersect()[0];
-                     savedPoint[1] = constantHitboxes[i].getIntersect()[1];
+                     newIntersectionIndex = obstacles[i].getIntersectionIndex();
+                     savedPoint[0] = obstacles[i].getIntersect()[0];
+                     savedPoint[1] = obstacles[i].getIntersect()[1];
                      hit = true;
                   }
                }
@@ -519,6 +520,16 @@ public abstract class Player extends User implements CanIntersect {
       hitbox.setLocation(((int) (xy[0] - WIDTH / 2+x)), ((int) (xy[1] - HEIGHT / 2+y)));
       return hitbox;
    }
+
+   public boolean hitObstacle(Projectile projectile){
+      for (int k=0;k<obstacles.length;k++) {
+         if (projectile.collides(obstacles[k])) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    public boolean contains(int x, int y) {
       return hitbox.contains(x, y);
    }

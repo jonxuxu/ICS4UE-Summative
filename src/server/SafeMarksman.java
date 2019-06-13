@@ -29,7 +29,7 @@ public class SafeMarksman extends Player{
     setFlareCooldown(100);
     setMelee(false);
   }
-  
+
   public boolean castSpell(int spellIndex){
     if (!getStunned()) {
       if (spellTimers[spellIndex]<=0) {
@@ -52,7 +52,7 @@ public class SafeMarksman extends Player{
       return false;
     }
   }
-  
+
   public int getSpellPercent(int spellIndex) {
     return (spellCooldowns[spellIndex] - spellTimers[spellIndex])/spellCooldowns[spellIndex]*100;
     /*
@@ -74,7 +74,7 @@ public class SafeMarksman extends Player{
     for (int i = getProjectilesSize()-1; i >= 0; i--){
       getProjectile(i).advance();
       Projectile removed = null;
-      if (getProjectile(i).getRemainingDuration() <= 0){
+      if ((getProjectile(i).getRemainingDuration() <= 0) || hitObstacle(getProjectile(i))){
         removed = removeProjectile(i);
         if (removed instanceof FlareProjectile){
           addAOE(new FlareAOE(removed.getX(), removed.getY()));
@@ -100,7 +100,7 @@ public class SafeMarksman extends Player{
         }
       }
     }
-    
+
     //Update AOEs
     for (int i = getAOESize()-1; i >= 0; i--){
       getAOE(i).advance();
@@ -175,9 +175,9 @@ public class SafeMarksman extends Player{
         }
       }
     }
-    
+
     updateStatuses();
-    
+
     for (int i = getShieldsSize()-1; i >= 0; i--){
       getShield(i).advance();
       Shield removed = null;

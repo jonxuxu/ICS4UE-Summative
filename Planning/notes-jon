@@ -1,6 +1,5 @@
 TODO:
 - clean up client code more
-- volume gain
 - background music
 - finish adding particles to projectiles
 - fog add zooom soon tm
@@ -8,5 +7,6 @@ TODO:
 
 
 Work log:
+- volume gain
 
 
