@@ -230,6 +230,7 @@ class MainMapGenModule extends JFrame {
             }
          }
       }
+      return(null);
    }
 
    /**
