@@ -11,9 +11,6 @@ import client.sound.*;
 import client.ui.*;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -71,7 +68,8 @@ public class Client extends JFrame implements WindowListener {
    private int[] mouseState = new int[3];
 
    // Assets
-   private soundEffectManager soundEffect = new soundEffectManager(this);
+   private SoundEffectManager soundEffect = new SoundEffectManager(); // Sound effects
+   private MusicManager bgMusic = new MusicManager(); //Bg music
    private Clock time = new Clock(30);
 
    // Ui stuff
@@ -217,6 +215,9 @@ public class Client extends JFrame implements WindowListener {
               1000,
               1000
       );
+
+      // Plays bg music
+      bgMusic.start();
 
       while (true) {  //Main game loop
          if (time.getFramePassed()) {
@@ -392,9 +393,8 @@ public class Client extends JFrame implements WindowListener {
 
    public void changeSoundLevel(int type, float level){
       soundLevels[type] = level;
-   }
-   public float[] getSoundLevel(){
-      return soundLevels;
+      soundEffect.setVolume(soundLevels);
+      bgMusic.setVolume(soundLevels);
    }
 
    public void gameLogic() {
@@ -822,6 +822,15 @@ public class Client extends JFrame implements WindowListener {
          INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
       } else {
          INTRO_SCALING = 1.0 * MAX_X / BG_X;
+      }
+   }
+
+   public void quit(){
+      try {
+         output.println("X");
+         output.flush();
+      } catch (Exception E) {
+         System.out.println("Not connected");
       }
    }
 

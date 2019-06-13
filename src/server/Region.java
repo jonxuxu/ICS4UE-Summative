@@ -36,8 +36,8 @@ public class Region extends Polygon {
 		
 		for (int idx = 0; idx < numVertices; idx++) {
 			tempAngle = 2*Math.PI*idx/numVertices;
-			this.xpoints[idx] = (int) (radius*Math.cos(tempAngle));
-			this.ypoints[idx] = (int) (radius*Math.sin(tempAngle));
+			this.xpoints[idx] = (int) (radius*Math.cos(tempAngle)) + centerX;
+			this.ypoints[idx] = (int) (radius*Math.sin(tempAngle)) + centerY;
 		}
 	}
 	
