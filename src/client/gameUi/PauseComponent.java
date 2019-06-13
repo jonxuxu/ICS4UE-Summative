@@ -1,6 +1,7 @@
 package client.gameUi;
 
 import client.Client;
+import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -28,7 +29,6 @@ public class PauseComponent extends ThemedPanel {
       title.setForeground(Color.WHITE);
       title.setFont(titleFont);
       title.setHorizontalAlignment(JLabel.CENTER);
-      this.add(title, BorderLayout.NORTH);
 
       JPanel mainPanel = new JPanel();
       mainPanel.setLayout(new BorderLayout());
@@ -36,7 +36,7 @@ public class PauseComponent extends ThemedPanel {
       mainPanel.setBackground(null);
          JPanel leftPanel = new JPanel();
          leftPanel.setBackground(null);
-         leftPanel.setPreferredSize(new Dimension(width/2, (int)(height*0.8)));
+         leftPanel.setPreferredSize(new Dimension(width/2, (int)(height*0.6)));
          leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.PAGE_AXIS));
             JLabel volumeTitle = new JLabel("   Volume");
             volumeTitle.setForeground(Color.WHITE);
@@ -72,17 +72,45 @@ public class PauseComponent extends ThemedPanel {
          rightPanel.add(graphicsTitle);
       mainPanel.add(leftPanel, BorderLayout.WEST);
       mainPanel.add(rightPanel, BorderLayout.CENTER);
-      this.add(mainPanel, BorderLayout.CENTER);
 
-      JButton back = new JButton("Return to game");
-      back.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            client.requestFocus();
-            thisComponent.setVisible(false);
-         }
-      });
-      this.add(back, BorderLayout.SOUTH);
+      JPanel bottomPanel = new JPanel();
+      bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
+      bottomPanel.setPreferredSize(new Dimension(width, (int)(height*0.2)));
+      bottomPanel.setBackground(null);
+        JPanel bottomRow1 = new JPanel();
+        bottomRow1.setBackground(null);
+          JButton surrender = new JButton("Surrender");
+          surrender.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+          });
+          JButton quit = new JButton("Quit Game");
+          quit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              System.exit(0);
+            }
+          });
+        bottomRow1.add(surrender);
+        bottomRow1.add(quit);
+        JPanel bottomRow2 = new JPanel();
+        bottomRow2.setBackground(null);
+          JButton back = new JButton("Return to game");
+          back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+             client.requestFocus();
+             thisComponent.setVisible(false);
+            }
+          });
+        bottomRow2.add(back);
+      bottomPanel.add(bottomRow1);
+      bottomPanel.add(bottomRow2);
+
+      this.add(title, BorderLayout.NORTH);
+      this.add(mainPanel, BorderLayout.CENTER);
+      this.add(bottomPanel, BorderLayout.SOUTH);
 
       this.setVisible(false);
 
