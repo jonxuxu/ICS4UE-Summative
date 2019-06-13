@@ -8,7 +8,7 @@ import java.util.HashSet;
 /**
  * This is a key listener which is used to register ctrl z, ctrl y, and ctrl s.
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 2.0
  * @since 2019-02-19
  */

@@ -3,7 +3,7 @@ package server;
 /**
  * This is a class which helps regulate the paint component speed
  *
- * @author Will Jeong
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
  * @since 2019-04-17
  */
