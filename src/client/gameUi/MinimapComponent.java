@@ -13,7 +13,7 @@ import java.awt.geom.Rectangle2D;
 
 /**
  * MinimapComponent.java
- * This is
+ * This is for the minimap
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0

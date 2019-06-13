@@ -3,7 +3,6 @@ package client;
 import client.gameUi.BottomComponent;
 import client.gameUi.DebugComponent;
 import client.gameUi.GameComponent;
-import client.gameUi.InventoryComponent;
 import client.gameUi.MinimapComponent;
 import client.gameUi.PauseComponent;
 import client.map.*;
@@ -119,6 +118,7 @@ public class Client extends JFrame implements WindowListener {
    private Artifact[] artifacts = new Artifact[2];
    private boolean[] drawArtifact = {true, true};
    private BufferedImage fullLeaf;
+   private String ipTyped = "";
    // Debugging
    private boolean testingBegin = false;
    private boolean finalScreen = false;
@@ -249,7 +249,9 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          if (connectionState < 1) {
-            connect();
+            if (!ipTyped.isEmpty()) {
+               connect();
+            }
          } else {
             try {
                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -936,12 +938,16 @@ public class Client extends JFrame implements WindowListener {
       }
    }
 
+   public void setIp(String ipTyped){
+      this.ipTyped = ipTyped;
+   }
+
    /**
     * Connect method to attempt to connect to the server
     */
    public void connect() {
       try {
-         socket = new Socket("10.242.169.116", 5002);//localhost
+         socket = new Socket(ipTyped, 5002);//localhost
          System.out.println("Successfully connected");
          connectionState = 1;
       } catch (Exception e) {
@@ -1285,8 +1291,7 @@ public class Client extends JFrame implements WindowListener {
          if ((currentPanel == 7) && (generateGraphics)) {
             allComponents[0] = new BottomComponent(myPlayer);
             allComponents[1] = new MinimapComponent(fog, players, myPlayerID);
-            allComponents[2] = new InventoryComponent();
-            allComponents[3] = new DebugComponent();
+            allComponents[2] = new DebugComponent();
             midXy[0] = (MAX_X / 2);
             midXy[1] = (MAX_Y / 2);
             for (Player currentPlayer : players) {
@@ -1381,7 +1386,7 @@ public class Client extends JFrame implements WindowListener {
             }
             //draw all components
 
-            ((DebugComponent) (allComponents[3])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
+            ((DebugComponent) (allComponents[2])).update(fps, mouseState, lastKeyTyped, usedMem, maxMem, myPlayer.getXy());
             if (keyPressed) {
                if (lastKeyTyped == 27) { // Esc key
                   pause = !pause;
@@ -1391,7 +1396,7 @@ public class Client extends JFrame implements WindowListener {
                      System.out.println("Pause");
                   }
                } else if (lastKeyTyped == 8) { // Back key
-                  ((DebugComponent) (allComponents[3])).toggle();
+                  ((DebugComponent) (allComponents[2])).toggle();
                   System.out.println("Debug mode");
                }
                keyPressed = false;

@@ -2,20 +2,35 @@ package client.gameUi;
 
 import client.Client;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.Base64;
 
-public class ChatComponent extends JPanel{
+/**
+ * ChatComponent.java
+ * This is responsible for drawing chat
+ *
+ * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
+ * @version 1.0
+ * @since 2019-06-02
+ */
+
+public class ChatComponent extends JPanel {
   private Client CLIENT;
-  //https://www.javatpoint.com/java-jtextpane
   private static int HEIGHT, WIDTH;
   private static int PARENT_WIDTH, PARENT_HEIGHT;
 
@@ -30,6 +45,12 @@ public class ChatComponent extends JPanel{
   private int mode = 1; // Default is to everyone
   private String[] modeString = {"To Team: ", "To Everyone: ", "To Player: "};
 
+  /**
+   * Sets the chat component up
+   * @param width int, the height of the component
+   * @param height int, the height of the component
+   * @param client Client, the actual client object
+   */
   public ChatComponent( int width, int height, Client client){
     WIDTH = width;
     HEIGHT = height;
@@ -96,6 +117,9 @@ public class ChatComponent extends JPanel{
     this.setVisible(true);
   }
 
+  /**
+   * Toggle mode results in changing the visibility
+   */
   public void toggleMode(){
     System.out.println("toggle mode");
     mode ++;
@@ -112,11 +136,20 @@ public class ChatComponent extends JPanel{
 
   }
 
+  /**
+   * Returns the visiblity mode
+   * @return
+   */
   public int getMode(){
     return mode;
   }
 
-
+  /**
+   * Sends a message in based on the team as well
+   * @param userName String, the player name
+   * @param message String, the message in question
+   * @param sameTeam boolean, determined b if they are on the same team
+   */
   public void messageIn(String userName, String message, boolean sameTeam){
     // Format and insert messages
     byte[] decodedBytes = Base64.getDecoder().decode(message.getBytes());
@@ -134,6 +167,9 @@ public class ChatComponent extends JPanel{
     }
   }
 
+  /**
+   * Requests focus from the client
+   */
   public void requestFocus(){
     textField.requestFocus();
   }
