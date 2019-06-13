@@ -1118,7 +1118,7 @@ public class Client extends JFrame implements WindowListener {
                output.println("C" + mode + "," + message);
                output.flush();
                try {
-                  Thread.sleep(10);
+                  Thread.sleep(50); // Delay to account for server lag
                } catch (Exception e) {
                   e.printStackTrace();
                }

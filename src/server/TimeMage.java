@@ -1,7 +1,8 @@
 package server;
 /**
- * SafeMarksman.java
- * This is
+ * TimeMage.java
+ *
+ * This is the class handling the Time Mage class, an extension of the Player class
  *
  * @author Will Jeong, Jonathan Xu, Kamron Zaidi, Artem Sotnikov, Kolby Chong, Bill Liu
  * @version 1.0
@@ -16,7 +17,14 @@ public class TimeMage extends Player{
   private static int SPACE_DURATION = 100;
   
   private ArrayList<Player> qBlacklist = new ArrayList<Player>();
-  
+
+  /**
+   * Another constructor for class TimeMage
+   *
+   * @param username the username of the player on the server
+   * @param teamNumber the team which the player is on
+   */
+
   TimeMage(String username, int teamNumber) {
     super(username,teamNumber);
     setMaxHealth(200);
@@ -28,7 +36,13 @@ public class TimeMage extends Player{
     setFlareCooldown(100);
     setMelee(true);
   }
-  
+
+  /**
+   * Handles the casting of the 3 different spells
+   * @param spellIndex the spell which to cast, where 0 is q, 1 is e, and 2 is space
+   * @return a boolean for whether the spell is cast or not
+   */
+
   public boolean castSpell(int spellIndex){
     if (!getStunned()) {
       if (spellTimers[spellIndex]<=0) {
@@ -67,6 +81,12 @@ public class TimeMage extends Player{
       return false;
     }
   }
+  /**
+   * Gets the cooldown remaining, as a percent, of the chosen spell
+   * @param spellIndex the spell which to check, where 0 is q, 1 is e, and 2 is space
+   * @return the percent away from the spell being off cooldown
+   */
+  @Override
   public int getSpellPercent(int spellIndex) {
     return ((int)((1.0*(spellCooldowns[spellIndex] - spellTimers[spellIndex]) / spellCooldowns[spellIndex]*100)));
       /*
@@ -76,7 +96,10 @@ public class TimeMage extends Player{
       return ((int) ((100.0 * (spellTick - lastSpellTicks[spellIndex]) / spellCooldowns[spellIndex])));
     }*/
   }
-  
+
+  /**
+   * Updates the character and all the autoattacks, aoes, statuses, and shields each frame
+   */
   public void update(){
     //ARTIFACT ADDED HERE
     if ((checkOnArtifact())) {
