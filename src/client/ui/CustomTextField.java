@@ -1,7 +1,9 @@
 package client.ui;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JTextField;
+import java.awt.Color;
+import java.awt.Font;
 
 public class CustomTextField extends JTextField {
   private Color foregroundColor = new Color(1f, 1f, 1f, 1f);
