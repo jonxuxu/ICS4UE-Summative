@@ -44,8 +44,8 @@ public class InstructionPanel extends MenuPanel { //State=5
       try {
          pages[0] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page1.png"));
          pages[1] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
-         pages[2] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
-         pages[3] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page2.png"));
+         pages[2] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page3.png"));
+         pages[3] = ImageIO.read(new File(System.getProperty("user.dir") + "/res/instructions/Page4.png"));
       } catch (IOException e) {
          System.out.println("Unable to find an image");
       }
@@ -72,7 +72,7 @@ public class InstructionPanel extends MenuPanel { //State=5
          currentPage--;
          if (currentPage == 0){ //Remove previous button on first page
             prevButton.setBounds(0, 0, 0, 0);
-         } else if (currentPage == 3){ //Show next button
+         } else if (currentPage == 2){ //Show next button
             nextButton.setBounds(MAX_X / 2 + 150, MAX_Y * 8 / 10, 200, MAIN_FONT.getSize() + 20);
          }
       });

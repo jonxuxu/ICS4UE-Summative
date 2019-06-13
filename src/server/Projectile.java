@@ -2,6 +2,10 @@ package server;
 
 import java.awt.Rectangle;
 
+/**
+ *
+ */
+
 class Projectile implements HasID{
    private int spawnX, spawnY;
    private int targetX, targetY;
