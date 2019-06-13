@@ -59,6 +59,7 @@ class MainMapGenModule extends JFrame{
          gen.tetherAllNodes2();
          gen.makeNodesElliptical();
          gen.generateRegions();
+         gen.insertArtifactClearing();
          gen.generateCrevices(2);
          gen.smokeTrees(7500, 130, 0, false);
          System.out.println("generation");
@@ -203,11 +204,12 @@ class MainMapGenModule extends JFrame{
                        gen.obstacles.get(i).location.y, g);
             }
          }
-         /*try {
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
+
       }
    }
 
