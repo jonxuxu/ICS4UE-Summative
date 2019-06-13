@@ -394,7 +394,10 @@ public abstract class Player extends User implements CanIntersect {
       }
    }
 
-
+   public void setSpawn(Region region){
+      /*xy[0]=region.;
+      xy[1]=region.;*/
+   }
    public void setTeam(int teamNumber) {
       this.teamNumber = teamNumber;
    }

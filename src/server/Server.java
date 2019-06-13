@@ -419,9 +419,9 @@ public class Server {
             }
             ///SET SPAWNING
 
-        /*    for (int i=0;i<players.length;i++){
-               players[i].setXy(builder.getTeamClearing(players[i].getTeam()))s;
-            }*/
+            for (int i=0;i<players.length;i++){
+               players[i].setSpawn(builder.getTeamClearing(players[i].getTeam()));
+            }
 
 
 
