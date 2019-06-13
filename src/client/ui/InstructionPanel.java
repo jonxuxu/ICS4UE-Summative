@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 /**
  * InstructionPanel.java
@@ -26,6 +27,9 @@ public class InstructionPanel extends MenuPanel { //State=5
    private final Font HEADER_FONT = super.getFont("header");
 
    private CustomButton backButton = new CustomButton("Back");
+
+   //Instructions pages
+   private BufferedImage[] pages = new BufferedImage[3];
 
 
    public InstructionPanel() {
@@ -55,6 +59,6 @@ public class InstructionPanel extends MenuPanel { //State=5
       drawAllParticles(g2);
       g2.setColor(Color.WHITE);
       g2.setFont(HEADER_FONT);
-      g2.drawString("Instructions", (int) ((MAX_X - g2.getFontMetrics().stringWidth("Instructions")) / 2.0), (MAX_Y / 5));
+      g2.drawString("Instructions", (MAX_X - g2.getFontMetrics().stringWidth("Instructions")) / 2, (MAX_Y / 5));
    }
 }

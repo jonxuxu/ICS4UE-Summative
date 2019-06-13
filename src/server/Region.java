@@ -101,8 +101,12 @@ public class Region extends Polygon {
 		this.xpoints = input.xpoints;
 		this.ypoints = input.ypoints;
 		this.npoints = input.npoints;
-		
 		return true;
+	}
+
+	public int[] getMidXy(){
+		int[] midXy = {(this.xpoints[0]+this.xpoints[this.npoints/2])/2,(this.ypoints[0]+this.ypoints[this.npoints/2])/2};
+		return(midXy);
 	}
 		
 }

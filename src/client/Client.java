@@ -313,15 +313,17 @@ public class Client extends JFrame implements WindowListener {
             }
          }
          if (notifyReady) {
-            notifyReady = false;
-            output.println("R");
-            output.flush();
-
-            waitForInput();
-            if (errors[3] != 0) {
-               menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
-               System.out.println("Error:" + errorMessages[errors[3]]);
-               soundEffect.playSound("error");
+            if (!waitingForImage) {
+               notifyReady = false;
+               output.println("R");
+               System.out.println("RRRRRRR");
+               output.flush();
+               waitForInput();
+               if (errors[3] != 0) {
+                  menuPanels[currentPanel].setErrorUpdate("Error: " + errorMessages[errors[3]]);
+                  System.out.println("Error:" + errorMessages[errors[3]]);
+                  soundEffect.playSound("error");
+               }
             }
          }
          if (teamChosen) {
@@ -822,6 +824,15 @@ public class Client extends JFrame implements WindowListener {
          INTRO_SCALING = 1.0 * MAX_Y / BG_Y;
       } else {
          INTRO_SCALING = 1.0 * MAX_X / BG_X;
+      }
+   }
+
+   public void quit(){
+      try {
+         output.println("X");
+         output.flush();
+      } catch (Exception E) {
+         System.out.println("Not connected");
       }
    }
 
