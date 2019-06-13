@@ -30,15 +30,37 @@ public class Status {
   public void advance(){
     lifetime++;
   }
+
+  /**
+   * Basic getter for the remaining lifespan of the status effect
+   *
+   * @return the integer value of the remaining lifespan
+   */
   public int getRemainingDuration(){
     return duration-lifetime;
   }
+
+  /**
+   * Sets the lifetime of the effect to 0, re-setting it
+   */
   public void refresh(){
     lifetime = 0;
   }
+
+  /**
+   * Basic setter for the id of the status effect
+   *
+   * @param id, the id to be assigned to the status effect
+   */
   public void setID(int id){
     this.id=id;
   }
+
+  /**
+   * Basic getter for the id of the status effect
+   *
+   * @return the id of the status effect
+   */
   public int getID(){
     return id;
   }
