@@ -22,6 +22,7 @@ public abstract class Player extends User {
    private int[] centerXy = new int[2];
    private static int PLAYER_LENGTH = 120;
 
+
    private int desiredSpell = -1;
    private int[] spellPercent = {100, 100, 100};
    private ArrayList<Status> statuses = new ArrayList<Status>();
@@ -38,6 +39,7 @@ public abstract class Player extends User {
    private double ROOT2O2 = 0.70710678118;
    private Polygon flashlightBeam = new Polygon();
    private boolean translated;
+   private CustomMouseAdapter myMouse;
 
    private boolean illuminated;
 
@@ -46,9 +48,18 @@ public abstract class Player extends User {
    private boolean uncollidable;
 
 
-   Player(String username) {
+   Player(String username, CustomMouseAdapter myMouse) {
       super(username);
+      this.myMouse = myMouse;
 
+   }
+
+   public boolean getMouse() {
+       if (myMouse.getState(2) == 1) {
+           return true;
+       } else {
+           return false;
+       }
    }
 
    public void setID(int ID) {
@@ -252,6 +263,8 @@ public abstract class Player extends User {
    public abstract void drawReal(Graphics2D g2, int x, int y, int width, int height, int spellIndex);
 
    public abstract void setMovementIndex(int positionIndex, boolean moving);
+
+   public abstract void setAttackIndex(int attackIndex, boolean attacking);
 
    public int getAttack() {
       return attack;
