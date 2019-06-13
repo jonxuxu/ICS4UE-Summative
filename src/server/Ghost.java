@@ -14,7 +14,7 @@ public class Ghost extends Player {
    private int[] spellCooldowns = {100, 100, 100};
    private int[] spellTimers = {0, 0, 0};
    private int[] passiveTimers;
-   private static int PASSIVE_COOLDOWN = 50;
+   private static int PASSIVE_COOLDOWN = 100;
    private static int PASSIVE_RANGE = 300;
    private static int Q_BASE_DAMAGE = 100;
    private static int Q_DAMAGE_PER_STACK = 10;
@@ -22,7 +22,7 @@ public class Ghost extends Player {
    private static int Q_RANGE = 200;
    private static int Q_DURATION = Q_RANGE / Q_SPEED;
    private boolean inE = false;
-   private static int SPACE_DURATION = 100;
+   private static int SPACE_DURATION = 200;
 
    private ArrayList<Player> qBlacklist = new ArrayList<Player>();
 
@@ -30,10 +30,10 @@ public class Ghost extends Player {
       super(username, teamNumber);
       setMaxHealth(300);
       setHealth(300);
-      setAttack(300);
+      setAttack(30);
       setMobility(5);
-      setRange(50);//REE Change to -1 when add support for melee attacks
-      setAutoAttackCooldown(10);
+      setRange(75);
+      setAutoAttackCooldown(20);
       setFlareCooldown(100);
       setMelee(true);
    }
@@ -106,6 +106,11 @@ public class Ghost extends Player {
          if (passiveTimers[i] <= 0) {
             if (Math.sqrt(Math.pow(getEnemy(i).getX() - getX(), 2) + Math.pow(getEnemy(i).getY() - getY(), 2)) < PASSIVE_RANGE) {
                getEnemy(i).addStatus(new GhostPassive());
+               for (int j = 0; j < getEnemy(i).getStatusesSize(); j++){
+                 if(getEnemy(i).getStatus(j) instanceof GhostPassive){
+                   (getEnemy(i).getStatus(j)).refresh();
+                 }
+               }
                passiveTimers[i] = PASSIVE_COOLDOWN;
             }
          }

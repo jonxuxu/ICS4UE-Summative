@@ -1,7 +1,7 @@
 package server;
 class GhostE extends Status{
   private static int SPEED = 20;
-  private static int RANGE = 500;
+  private static int RANGE = 300;
   private static int TOTAL_TIME = RANGE/SPEED;
   private static int ID = 2;
   double dx, dy;
