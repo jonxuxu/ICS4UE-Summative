@@ -137,7 +137,7 @@ public class MapGen {
     			
     			Region creation = new Region("road",3);
     			creation.adoptRoadShape(activeNode.location, 
-    					activeNode.connections.get(connectionIdx), 200);
+    					activeNode.connections.get(connectionIdx), 250);
     			this.regionLayer.regions.add(creation);
     			
     		}
@@ -376,6 +376,13 @@ public class MapGen {
     	
     	regionLayer.regions.add(t1Clearing);
     	regionLayer.regions.add(t2Clearing);
+
+    	nodes.get(teamOneIdx).isClearing = false;
+		nodes.get(teamOneIdx).clearingSize = 0;
+		nodes.get(teamTwoIdx).isClearing = false;
+		nodes.get(teamTwoIdx).clearingSize = 0;
+
+
     }
 
 	/**
@@ -397,9 +404,9 @@ public class MapGen {
 			for (int idx2 = 0; idx2 < numVertices; idx2++) {
 				tempAngle = 2*Math.PI*idx2/numVertices;
 				creation.xpoints[idx2] = (int) (radius*Math.cos(tempAngle)) + obstacles.get(idx).location.x;
-				System.out.println(creation.xpoints[idx2]);
+				//System.out.println(creation.xpoints[idx2]);
 				creation.ypoints[idx2] = (int) (radius*Math.sin(tempAngle)) +  obstacles.get(idx).location.y;
-				System.out.println(creation.ypoints[idx2]);
+				//System.out.println(creation.ypoints[idx2]);
 			}
 
 			obstacles.get(idx).boundingBox = creation;
@@ -761,6 +768,14 @@ public class MapGen {
 
 		obstacles.addAll(tempList);
 	}
+
+	/**
+	 * This method averages the x and y values between two points to return a point in the middle
+	 *
+	 * @param point1 first point to be averaged
+	 * @param point2 second point to be averaged
+	 * @return the resultant point
+	 */
 
 	public Point averagePoints(Point point1, Point point2) {
 		int finalX = (int) ((point1.x + point2.x)/2);

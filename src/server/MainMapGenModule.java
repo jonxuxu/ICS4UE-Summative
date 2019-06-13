@@ -79,7 +79,7 @@ class MainMapGenModule extends JFrame {
          System.out.println("generation");
          gen.smokeRocks(7500, 20, true);
          gen.makeObstaclesElliptical();
-         gen.genClearingByNum(8, 500);
+         gen.genClearingByNum(10, 500);
          gen.purgeRedundancies();
          gen.generateBarrier();
 
@@ -240,11 +240,11 @@ class MainMapGenModule extends JFrame {
                        gen.obstacles.get(i).location.y, g);
             }
          }
-       /*  try {
+         try {
             ImageIO.write(mapImage, "PNG", new File("Map.png"));//also try png
          } catch (Exception e) {
             System.out.println("this is bad");
-         }*/
+         }
       }
    }
 
@@ -256,6 +256,13 @@ class MainMapGenModule extends JFrame {
    public ArrayList<Obstacle> getObstacle() {
       return (gen.obstacles);
    }
+
+   /**
+    * Returns the index of the team clearing region
+    *
+    * @param teamNumber the team number for which the index is to be retrieved
+    * @return the index within the region ArrayList of that team clearing
+    */
 
    public Region getTeamClearing(int teamNumber) {
       if (teamNumber == 0) {
