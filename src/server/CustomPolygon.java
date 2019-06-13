@@ -1,5 +1,7 @@
 package server;
 
+import java.awt.Polygon;
+import java.awt.geom.Area;
 import java.util.ArrayList;
 
 /**
@@ -11,7 +13,7 @@ import java.util.ArrayList;
  * @since 2019-06-05
  */
 
-public class CustomPolygon {
+public class CustomPolygon implements CanIntersect{
    private int pointNum;
    private int[][] points;
    private int[][] vectors;
@@ -27,6 +29,7 @@ public class CustomPolygon {
 
    private double tVal;
    private int intersectingVectorIndex;
+   private Area thisArea;
 
    CustomPolygon(int[] xPoints, int[] yPoints, int pointNum) {
       this.pointNum = pointNum;
@@ -44,6 +47,7 @@ public class CustomPolygon {
             vectors[i][1] = yPoints[0] - yPoints[i];
          }
       }
+      thisArea= new Area (new Polygon(xPoints,yPoints,xPoints.length));
    }
 
    public void setPlayerScalar(int xCo, int yCo, int cVal) { //player is initial, final is mouse
@@ -112,6 +116,10 @@ public class CustomPolygon {
          }
       }
       return(false);
+   }
+
+   public Area getHitbox(){
+      return(thisArea);
    }
 
    public int[] getIntersect() {
