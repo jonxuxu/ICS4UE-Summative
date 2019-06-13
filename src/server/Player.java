@@ -301,7 +301,7 @@ public abstract class Player extends User implements CanIntersect {
             newIntersectionIndex = -1;
          } else {
             if (newShapeIndex < playerNum) {
-               players[newShapeIndex].addStatus(new Illuminated(2)); //TODO: Fix with Kamron
+               players[newShapeIndex].addStatus(new Illuminated(2));
             }
          }
          if ((shapeIndex != newShapeIndex) || (intersectionIndex != newIntersectionIndex) || (k == 0) || (k == FLASHLIGHT_SPREAD - 1)) {
@@ -496,7 +496,6 @@ public abstract class Player extends User implements CanIntersect {
    }
 
    public void updateStatuses() {
-      //TODO: account for duplicate illumination
       mobilityBoost = 0;
       buffBlacklist.clear();
       illuminated = false;
@@ -536,7 +535,7 @@ public abstract class Player extends User implements CanIntersect {
    public void applyStatus(Status status) {
       boolean blacklisted = false;
       if ((status instanceof Illuminated) && (!invisible)) {
-         illuminated = true;//TODO: Ask kamron how this works
+         illuminated = true;
       } else if (status instanceof MSBuff) {
          for (int i = 0; i < buffBlacklist.size(); i++) {
             if (status.getClass().equals(buffBlacklist.get(i))) {

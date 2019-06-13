@@ -28,8 +28,6 @@ public class CustomKeyListener implements KeyListener {
    private char ESC = ((char) (27));
    private char CAPS_LOCK = ((char) (20));
 
-   //Start of methods that are implemented from KeyListener
-   // TODO: Split keylisteners??
    public CustomKeyListener(Client main) {
       this.main = main;
    }
@@ -65,7 +63,6 @@ public class CustomKeyListener implements KeyListener {
    //End of methods that are implemented from KeyListener
 
    //Getters and setters
-   //TODO: Seems like these functions are used only in client
    public int getAngle() {
       direction[0] = 0;
       direction[1] = 0;
@@ -94,7 +91,6 @@ public class CustomKeyListener implements KeyListener {
       }
    }
 
-   //TODO: Seems like these functions are used only in client
 
    public boolean[] getSpell() {
       //0 refers to q, 1 refers to e, 2 refers to space
@@ -127,7 +123,6 @@ public class CustomKeyListener implements KeyListener {
       return (flashlightOn);
    }
 
-   //TODO: Seems like these functions are used only in client
 }
 /*
    public HashSet<> getKeysPressed(){
